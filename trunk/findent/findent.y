@@ -141,9 +141,10 @@ line:    STLABEL
 
 nolabelline:
            EOL            {  // EOL END OF LINE or ;
-	                     D(O("EOL");O($1);)
+	                     D(O("EOL");O($1);O("lexer_position 1");O(lexer_position))
 			     cur_semi_eol = $1;
 			     output_line();
+	                     D(O("EOL");O($1);O("lexer_position 2");O(lexer_position))
 			     if(cur_semi_eol)
 			        shorten_full_line();
 			     labelleng  = 0;
@@ -922,11 +923,12 @@ void empty_dolabels()
 void shorten_full_line()
 {  // strip off scanned part of full_line
    // and use as new lexer buffer
+  D(O("shorten full_line before:");O(lexer_position);O(full_line);)
   full_line.erase(0,lexer_position);
   full_line = trim(full_line);
   lexer_pop();
   lexer_push(full_line+'\n',FREE);
-  D(O("shorten full_line:");O(lexer_position);O(full_line);)
+  D(O("shorten full_line after:");O(lexer_position);O(full_line);)
 }
 
 void set_default_indents()
@@ -1068,9 +1070,11 @@ char fixedmissingquote(const string s)
    // returns ' ' if there is no unterminated string
    // returns '"' if this is an unterminated string, a '"' is missing
    // returns '\'' if this is an unterminated string, a '\'' is missing
+   D(O(lexer_position);)
    lexer_push(s + '\n',UNTERMSTR);
    int rc = yylex();
    lexer_pop();
+   D(O(lexer_position);)
    D(O("rc:");O(rc);O(EOL);O(DQUOTE);O(SQUOTE);)
    char result = ' ';
    switch (rc)
