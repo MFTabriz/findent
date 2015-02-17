@@ -52,6 +52,7 @@ program progfree
                enddo
                continue
                enddo
+               do ; enddo
          critical
          x=y
       endcritical

@@ -465,11 +465,11 @@ void lexer_push(const string s, int start)
 void lexer_pop()
 {
    yypop_buffer_state();
-   lexer_start_stack.pop();
    start_state = lexer_start_stack.top();
    BEGIN start_state;
-   lexer_position_stack.pop();
+   lexer_start_stack.pop();
    lexer_position = lexer_position_stack.top();
+   lexer_position_stack.pop();
 }
 
 void quiet_compiler()                   // to prevent warning about unused unput
