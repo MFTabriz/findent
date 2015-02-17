@@ -1,0 +1,21 @@
+Prerequisites:
+
+   c++ compiler (g++ will do perfectly)
+   flex
+   bison
+   GNU make
+
+In this directory:
+
+   make clean
+   make
+
+Testing:
+   
+   make test
+
+Install findent in your favorite location, for example:
+
+   sudo install findent /usr/local/bin
+
+USE AT YOUR OWN RISK.
