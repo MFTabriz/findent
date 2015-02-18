@@ -10,7 +10,7 @@ YACC      = bison
 LEX       = flex
 
 $(PROG): $(PROG)_parser.o $(PROG)_lexer.o
-	$(LD) -o $@ $(PROG)_parser.o $(PROG)_lexer.o -ll
+	$(LD) -o $@ $(PROG)_parser.o $(PROG)_lexer.o
 	
 $(PROG)_parser.cpp $(PROG)_parser.h: $(PROG).y
 	$(YACC) -o $(PROG)_parser.cpp --defines=$(PROG)_parser.h $<
