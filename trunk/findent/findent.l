@@ -454,22 +454,26 @@ void lexer_push(const string s, int start)
 // pushes new lexer state, next reading will be from 's', with start state 'start'
 {
 
-   lexer_set_state(start);
+   D(O("before push");O(YY_START);O(lexer_position);)
    yypush_buffer_state(YY_CURRENT_BUFFER);
    lexer_start_stack.push(YY_START);
+   lexer_set_state(start);
    yy_scan_string(s.c_str());
    lexer_position_stack.push(lexer_position);
    lexer_position = 0;
+   D(O("after push");O(YY_START);O(lexer_position);)
 }
 
 void lexer_pop()
 {
+   D(O("before pop");O(YY_START);O(lexer_position);)
    yypop_buffer_state();
    start_state = lexer_start_stack.top();
    BEGIN start_state;
    lexer_start_stack.pop();
    lexer_position = lexer_position_stack.top();
    lexer_position_stack.pop();
+   D(O("after pop");O(YY_START);O(lexer_position);)
 }
 
 void quiet_compiler()                   // to prevent warning about unused unput
