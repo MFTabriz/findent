@@ -24,8 +24,9 @@ $(PROG)_lexer.cpp: $(PROG).l
 
 clean:
 	rm -f $(PROG)_lexer.cpp *.o $(PROG) $(PROG)_parser.h $(PROG)_parser.cpp
+	rm -f test/*.f.try.f test/a.out test/*.mod
 
-test:
+test:   all
 	cd test; ./tester
 
 .SUFFIXES:

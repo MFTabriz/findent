@@ -56,7 +56,7 @@ findent, why?
    to try to build a Fortran indenter, based on flex and bison for
    readability, which does not touch in-line alignments.
    As programming language I chose C++, because of the availability
-   of strings and queues.
+   of string, queue, stack and deque.
 
 findent, how?
 
@@ -114,6 +114,9 @@ findent, usage?
 	converts from fixed format to free format.
 
    NOTE 1: findent does not honour line lengths
+           if your fixed-source file contains characters after
+           column 72 that should be ignored, use:
+             cut -c 1-72 oldprog.f | findent > prognew.f
    NOTE 2: findent silently ignores errors in the flags
 
 

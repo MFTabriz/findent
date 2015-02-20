@@ -926,8 +926,7 @@ void shorten_full_line()
   D(O("shorten full_line before:");O(lexer_position);O(full_line);)
   full_line.erase(0,lexer_position);
   full_line = trim(full_line);
-  lexer_pop();
-  lexer_push(full_line+'\n',FREE);
+  lexer_set(full_line+'\n',FREE);
   D(O("shorten full_line after:");O(lexer_position);O(full_line);)
 }
 
@@ -1097,8 +1096,7 @@ extern "C" int yywrap()
   D(O("yywrap");)
   if (end_of_file)
      return 1;
-  lexer_pop();
   get_full_line();
-  lexer_push(full_line+'\n',FREE);
+  lexer_set(full_line+'\n',FREE);
   return 0;
 }
