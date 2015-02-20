@@ -1,3 +1,6 @@
+findent-1.4
+   findent.y:
+      make sure that string(n,' ') is always called with n >= 0
 findent-1.3
    version.h:
       set version to 1.3
