@@ -5,6 +5,7 @@
 #include <queue>
 #include <iomanip>
 #include <unistd.h>
+#include <algorithm>
 using namespace std;
 #include "findent.h"
 #include "version.h"
@@ -727,7 +728,7 @@ void output_line()
       cout << firstline << endline;
       while (!lines.empty())
       {
-	  cout << string(cur_indent,' ') << lines.front()<<endline;
+	  cout << string(max(cur_indent,0),' ') << lines.front()<<endline;
 	  lines.pop_front();
       }
    }
@@ -748,7 +749,7 @@ void output_line()
 	       if (trim(s) == "")
 	          cout << "" << endline;
 	    else
-		  cout << string(cur_indent,' ') << "!" << trim(s.substr(1)) << endline;
+		  cout << string(max(cur_indent,0),' ') << "!" << trim(s.substr(1)) << endline;
 	 }
 	 else
 	 {
@@ -778,7 +779,7 @@ void output_line()
 		  switch(prevquote)
 		  {
 		     case(' '):   // no dangling strings, output with indent
-			cout << string(adjust_indent+cur_indent,' ') << trim(s.substr(6));
+			cout << string(max(adjust_indent+cur_indent,0),' ') << trim(s.substr(6));
 			break;
 		     default:  // dangling string, output asis
 			cout << s.substr(6);
@@ -817,9 +818,7 @@ void output_line()
 		     else
 			l = cur_indent;
 
-		     if (l<0)
-		       l=0;
-		     cout <<string(l,' '); 
+		     cout <<string(max(l,0),' '); 
 		  }
 		  cout << trim(s);
 		  prevquote = fixedmissingquote(prevquote + s);
@@ -828,7 +827,7 @@ void output_line()
 	       {
 	          if (s.length() >6)
 		  {
-		     cout << string(cur_indent,' ');
+		     cout << string(max(cur_indent,0),' ');
 		     // try to honor current indentation
 		     // if this is a continuation line, count the number
 		     // of spaces after column 6.
