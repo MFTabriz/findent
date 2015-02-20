@@ -6,6 +6,7 @@ void yyerror(const char *c);
 extern "C" int yylex();
 void lexer_pop();
 void lexer_push(const std::string s, int start);
+void lexer_set(const string s, int start);
 
 extern int  lexer_position;
 extern bool stlabel_found;

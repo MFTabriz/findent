@@ -417,14 +417,6 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 
 %%
 
-YY_BUFFER_STATE lexer_ybs = 0;   // lexer will read from this
-
-void lexer_init()
-{
-   lexer_position = 0;
-   lexer_push("\n",INITIAL);
-}
-
 void lexer_set_state(int k)
 {
    start_state = k;
@@ -449,11 +441,34 @@ void lexer_set_state(int k)
    }
 }
 
+void quiet_compiler()                   // to prevent warning about unused unput
+{
+   char *a=0;
+   yyunput(1,a);
+}
+
+// the following functions are for use by the parser
+
+void lexer_init()
+{
+   lexer_position = 0;
+   lexer_set("\n",INITIAL);
+}
+
+void lexer_set(const string s, int start)
+// sets new lexer state, next reading will be from 's', with start state 'start'
+{
+   D(O("before set");O(YY_START);O(lexer_position);)
+   yy_delete_buffer(YY_CURRENT_BUFFER);
+   lexer_set_state(start);
+   yy_scan_string(s.c_str());
+   lexer_position = 0;
+   D(O("after set");O(YY_START);O(lexer_position);)
+}
 
 void lexer_push(const string s, int start)
 // pushes new lexer state, next reading will be from 's', with start state 'start'
 {
-
    D(O("before push");O(YY_START);O(lexer_position);)
    yypush_buffer_state(YY_CURRENT_BUFFER);
    lexer_start_stack.push(YY_START);
@@ -466,6 +481,7 @@ void lexer_push(const string s, int start)
 
 void lexer_pop()
 {
+// pops lexer state off the stack
    D(O("before pop");O(YY_START);O(lexer_position);)
    yypop_buffer_state();
    start_state = lexer_start_stack.top();
@@ -476,8 +492,3 @@ void lexer_pop()
    D(O("after pop");O(YY_START);O(lexer_position);)
 }
 
-void quiet_compiler()                   // to prevent warning about unused unput
-{
-   char *a=0;
-   yyunput(1,a);
-}

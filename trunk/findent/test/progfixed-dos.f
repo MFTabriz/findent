@@ -1,4 +1,4 @@
-! -I0 -i5 -a1 -b2 -d3 -f4 -m5
+! -I0 -i5 -a1 -b2 -d3 -f4 -m5 -ifixed
       module m1
          integer k
          enum, bind(c)

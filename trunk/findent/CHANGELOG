@@ -1,0 +1,32 @@
+findent-1.3
+   version.h:
+      set version to 1.3
+   findent.h:
+      add definition for lexer_set()
+   findent.l:
+      add lexer_set()
+      in lexer_init(): change lexer_push() to lexer_set()
+   findent.y:
+      replace lexer_pop()...lexer_push() sequences by lexer_set()
+   minor code cleaning.
+   Makefile: 
+     'test' dependent of 'all'
+     'clean' also cleans test directory
+   test/progfixed_dos.f:
+      add -ifixed in first line
+   test/progfree_dos.f:
+      add -ifree in first line
+   README:
+      minor adaptations
+   CHANGELOG added
+
+findent-1.2
+   findent.l:
+      fix error in lexer_push
+
+findent-1.1
+   findent.l:
+      fix error in lexer_pop
+
+findent-1.0
+   initial release
