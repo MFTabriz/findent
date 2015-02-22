@@ -131,7 +131,7 @@ line:    STLABEL
 			 }
 	   nolabelline
          | nolabelline    {
-	                     D(O("nolabelline"))
+	                     D(O("nolabelline"));
 			  }
          | error          {
 	                     output_line();
@@ -150,7 +150,7 @@ nolabelline:
 			        shorten_full_line();
 			     labelleng  = 0;
 			     cur_indent = top_indent();
-			     D(O("top_indent:");O(top_indent());O("cur_indent:");O(cur_indent);)
+			     D(O("top_indent:");O(top_indent());O("cur_indent:");O(cur_indent););
 			  }
          | ROUTINESTART   {  // ROUTINE
 	                     D(O("ROUTINESTART");)
