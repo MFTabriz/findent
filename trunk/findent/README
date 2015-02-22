@@ -119,6 +119,24 @@ findent, usage?
              cut -c 1-72 oldprog.f | findent > prognew.f
    NOTE 2: findent silently ignores errors in the flags
 
+findent and vim
+
+   Take care that findent can be found via the PATH environment variable.
+   In your .vimrc add the following:
+
+set sw=3
+augroup fortfiletype
+  autocmd!
+  autocmd Filetype fortran :execute ":setl equalprg=findent\\ -Ia\\ -i3"
+augroup END
+
+  Now, the standard formatting ( see :help = ) is for Fortran programs
+  replaced by findent. For example, to format the whole file, enter:
+
+     gg=G
+
+
+
 
 USE AT YOUR OWN RISK.
 

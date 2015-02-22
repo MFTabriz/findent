@@ -1,3 +1,8 @@
+findent-1.5
+   README:
+      add recipe to use equalprg in vim
+   findent.y:
+      add ';' in to rules to quiet bison-2.5
 findent-1.4
    findent.y:
       make sure that string(n,' ') is always called with n >= 0
