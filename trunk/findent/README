@@ -124,10 +124,11 @@ findent and vim
    Take care that findent can be found via the PATH environment variable.
    In your .vimrc add the following:
 
-set sw=3
 augroup fortfiletype
   autocmd!
+  autocmd Filetype fortran :execute ":setl sw=3"
   autocmd Filetype fortran :execute ":setl equalprg=findent\\ -Ia\\ -i3"
+  autocmd Filetype fortran :execute ":setl expandtab"
 augroup END
 
   Now, the standard formatting ( see :help = ) is for Fortran programs
@@ -135,10 +136,6 @@ augroup END
 
      gg=G
 
-
-
-
-USE AT YOUR OWN RISK.
 
 I am happy to receive comments, error reports and suggestions for
 improvements.
