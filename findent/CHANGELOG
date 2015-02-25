@@ -3,6 +3,13 @@ findent-1.5
       add recipe to use equalprg in vim
    findent.y:
       add ';' in to rules to quiet bison-2.5
+      fix placement of preprocessor lines if they are in a 
+         continuation suite
+      enlarge number of lines to be considered when determining
+         fixed or free from 10 to 1000
+   findent.l:
+      fix definition of {neol}
+
 findent-1.4
    findent.y:
       make sure that string(n,' ') is always called with n >= 0

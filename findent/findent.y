@@ -515,7 +515,7 @@ void get_full_line()
 	    break;
       }
    }
-   D(O("full_line at:");O(num_lines);O(full_line);)
+   D(O("full_line:");O(num_lines);O(full_line);)
 }
 
 bool handle_free(string s)
@@ -535,7 +535,7 @@ bool handle_free(string s)
       sl = trim(sl);
    }
 
-   //  if this line is pure comment or empty:
+   //  if this line is pure comment or empty or preprocessor statement:
    //     add it to lines
 
    if (sl == "" || sl[0] == '!')
@@ -545,7 +545,10 @@ bool handle_free(string s)
       // we are not in a continuation:
       if(lines.size() ==1)
 	 return 0;
-      // we are in a continuation, read more:
+      // we are in a continuation, read more and
+      // add a preprocessor statement to lines:
+      if (sl[0] == '#')
+	 lines.push_back(trim(s));
       return 1;
    }
 
@@ -583,7 +586,7 @@ bool handle_free(string s)
 	    lines.push_back(trim(s));
 	    // and strip off &:
 	    full_line = cs.substr(0,cs.length()-1);
-	    D(O("full_line at");O(full_line);)
+	    D(O("full_line");O(full_line);)
 	    return 1;  // expect a continuation line
 	    break;
       }
@@ -611,7 +614,7 @@ bool handle_fixed(string s)
    s = ltab2sp(s);
    D(O("fixed:");O("s");O(s);)
 
-   if (trim(s) == "" || s[0] == 'c' || s[0] == 'C' || s[0] == '!' || s[0] == '*')
+   if (trim(s) == "" || s[0] == 'c' || s[0] == 'C' || s[0] == '!' || s[0] == '*' || s[0] == '#')
    {  // this is a blank or comment line
       lines.push_back(trim(s));
       if (lines.size() ==1)
@@ -724,11 +727,16 @@ void output_line()
 	 if (l<0)
 	   l=0;
 	 cout << string(l,' '); 
+	 D(O("output indent before firstline");O(string(l,' '));)
       }
       cout << firstline << endline;
+      D(O("output firstline");O(firstline);)
       while (!lines.empty())
       {
-	  cout << string(max(cur_indent,0),' ') << lines.front()<<endline;
+      // sometimes, there are preprocessor statements within a continuation ...
+          if (lines.front()[0] != '#')
+	     cout << string(max(cur_indent,0),' ');
+	  cout << lines.front()<<endline;
 	  lines.pop_front();
       }
    }
@@ -745,11 +753,13 @@ void output_line()
 	 {  // this is an empty line or comment line
 	    if (output_format == FIXED)
 	       cout << trim(s) << endline;
-	    else
+	    else  // output_format = FREE
+	    {
 	       if (trim(s) == "")
-	          cout << "" << endline;
-	    else
+	          cout << endline;
+	       else
 		  cout << string(max(cur_indent,0),' ') << "!" << trim(s.substr(1)) << endline;
+	    }
 	 }
 	 else
 	 {
@@ -1001,7 +1011,7 @@ int determine_fix_or_free(const bool store)
    int rc;
    string s;
    int n = 0;
-   const int nmax = 10;
+   const int nmax = 1000;
    while ( n < nmax)
    {
       n++;
