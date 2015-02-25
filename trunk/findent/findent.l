@@ -27,7 +27,7 @@ void lexer_set_state(int k);
 eol [\n;!]
 
    // any character, not being end of line
-neol [^\n^;^!]
+neol [^\n;!]
 
    // blank character
 b [ \t]
@@ -230,7 +230,7 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 				       BEGIN rest;
 				    }
 
-^{b}*end/{nc}                     |
+^{b}*end/{nc}                      |
 ^{b}*end{b}*function/{nc}+         |
 ^{b}*end{b}*subroutine/{nc}+       |
 ^{b}*end{b}*do/{nc}+               |
