@@ -126,17 +126,37 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 }
 
 <ff>{
+^[^!]*!.*\n    {
+                  D(O("UNSURE");Y;)
+		  return UNSURE;
+               }
+
+^[ ]{5}&[^&]*\n {
+                  D(O("UNSURE");Y;)
+		  return UNSURE;
+               }
+
+^.{0,4}&{b}*\n {
+                  D(O("FREE");Y;)
+		  return FREE;
+               }
+
+^.{6,}&{b}*\n  {
+                  D(O("FREE");Y;)
+		  return FREE;
+               }
+                  
 ^[^&]*&{b}*\n  {
                   D(O("FREE");Y;)
 		  return FREE;
                }
 
 ^[ ]{0,4}&.*\n {
-                  D(O("FREE 1");Y;)
+                  D(O("FREE");Y;)
 		  return FREE;
                }
 ^[ ]{6,}&.*\n {
-                  D(O("FREE 1.5");Y;)
+                  D(O("FREE");Y;)
 		  return FREE;
                }
 ^{ckey}.*\n    {
@@ -152,15 +172,15 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 		  return PROBFREE;
 	       }
 ^[ 0123456789]{6}.*\n {
-                  D(O("UNSURE 1");Y;)
+                  D(O("UNSURE");Y;)
 		  return UNSURE;
                }
 ^[ ]{0,4}[[:alnum:]_%].*\n {
-                  D(O("FREE 2");Y;)
+                  D(O("FREE");Y;)
 		  return FREE;
 	       }
 .*\n           {
-                  D(O("UNSURE 2");Y;)
+                  D(O("UNSURE");Y;)
 		  return UNSURE;
 	       }
 }

@@ -10,6 +10,7 @@ using namespace std;
 #include "findent.h"
 #include "version.h"
 extern "C" FILE *yyin;
+string mygetline();
 void get_full_line();
 bool handle_free(string s);
 bool handle_fixed(string s);
@@ -448,6 +449,25 @@ string ltab2sp(const string& s)
    return string(si,' ')+trim(s);
 }
 
+string mygetline()
+{
+   // reads next line from cin.
+   // side effects:
+   //   end_of_file is set if endoffile condition is met
+   //   endline is onde set to \n or \r\n
+
+   string s;
+
+   getline(cin,s);
+   D(O("getline:");O(s);O("eofbit");O(cin.eofbit);O(cin.eof());)
+
+   // sometimes, files do not end with (cr)lf, hence the test for s=="":
+   end_of_file = (cin.eof() && s == "");
+
+   return handle_dos(s);
+
+}
+
 void get_full_line()
 {
    string s;
@@ -466,9 +486,7 @@ void get_full_line()
       }
       else if (linebuffer.empty())
       {
-	 getline(cin,s);
-	 s = handle_dos(s);
-	 end_of_file = cin.eof();
+         s = mygetline();
       }
       else
       {
@@ -525,7 +543,10 @@ bool handle_free(string s)
 
 {
    if(end_of_file)
+   {
+      D(O("end of file");)
       return 0;
+   }
 
    string sl     = trim(s);
 
@@ -1015,11 +1036,10 @@ int determine_fix_or_free(const bool store)
    while ( n < nmax)
    {
       n++;
-      getline(cin,s);
-      s = handle_dos(s);
-
-      if (cin.eof())
+      s = mygetline();
+      if (end_of_file)
          break;
+
       if (store)
          linebuffer.push(s);
       rc = guess_fixedfree(s);

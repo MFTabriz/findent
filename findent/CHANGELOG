@@ -1,3 +1,8 @@
+findent-1.5.1
+   findent.l:
+      added some patterns to distinguish between fixed and fixed format
+   findent.y:
+      fix for files that do not end with \n
 findent-1.5
    README:
       add recipe to use equalprg in vim
