@@ -39,8 +39,8 @@
            continue
         enddo
         print *,a,b,&
-        &       c,d&
-        &      ,e,f
+        &        c,d&
+        &       ,e,f
         continue
         do i=1,20
            block

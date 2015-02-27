@@ -866,8 +866,10 @@ void output_line()
 		     {
 			string s6 = ltab2sp(s.substr(6))+'x';
 			old_indent = s6.find_first_not_of(' ');
+			D(O(s6);O(old_indent);)
 		     }
-		     int adjust_indent = old_indent - first_indent - 1;
+		     D(O(old_indent);O(first_indent);)
+		     int adjust_indent = old_indent - first_indent;
 		     if (adjust_indent < 0 || prevquote!=' ')
 			adjust_indent = 0;
 
