@@ -126,6 +126,16 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 }
 
 <ff>{
+^[^cC#!* 0-9].*\n {
+                  D(O("FREE");Y;)
+		  return FREE;
+               }
+
+^[ ]{1,4}[[:alpha:]_%].*\n {
+                  D(O("FREE");Y;)
+		  return FREE;
+	       }
+
 ^[^!]*!.*\n    {
                   D(O("UNSURE");Y;)
 		  return UNSURE;
@@ -175,10 +185,6 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
                   D(O("UNSURE");Y;)
 		  return UNSURE;
                }
-^[ ]{0,4}[[:alnum:]_%].*\n {
-                  D(O("FREE");Y;)
-		  return FREE;
-	       }
 .*\n           {
                   D(O("UNSURE");Y;)
 		  return UNSURE;
@@ -193,7 +199,7 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 		  D(O("scan STRING:");Y;)
 	       }
 !              {
-                  D(O("scan ");Y;)
+                  D(O("scan CMT:");Y;O(lexer_position);)
 		  return CMT;
 	       }
 

@@ -587,7 +587,11 @@ bool handle_free(string s)
       string cs = full_line + sl;
       lexer_push(cs + '\n',SCANSTRCMT);
       int rc = yylex();
+      int p = max(lexer_position-1,0);
       lexer_pop();
+      // todo: have to look at this code
+      // this also requests a continuation line:
+      // 4.  i=4+ & ! comment
       switch (rc)
       {
 	 case(CMT):
@@ -596,7 +600,7 @@ bool handle_free(string s)
 	    // put line in lines and
 	    // strip off comment for full_line
 	    lines.push_back(trim(s));
-	    full_line = cs.substr(0,lexer_position);
+	    full_line = cs.substr(0,p);
 	    D(O("full_line");O(full_line);)
 	    return 0;  // do not expect continuation
 	    break;
@@ -724,6 +728,8 @@ void output_line()
    int lineno                = 0;
    string needamp            = "";
    char prevquote            = ' ';
+   char preprevquote         = ' ';
+   string outputline;
 
    if (input_format == FREE)
    {
@@ -830,6 +836,7 @@ void output_line()
 	    }
 	    else  // output_format == FREE
 	    {
+	       outputline = needamp;
 	       if (lineno == 1)
 	       {
 		  D(O("s");O(s);)
@@ -856,8 +863,10 @@ void output_line()
 
 		     cout <<string(max(l,0),' '); 
 		  }
-		  cout << trim(s);
-		  prevquote = fixedmissingquote(prevquote + s);
+		  outputline += trim(s);
+		  // we need the value of prevquote later on:
+		  preprevquote = prevquote;
+		  prevquote    = fixedmissingquote(prevquote + s);
 	       }
 	       else
 	       {
@@ -882,11 +891,12 @@ void output_line()
 		     if (prevquote == ' ')
 			s1 = trim(s1);
 		     if (s1 != "")
-			cout << needamp << string(adjust_indent,' ');
-		     cout << s1;
+			outputline += string(adjust_indent,' ');
+		     outputline += s1;
+		     // we need the value of prevquote later on:
+		     preprevquote = prevquote;
 		     prevquote = fixedmissingquote(prevquote + s1);
 		  }
-
 	       }
 	       // check for continuation lines
 	       // there is a continuation line if there is a non-comment in 
@@ -900,11 +910,51 @@ void output_line()
 		  if (!isfixedcmt(*it++))
 		  {
 		     needamp =  '&';
-		     cout    << '&';
-		     break;
+		     // we have to put an '&' at the end of the line,
+		     // but what if the line ends in a ! comment, as in
+		     //   x = x *  ! comment
+		     // Then we have to put the '&' like this:
+		     //   x = x * & ! comment
+		     // but in this case:
+		     //  x = ' a string ! no comment
+		     // we have to place the '&' like this:
+		     //  x = ' a string ! no comment&
+
+                     // if there is an unterminated string, then:
+		     if (prevquote != ' ')
+		     {
+		        outputline = outputline + '&';
+			break;
+		     }
+
+                     // the line does not contain an unterminated string,
+		     // is there a !commant outside a string?
+		     // we ask the lexer to have a look
+		     // here we need the value of preprevquote:
+
+		     lexer_push(preprevquote+outputline+'\n',SCANSTRCMT);
+		     int rc = yylex();
+		     int p = lexer_position;
+		     lexer_pop();
+		     if (rc == CMT)
+		     {
+			// there is a comment outside strings,
+			// the number of characters before the comment
+			// has to be decreased by one, because
+			// of the prepending of preprevquote
+			p = max(p-2,0);
+			outputline = outputline.substr(0, p) + '&' + outputline.substr(p);
+			break;
+		     }
+		     else
+		     {
+		        // no !comment, simply put '&' at the end
+			outputline += '&';
+			break;
+		     }
 		  }
 	       }
-	       cout << endline;	
+	       cout << outputline << endline;
 	    }
 	 }
       }
@@ -1028,7 +1078,7 @@ void usage()
 
 int guess_fixedfree(const string s)
 {
-   lexer_push(s+'\n',FINDFORMAT);
+   lexer_push(ltab2sp(s)+'\n',FINDFORMAT);
    int rc = yylex();
    lexer_pop();
    return rc;
@@ -1097,7 +1147,7 @@ bool isfixedcmt(const string s)
    if (s == "" || trim(s) == "")
       return 1;
    char c = s[0];
-   return (c == 'C' || c == 'c' || c == '!' || c == '*' || c == 'c' || c == '#'); 
+   return (c == 'C' || c == 'c' || c == '!' || c == '*' || c == '#'); 
 }
 
 char fixedmissingquote(const string s)
