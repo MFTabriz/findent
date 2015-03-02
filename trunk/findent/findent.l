@@ -388,7 +388,7 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 				       BEGIN wf;
 				    }
 
-^{b}*type{b}*[[:alpha:]]            {
+^{b}*type{b}*[,[:alpha:]]            {
 				       // type 
 				       D(O("TYPECONSTRUCT");Y;)
 				       BEGIN rest;

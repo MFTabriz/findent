@@ -1,3 +1,6 @@
+findent-1.5.2
+   findent.l:
+      let lexer recognise 'type, public :: mytype' Thanks to Dysan Jovic
 findent-1.5.1
    findent.l:
       added some patterns to distinguish between fixed and fixed format
