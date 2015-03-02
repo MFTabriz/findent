@@ -14,6 +14,6 @@ extern bool stlabel_found;
 #define O(x) {cerr << " [" << x << "] ";}
 #define Y O(yytext)
 // macro to activate or deactivate debug output:
-//#define D(x) {cerr << "WD: "<< __FILE__ <<":"<<__LINE__<<" "; x; cerr << endl; }
-#define D(x) ;
+#define D(x) {cerr << "WD: "<< __FILE__ <<":"<<__LINE__<<" "; x; cerr << endl; }
+//#define D(x) ;
 #endif

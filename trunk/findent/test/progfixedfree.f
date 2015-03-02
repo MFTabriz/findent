@@ -30,6 +30,7 @@
 #endif
          integer x(100)
          type(mytype)  xyz
+         character*1000 astring
          do i=1,
 c a comment         
 c a comment         
@@ -38,6 +39,10 @@ c a comment
      x   0
          continue
          enddo
+
+         astring = " ! this
+     x is
+     x no comment!"
          print *,a,b,
      x           c,d
      x          ,e,f

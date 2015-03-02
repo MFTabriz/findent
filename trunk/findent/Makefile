@@ -3,7 +3,7 @@ PROG      = findent
 all:        $(PROG)
 
 CPP       = g++
-CPPFLAGS  = -Wall -g -O2 
+CPPFLAGS  = -Wall -g -O0 
 INCLUDES  = $(PROG).h $(PROG)_parser.h version.h
 LD        = $(CPP)
 YACC      = bison

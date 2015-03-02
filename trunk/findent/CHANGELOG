@@ -1,6 +1,13 @@
 findent-1.5.3
    findent.y:
       add fixed-to-free: add check if this is a preprocessor line
+      fixed-to-free: fixed fortran can have a trailing comment,
+         starting with !, and have a continuation line.
+         This is fixed.
+      fixed-to-free: fixed bad handling of otherwise empty continuation lines
+   findent.l: better recognition of fixed and free
+
+
 findent-1.5.2
    findent.l:
       let lexer recognise 'type, public :: mytype' Thanks to Dysan Jovic
