@@ -10,6 +10,9 @@ module m1
    enumerator :: pink, lavender
 
 endenum
+   type, public :: mytypea
+      integer i
+   end type mytypea
 contains
    function f(x)
       print *,'abc &
