@@ -25,9 +25,9 @@
              integer i
              real x
         end type mytype
-        !ifdef abcde
-        real klm(10)
-        !endif
+#ifdef abcde
+        real klm@@@(10)
+#endif
         integer x(100)
         type(mytype)  xyz
         do i=1,&

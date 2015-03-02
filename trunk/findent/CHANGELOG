@@ -1,3 +1,6 @@
+findent-1.5.3
+   findent.y:
+      add fixed-to-free: add check if this is a preprocessor line
 findent-1.5.2
    findent.l:
       let lexer recognise 'type, public :: mytype' Thanks to Dysan Jovic
