@@ -26,7 +26,7 @@
             real x
          end type mytype
 #ifdef abcde
-         real klm(10)
+         real klm@@@(10)
 #endif
          integer x(100)
          type(mytype)  xyz

@@ -771,7 +771,7 @@ void output_line()
          string s = lines.front();
 	 lines.pop_front();
 	 if(isfixedcmt(s))
-	 {  // this is an empty line or comment line
+	 {  // this is an empty line or comment line or a preprocessing line
 	    if (output_format == FIXED)
 	       cout << trim(s) << endline;
 	    else  // output_format = FREE
@@ -779,7 +779,12 @@ void output_line()
 	       if (trim(s) == "")
 	          cout << endline;
 	       else
-		  cout << string(max(cur_indent,0),' ') << "!" << trim(s.substr(1)) << endline;
+	       {
+	          if (s[0] == '#')
+		     cout << trim(s) << endline;
+		  else
+		     cout << string(max(cur_indent,0),' ') << "!" << trim(s.substr(1)) << endline;
+	       }
 	    }
 	 }
 	 else
@@ -1088,6 +1093,7 @@ string handle_dos(const string s)
  
 bool isfixedcmt(const string s)
 {
+// returns 1 if this is a fixed empty line or fixed comment line or preprocessor line
    if (s == "" || trim(s) == "")
       return 1;
    char c = s[0];
