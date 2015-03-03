@@ -5,12 +5,16 @@ findent-1.5.3
          starting with !, and have a continuation line.
          This is fixed.
       fixed-to-free: fixed bad handling of otherwise empty continuation lines
-   findent.l: better recognition of fixed and free
+   findent.l: 
+      better recognition of fixed and free
+      recognize 'integer(kind=8) function func1(a,b)' as a function
+              Thanks to Dusan Jovic
+      removed 'select' from definition of explicitly not-handled keywords
 
 
 findent-1.5.2
    findent.l:
-      let lexer recognise 'type, public :: mytype' Thanks to Dysan Jovic
+      let lexer recognise 'type, public :: mytype' Thanks to Dusan Jovic
 findent-1.5.1
    findent.l:
       added some patterns to distinguish between fixed and fixed format
