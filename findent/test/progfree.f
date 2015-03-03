@@ -13,6 +13,7 @@ endenum
    type, public :: mytypea
       integer i
    end type mytypea
+   integer, parameter, public :: i8=selected_int_kind(16)
 contains
    function f(x)
       print *,'abc &
@@ -21,6 +22,10 @@ contains
        & efgh"
  return
  end function
+ integer(kind=i8) function func1(a, b)
+      integer(kind=i8), intent(in) :: a, b
+      func1 = a + b
+   end function func1
  end module
 
 program progfree

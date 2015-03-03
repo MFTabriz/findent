@@ -45,7 +45,7 @@ str1 \"[^\"]*\"
 str2 \'[^\']*\'
 
   // following are keywords explicitly not-handled by this code
-skk assign|backspace|call|close|common|continue|data|dimension|endfile|equivalence|external|format|goto|implicit|inquire|open|parameter|pause|print|read|return|rewind|rewrite|save|stop|write|allocatable|allocate|cycle|deallocate|exit|include|intent|namelist|nullify|only|operator|optional|pointer|private|procedure|public|result|select|sequence|target|use|asynchronous|bind|class|deferred|enum|enumerator|extends|final|flush|import|nopass|pass|protected|value|volatile|codimension|contiguous|error{b}*stop|sync{b}*all|sync{b}*images|sync{b}*memory|lock|unlock
+skk assign|backspace|call|close|common|continue|data|dimension|endfile|equivalence|external|format|goto|implicit|inquire|open|parameter|pause|print|read|return|rewind|rewrite|save|stop|write|allocatable|allocate|cycle|deallocate|exit|include|intent|namelist|nullify|only|operator|optional|pointer|private|procedure|public|result|sequence|target|use|asynchronous|bind|class|deferred|enum|enumerator|extends|final|flush|import|nopass|pass|protected|value|volatile|codimension|contiguous|error{b}*stop|sync{b}*all|sync{b}*images|sync{b}*memory|lock|unlock
 
   //  following are keywords starting with c
 ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguous|critical
@@ -278,7 +278,7 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 
 ^{bc}*subroutine{b}+                   |
 ^{b}*program{b}*/[;\n![:alpha:]]   |
-^{bc}*function{b}                     |
+^.*function{b}                     |
 ^{b}*block{b}*data/{nc}             {   // generic routine
 				       D(O("ROUTINESTART");Y;)
 				       BEGIN rest;
