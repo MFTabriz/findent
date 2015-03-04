@@ -1,3 +1,5 @@
+findent-1.5.4
+   findent.y: recognize ' x = 3 & ! comment' as a line needing a continuation
 findent-1.5.3
    findent.y:
       add fixed-to-free: add check if this is a preprocessor line
