@@ -138,3 +138,19 @@ c a comment
             continue
             return 
          end
+         subroutine seven
+            a = 1
+     x      + 2   ! comment 1
+     y      + 3   ! comment 2
+     y      + 4
+     y      + 5
+     y      + 6
+            a = 1
+     x      + 2   ! comment 1
+     y      + 3   ! comment 2
+#ifdef klm
+     y      + 4 syntax error
+     y      + 5 syntax error
+#endif
+     y      + 6
+            end

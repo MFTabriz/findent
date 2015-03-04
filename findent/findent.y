@@ -97,7 +97,7 @@ bool cur_semi_eol;
 
 %token ROUTINESTART END DOSTART MODULESTART SELECTSTART ENDSELECT CASE
 %token CONTAINS IFCONSTRUCT WHERECONSTRUCT FORALLCONSTRUCT
-%token ELSE ELSEIF ENTRY ELSEWHERE INTERFACE BLOCK CRITICAL PREPROCESS
+%token ELSE ELSEIF ENTRY ELSEWHERE INTERFACE BLOCK CRITICAL
 %token ENUM TYPECONSTRUCT ASSOCIATECONSTRUCT
 %token FREE FIXED PROBFREE UNSURE FINDFORMAT
 %token CMT SCANSTRCMT DQUOTE SQUOTE UNTERMSTR
@@ -260,11 +260,6 @@ nolabelline:
 	                     D(O("FORALLCONSTRUCT");)
 			     cur_indent = top_indent();
 			     push_indent(cur_indent + forall_indent);
-	                  }
-         | PREPROCESS     {  // PREPROCESS STATEMENT
-	                     D(O("PREPROCESS");)
-			     cur_indent = 0;
-			     fixed_ignore_cur_indent = 1;
 	                  }
 
 	 ;
@@ -507,7 +502,7 @@ void get_full_line()
 	       string s1;
 	       s1 = ltab2sp(s);
 	       if (s1.length() > 6)
-	          non_blank_line_seen = (s[0] != 'c' && s[0] != 'C' && s[0] != '!' && s[0] != '*');
+	          non_blank_line_seen = (s[0] != 'c' && s[0] != 'C' && s[0] != '!' && s[0] != '*' && s[0] != '#');
 	    }
 	 if (auto_firstindent && non_blank_line_seen)
 	 {
@@ -559,17 +554,14 @@ bool handle_free(string s)
    //  if this line is pure comment or empty or preprocessor statement:
    //     add it to lines
 
-   if (sl == "" || sl[0] == '!')
+   if (sl == "" || sl[0] == '!' || sl[0] == '#')
    {
       lines.push_back(trim(s));
       // if there is now only one line in lines,
       // we are not in a continuation:
       if(lines.size() ==1)
 	 return 0;
-      // we are in a continuation, read more and
-      // add a preprocessor statement to lines:
-      if (sl[0] == '#')
-	 lines.push_back(trim(s));
+      // we are in a continuation, read more
       return 1;
    }
 
@@ -611,60 +603,8 @@ bool handle_free(string s)
    full_line = cs;
    lines.push_back(trim(s));
    D(O("full_line");O(full_line);O(expect_continuation);)
-   return expect_continuation;
 
-/*
-   if (sl[sl.length()-1] == '&')
-   {
-      // possibilities:
-      //  1. for i = 1, &
-      //  2. print *,'foo  !&
-      //  3. i=4 ! comment &
-      // 1 and 2 are requests for a continuation line
-      
-      string cs = full_line + sl;
-      lexer_push(cs + '\n',SCANSTRCMT);
-      int rc = yylex();
-      int p = max(lexer_position-1,0);
-      lexer_pop();
-      // todo: have to look at this code
-      // this also requests a continuation line:
-      // 4.  i=4+ & ! comment
-      switch (rc)
-      {
-	 case(CMT):
-	    // lexer found ! outside strings
-	    // so this must be trailing comment
-	    // put line in lines and
-	    // strip off comment for full_line
-	    lines.push_back(trim(s));
-	    full_line = cs.substr(0,p);
-	    D(O("full_line");O(full_line);)
-	    return 0;  // do not expect continuation
-	    break;
-	 case(EOL):
-	    // lexer found EOL,not after ! (but possibly inside 
-	    // unterminated string), so
-	    // this is a real request for continuation
-	    lines.push_back(trim(s));
-	    // and strip off &:
-	    full_line = cs.substr(0,cs.length()-1);
-	    D(O("full_line");O(full_line);)
-	    return 1;  // expect a continuation line
-	    break;
-      }
-   }
-   else
-   {
-      // no trailing &, so this is the last line of this statement
-      // the lexer will handle a trailing comment
-      full_line += sl;
-      lines.push_back(trim(s));
-      D(O("full_line");O(full_line);)
-      return 0;         // no continuation lines anymore
-   }
-   */
-   return 0;
+   return expect_continuation;
 }
 
 bool handle_fixed(string s)
@@ -792,8 +732,11 @@ void output_line()
 
 	 if (l<0)
 	   l=0;
-	 cout << string(l,' '); 
-	 D(O("output indent before firstline");O(string(l,' '));)
+	 if (firstline[0] != '#')
+	 {
+	    cout << string(l,' '); 
+	    D(O("output indent before firstline");O(string(l,' '));)
+	 }
       }
       cout << firstline << endline;
       D(O("output firstline");O(firstline);)
