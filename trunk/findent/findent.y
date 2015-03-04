@@ -573,9 +573,47 @@ bool handle_free(string s)
       return 1;
    }
 
-   // if this line ends with '&', check if this really
-   // is a continuation marker
+   // Investigate if this line wants a continuation.
+   // We append the line to full_line, and look for
+   // an unterminated string. 
+   // If there is an unterminated
+   // string, and the line ends with '&', a continuation
+   // line is expected.
+   // If there is no unterminated string, we strip of
+   // a possible trailing comment, and trim.
+   // If tha last character = '&', a continuation is expected.
 
+   bool expect_continuation = 0;
+   string cs = full_line + sl;
+
+   // the lexer will tell if 
+   // there is an terminated string followed by !comment.  rc == CMT
+   //   the position of '!' is in lexer_position 
+   // or the line ends in a unterminated string          rc == EOL
+
+   lexer_push(cs + '\n', SCANSTRCMT);
+   int rc = yylex();
+   int p = lexer_position;  // have to save lexer_position because of lexer_pop
+   D(O("p:");O(p);)
+   lexer_pop();
+
+   switch(rc)
+   {
+      case(CMT):
+	 cs = trim(cs.substr(0, max(p-1,0)));
+      case(EOL):
+	 expect_continuation = ( cs[cs.length()-1] == '&');
+   }
+
+   if (expect_continuation)            // chop off '&' :
+      cs = cs.substr(0,cs.length()-1);
+
+   full_line = cs;
+   lines.push_back(trim(s));
+   D(O("full_line");O(full_line);O(expect_continuation);)
+   return expect_continuation;
+
+/*
    if (sl[sl.length()-1] == '&')
    {
       // possibilities:
@@ -625,6 +663,7 @@ bool handle_free(string s)
       D(O("full_line");O(full_line);)
       return 0;         // no continuation lines anymore
    }
+   */
    return 0;
 }
 
