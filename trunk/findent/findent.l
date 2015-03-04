@@ -429,17 +429,10 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 				       return ENTRY;
 				    }
 
-^#.*                                {  // preprocess
-				       D(O("PREPROCESS");Y;)
-				       BEGIN rest;
-				       return PREPROCESS;
-				    }
-
 .	                            {  // not recognized, skip rest
 				       D(O("BLA");Y;)
 				       BEGIN rest;
 				    }
-
 
 %%
 

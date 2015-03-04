@@ -124,6 +124,16 @@
   end subroutine
   subroutine two(a)
        continue
+       a = 3 + &! comment1
+       4 + & ! comment 2
+       5
+
+       a = 3 + & ! test preprocessor within continuation
+       4 + &
+#ifdef abc
+       this would cause a compilation error &
+#endif
+       5
        return
   endsubroutine
   subroutine three(a)
