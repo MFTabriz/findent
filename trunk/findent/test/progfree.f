@@ -26,6 +26,18 @@ contains
       integer(kind=i8), intent(in) :: a, b
       func1 = a + b
    end function func1
+#ifdef usempi
+       function f1(x,m)
+            real x,m
+#elif defined(useopenmp)
+       function f1(x,m,n)
+            real x,m,n
+#else
+       function f1(x)
+            real x
+#endif
+            continue
+       end function f1
  end module
 
 program progfree
