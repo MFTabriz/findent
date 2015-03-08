@@ -19,6 +19,8 @@ int pop_indent();
 int top_indent();
 void push_indent(int p);
 
+void handle_pre(const string s);
+
 void shorten_full_line();
 
 int pop_dolabel();
@@ -33,13 +35,15 @@ string ltab2sp(const string& s);
 string handle_dos(const string s);
 
 int input_format, output_format;
-bool fixed_ignore_cur_indent;
 int guess_indent(const string str);
 int determine_fix_or_free(const bool store);
 bool isfixedcmt(const string s);
 char fixedmissingquote(const string s);
 
-stack<int> indent;            // to store indents
+stack<int> indent;                 // to store indents
+stack<stack <int> > indent_stack;  // to store indent stack
+stack<bool> pre_stack;             // to note if there is an #else after #if
+
 int cur_indent, start_indent;
 bool auto_firstindent;
 int num_lines;                    // number of lines read sofar
@@ -163,6 +167,7 @@ nolabelline:
          | MODULESTART    {  // MODULE
 	                     D(O("MODULE");)
 	                     cur_indent = top_indent();
+			     D(O("cur_indent:");O(cur_indent);)
 			     push_indent(cur_indent + module_indent);
 			     empty_dolabels();
 			  }
@@ -468,7 +473,6 @@ void get_full_line()
    string s;
    full_line_has_been_output = 0;
    stlabel_found             = 0;
-   fixed_ignore_cur_indent   = 0;
    full_line                 = "";
 
    while(1)
@@ -713,6 +717,7 @@ void output_line()
    if (input_format == FREE)
    {
       string firstline = lines.front();
+      handle_pre(firstline);
       lines.pop_front();
       D(O("firstline");O(firstline);)
       int l;
@@ -743,10 +748,11 @@ void output_line()
       while (!lines.empty())
       {
       // sometimes, there are preprocessor statements within a continuation ...
-          if (lines.front()[0] != '#')
-	     cout << string(max(cur_indent,0),' ');
-	  cout << lines.front()<<endline;
-	  lines.pop_front();
+         handle_pre(lines.front());
+	 if (lines.front()[0] != '#')
+	    cout << string(max(cur_indent,0),' ');
+	 cout << lines.front()<<endline;
+	 lines.pop_front();
       }
    }
    else   // input_format = FIXED, output can be FREE or FIXED
@@ -757,6 +763,7 @@ void output_line()
       {
          lineno++;
          string s = lines.front();
+	 handle_pre(s);
 	 lines.pop_front();
 	 if(isfixedcmt(s))
 	 {  // this is an empty line or comment line or a preprocessing line
@@ -1158,6 +1165,63 @@ char fixedmissingquote(const string s)
 	 break;
    }
    return result;
+}
+
+// #if, #ifdef, #ifndef, #else, #elif and #endif
+
+// after an #if{,def,ndef} the indent stack is pushed
+// on indent_stack, and the current indent stack is used.
+// after an #elif the indent stack is made equal to indent_stack.top()
+// after an #else, the indent stack is popped from indent_stack.
+// after an #endif:
+//     if the index stack was not already popped from index_stack (after
+//        #else), it is popped
+// the stack pre_stack is used to note if the index stack was already
+//      popped by #else
+//
+// So, after #endif, the indentation is taken from the code after #else
+//     or, if there is no #else, from the code before the #if{,def,ndef}
+
+void handle_pre(const string s)
+{
+   D(O("pre before");O(cur_indent);O(top_indent());O(s);)
+
+   if (s == "" || s[0] != '#')
+      return;
+
+   if (s.find("#if") == 0)   // covers #if #ifdef #ifndef
+   {
+      indent_stack.push(indent);
+      pre_stack.push(0);
+   }
+   else if (s.find("#elif") == 0)
+   {
+      if (!indent_stack.empty())
+	 indent = indent_stack.top();
+   }
+   else if (s.find("#else") == 0)
+   {
+      if (!indent_stack.empty())
+      {
+	 indent = indent_stack.top();
+	 indent_stack.pop();
+	 pre_stack.pop();
+	 pre_stack.push(1);
+      }
+   }
+   else if (s.find("#endif") == 0)
+   {
+      if (!indent_stack.empty())
+      {
+	 if (!pre_stack.top())
+	 {
+	    indent = indent_stack.top();
+	    indent_stack.pop();
+	 }
+	 pre_stack.pop();
+      }
+   }
+   D(O("pre after");O(cur_indent);O(top_indent());)
 }
 
 extern "C" int yywrap()

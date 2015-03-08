@@ -1,3 +1,17 @@
+findent-1.5.5
+   findent.y:
+      added support for conditional preprocessor statements. Example:
+      #ifdef USEMPI
+      subroutine mysub(a,b)
+      real a,b
+      #else
+      subroutine mysub(a)
+      real a
+      #endif
+      end subroutine mysub
+
+      indents correctly now.
+
 findent-1.5.4
    findent.y: 
       recognize ' x = 3 & ! comment' as a line needing a continuation
