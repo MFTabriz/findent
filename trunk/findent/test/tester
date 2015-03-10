@@ -1,4 +1,6 @@
 #!/bin/bash
+exe=${1:-../findent}
+$exe -v
 rm -f *.try.f
 for i in *.f ; do
    echo -n "$i: "
@@ -17,7 +19,7 @@ for i in *.f ; do
    fi
 
    parms=`head -n1 < $i | tr '!' ' '|tr '\r' ' '`
-   ../findent $parms < $i > $i.try.f 2>/dev/null
+   $exe $parms < $i > $i.try.f 2>/dev/null
    if [ -f $i.try.f.ref ]; then
       cmp -s $i.try.f $i.try.f.ref >/dev/null 2>&1
       if [ "$?" -eq 0 ]; then
@@ -28,7 +30,7 @@ for i in *.f ; do
       echo
    else
       echo "cannot compare, try running"
-      echo "  $0 makereference"
+      echo "  makereference"
    fi
    case "$i" in
       *free*) 
@@ -43,9 +45,3 @@ for i in *.f ; do
       echo "        converted program does not compile "
    fi
 done
-if [ "$1" = "makereference" ] ; then
-   echo "creating reference"
-   for i in *.try.f ; do
-      cp $i $i.ref
-   done
-fi
