@@ -18,4 +18,12 @@ Install findent in your favorite location, for example:
 
    sudo install findent /usr/local/bin
 
+WINDOWS:
+
+   install mingw32
+
+   create findent.exe (windows 32 bit executable):
+      make clean
+      make MINGW=1
+
 USE AT YOUR OWN RISK.

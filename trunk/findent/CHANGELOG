@@ -1,3 +1,13 @@
+findent-1.5.6
+   Makefile:
+      added support for cross compiling to windows:
+         make clean
+	 make MINGW=1
+      creates a windows 32 bit findent.exe
+   findent.l:
+      ticket 1: 
+         more precise recognition of function statement
+
 findent-1.5.5
    findent.y:
       added support for conditional preprocessor statements. Example:
