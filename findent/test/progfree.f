@@ -1,4 +1,18 @@
 ! -I2 -i5 -a1 -b2 -d3 -f4 -m5
+! ticket 1
+module some_module
+
+contains
+
+real function alpha_integral_function(x)
+implicit none
+real:: x
+alpha_integral_function = 0
+end function alpha_integral_function
+
+end module some_module
+! /ticket 1
+
 module m1
    integer k
    enum, bind(c)
@@ -26,6 +40,10 @@ contains
       integer(kind=i8), intent(in) :: a, b
       func1 = a + b
    end function func1
+ integer(kind=i8)function funcx(a, b)
+      integer(kind=i8), intent(in) :: a, b
+      funcx = a + b
+   end function funcx
 #ifdef usempi
        function f1(x,m)
             real x,m
