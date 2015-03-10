@@ -276,9 +276,11 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 			  		  return END;
 				    }
 
-^{bc}*subroutine{b}+                   |
+^{bc}*subroutine{b}+               |
 ^{b}*program{b}*/[;\n![:alpha:]]   |
-^.*function{b}                     |
+^.*{b}+function{b}                 |
+^.*\)function{b}                   |
+^{b}*function{b}                   |
 ^{b}*block{b}*data/{nc}             {   // generic routine
 				       D(O("ROUTINESTART");Y;)
 				       BEGIN rest;
