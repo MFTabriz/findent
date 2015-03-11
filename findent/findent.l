@@ -26,8 +26,8 @@ void lexer_set_state(int k);
    // end of line, including ; and !
 eol [\n;!]
 
-   // any character, not being end of line
-neol [^\n;!]
+   // any character, not being end of line or start of string
+neol [^\n;!\'\"]
 
    // blank character
 b [ \t]
@@ -43,6 +43,12 @@ str1 \"[^\"]*\"
 
    // string starting with '
 str2 \'[^\']*\'
+
+   // unterminated string starting with "
+ustr1 \"[^\"]*
+
+   // unterminated string starting with '
+ustr2 \'[^\']*
 
   // following are keywords explicitly not-handled by this code
 skk assign|backspace|call|close|common|continue|data|dimension|endfile|equivalence|external|format|goto|implicit|inquire|open|parameter|pause|print|read|return|rewind|rewrite|save|stop|write|allocatable|allocate|cycle|deallocate|exit|include|intent|namelist|nullify|only|operator|optional|pointer|private|procedure|public|result|sequence|target|use|asynchronous|bind|class|deferred|enum|enumerator|extends|final|flush|import|nopass|pass|protected|value|volatile|codimension|contiguous|error{b}*stop|sync{b}*all|sync{b}*images|sync{b}*memory|lock|unlock
@@ -70,6 +76,17 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 	 }
 }
 <rest>{     // skip to end of line or ;
+
+{str1}  |
+{str2}   {
+            D(O("RESTSTRING"); Y;)
+	 }
+
+{ustr1} |
+{ustr2}  {
+            D(O("RESTUSTRING"); Y;)
+	 }
+
 {neol}*  {
 	    D(O("REST"); Y;)
 	 }
@@ -278,8 +295,8 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 
 ^{bc}*subroutine{b}+               |
 ^{b}*program{b}*/[;\n![:alpha:]]   |
-^.*{b}+function{b}                 |
-^.*\)function{b}                   |
+^[^\'\"!]*{b}+function{b}          |
+^[^\'\"!]*\)function{b}            |
 ^{b}*function{b}                   |
 ^{b}*block{b}*data/{nc}             {   // generic routine
 				       D(O("ROUTINESTART");Y;)
@@ -292,6 +309,11 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 					BEGIN rest;
 					return ENUM;
 				    }
+^{b}*do{b}*\(                       {   // false do
+                                        D(O("FALSEDO");Y;)
+					BEGIN rest;
+				    }
+                                     
 
 ^{b}*do/{nc}                    |
 ^{b}*do{b}*while/{nc}           |
@@ -328,7 +350,7 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 				       return INTERFACE;
 				    }
 
-^{b}*[0-9]+                         {  // statement label
+^{b}*[0-9]+/{b}.*                         {  // statement label
 				       D(O("STLABEL");Y;O(stlabel_found);)
 				       if (stlabel_found)
 				       {  // a statementlabel has already been found, do not return
