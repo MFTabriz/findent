@@ -275,6 +275,7 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 
 ^{b}*end/{nc}                      |
 ^{b}*end{b}*function/{nc}+         |
+^{b}*end{b}*program/{nc}+          |
 ^{b}*end{b}*subroutine/{nc}+       |
 ^{b}*end{b}*do/{nc}+               |
 ^{b}*end{b}*if/{nc}+               |

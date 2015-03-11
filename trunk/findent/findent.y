@@ -633,7 +633,7 @@ bool handle_fixed(string s)
    string sl;
    sl = s.substr(0,5);
    if (s.length() >6)
-      sl = sl+s.substr(6);
+      sl = sl+' '+s.substr(6);
 
    D(O("sl:");O(sl);O(lines.size());)
 

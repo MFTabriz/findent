@@ -28,9 +28,26 @@
 #ifdef abcde
            real klm(10)
 #endif
+           real do(100)
            integer x(100)
            type(mytype)  xyz
            continue
+           do 123 i=1,2
+              continue
+  123      continue
+           print *,'; function ',indx," function "
+           continue
+99880      FORMAT ('  function ')
+99870      FORMAT(1X,'Invalid species name',2X,A8)
+           do i=1,10
+              do (i) = 5
+              continue
+              do(i) = 5
+              continue
+           enddo
+           x = y   ! function values
+           continue
+
            print *,a,b,
      x             c,d
      x            ,e,f

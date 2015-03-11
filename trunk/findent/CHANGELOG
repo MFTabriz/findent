@@ -2,6 +2,11 @@ findent-1.5.7
    findent.l:
       recognize strings in 'rest' state
       more precise definition of function
+      recognize 'endprogram'
+      do not confuse 'do (i) =' witha do statement
+   findent.y:
+      fixed form: put an ' ' as possible separator between label and code
+
 
 findent-1.5.6
    Makefile:
