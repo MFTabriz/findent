@@ -1,3 +1,8 @@
+findent-1.5.7
+   findent.l:
+      recognize strings in 'rest' state
+      more precise definition of function
+
 findent-1.5.6
    Makefile:
       added support for cross compiling to windows:
