@@ -29,7 +29,7 @@ $(PROG)_lexer.cpp: $(PROG).l
 	$(CPP) -c $(CPPFLAGS) -o $@ $<
 
 clean:
-	rm -f $(PROG)_lexer.cpp *.o $(PROG) $(EXE) $(PROG)_parser.h $(PROG)_parser.cpp
+	rm -f $(PROG)_lexer.cpp *.o $(PROG) $(EXE) findent.exe $(PROG)_parser.h $(PROG)_parser.cpp
 	rm -f test/*.f.try.f test/a.out test/*.mod
 
 test:   all
