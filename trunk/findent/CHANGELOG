@@ -1,3 +1,11 @@
+findent-1.5.8:
+   findent.y:
+      fill indent-stack from 0 to start_indent with the default indent
+   findent.l: 
+      support for construct name in 'do' 'if' 'select' 'block' 
+      recognize some forms of false end
+      reconize 'abstract type' and 'abstract interface'
+
 findent-1.5.7
    findent.l:
       recognize strings in 'rest' state

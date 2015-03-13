@@ -1,5 +1,5 @@
 ! -I0 -i5 -a1 -b2 -d3 -f4 -m5
-      module m1
+         module m1
          integer k
          enum, bind(c)
       
@@ -18,6 +18,18 @@
      8        efgh"
        return
        end function
+#ifdef usempi
+           function f1(x,m)
+                real x,m
+#elif defined(useopenmp)
+           function f1(x,m,n)
+                real x,m,n
+#else
+           function f1(x)
+                real x
+#endif
+                continue
+           end function f1
        end module
       
       program progfixed
@@ -26,12 +38,29 @@
             real x
          end type mytype
 #ifdef abcde
-         real klm(10)
+         real klm@@@(10)
 #endif
          real do(100)
          integer x(100)
          type(mytype)  xyz
+         character*1000 astring
          continue
+               a_ap: do i=1,20
+               continue
+               enddo a_ap
+               end = 10
+               if ( e .eq. n .and.
+     *              e .eq. m    )then
+                  npar   = npar   + 1
+               endif
+         do i=1,
+c a comment         
+c a comment         
+     x   1
+c a comment         
+     x   0
+         continue
+         enddo
       do 123 i=1,2
       continue
   123 continue
@@ -48,10 +77,17 @@
          x = y   ! function values
          continue
 
+         astring = " ! this
+     x is
+     x no comment!"
          print *,a,b,
      x           c,d
      x          ,e,f
-         do i=1,20
+         continue
+         print *,a,b,
+     x           c,d
+     x          ,e,f
+         loop: do i=1,20
             block
                do 90 k=1,90
                   do 90 k1=1,4
@@ -63,8 +99,24 @@
   90                 continue
                   continue
                   end block
-               enddo
+               enddo loop
 
+               bbb: block
+                  continue
+               end block bbb
+
+           sc: select case(ja)
+              case(1)
+                 continue
+              case(2)
+                 continue
+                       end select sc
+         continue
+         do i=1,20
+            block
+                  continue
+                  end block
+               enddo
                critical
                x=y
             endcritical
@@ -74,10 +126,15 @@
                critical
                x=y
             end critical
+           wv: if ( a.eq.b) then
+              continue
+           endif wv
             if (.false.) goto 88
             if (.false.) goto 99999
   88            if ('x' .eq. "abc''d") l=1
 99999            continue
+            if ('x' .eq. "abc''d") l=1
+            continue
             if ('x' .eq. "abc''d")then
                continue
             endif
@@ -141,3 +198,19 @@
             continue
             return 
          end
+         subroutine seven
+            a = 1
+     x      + 2   ! comment 1
+     y      + 3   ! comment 2
+     y      + 4
+     y      + 5
+     y      + 6
+            a = 1
+     x      + 2   ! comment 1
+     y      + 3   ! comment 2
+#ifdef klm
+     y      + 4 syntax error
+     y      + 5 syntax error
+#endif
+     y      + 6
+            end

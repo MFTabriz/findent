@@ -68,7 +68,35 @@ program progfree
 #endif
    integer x(100)
    type(mytype)  xyz
+   real do(1000)
    continue
+   loop: do i=1,20
+   continue
+   enddo loop
+   end = 10
+
+   if ( a.eq.b .and. &
+         c.eq.r) then
+      n=n+1
+   endif
+
+   iff: if (a.eq.b) then
+      continue
+   endif iff
+
+   lsele: select case(i)
+   case(10)
+      continue
+   case(11)
+      continue
+   case default
+      continue
+   end select lsele
+
+   lblock: block
+      continue
+      end block lblock
+    
     x = 3.0*a + 4*b +   &
     &   2  *c +   y
    do i=1,20
@@ -93,6 +121,7 @@ program progfree
                do ; enddo
          critical
          x=y
+         do(3) = 123
       endcritical
          critical
          x=y
@@ -179,3 +208,19 @@ END ASSOCIATE
       continue
       return 
    end
+   subroutine seven
+           a = 1&
+              &+ 2   &! comment 1
+              &+ 3   &! comment 2
+        &+ 4&
+        &+ 5&
+              &+ 6
+        a = 1&
+        &+ 2   &! comment 1
+        &+ 3   &! comment 2
+#ifdef klm
+           &+ 4 syntax error&
+        &+ 5 syntax error&
+#endif
+              &+ 6
+                                                   end
