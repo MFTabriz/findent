@@ -32,10 +32,10 @@ neol [^\n;!\'\"]
    // blank character
 b [ \t]
 
-   // not a character that can be part of a word
+   // a character that can't be part of a word
 nc [ \t\n;!]
 
-   // an alpanumeric character or % or _ or space or tab or *
+   // an alphanumeric character or % or _ or space or tab or *
 bc [[:alnum:]_%\* \t]
 
    // string starting with "
@@ -49,6 +49,10 @@ ustr1 \"[^\"]*
 
    // unterminated string starting with '
 ustr2 \'[^\']*
+
+   // blancs or construct name
+b_cname {b}*|{b}*[[:alnum:]_]+:{b}*   
+
 
   // following are keywords explicitly not-handled by this code
 skk assign|backspace|call|close|common|continue|data|dimension|endfile|equivalence|external|format|goto|implicit|inquire|open|parameter|pause|print|read|return|rewind|rewrite|save|stop|write|allocatable|allocate|cycle|deallocate|exit|include|intent|namelist|nullify|only|operator|optional|pointer|private|procedure|public|result|sequence|target|use|asynchronous|bind|class|deferred|enum|enumerator|extends|final|flush|import|nopass|pass|protected|value|volatile|codimension|contiguous|error{b}*stop|sync{b}*all|sync{b}*images|sync{b}*memory|lock|unlock
@@ -143,6 +147,7 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 }
 
 <ff>{
+
 ^[^cC#!* 0-9].*\n {
                   D(O("FREE");Y;)
 		  return FREE;
@@ -269,11 +274,16 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 	       }
 
 
-^{b}*{skk}{b}+{bc}*                {     D(O("USE CALL ... ");Y;)
+^{b}*{skk}{b}+{bc}*                {   D(O("USE CALL ... ");Y;)
 				       BEGIN rest;
-				    }
+				   }
 
-^{b}*end/{nc}                      |
+^{b}*end{b}*[=\(\)].*              {   // false end
+				       D(O("FALSE END");Y;)
+				       BEGIN rest;
+				   }
+                                  
+^{b}*end/{nc}+                     |
 ^{b}*end{b}*function/{nc}+         |
 ^{b}*end{b}*program/{nc}+          |
 ^{b}*end{b}*subroutine/{nc}+       |
@@ -316,14 +326,14 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 				    }
                                      
 
-^{b}*do/{nc}                    |
-^{b}*do{b}*while/{nc}           |
-^{b}*do{b}*concurrent/{nc}          {  D(O("DOSTART");Y;)
+^{b_cname}do{b}*while/{nc}          |
+^{b_cname}do/{nc}                   |
+^{b_cname}do{b}*concurrent/{nc}     {  D(O("DOSTART");Y;)
 				       BEGIN dolabel;
 				       return DOSTART;
 				    }
 
-^{b}*select{b}*case/{b}*\(          {  // select case
+^{b_cname}select{b}*case/{b}*\(     {  // select case
 				       D(O("DOSTART");Y;)
 				       BEGIN rest;
 				       return SELECTSTART;
@@ -344,7 +354,7 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 				       BEGIN rest;
 				       return MODULESTART;
 				    }
-
+^{b}*abstract{b}+interface/{nc}    |
 ^{b}*interface/{nc}                 {  // module
 				       D(O("INTERFACE");Y;)
 				       BEGIN rest;
@@ -370,7 +380,7 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 				       BEGIN rest;
 				       return CONTAINS;
 				    }
-^{b}*block/{b}*{eol}                {  // block
+^{b_cname}*block/{b}*{eol}                {  // block
 				       D(O("BLOCK");Y;)
 				       BEGIN rest;
 				       return BLOCK;
@@ -381,7 +391,7 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 				       return CRITICAL;
 				    }
 
-^{b}*if{b}*\(.*\){b}*then/{b}*{eol} { // if construct (if (...) then )
+^{b_cname}if{b}*\(.*\){b}*then/{b}*{eol} { // if construct (if (...) then )
 				       D(O("IFCONSTRUCT");Y;)
 				       BEGIN rest;
 				       return IFCONSTRUCT;
@@ -419,7 +429,8 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 				       BEGIN wf;
 				    }
 
-^{b}*type{b}*[,[:alpha:]]            {
+^{b}*abstract{b}+type{b}*[,[:alpha:]:]            |
+^{b}*type{b}*[,[:alpha:]:]            {
 				       // type 
 				       D(O("TYPECONSTRUCT");Y;)
 				       BEGIN rest;

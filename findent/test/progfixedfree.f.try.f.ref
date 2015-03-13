@@ -40,9 +40,19 @@
 #ifdef abcde
         real klm@@@(10)
 #endif
+        real do(100)
         integer x(100)
         type(mytype)  xyz
         character*1000 astring
+        continue
+        a_ap: do i=1,20
+           continue
+        enddo a_ap
+        end = 10
+        if ( e .eq. n .and.&
+        &     e .eq. m    )then
+            npar   = npar   + 1
+        endif
         do i=1,&
         !a comment
         !a comment
@@ -51,6 +61,21 @@
         &0
            continue
         enddo
+        do 123 i=1,2
+           continue
+123     continue
+        print *,'; function ',indx," function "
+        continue
+99880   FORMAT ('  function ')
+99870   FORMAT(1X,'Invalid species name',2X,A8)
+        do i=1,10
+           do (i) = 5
+           continue
+           do(i) = 5
+           continue
+        enddo
+        x = y   ! function values
+        continue
 
         astring = " ! this&
         & is&
@@ -59,7 +84,10 @@
         &        c,d&
         &       ,e,f
         continue
-        do i=1,20
+        print *,a,b,&
+        &        c,d&
+        &       ,e,f
+        loop: do i=1,20
            block
              do 90 k=1,90
                 do 90 k1=1,4
@@ -69,6 +97,23 @@
 7                  x=x+j
                    continue
 90           continue
+             continue
+           end block
+        enddo loop
+
+        bbb: block
+          continue
+        end block bbb
+
+        sc: select case(ja)
+          case(1)
+             continue
+          case(2)
+             continue
+        end select sc
+        continue
+        do i=1,20
+           block
              continue
            end block
         enddo
@@ -81,6 +126,9 @@
         critical
              x=y
         end critical
+        wv: if ( a.eq.b) then
+            continue
+        endif wv
         if (.false.) goto 88
         if (.false.) goto 99999
 88      if ('x' .eq. "abc''d") l=1

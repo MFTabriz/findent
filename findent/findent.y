@@ -18,6 +18,7 @@ void output_line();
 int pop_indent();
 int top_indent();
 void push_indent(int p);
+void init_indent();
 
 void handle_pre(const string s);
 
@@ -388,6 +389,7 @@ int main(int argc, char*argv[])
 	      break;
 	 }
 
+
    if (input_format == 0)
       input_format = determine_fix_or_free(1);
 
@@ -399,12 +401,28 @@ int main(int argc, char*argv[])
    lexer_push(full_line+'\n',FREE);
    cur_semi_eol  = 0;
    cur_indent    = start_indent;
+   init_indent();
    yyparse();
    return 0;
 }
 
 void yyerror(const char *s)
 {
+}
+
+void init_indent()
+// fills the indent-stack until indent 0
+{
+   D(O("init_indent");O(indent.size());)
+   while(!indent.empty())
+      indent.pop();
+   int l=0;
+   for (int i=0; l<start_indent; i++)
+   {
+      indent.push(l);
+      l = i*default_indent;
+   }
+   indent.push(start_indent);
 }
 
 string trim(const string& str)
@@ -512,6 +530,7 @@ void get_full_line()
 	 {
 	    start_indent = guess_indent(s);
 	    cur_indent   = start_indent;
+	    init_indent();
 	 }
       }
 
@@ -953,7 +972,7 @@ void output_line()
 int pop_indent()
 {
    if (indent.empty())
-      return start_indent;
+      return 0;
    indent.pop();
    return top_indent();
 }
@@ -961,7 +980,7 @@ int pop_indent()
 int top_indent()
 {
    if (indent.empty())
-      return start_indent;
+      return 0;
    return indent.top();
 }
 
@@ -1067,6 +1086,14 @@ void usage()
 
 int guess_fixedfree(const string s)
 {
+   // sometimes, program sources contain carriage control characters
+   // such as ^L
+   // I cannot get the lexer to respond to [:cntrl:]
+   // so I handle that here:
+   if (s != "" && s[0] != '\t')
+      if(s[0] < 32)
+         return UNSURE;
+
    lexer_push(ltab2sp(s)+'\n',FINDFORMAT);
    int rc = yylex();
    lexer_pop();
