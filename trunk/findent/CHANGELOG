@@ -1,3 +1,9 @@
+findent-1.5.9:
+   findent.l:
+      recognize 'label :' ('label:' was already recognized)
+   findent.y:
+      recognize '123 enddo', do not double-de-indent
+
 findent-1.5.8:
    findent.y:
       fill indent-stack from 0 to start_indent with the default indent

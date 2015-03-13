@@ -51,7 +51,7 @@ ustr1 \"[^\"]*
 ustr2 \'[^\']*
 
    // blancs or construct name
-b_cname {b}*|{b}*[[:alnum:]_]+:{b}*   
+b_cname {b}*|{b}*[[:alnum:]_]+{b}*:{b}*   
 
 
   // following are keywords explicitly not-handled by this code
