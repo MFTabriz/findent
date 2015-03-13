@@ -49,6 +49,7 @@ int cur_indent, start_indent;
 bool auto_firstindent;
 int num_lines;                    // number of lines read sofar
 bool non_blank_line_seen;
+bool indent_handled;
 
 stack<int> dolabels;          // to sotre labels, necessary for labelled do
 int stlabel;
@@ -131,6 +132,7 @@ line:    STLABEL
 				  pop_indent();
 				  pop_dolabel();
 			          cur_indent = top_indent();
+				  indent_handled = 1;
 			       }
 			       shorten_full_line();
 			     }
@@ -216,7 +218,8 @@ nolabelline:
 	                  }
 	 | END            {  // GENERIC END
 	                     D(O("END");)
-	                     cur_indent = pop_indent();
+			     if (!indent_handled)
+				cur_indent = pop_indent();
 			  }
 	 | ENDSELECT      {  // ENDSELECT
 	                     D(O("END");)
@@ -492,6 +495,7 @@ void get_full_line()
    full_line_has_been_output = 0;
    stlabel_found             = 0;
    full_line                 = "";
+   indent_handled            = 0;
 
    while(1)
    {
