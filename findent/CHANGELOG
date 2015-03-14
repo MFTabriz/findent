@@ -1,6 +1,7 @@
 findent-1.5.9:
    findent.l:
       recognize 'label :' ('label:' was already recognized)
+      recognize false type as in 'typecode = 10'
    findent.y:
       recognize '123 enddo', do not double-de-indent
 
