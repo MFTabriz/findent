@@ -2,8 +2,8 @@
   ! ticket 1
   module some_module
 
+       complex ccc
   contains
-
        real function alpha_integral_function(x)
             implicit none
             real:: x
