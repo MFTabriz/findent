@@ -429,6 +429,11 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 				       BEGIN wf;
 				    }
 
+^{b}*type[[:alnum:]_].*             {  // false type
+                                       D(O("FALSETYPE");Y;)
+				       BEGIN rest;
+				    }
+                           
 ^{b}*abstract{b}+type{b}*[,[:alpha:]:]            |
 ^{b}*type{b}*[,[:alpha:]:]            {
 				       // type 
