@@ -73,6 +73,9 @@ program progfree
    loop: do i=1,20
    continue
    enddo loop
+   loop1 : do i=1,20
+   continue
+   enddo loop1
    end = 10
 
    if ( a.eq.b .and. &
@@ -196,7 +199,13 @@ END ASSOCIATE
          return
       endsubroutine
       subroutine three(a)
+         do 10 i=1,4
+         do 5 j=1,2
          continue
+      5 enddo
+      10 enddo
+      typecode = 9
+      continue
          return
       end
       subroutine four(a)
