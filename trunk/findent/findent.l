@@ -153,7 +153,7 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 		  return FREE;
                }
 
-^[ ]{1,4}[[:alpha:]_%].*\n {
+^[ 0-9]{1,4}[[:alpha:]_%].*\n {
                   D(O("FREE");Y;)
 		  return FREE;
 	       }
@@ -187,15 +187,15 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
                   D(O("FREE");Y;)
 		  return FREE;
                }
-^[ ]{6,}&.*\n {
+^[ ]{6,}&.*\n  {
                   D(O("FREE");Y;)
 		  return FREE;
                }
 ^{ckey}.*\n    {
-                  D(O("UNSURE");Y;)
-                  return UNSURE;
+                  D(O("FREE");Y;)
+                  return FREE;
 	       }
-^c.*\n         {
+^c{b}+[[:alnum:]].*\n         {
                   D(O("FIXED");Y;)
 		  return FIXED;
 	       }

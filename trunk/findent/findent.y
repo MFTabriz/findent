@@ -105,7 +105,7 @@ bool cur_semi_eol;
 %token CONTAINS IFCONSTRUCT WHERECONSTRUCT FORALLCONSTRUCT
 %token ELSE ELSEIF ENTRY ELSEWHERE INTERFACE BLOCK CRITICAL
 %token ENUM TYPECONSTRUCT ASSOCIATECONSTRUCT
-%token FREE FIXED PROBFREE UNSURE FINDFORMAT
+%token FREE FIXED PROBFREE PROBFIXED UNSURE FINDFORMAT
 %token CMT SCANSTRCMT DQUOTE SQUOTE UNTERMSTR
 
 %token <val> STLABEL
@@ -1109,7 +1109,7 @@ int determine_fix_or_free(const bool store)
    int rc;
    string s;
    int n = 0;
-   const int nmax = 1000;
+   const int nmax = 4000;
    while ( n < nmax)
    {
       n++;
