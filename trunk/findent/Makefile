@@ -25,7 +25,7 @@ $(PROG)_parser.cpp $(PROG)_parser.h: $(PROG).y
 $(PROG)_lexer.cpp: $(PROG).l
 	$(LEX) -i -o $@ $<
 
-%o:     %cpp $(INCLUDES) 
+%.o:     %.cpp $(INCLUDES) 
 	$(CPP) -c $(CPPFLAGS) -o $@ $<
 
 clean:
