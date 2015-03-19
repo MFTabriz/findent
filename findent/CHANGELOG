@@ -1,3 +1,7 @@
+findent-1.6.0:
+   Makefile:
+      slight change in rule to make .o from .cpp
+
 findent-1.5.9:
    findent.l:
       recognize 'label :' ('label:' was already recognized)
