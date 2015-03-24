@@ -1,6 +1,14 @@
 findent-1.6.0:
    Makefile:
       slight change in rule to make .o from .cpp
+   wfindent:
+      added
+   findent.l:
+      fixed recognition of elseif by better definition of {nc}
+   README:
+      describe wfindent
+   INSTALL:
+      install wfindent
 
 findent-1.5.9:
    findent.l:

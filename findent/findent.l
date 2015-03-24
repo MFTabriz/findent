@@ -33,7 +33,7 @@ neol [^\n;!\'\"]
 b [ \t]
 
    // a character that can't be part of a word
-nc [ \t\n;!]
+nc [ \t\n;!\(\)]
 
    // an alphanumeric character or % or _ or space or tab or *
 bc [[:alnum:]_%\* \t]
@@ -448,23 +448,25 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 				       return CASE;
 				    }
 
-^{b}*else/{nc}                      {  // else
+^{b}*else{b}*/{nc}                  {  // else
 				       D(O("ELSE");Y;)
 				       BEGIN rest;
 				       return ELSE;
 				    }
 
-^{b}*else{b}*if/{nc}               {  // elseif
+^{b}*else{b}*if{b}*/{nc}                 {  // elseif
 				       D(O("ELSEIF");Y;)
 				       BEGIN rest;
 				       return ELSEIF;
 				    }
-^{b}*else{b}*where/{nc}             {  // elsewhere
+
+^{b}*else{b}*where{b}*/{nc}         {  // elsewhere
 				       D(O("ELSEWHERE");Y;)
 				       BEGIN rest;
 				       return ELSEWHERE;
 				    }
-^{b}*entry/{nc}                     {  // entry
+
+^{b}*entry{b}*/{nc}                     {  // entry
 				       D(O("ENTRY");Y;)
 				       BEGIN rest;
 				       return ENTRY;

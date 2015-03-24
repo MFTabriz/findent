@@ -72,6 +72,8 @@ findent, how?
     - findent.h include file for the version number
     - findent.l: input for flex
     - findent.y: input for bison, also containing the main program
+    - wfindent:  a bash script that calls findent to indent
+                 Fortran sources in-place
 
    findent.l
       
@@ -136,6 +138,17 @@ augroup END
 
      gg=G
 
+wfindent
+
+  wfindent will indent Fortran source in-place.
+
+  Usage:
+
+     wfindent [ findent flags ] files
+
+   example
+
+     wfindent -I4 *.f90
 
 I am happy to receive comments, error reports and suggestions for
 improvements.
