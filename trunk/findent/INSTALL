@@ -14,9 +14,11 @@ Testing:
    
    make test
 
-Install findent in your favorite location, for example:
+Install findent and the script wfindent in your favorite location, 
+for example:
 
    sudo install findent /usr/local/bin
+   sudo install wfindent /usr/local/bin
 
 WINDOWS:
 

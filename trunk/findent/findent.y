@@ -239,7 +239,7 @@ nolabelline:
 			     cur_indent -= if_indent;
 	                  }
          | ELSEIF         {  // ELSIF
-	                     D(O("ELSEIFCONSTRUCT");)
+	                     D(O("ELSEIF");)
 			     cur_indent -= if_indent;
 	                  }
          | ENTRY          {  // ENTRY
