@@ -361,7 +361,7 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 				       return INTERFACE;
 				    }
 
-^{b}*[0-9]+/{b}.*                         {  // statement label
+^{b}*[0-9]+/{b}+[^0-9]              {  // statement label
 				       D(O("STLABEL");Y;O(stlabel_found);)
 				       if (stlabel_found)
 				       {  // a statementlabel has already been found, do not return
@@ -448,25 +448,25 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 				       return CASE;
 				    }
 
-^{b}*else{b}*/{nc}                  {  // else
+^{b}*else/{nc}                      {  // else
 				       D(O("ELSE");Y;)
 				       BEGIN rest;
 				       return ELSE;
 				    }
 
-^{b}*else{b}*if{b}*/{nc}                 {  // elseif
+^{b}*else{b}*if/{nc}                {  // elseif
 				       D(O("ELSEIF");Y;)
 				       BEGIN rest;
 				       return ELSEIF;
 				    }
 
-^{b}*else{b}*where{b}*/{nc}         {  // elsewhere
+^{b}*else{b}*where/{nc}             {  // elsewhere
 				       D(O("ELSEWHERE");Y;)
 				       BEGIN rest;
 				       return ELSEWHERE;
 				    }
 
-^{b}*entry{b}*/{nc}                     {  // entry
+^{b}*entry/{nc}                     {  // entry
 				       D(O("ENTRY");Y;)
 				       BEGIN rest;
 				       return ENTRY;
