@@ -1,3 +1,8 @@
+findent-1.6.1:
+   findent.l: get rid of flex message: "warning, dangerous trailing context"
+                by slight redefinition of statement-label
+              simplified else, elseif, elsewhere recognition
+
 findent-1.6.0:
    Makefile:
       slight change in rule to make .o from .cpp
@@ -24,7 +29,7 @@ findent-1.5.8:
    findent.l: 
       support for construct name in 'do' 'if' 'select' 'block' 
       recognize some forms of false end
-      reconize 'abstract type' and 'abstract interface'
+      recognize 'abstract type' and 'abstract interface'
 
 findent-1.5.7
    findent.l:
