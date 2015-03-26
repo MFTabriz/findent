@@ -6,7 +6,7 @@ for i in *.f ; do
    echo -n "$i: "
    case "$i" in
       *fixed*) 
-	 format="-ffixed-form -ffixed-line-length-none"
+	 format="-ffixed-form -ffixed-line-length-none -fd-lines-as-comments"
 	 ;;
       *) 
 	 format="-ffree-form -ffree-line-length-none" 
@@ -37,7 +37,7 @@ for i in *.f ; do
 	 format="-ffree-form -ffree-line-length-none" 
 	 ;;
       *) 
-	 format="-ffixed-form -ffixed-line-length-none"
+	 format="-ffixed-form -ffixed-line-length-none -fd-lines-as-comments"
 	 ;;
    esac
    gfortran -fcoarray=single -cpp $format $i.try.f >/dev/null 2>&1

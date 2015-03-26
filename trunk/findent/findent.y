@@ -645,8 +645,8 @@ bool handle_fixed(string s)
    s = ltab2sp(s);
    D(O("fixed:");O("s");O(s);)
 
-   if (trim(s) == "" || s[0] == 'c' || s[0] == 'C' || s[0] == '!' || s[0] == '*' || s[0] == '#')
-   {  // this is a blank or comment line
+   if (isfixedcmt(s))
+   {  // this is a blank or comment or preprocessor line
       lines.push_back(trim(s));
       if (lines.size() ==1)
          return 0;   // do not expect continuation lines
@@ -798,10 +798,19 @@ void output_line()
 	          cout << endline;
 	       else
 	       {
-	          if (s[0] == '#')
-		     cout << trim(s) << endline;
-		  else
-		     cout << string(max(cur_indent,0),' ') << "!" << trim(s.substr(1)) << endline;
+	          switch (s[0])
+		  {
+	             // special hack for lines starting with 'd' or 'D'
+	             case('d'):
+		     case('D'):
+		        cout << "!" + trim(s) << endline;
+			break;
+	             case('#'):
+			cout << trim(s) << endline;
+			break;
+	             default:
+			cout << string(max(cur_indent,0),' ') << "!" << trim(s.substr(1)) << endline;
+		  }
 	       }
 	    }
 	 }
@@ -1164,10 +1173,11 @@ string handle_dos(const string s)
 bool isfixedcmt(const string s)
 {
 // returns 1 if this is a fixed empty line or fixed comment line or preprocessor line
+//                                         or debug line ('d' or 'D' in column 1)
    if (s == "" || trim(s) == "")
       return 1;
    char c = s[0];
-   return (c == 'C' || c == 'c' || c == '!' || c == '*' || c == '#'); 
+   return (c == 'C' || c == 'c' || c == '!' || c == '*' || c == '#' || c == 'd' || c == 'D'); 
 }
 
 char fixedmissingquote(const string s)
