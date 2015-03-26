@@ -183,6 +183,9 @@ c a comment
             end subroutine
             subroutine two(a)
                continue
+d         print *,'debug i=',i
+c
+D         print *,'debug j=',j
                return
             endsubroutine
             subroutine three(a)
