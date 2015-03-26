@@ -186,6 +186,19 @@ c a comment
 d         print *,'debug i=',i
 c
 D         print *,'debug j=',j
+               x = 4 +
+c next line starts with <tab>
+	1  5 +
+c next line starts with <sp><tab>
+ 	2  5+
+c next line starts with <sp><sp><tab>
+  	3  5+
+c next line starts with <sp><sp><sp><tab>
+   	4  5+
+c next line starts with <sp><sp><sp><sp><tab>
+    	5  5+
+c next line starts with <sp><sp><sp><sp><sp><tab>
+     	6  5
                return
             endsubroutine
             subroutine three(a)
