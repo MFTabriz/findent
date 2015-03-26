@@ -21,6 +21,17 @@ for i in *.f ; do
    parms=`head -n1 < $i | tr '!' ' '|tr '\r' ' '`
    $exe $parms < $i > $i.try.f 2>/dev/null
    if [ -f $i.try.f.ref ]; then
+      case "$exe" in
+	 *.exe)
+	    case $i in
+	       *dos*)
+		  :
+		  ;;
+	       *)
+		  dos2unix -q $i.try.f
+		  ;;
+	    esac
+      esac
       cmp -s $i.try.f $i.try.f.ref >/dev/null 2>&1
       if [ "$?" -eq 0 ]; then
          echo -n "OK"
