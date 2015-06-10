@@ -10,6 +10,11 @@ endif
 
 all:        $(EXE)
 
+jfindent: Jfindent.class
+
+Jfindent.class: Jfindent.java
+	javac Jfindent.java
+
 LD        = $(CXX)
 YACC      = bison
 LEX       = flex
@@ -70,6 +75,7 @@ distclean:
 	$(RM) -f $(LEXCFILES) *.$(OBJSUFFIX) $(PARCFILES)
 	$(RM) -f $(PARPFILE) $(LEXPFILE) $(PARREPORTFILE)
 	$(RM) -f test/*.f.try.f test/a.out test/*.mod
+	$(RM) -f *.class
 
 clean: distclean
 	$(RM) -f $(PROG) $(EXE) findent.exe
