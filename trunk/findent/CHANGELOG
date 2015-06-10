@@ -1,5 +1,12 @@
 findent-2.1:
-   added wfindent.bat
+   wfindent.bat:
+      added
+   wfindent:
+      change from bash syntax to sh syntax
+   Jfindent.java:
+      added
+   Makefile:
+      add support for jfindent
 
 findent-2.0:
    Complete new code
