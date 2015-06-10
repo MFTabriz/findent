@@ -18,7 +18,7 @@ RM        = rm
 SED       = sed
 YACC      = bison
 
-all:        $(EXE) jfindent
+all:        $(EXE)
 
 jfindent jfindent.jar:  Jfindent.java
 	$(JAVAC)        Jfindent.java
