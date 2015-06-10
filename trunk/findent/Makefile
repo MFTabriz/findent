@@ -8,18 +8,23 @@ else
    EXE       = $(PROG)
 endif
 
-all:        $(EXE)
-
-jfindent: Jfindent.class
-
-Jfindent.class: Jfindent.java
-	javac Jfindent.java
-
+CHMOD     = chmod
+CP        = cp
+JAR       = jar
+JAVAC     = javac
 LD        = $(CXX)
-YACC      = bison
 LEX       = flex
-SED       = sed
 RM        = rm
+SED       = sed
+YACC      = bison
+
+all:        $(EXE) jfindent
+
+jfindent jfindent.jar:  Jfindent.java
+	$(JAVAC)        Jfindent.java
+	$(JAR)   cfe $@ Jfindent Jfindent*.class
+	$(CHMOD) +x  $@
+	$(CP)        $@ jfindent.jar
 
 ifdef DEBUG
    CXXFLAGS = -Wall -g -O0 -DDEBUG
@@ -78,7 +83,7 @@ distclean:
 	$(RM) -f *.class
 
 clean: distclean
-	$(RM) -f $(PROG) $(EXE) findent.exe
+	$(RM) -f $(PROG) $(EXE) findent.exe jfindent jfindent.jar
 
 test:	all
 	cd test; ./tester ../$(EXE)
