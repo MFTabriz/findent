@@ -5,6 +5,7 @@ findent-2.1:
       change from bash syntax to sh syntax
    Jfindent.java:
       added
+      added Oracle copyright text
    Makefile:
       add support for jfindent
 
