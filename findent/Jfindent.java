@@ -53,7 +53,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import java.beans.*;
- 
+
 import javax.swing.*;
 
 
@@ -133,6 +133,7 @@ public class Jfindent {
 	    indentParm = source.getValue();
 	 }
 	 showPreview(inFile,log);
+	 writeConfig();
       }
    }
 
@@ -167,6 +168,7 @@ public class Jfindent {
 	 JSpinner source = (JSpinner)e.getSource();
 	 indentParm = (int)source.getValue();
 	 showPreview(inFile,log);
+	 writeConfig();
 	 System.out.println("TD:" + indentParm);
       }
    }
@@ -220,6 +222,7 @@ public class Jfindent {
 	 }
 	 System.out.println("TD:"+s);
 	 showPreview(inFile,log);
+	 writeConfig();
       }
    }
 
@@ -244,7 +247,7 @@ public class Jfindent {
 
 	 noButton.setSelected(true);
 
-	    System.out.println("TD: convertParm"+convertParm);
+	 System.out.println("TD: convertParm"+convertParm);
 	 if (convertParm.equals("yes"))
 	 {
 	    System.out.println("TD1: convertParm"+convertParm);
@@ -265,6 +268,7 @@ public class Jfindent {
 	    case "no":  convertParm = "no";  break;
 	 }
 	 showPreview(inFile,log);
+	 writeConfig();
       }
    }
 
@@ -356,7 +360,7 @@ public class Jfindent {
 	 return errmsg;
       }
    }
-   
+
 
    JFileChooser fc;
    JTextArea log;
@@ -365,7 +369,7 @@ public class Jfindent {
    IndentOptions1 indentPanel1;
    ConvertOption  convertPanel;
    final static boolean MULTICOLORED = false;
-   File inFile;
+   File inFile = null; // used for preview
 
    //Specify the look and feel to use.  Valid values:
    //null (use the default), "Metal", "System", "Motif", "GTK+"
@@ -383,7 +387,7 @@ public class Jfindent {
    {
       UIManager.put("FileChooser.readOnly", true);
       readConfig();
-      log = new JTextArea(40,130);
+      log = new JTextArea(30,130);
       log.setMargin(new Insets(5,5,5,5));
       log.setEditable(false);
       log.setFont(new Font(Font.MONOSPACED,Font.BOLD,14));
@@ -635,6 +639,7 @@ public class Jfindent {
 
 
    void showPreview(File inFile,JTextArea log) {
+      if(inFile == null) return;
       String endl = OsUtils.getNewLine();
       log.setText(null);
       java.util.List<String> parms = new ArrayList<String>();
@@ -704,7 +709,7 @@ public class Jfindent {
 	 System.out.println("counterout = "+counterout+" counterin = "+counterin);
       }
    }
-   
+
 
    /**
     * Create the GUI and show it.  For thread safety,
