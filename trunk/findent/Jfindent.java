@@ -38,12 +38,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.filechooser.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
+import java.text.*;
 import java.lang.ProcessBuilder.Redirect;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -56,11 +52,18 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import java.beans.*;
+ 
+import javax.swing.*;
+
 
 public class Jfindent {
    public static final class OsUtils
    {
-      private static String OS = null;
+      private static String OS             = null;
+      private static String configFileName = null;
+      private static String newLine        = null;
+
       public static String getOsName()
       {
 	 if(OS == null) { OS = System.getProperty("os.name"); }
@@ -72,10 +75,22 @@ public class Jfindent {
       }
       public static String getConfigFileName()
       {
-	 if (isWindows())
-	    return System.getProperty("user.home")+".\\jfindent.data";
-	 else
-	    return System.getProperty("user.home")+"/.jfindent";
+	 if(configFileName == null)
+	 {
+	    if (isWindows())
+	       configFileName = System.getProperty("user.home")+".\\jfindent.data";
+	    else
+	       configFileName =  System.getProperty("user.home")+"/.jfindent";
+	 }
+	 return configFileName;
+      }
+      public static String getNewLine()
+      {
+	 if(newLine == null)
+	 {
+	    newLine = System.getProperty("line.separator");
+	 }
+	 return newLine;
       }
    }
 
@@ -117,6 +132,7 @@ public class Jfindent {
 	 {
 	    indentParm = source.getValue();
 	 }
+	 showPreview(inFile,log);
       }
    }
 
@@ -150,13 +166,13 @@ public class Jfindent {
 
 	 JSpinner source = (JSpinner)e.getSource();
 	 indentParm = (int)source.getValue();
+	 showPreview(inFile,log);
 	 System.out.println("TD:" + indentParm);
       }
    }
 
    class FormatOptions extends JPanel implements ActionListener 
    {
-
 
       public FormatOptions()
       {
@@ -203,6 +219,7 @@ public class Jfindent {
 	    case "fixed": fixedfreeParm = "fixed"; break;
 	 }
 	 System.out.println("TD:"+s);
+	 showPreview(inFile,log);
       }
    }
 
@@ -247,8 +264,99 @@ public class Jfindent {
 	    case "yes": convertParm = "yes";  break;
 	    case "no":  convertParm = "no";  break;
 	 }
+	 showPreview(inFile,log);
       }
    }
+
+   class Preview implements PropertyChangeListener
+   {
+      public Preview()
+      {
+      }
+      public void propertyChange(PropertyChangeEvent evt) 
+      {
+	 if (JFileChooser.SELECTED_FILE_CHANGED_PROPERTY == evt.getPropertyName())
+	 {
+	    if (evt.getNewValue() != null)
+	    {
+	       inFile = new File(evt.getNewValue().toString());
+	       if (inFile != null)
+	       {
+		  showPreview(inFile,log);
+		  fcFolder = fc.getCurrentDirectory().getAbsolutePath();
+		  writeConfig();
+	       }
+	    }
+	 }
+      }
+   }
+
+
+   static class PipeFromFile implements Runnable {
+
+      BufferedReader inputFile;
+      int maxCount;
+      int counterin;
+      BufferedWriter bw;
+      boolean canRun = true;
+      String errmsg;
+      static String newline = System.getProperty("line.separator");
+
+      public PipeFromFile(String fileName, BufferedWriter bw, int maxCount){
+
+	 errmsg = null;
+	 this.maxCount = maxCount;
+	 this.bw = bw;
+	 counterin = 0;
+	 try{
+	    inputFile = new BufferedReader(
+		  new InputStreamReader(new FileInputStream(fileName)));
+	 } catch (Exception e) {
+	    errmsg += newline + "Not found: " + fileName;
+	    canRun = false;
+	 }
+      }
+
+      public void run(){
+
+	 String currInputLine;
+	 if (! canRun){
+	    errmsg += newline + "Cannot run";
+	    try{
+	       bw.close();
+	    } catch (Exception e) {
+	    }
+	    return;
+	 }
+	 try{
+	    while((currInputLine = inputFile.readLine()) != null) {
+	       counterin++;
+	       if (maxCount > 0 && counterin > maxCount){
+		  counterin--;
+		  break;
+	       }
+	       bw.write(currInputLine);
+	       bw.newLine();
+	    }
+	    bw.close();
+	 } catch (Exception e) {
+	    errmsg += newline + "Something wrong";
+	    try{
+	       bw.close();
+	    } catch (Exception e1){
+	    }
+	 }
+      }
+
+      public int getcounterin(){
+	 return counterin;
+      }
+
+      public String getErrmsg(){
+	 return errmsg;
+      }
+   }
+   
 
    JFileChooser fc;
    JTextArea log;
@@ -257,6 +365,7 @@ public class Jfindent {
    IndentOptions1 indentPanel1;
    ConvertOption  convertPanel;
    final static boolean MULTICOLORED = false;
+   File inFile;
 
    //Specify the look and feel to use.  Valid values:
    //null (use the default), "Metal", "System", "Motif", "GTK+"
@@ -274,9 +383,10 @@ public class Jfindent {
    {
       UIManager.put("FileChooser.readOnly", true);
       readConfig();
-      log = new JTextArea(5,80);
+      log = new JTextArea(40,130);
       log.setMargin(new Insets(5,5,5,5));
       log.setEditable(false);
+      log.setFont(new Font(Font.MONOSPACED,Font.BOLD,14));
       JScrollPane logScrollPane = new JScrollPane(log);
       fc = new JFileChooser(fcFolder)
       {
@@ -286,6 +396,7 @@ public class Jfindent {
 	    fcFolder = getCurrentDirectory().getAbsolutePath();
 	    writeConfig();
 	    File[] ff = getSelectedFiles();
+	    System.out.println(ff[0].getAbsolutePath());
 	    for ( File f : ff )
 	    {
 	       // System.out.println(f.getName());
@@ -334,20 +445,20 @@ public class Jfindent {
 		  log.append(out.toString());
 		  for ( String ss : pparms)
 		     log.append(" "+ss);
-		  log.append("\r\n");
+		  log.append(OsUtils.getNewLine());
 		  log.setCaretPosition(log.getDocument().getLength());
 
 	       }
 	       catch (IOException e) 
 	       {
-		  log.append("Error calling wfindent\r\n");
+		  log.append("Error calling wfindent"+OsUtils.getNewLine());
 		  if (OsUtils.isWindows())
 		  {
-		     log.append("Check if the folder of wfindent.bat and findent.exe is in %PATH%\r\n");
+		     log.append("Check if the folder of wfindent.bat and findent.exe is in %PATH%"+OsUtils.getNewLine());
 		  }
 		  else
 		  {
-		     log.append("Check if the folder of wfindent and findent is in $PATH\r\n");
+		     log.append("Check if the folder of wfindent and findent is in $PATH"+OsUtils.getNewLine());
 		  }
 		  log.setCaretPosition(log.getDocument().getLength());
 	       }
@@ -363,6 +474,8 @@ public class Jfindent {
       fc.setFileFilter(filter);
       fc.setMultiSelectionEnabled(true);
       fc.setApproveButtonText("indent");
+      Preview preview = new Preview();
+      fc.addPropertyChangeListener(preview);
 
       formatPanel  = new FormatOptions();
       indentPanel  = new IndentOptions();
@@ -388,6 +501,7 @@ public class Jfindent {
       mainPane.add(logScrollPane);
       mainPane.add(Box.createGlue());
    }
+
 
    private static void initLookAndFeel() {
       String lookAndFeel = null;
@@ -515,9 +629,82 @@ public class Jfindent {
       }
       catch (Exception e)
       {
-	 System.out.println("TD: exception in writeconfig");
+	 System.out.println("TD: exception in writeConfig");
       }
    }
+
+
+   void showPreview(File inFile,JTextArea log) {
+      String endl = OsUtils.getNewLine();
+      log.setText(null);
+      java.util.List<String> parms = new ArrayList<String>();
+      parms.add("findent");
+      String s;
+
+      s = "-i"+fixedfreeParm;
+      parms.add(s);
+
+      if (convertParm.equals("yes"))
+      {
+	 s = "-ofree";
+	 parms.add(s);
+      }
+      s = "-i"+indentParm;
+      parms.add(s);
+
+      ProcessBuilder pb = new ProcessBuilder(parms);
+      pb.redirectErrorStream(true);
+
+      Process process = null;
+      try {
+	 process = pb.start();
+      } catch (IOException e) {
+	 log.append("Couldn't start the process.");
+	 log.setCaretPosition(log.getDocument().getLength());
+      }
+
+      BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
+      BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+
+      PipeFromFile pipe = new PipeFromFile(inFile.getAbsolutePath(),bw,1000);
+      Thread thread = new Thread(pipe);
+      thread.start();
+
+      int counterin = 0;
+      int counterout = 0;
+
+      String currLine;
+      try {
+	 while((currLine = br.readLine()) != null) {
+	    System.out.println(currLine);
+	    counterout++;
+	    log.append(String.format("%06d ",counterout));
+	    log.append(currLine+endl);
+	 }
+      } catch (IOException e) {
+	 System.out.println("Couldn't read the output.");
+	 e.printStackTrace();
+      }
+
+      String errmsg = pipe.getErrmsg();
+
+      if (errmsg !=null){
+	 System.out.println(errmsg);
+	 return;
+      }
+
+      counterin = pipe.getcounterin();
+      System.out.println("---> end of preview <---");
+      log.append("---> end of preview <---"+endl);
+      log.setCaretPosition(0);
+      if (counterin == counterout){
+	 System.out.println("counterout == counterin == "+counterin);
+      }
+      else{
+	 System.out.println("counterout = "+counterout+" counterin = "+counterin);
+      }
+   }
+   
 
    /**
     * Create the GUI and show it.  For thread safety,
