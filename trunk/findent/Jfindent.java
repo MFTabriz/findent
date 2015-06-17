@@ -41,6 +41,8 @@ import javax.swing.filechooser.*;
 import java.io.*;
 import java.text.*;
 import java.lang.ProcessBuilder.Redirect;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -132,7 +134,7 @@ public class Jfindent {
 	 {
 	    indentParm = source.getValue();
 	 }
-	 showPreview(inFile,log);
+	 callFindent(inFile,log,null);
 	 writeConfig();
       }
    }
@@ -167,7 +169,7 @@ public class Jfindent {
 
 	 JSpinner source = (JSpinner)e.getSource();
 	 indentParm = (int)source.getValue();
-	 showPreview(inFile,log);
+	 callFindent(inFile,log,null);
 	 writeConfig();
 	 System.out.println("TD:" + indentParm);
       }
@@ -179,7 +181,7 @@ public class Jfindent {
       public FormatOptions()
       {
 
-	 JLabel formatLabel = new JLabel("Format:");
+	 JLabel formatLabel = new JLabel("Input form:");
 	 JRadioButton fixedButton = new JRadioButton("fixed");
 	 JRadioButton freeButton  = new JRadioButton("free");
 	 JRadioButton autoButton  = new JRadioButton("auto");
@@ -221,7 +223,7 @@ public class Jfindent {
 	    case "fixed": fixedfreeParm = "fixed"; break;
 	 }
 	 System.out.println("TD:"+s);
-	 showPreview(inFile,log);
+	 callFindent(inFile,log,null);
 	 writeConfig();
       }
    }
@@ -248,13 +250,57 @@ public class Jfindent {
 	 noButton.setSelected(true);
 
 	 System.out.println("TD: convertParm"+convertParm);
-	 if (convertParm.equals("yes"))
-	 {
+	 if (convertParm) {
 	    System.out.println("TD1: convertParm"+convertParm);
 	    yesButton.setSelected(true);
 	 }
 
 	 add(convertLabel);
+	 add(noButton);
+	 add(yesButton);
+      }
+      public void actionPerformed(ActionEvent e)
+      {
+	 String s = e.getActionCommand();
+	 switch (s)
+	 {
+	    case "yes": convertParm = true;  break;
+	    case "no":  convertParm = false; break;
+	 }
+	 callFindent(inFile,log,null);
+	 writeConfig();
+      }
+   }
+
+   class PreviewOption extends JPanel implements ActionListener
+   {
+      public PreviewOption()
+      {
+
+	 JLabel previewLabel    = new JLabel("Preview:");
+	 JRadioButton yesButton = new JRadioButton("yes");
+	 JRadioButton noButton  = new JRadioButton("no");
+
+	 yesButton.setActionCommand("yes");
+	 noButton.setActionCommand("no");
+
+	 yesButton.addActionListener(this);
+	 noButton.addActionListener(this);
+
+	 ButtonGroup yesnoGroup = new ButtonGroup();
+	 yesnoGroup.add(yesButton);
+	 yesnoGroup.add(noButton);
+
+	 yesButton.setSelected(true);
+
+	 System.out.println("TD: previewParm"+previewParm);
+	 if (!previewParm)
+	 {
+	    System.out.println("TD1: previewParm"+previewParm);
+	    noButton.setSelected(true);
+	 }
+
+	 add(previewLabel);
 	 add(noButton);
 	 add(yesButton);
       }
@@ -264,10 +310,10 @@ public class Jfindent {
 	 String s = e.getActionCommand();
 	 switch (s)
 	 {
-	    case "yes": convertParm = "yes";  break;
-	    case "no":  convertParm = "no";  break;
+	    case "yes": previewParm = true;  break;
+	    case "no":  previewParm = false; break;
 	 }
-	 showPreview(inFile,log);
+	 callFindent(inFile,log,null);
 	 writeConfig();
       }
    }
@@ -286,7 +332,7 @@ public class Jfindent {
 	       inFile = new File(evt.getNewValue().toString());
 	       if (inFile != null)
 	       {
-		  showPreview(inFile,log);
+		  callFindent(inFile,log,null);
 		  fcFolder = fc.getCurrentDirectory().getAbsolutePath();
 		  writeConfig();
 	       }
@@ -361,6 +407,38 @@ public class Jfindent {
       }
    }
 
+   public static class FileFormat {
+      public enum FileType { WINDOWS, UNIX, MAC, UNKNOWN }
+
+      private static final char CR = '\r';
+      private static final char LF = '\n';
+
+      public static FileType discover(String fileName) throws IOException {    
+
+	 Reader reader = new BufferedReader(new FileReader(fileName));
+	 FileType result = discover(reader);
+	 reader.close();
+	 return result;
+      }
+
+      private static FileType discover(Reader reader) throws IOException {
+	 int c;
+	 System.out.println("HOPPA");
+	 while ((c = reader.read()) != -1) {
+	    switch(c) {        
+	       case LF: return FileType.UNIX;
+	       case CR: {
+			   if (reader.read() == LF) {
+			      return FileType.WINDOWS;
+			   }
+			   return FileType.MAC;
+	       }
+	       default: continue;
+	    }
+	 }
+	 return FileType.UNKNOWN;
+      }
+   }
 
    JFileChooser fc;
    JTextArea log;
@@ -368,6 +446,7 @@ public class Jfindent {
    IndentOptions  indentPanel;
    IndentOptions1 indentPanel1;
    ConvertOption  convertPanel;
+   PreviewOption  previewPanel;
    final static boolean MULTICOLORED = false;
    File inFile = null; // used for preview
 
@@ -378,9 +457,10 @@ public class Jfindent {
    JPanel mainPane;
 
    String extraParm;
-   String convertParm;
+   boolean convertParm;
    String fixedfreeParm;
    int indentParm;
+   boolean previewParm;
    String fcFolder;
 
    public Jfindent() 
@@ -405,69 +485,12 @@ public class Jfindent {
 	    {
 	       // System.out.println(f.getName());
 	       // System.out.println(f.getAbsolutePath());
-	       try 
-	       {
-		  java.util.List<String> parms = new ArrayList<String>();
-		  java.util.List<String> pparms = new ArrayList<String>();
-		  if (OsUtils.isWindows())
-		  {
-		     parms.add("cmd");
-		     parms.add("/C");
-		  }
-		  parms.add("wfindent");
-		  pparms.add("wfindent");
-		  String s;
-
-		  s = "-i"+fixedfreeParm;
-		  parms.add(s);
-		  pparms.add(s);
-
-		  if (convertParm.equals("yes"))
-		  {
-		     s = "-ofree";
-		     parms.add(s);
-		     pparms.add(s);
-		  }
-		  s = "-i"+indentParm;
-		  parms.add(s);
-		  pparms.add(s);
-
-		  parms.add(f.getAbsolutePath());
-		  pparms.add(f.getName());
-
-		  ProcessBuilder pb = new ProcessBuilder(parms);
-		  pb.redirectErrorStream(true);
-		  Process p = pb.start();
-		  InputStream in = p.getInputStream();
-		  BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-		  StringBuilder out = new StringBuilder();
-		  String line;
-		  while ((line = reader.readLine()) != null) {
-		     out.append(line);
-		  }
-		  reader.close();
-		  log.append(out.toString());
-		  for ( String ss : pparms)
-		     log.append(" "+ss);
-		  log.append(OsUtils.getNewLine());
-		  log.setCaretPosition(log.getDocument().getLength());
-
-	       }
-	       catch (IOException e) 
-	       {
-		  log.append("Error calling wfindent"+OsUtils.getNewLine());
-		  if (OsUtils.isWindows())
-		  {
-		     log.append("Check if the folder of wfindent.bat and findent.exe is in %PATH%"+OsUtils.getNewLine());
-		  }
-		  else
-		  {
-		     log.append("Check if the folder of wfindent and findent is in $PATH"+OsUtils.getNewLine());
-		  }
-		  log.setCaretPosition(log.getDocument().getLength());
-	       }
-
+	       callFindent(f,log,f);
 	    }
+	 }
+	 @Override
+	 public void cancelSelection()
+	 {
 	 }
       };
 
@@ -485,11 +508,13 @@ public class Jfindent {
       indentPanel  = new IndentOptions();
       indentPanel1 = new IndentOptions1();
       convertPanel = new ConvertOption();
+      previewPanel = new PreviewOption();
 
 
       JPanel optionsPanel = new JPanel();
       optionsPanel.add(formatPanel);
       //optionsPanel.add(indentPanel);
+      optionsPanel.add(previewPanel);
       optionsPanel.add(convertPanel);
       optionsPanel.add(indentPanel1);
 
@@ -550,9 +575,10 @@ public class Jfindent {
    void readConfig()
    {
       extraParm     = "";
-      convertParm   = "no";
+      convertParm   = false;
       fixedfreeParm = "auto";
       indentParm    = 3;
+      previewParm   = true;
       fcFolder      = System.getProperty("user.home");
 
       try
@@ -574,37 +600,41 @@ public class Jfindent {
 	    {
 	       Element elem = (Element) node;
 
-	       // Get the value of the ID attribute.
-	       // String ID = node.getAttributes().getNamedItem("ID").getNodeValue();
-
-	       // Get the value of all sub-elements.
-
-	       if (elem.getElementsByTagName("extra").item(0).getChildNodes().getLength()>0)
-	       {
+	       try {
 		  extraParm = elem.getElementsByTagName("extra")
 		     .item(0).getChildNodes().item(0).getNodeValue();
 		  System.out.println("TD:extra["+extraParm+"]"+i);
-	       }
+	       } catch (Exception e) {}
 
-	       convertParm = elem.getElementsByTagName("convert")
-		  .item(0).getChildNodes().item(0).getNodeValue();
-	       System.out.println("TD:"+convertParm+" "+i);
-
-	       fixedfreeParm = elem.getElementsByTagName("fixedfree").item(0)
-		  .getChildNodes().item(0).getNodeValue();
-	       System.out.println("TD:"+fixedfreeParm+" "+i);
-
-	       indentParm = Integer.parseInt(elem.getElementsByTagName("indent")
+	       try {
+		  convertParm = Boolean.parseBoolean(elem.getElementsByTagName("convert")
 		     .item(0).getChildNodes().item(0).getNodeValue());
-	       System.out.println("TD:"+indentParm+" "+i);
+		  System.out.println("TD:"+convertParm+" "+i);
+	       } catch (Exception e) {}
 
-	       if (elem.getElementsByTagName("fcfolder").item(0).getChildNodes().getLength()>0)
-	       {
+	       try {
+		  previewParm = Boolean.parseBoolean(elem.getElementsByTagName("preview")
+		     .item(0).getChildNodes().item(0).getNodeValue());
+		  System.out.println("TD:"+previewParm+" "+i);
+	       } catch (Exception e) {}
+
+	       try {
+		  fixedfreeParm = elem.getElementsByTagName("fixedfree").item(0)
+		     .getChildNodes().item(0).getNodeValue();
+		  System.out.println("TD:"+fixedfreeParm+" "+i);
+	       } catch (Exception e) {}
+
+	       try {
+		  indentParm = Integer.parseInt(elem.getElementsByTagName("indent")
+			.item(0).getChildNodes().item(0).getNodeValue());
+		  System.out.println("TD:"+indentParm+" "+i);
+	       } catch (Exception e) {}
+
+	       try {
 		  fcFolder = elem.getElementsByTagName("fcfolder").item(0)
 		     .getChildNodes().item(0).getNodeValue();
 		  System.out.println("TD:"+fcFolder+" "+i);
-	       }
-
+	       } catch (Exception e) {}
 	    }
 	 }
       }
@@ -627,6 +657,7 @@ public class Jfindent {
 	 writer.println("    <indent>"    + indentParm     +"</indent>");
 	 writer.println("    <extra>"     + extraParm      +"</extra>");
 	 writer.println("    <fcfolder>"  + fcFolder       +"</fcfolder>");
+	 writer.println("    <preview>"   + previewParm    +"</preview>");
 	 writer.println("  </parms>");
 	 writer.println("</jfindent>");
 	 writer.close();
@@ -637,20 +668,47 @@ public class Jfindent {
       }
    }
 
+   void callFindent(File inFile, JTextArea log, File outFile) {
+      // outFile = null: output to log, else output to outFile
+      // outFile can be the same file as inFile
+      
+      boolean doFile = (outFile != null);
 
-   void showPreview(File inFile,JTextArea log) {
-      if(inFile == null) return;
-      String endl = OsUtils.getNewLine();
-      log.setText(null);
+      if (!doFile){
+	 log.setText(null);
+      }
+
+      if (!doFile && !previewParm){
+	 return;
+      }
+      String endl  = OsUtils.getNewLine();
+      String fendl = "\n";
+
+      if(inFile == null){
+	 if (doFile) {
+	    log.append("No inputfile ..."+endl);
+	    log.setCaretPosition(log.getDocument().getLength());
+	 }
+	 return;
+      }
+
+      try{
+	 switch(FileFormat.discover(inFile.getAbsolutePath())){
+	    case WINDOWS: fendl = "\r\n"; break;
+	    case MAC:     fendl = "\r";   break;
+	    default:      fendl = "\n";   break;
+	 }
+      } catch (Exception e) { 
+	 fendl = "\n"; }
+
       java.util.List<String> parms = new ArrayList<String>();
       parms.add("findent");
-      String s;
 
+      String s;
       s = "-i"+fixedfreeParm;
       parms.add(s);
 
-      if (convertParm.equals("yes"))
-      {
+      if (convertParm) {
 	 s = "-ofree";
 	 parms.add(s);
       }
@@ -664,49 +722,143 @@ public class Jfindent {
       try {
 	 process = pb.start();
       } catch (IOException e) {
-	 log.append("Couldn't start the process.");
+	 log.append("Couldn't start findent."+endl);
+	 if (OsUtils.isWindows())
+	 {
+	    log.append("Check if the folder of wfindent.bat and findent.exe is in %PATH%"+OsUtils.getNewLine());
+	 }
+	 else
+	 {
+	    log.append("Check if the folder of wfindent and findent is in $PATH"+OsUtils.getNewLine());
+	 }
 	 log.setCaretPosition(log.getDocument().getLength());
       }
 
       BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
       BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
-      PipeFromFile pipe = new PipeFromFile(inFile.getAbsolutePath(),bw,1000);
+      int mcount = 1000;
+      if (doFile){
+	 mcount = 0;
+      }
+      PipeFromFile pipe = new PipeFromFile(inFile.getAbsolutePath(),bw,mcount);
       Thread thread = new Thread(pipe);
       thread.start();
 
       int counterin = 0;
       int counterout = 0;
 
+      if (!doFile){
+	 log.append("Preview: ");
+      }
+      for (String s1: parms){
+	 log.append(s1+" ");
+      }
+      log.append(" < "+inFile.getName());
+      if (doFile){
+	 log.append(" -- ");
+      } else {
+	 log.append(endl);
+      }
+
+      File temp = null;
+      Writer writer = null;
+
+      if (doFile){
+	 try{
+	    temp = File.createTempFile("jfindent", ".tmp");
+	 } catch (Exception e) {
+	    log.append("Cannot create temp file");
+	    log.setCaretPosition(log.getDocument().getLength());
+	    return;
+	 }
+
+	 try {
+	    writer = new BufferedWriter(new OutputStreamWriter(
+		     new FileOutputStream(temp), "utf-8"));
+	 } catch (Exception e) {
+	    log.append("Cannot write to temp file "+temp.getAbsolutePath());
+	    log.setCaretPosition(log.getDocument().getLength());
+	    try{
+	       temp.delete();
+	    } catch(Exception ee) {}
+	    return;
+	 }
+      }
+
       String currLine;
       try {
 	 while((currLine = br.readLine()) != null) {
-	    System.out.println(currLine);
 	    counterout++;
-	    log.append(String.format("%06d ",counterout));
-	    log.append(currLine+endl);
+	    if (doFile){
+	       writer.write(currLine+fendl);
+	    } else {
+	       log.append(String.format("%06d ",counterout)+currLine+endl);
+	    }
 	 }
       } catch (IOException e) {
-	 System.out.println("Couldn't read the output.");
-	 e.printStackTrace();
+	 log.append(endl+"Couldn't read the output or write to temp file."+endl);
+	 log.setCaretPosition(log.getDocument().getLength());
+	 if (doFile){
+	    try{
+	       temp.delete();
+	    } catch(Exception ee) {}
+	 }
+	 return;
+      }
+
+      if (doFile) {
+	 try{
+	    writer.close();
+	 } catch (Exception e) {}
       }
 
       String errmsg = pipe.getErrmsg();
 
       if (errmsg !=null){
-	 System.out.println(errmsg);
+	 log.append(endl+errmsg+endl);
+	 log.setCaretPosition(log.getDocument().getLength());
+	 if (doFile){
+	    try{
+	       temp.delete();
+	    } catch(Exception e) {}
+	 }
 	 return;
       }
 
       counterin = pipe.getcounterin();
-      System.out.println("---> end of preview <---");
-      log.append("---> end of preview <---"+endl);
-      log.setCaretPosition(0);
-      if (counterin == counterout){
-	 System.out.println("counterout == counterin == "+counterin);
+      if (counterin != counterout){
+	 log.append(endl + 
+	       "Error: number of input lines("
+	       +counterin+") is not equal to number of output lines("
+	       +counterout+")"+endl);
+	 log.setCaretPosition(log.getDocument().getLength());
+	 if (doFile){
+	    try{
+	       temp.delete();
+	    } catch(Exception e) {}
+	 }
+	 return;
       }
-      else{
-	 System.out.println("counterout = "+counterout+" counterin = "+counterin);
+
+      System.out.println("TD: "+counterin + " " + counterout);
+      if (doFile){
+	 try{
+	    Files.copy(temp.toPath(),outFile.toPath(),StandardCopyOption.REPLACE_EXISTING);
+	 }
+	 catch (Exception e){
+	    log.append(endl+"Cannot copy from "+temp.getAbsolutePath()+" to "+outFile.getAbsolutePath()+endl);
+	    log.setCaretPosition(log.getDocument().getLength());
+	    try{
+	       temp.delete();
+	    } catch(Exception ee) {}
+	    return;
+	 }
+	 log.append("Indented "+counterin+" lines"+endl);
+	 log.setCaretPosition(log.getDocument().getLength());
+      } else {
+	 log.append("---> end of preview <---"+endl);
+	 log.setCaretPosition(0);
       }
    }
 
