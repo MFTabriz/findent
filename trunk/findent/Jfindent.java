@@ -60,49 +60,42 @@ import javax.swing.*;
 
 
 public class Jfindent {
-   public static final class OsUtils
-   {
+   public static final class OsUtils {
       private static String OS             = null;
       private static String configFileName = null;
       private static String newLine        = null;
 
-      public static String getOsName()
-      {
-	 if(OS == null) { OS = System.getProperty("os.name"); }
+      public static String getOsName() {
+	 if(OS == null) { 
+	    OS = System.getProperty("os.name"); }
 	 return OS;
       }
-      public static boolean isWindows()
-      {
+      public static boolean isWindows() {
 	 return getOsName().startsWith("Windows");
       }
-      public static String getConfigFileName()
-      {
-	 if(configFileName == null)
-	 {
-	    if (isWindows())
+      public static String getConfigFileName() {
+	 if(configFileName == null) {
+	    if (isWindows()) {
 	       configFileName = System.getProperty("user.home")+".\\jfindent.data";
-	    else
+	    } else {
 	       configFileName =  System.getProperty("user.home")+"/.jfindent";
+	    }
 	 }
 	 return configFileName;
       }
-      public static String getNewLine()
-      {
-	 if(newLine == null)
-	 {
+      public static String getNewLine() {
+	 if(newLine == null) {
 	    newLine = System.getProperty("line.separator");
 	 }
 	 return newLine;
       }
    }
 
-   class IndentOptions extends JPanel implements ChangeListener
-   {
+   class IndentOptions extends JPanel implements ChangeListener {
       static final int minIndent = 0;
       static final int maxIndent = 8;
 
-      public IndentOptions()
-      {
+      public IndentOptions() {
 	 JLabel indentLabel = new JLabel("Indent:");
 
 	 if (indentParm < minIndent)
@@ -127,11 +120,9 @@ public class Jfindent {
 	 add(indentation);
 
       }
-      public void stateChanged(ChangeEvent e) 
-      {
+      public void stateChanged(ChangeEvent e) {
 	 JSlider source = (JSlider)e.getSource();
-	 if (!source.getValueIsAdjusting()) 
-	 {
+	 if (!source.getValueIsAdjusting()) {
 	    indentParm = source.getValue();
 	 }
 	 callFindent(inFile,log,null);
@@ -139,14 +130,12 @@ public class Jfindent {
       }
    }
 
-   class IndentOptions1 extends JPanel implements ChangeListener
-   {
+   class IndentOptions1 extends JPanel implements ChangeListener {
       static final int minIndent = 0;
       static final int maxIndent = 8;
 
       JSpinner spinner;
-      public IndentOptions1()
-      {
+      public IndentOptions1() {
 	 JLabel indentLabel = new JLabel("Indent:");
 
 	 if (indentParm < minIndent)
@@ -164,22 +153,18 @@ public class Jfindent {
 	 add(spinner);
       }
 
-      public void stateChanged(ChangeEvent e)
-      {
+      public void stateChanged(ChangeEvent e) {
 
 	 JSpinner source = (JSpinner)e.getSource();
 	 indentParm = (int)source.getValue();
 	 callFindent(inFile,log,null);
 	 writeConfig();
-	 System.out.println("TD:" + indentParm);
       }
    }
 
-   class FormatOptions extends JPanel implements ActionListener 
-   {
+   class FormatOptions extends JPanel implements ActionListener {
 
-      public FormatOptions()
-      {
+      public FormatOptions() {
 
 	 JLabel formatLabel = new JLabel("Input form:");
 	 JRadioButton fixedButton = new JRadioButton("fixed");
@@ -201,8 +186,7 @@ public class Jfindent {
 
 	 autoButton.setSelected(true);
 
-	 switch (fixedfreeParm)
-	 {
+	 switch (fixedfreeParm) {
 	    case "fixed": fixedButton.setSelected(true); break;
 	    case "free":  freeButton.setSelected(true); break;
 	 }
@@ -213,25 +197,20 @@ public class Jfindent {
 	 add(fixedButton);
       }
 
-      public void actionPerformed(ActionEvent e)
-      {
+      public void actionPerformed(ActionEvent e) {
 	 String s = e.getActionCommand();
-	 switch (s)
-	 {
+	 switch (s) {
 	    case "auto":  fixedfreeParm = "auto";  break;
 	    case "free":  fixedfreeParm = "free";  break;
 	    case "fixed": fixedfreeParm = "fixed"; break;
 	 }
-	 System.out.println("TD:"+s);
 	 callFindent(inFile,log,null);
 	 writeConfig();
       }
    }
 
-   class ConvertOption extends JPanel implements ActionListener
-   {
-      public ConvertOption()
-      {
+   class ConvertOption extends JPanel implements ActionListener {
+      public ConvertOption() {
 
 	 JLabel convertLabel = new JLabel("Convert fixed->free:");
 	 JRadioButton yesButton = new JRadioButton("yes");
@@ -249,9 +228,7 @@ public class Jfindent {
 
 	 noButton.setSelected(true);
 
-	 System.out.println("TD: convertParm"+convertParm);
 	 if (convertParm) {
-	    System.out.println("TD1: convertParm"+convertParm);
 	    yesButton.setSelected(true);
 	 }
 
@@ -259,11 +236,9 @@ public class Jfindent {
 	 add(noButton);
 	 add(yesButton);
       }
-      public void actionPerformed(ActionEvent e)
-      {
+      public void actionPerformed(ActionEvent e) {
 	 String s = e.getActionCommand();
-	 switch (s)
-	 {
+	 switch (s) {
 	    case "yes": convertParm = true;  break;
 	    case "no":  convertParm = false; break;
 	 }
@@ -272,10 +247,44 @@ public class Jfindent {
       }
    }
 
-   class PreviewOption extends JPanel implements ActionListener
-   {
-      public PreviewOption()
-      {
+   class ExtraOptions extends JPanel implements ActionListener {
+	 JTextField extraText;
+      public ExtraOptions() {
+
+	 JLabel extraLabel = new JLabel("Extra options:");
+	 extraText         = new JTextField(extraParm,40);
+	 extraText.setActionCommand("extra");
+	 extraText.addActionListener(this);
+	 extraText.setFont(new Font(Font.MONOSPACED,Font.BOLD,14));
+
+	 JButton enterButton = new JButton("enter");
+	 JButton clearButton = new JButton("clear");
+	 enterButton.addActionListener(this);
+	 enterButton.setActionCommand("enter");
+	 clearButton.addActionListener(this);
+	 clearButton.setActionCommand("clear");
+	 add(extraLabel);
+	 add(extraText);
+	 add(enterButton);
+	 add(clearButton);
+      }
+
+      public void actionPerformed(ActionEvent e) {
+	 switch (e.getActionCommand()){
+	    case "clear": extraParm = "";
+			  extraText.setText(extraParm); 
+			  break;
+	    case "enter": 
+	    case "extra":
+			  extraParm = extraText.getText();
+	 }
+	 callFindent(inFile,log,null);
+	 writeConfig();
+      }
+   }
+
+   class PreviewOption extends JPanel implements ActionListener {
+      public PreviewOption() {
 
 	 JLabel previewLabel    = new JLabel("Preview:");
 	 JRadioButton yesButton = new JRadioButton("yes");
@@ -293,10 +302,7 @@ public class Jfindent {
 
 	 yesButton.setSelected(true);
 
-	 System.out.println("TD: previewParm"+previewParm);
-	 if (!previewParm)
-	 {
-	    System.out.println("TD1: previewParm"+previewParm);
+	 if (!previewParm) {
 	    noButton.setSelected(true);
 	 }
 
@@ -305,11 +311,9 @@ public class Jfindent {
 	 add(yesButton);
       }
 
-      public void actionPerformed(ActionEvent e)
-      {
+      public void actionPerformed(ActionEvent e) {
 	 String s = e.getActionCommand();
-	 switch (s)
-	 {
+	 switch (s) {
 	    case "yes": previewParm = true;  break;
 	    case "no":  previewParm = false; break;
 	 }
@@ -318,20 +322,14 @@ public class Jfindent {
       }
    }
 
-   class Preview implements PropertyChangeListener
-   {
-      public Preview()
-      {
+   class Preview implements PropertyChangeListener {
+      public Preview() {
       }
-      public void propertyChange(PropertyChangeEvent evt) 
-      {
-	 if (JFileChooser.SELECTED_FILE_CHANGED_PROPERTY == evt.getPropertyName())
-	 {
-	    if (evt.getNewValue() != null)
-	    {
+      public void propertyChange(PropertyChangeEvent evt) {
+	 if (JFileChooser.SELECTED_FILE_CHANGED_PROPERTY == evt.getPropertyName()) {
+	    if (evt.getNewValue() != null) {
 	       inFile = new File(evt.getNewValue().toString());
-	       if (inFile != null)
-	       {
+	       if (inFile != null) {
 		  callFindent(inFile,log,null);
 		  fcFolder = fc.getCurrentDirectory().getAbsolutePath();
 		  writeConfig();
@@ -423,7 +421,6 @@ public class Jfindent {
 
       private static FileType discover(Reader reader) throws IOException {
 	 int c;
-	 System.out.println("HOPPA");
 	 while ((c = reader.read()) != -1) {
 	    switch(c) {        
 	       case LF: return FileType.UNIX;
@@ -447,6 +444,8 @@ public class Jfindent {
    IndentOptions1 indentPanel1;
    ConvertOption  convertPanel;
    PreviewOption  previewPanel;
+   ExtraOptions   extraPanel;
+
    final static boolean MULTICOLORED = false;
    File inFile = null; // used for preview
 
@@ -456,15 +455,14 @@ public class Jfindent {
 
    JPanel mainPane;
 
-   String extraParm;
+   String  extraParm;
+   String  fixedfreeParm;
+   String  fcFolder;
    boolean convertParm;
-   String fixedfreeParm;
-   int indentParm;
    boolean previewParm;
-   String fcFolder;
+   int     indentParm;
 
-   public Jfindent() 
-   {
+   public Jfindent() {
       UIManager.put("FileChooser.readOnly", true);
       readConfig();
       log = new JTextArea(30,130);
@@ -472,28 +470,23 @@ public class Jfindent {
       log.setEditable(false);
       log.setFont(new Font(Font.MONOSPACED,Font.BOLD,14));
       JScrollPane logScrollPane = new JScrollPane(log);
-      fc = new JFileChooser(fcFolder)
-      {
+      fc = new JFileChooser(fcFolder) {
 	 @Override
-	 public void approveSelection()
-	 {
+	 public void approveSelection() {
 	    fcFolder = getCurrentDirectory().getAbsolutePath();
 	    writeConfig();
 	    File[] ff = getSelectedFiles();
-	    System.out.println(ff[0].getAbsolutePath());
-	    for ( File f : ff )
-	    {
-	       // System.out.println(f.getName());
-	       // System.out.println(f.getAbsolutePath());
+	    for ( File f : ff ) {
 	       callFindent(f,log,f);
 	    }
 	 }
 	 @Override
-	 public void cancelSelection()
-	 {
+	 public void cancelSelection() {
+	    System.exit(0);
 	 }
       };
 
+      fc.setFont(new Font(Font.MONOSPACED,Font.BOLD,14));
       fc.setAcceptAllFileFilterUsed(true);
       FileNameExtensionFilter filter = new FileNameExtensionFilter(
 	    ".f .f90 f95 f03 f08 for ftn", 
@@ -501,6 +494,7 @@ public class Jfindent {
       fc.setFileFilter(filter);
       fc.setMultiSelectionEnabled(true);
       fc.setApproveButtonText("indent");
+      fc.setApproveButtonToolTipText("indent selected files");
       Preview preview = new Preview();
       fc.addPropertyChangeListener(preview);
 
@@ -508,13 +502,14 @@ public class Jfindent {
       indentPanel  = new IndentOptions();
       indentPanel1 = new IndentOptions1();
       convertPanel = new ConvertOption();
+      extraPanel   = new ExtraOptions();
       previewPanel = new PreviewOption();
 
 
       JPanel optionsPanel = new JPanel();
+      optionsPanel.add(previewPanel);
       optionsPanel.add(formatPanel);
       //optionsPanel.add(indentPanel);
-      optionsPanel.add(previewPanel);
       optionsPanel.add(convertPanel);
       optionsPanel.add(indentPanel1);
 
@@ -527,6 +522,7 @@ public class Jfindent {
       mainPane.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
       mainPane.add(fc);
       mainPane.add(optionsPanel);
+      mainPane.add(extraPanel);
       mainPane.add(logScrollPane);
       mainPane.add(Box.createGlue());
    }
@@ -572,8 +568,7 @@ public class Jfindent {
       }
    }
 
-   void readConfig()
-   {
+   void readConfig() {
       extraParm     = "";
       convertParm   = false;
       fixedfreeParm = "auto";
@@ -581,8 +576,7 @@ public class Jfindent {
       previewParm   = true;
       fcFolder      = System.getProperty("user.home");
 
-      try
-      {
+      try {
 	 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 	 DocumentBuilder builder = factory.newDocumentBuilder();
 
@@ -591,63 +585,50 @@ public class Jfindent {
 
 	 Document document = builder.parse(new File(OsUtils.getConfigFileName()));
 	 NodeList nodeList = document.getDocumentElement().getChildNodes();
-	 System.out.println("TD: nrnodes: "+nodeList.getLength());
-	 for (int i = 0; i < nodeList.getLength(); i++) 
-	 {
+	 for (int i = 0; i < nodeList.getLength(); i++) {
 	    Node node = nodeList.item(i);
 
-	    if (node.getNodeType() == Node.ELEMENT_NODE) 
-	    {
+	    if (node.getNodeType() == Node.ELEMENT_NODE) {
 	       Element elem = (Element) node;
 
 	       try {
 		  extraParm = elem.getElementsByTagName("extra")
 		     .item(0).getChildNodes().item(0).getNodeValue();
-		  System.out.println("TD:extra["+extraParm+"]"+i);
 	       } catch (Exception e) {}
 
 	       try {
 		  convertParm = Boolean.parseBoolean(elem.getElementsByTagName("convert")
 		     .item(0).getChildNodes().item(0).getNodeValue());
-		  System.out.println("TD:"+convertParm+" "+i);
 	       } catch (Exception e) {}
 
 	       try {
 		  previewParm = Boolean.parseBoolean(elem.getElementsByTagName("preview")
 		     .item(0).getChildNodes().item(0).getNodeValue());
-		  System.out.println("TD:"+previewParm+" "+i);
 	       } catch (Exception e) {}
 
 	       try {
 		  fixedfreeParm = elem.getElementsByTagName("fixedfree").item(0)
 		     .getChildNodes().item(0).getNodeValue();
-		  System.out.println("TD:"+fixedfreeParm+" "+i);
 	       } catch (Exception e) {}
 
 	       try {
 		  indentParm = Integer.parseInt(elem.getElementsByTagName("indent")
 			.item(0).getChildNodes().item(0).getNodeValue());
-		  System.out.println("TD:"+indentParm+" "+i);
 	       } catch (Exception e) {}
 
 	       try {
 		  fcFolder = elem.getElementsByTagName("fcfolder").item(0)
 		     .getChildNodes().item(0).getNodeValue();
-		  System.out.println("TD:"+fcFolder+" "+i);
 	       } catch (Exception e) {}
 	    }
 	 }
       }
-      catch (Exception e)
-      {
-	 System.out.println("TD: exception in readconfig");
+      catch (Exception e) {
       }
    }
 
-   void writeConfig()
-   {
-      try
-      {
+   void writeConfig() {
+      try {
 	 PrintWriter writer = new PrintWriter(OsUtils.getConfigFileName(),"UTF-8");
 	 writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 	 writer.println("<jfindent>");
@@ -662,9 +643,7 @@ public class Jfindent {
 	 writer.println("</jfindent>");
 	 writer.close();
       }
-      catch (Exception e)
-      {
-	 System.out.println("TD: exception in writeConfig");
+      catch (Exception e) {
       }
    }
 
@@ -715,6 +694,11 @@ public class Jfindent {
       s = "-i"+indentParm;
       parms.add(s);
 
+      String[] extraparms = extraParm.split("[ \t]+");
+      for ( String sp : extraparms ){
+	 parms.add(sp);
+      }
+
       ProcessBuilder pb = new ProcessBuilder(parms);
       pb.redirectErrorStream(true);
 
@@ -723,12 +707,9 @@ public class Jfindent {
 	 process = pb.start();
       } catch (IOException e) {
 	 log.append("Couldn't start findent."+endl);
-	 if (OsUtils.isWindows())
-	 {
+	 if (OsUtils.isWindows()) {
 	    log.append("Check if the folder of wfindent.bat and findent.exe is in %PATH%"+OsUtils.getNewLine());
-	 }
-	 else
-	 {
+	 } else {
 	    log.append("Check if the folder of wfindent and findent is in $PATH"+OsUtils.getNewLine());
 	 }
 	 log.setCaretPosition(log.getDocument().getLength());
@@ -841,7 +822,6 @@ public class Jfindent {
 	 return;
       }
 
-      System.out.println("TD: "+counterin + " " + counterout);
       if (doFile){
 	 try{
 	    Files.copy(temp.toPath(),outFile.toPath(),StandardCopyOption.REPLACE_EXISTING);
@@ -849,9 +829,9 @@ public class Jfindent {
 	 catch (Exception e){
 	    log.append(endl+"Cannot copy from "+temp.getAbsolutePath()+" to "+outFile.getAbsolutePath()+endl);
 	    log.setCaretPosition(log.getDocument().getLength());
-	    try{
-	       temp.delete();
-	    } catch(Exception ee) {}
+	    //try{
+	     //  temp.delete();
+	    //} catch(Exception ee) {}
 	    return;
 	 }
 	 log.append("Indented "+counterin+" lines"+endl);
