@@ -215,6 +215,60 @@ findent, usage?
 
    NOTE 2: findent silently ignores errors in the flags
 
+   Installation:
+
+   Linux:
+      sudo install findent /usr/local/bin
+   Windows:
+      copy findent.exe C:\WINDOWS
+
+wfindent
+
+  wfindent, a bash shell script, indents Fortran source in-place, performing a
+  sanity check.
+  It accepts all flags that findent accepts.
+
+  Usage:
+
+     wfindent [ findent flags ] files
+
+   example
+
+     wfindent -I4 *.f90
+
+   Installation:
+     
+      sudo install wfindent /usr/local/bin
+
+wfindent.bat
+
+  wfindent.bat is for usage in the cmd shell of Windows and has the same
+  functionality as wfindent, described just above
+
+  Installation:
+
+    copy wfindent.bat C:\WINDOWS
+
+jfindent or jfindent.jar
+
+  jfindent is a graphical frontend for findent. It requires java >= 1.7.
+  Depending on your system, there are several ways to call it:
+
+  Linux (and probably MacOs):
+
+    java -jar jfindent.jar
+
+    But, after installing binfmt-support (at least on Ubuntu):
+       sudo apt-get install binfmt-support
+    you can call jfindent by installing it in for example in /usr/local/bin:
+       sudo install jfindent /usr/local/bin
+
+  Windows:
+
+       java -jar jfindent.jar
+    or just
+       jfindent.jar
+
 findent and vim
 
    Take care that findent can be found via the PATH environment variable.
@@ -231,20 +285,6 @@ augroup END
   replaced by findent. For example, to format the whole file, enter:
 
      gg=G
-
-wfindent
-
-  wfindent, a bash shell script, indents Fortran source in-place, performing a
-  sanity check.
-  It accepts all flags that findent accepts.
-
-  Usage:
-
-     wfindent [ findent flags ] files
-
-   example
-
-     wfindent -I4 *.f90
 
 Issues
    

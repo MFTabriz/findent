@@ -1,6 +1,8 @@
 findent: indents/beautifies/converts Fortran sources
          supports Fortran-2008
 
+NEW since 2.1: jfindent, a graphical frontent for findent is
+               available (requires java >=1.7)
 NEW since 2.0: better parser
                findent is space-insensitive
 
@@ -16,6 +18,16 @@ Linux users: the tar ball contains a static linked executable,
 	     If the precompiled version does not work,
 	     use the next recipe.
 
+	     The tar ball contains jfindent and jfindent.jar, these
+	     files are identical.
+
+	     you can cal jfindent like this:
+	       java -jar jfindent.jar
+	     or, after installing binfmt-support, you can install
+	     jfindent:
+	       sudo install jfindent /usr/local/bin
+	     and call it by the name jfindent.
+
 Unix-Linux users: 
     prerequisites: flex, bison, gnumake, g++
     make:    download findent-x.y.tgz
@@ -28,7 +40,9 @@ Unix-Linux users:
 
 Windows users: download findent-x.y.zip
                unzip findent-x.y.zip
-               copy findent.exe to your 'Program Files' folder
+               copy findent.exe C:\WINDOWS
+	       copy wfindent.bat C:\WINDOWS
+	       copy findent.jar C:\WINDOWS
 
 Usage:    findent -h
 Examples: findent < in.f90 > out.f90

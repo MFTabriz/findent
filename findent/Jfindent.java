@@ -263,8 +263,7 @@ public class Jfindent {
 	    case "enter": 
 	    case "extra":   extraParm = extraText.getText();
 			    break;
-	    case "options": System.out.println("HELP!");
-			    callFindent(null,log,null,true);
+	    case "options": callFindent(null,log,null,true);
 			    return;
 	 }
 	 callFindent(inFile,log,null);
@@ -652,7 +651,6 @@ public class Jfindent {
       if (doHelp){
 	 doFile = false;
       }
-      System.out.println("A "+doHelp+doFile);
 
       if (!doFile){
 	 log.setText(null);
@@ -663,7 +661,6 @@ public class Jfindent {
 	    return;
 	 }
       }
-      System.out.println("B");
 
       String endl  = OsUtils.getNewLine();
       String fendl = "\n";
