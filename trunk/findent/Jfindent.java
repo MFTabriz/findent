@@ -95,47 +95,8 @@ public class Jfindent {
       static final int minIndent = 0;
       static final int maxIndent = 8;
 
-      public IndentOptions() {
-	 JLabel indentLabel = new JLabel("Indent:");
-
-	 if (indentParm < minIndent)
-	    indentParm = minIndent;
-	 if (indentParm >maxIndent)
-	    indentParm = maxIndent;
-
-	 JSlider indentation = new JSlider(JSlider.HORIZONTAL,
-	       minIndent, maxIndent, indentParm);
-
-	 indentation.addChangeListener(this);
-
-	 indentation.setMajorTickSpacing(1);
-	 indentation.setMinorTickSpacing(1);
-	 indentation.setPaintTicks(true);
-	 indentation.setPaintLabels(true);
-	 indentation.setBorder(BorderFactory.createEmptyBorder(0,0,10,0));
-	 //Font font = new Font("Serif", Font.ITALIC, 15);
-	 //indentation.setFont(font);
-
-	 add(indentLabel);
-	 add(indentation);
-
-      }
-      public void stateChanged(ChangeEvent e) {
-	 JSlider source = (JSlider)e.getSource();
-	 if (!source.getValueIsAdjusting()) {
-	    indentParm = source.getValue();
-	 }
-	 callFindent(inFile,log,null);
-	 writeConfig();
-      }
-   }
-
-   class IndentOptions1 extends JPanel implements ChangeListener {
-      static final int minIndent = 0;
-      static final int maxIndent = 8;
-
       JSpinner spinner;
-      public IndentOptions1() {
+      public IndentOptions() {
 	 JLabel indentLabel = new JLabel("Indent:");
 
 	 if (indentParm < minIndent)
@@ -307,8 +268,8 @@ public class Jfindent {
 	 }
 
 	 add(previewLabel);
-	 add(noButton);
 	 add(yesButton);
+	 add(noButton);
       }
 
       public void actionPerformed(ActionEvent e) {
@@ -331,7 +292,7 @@ public class Jfindent {
 	       inFile = new File(evt.getNewValue().toString());
 	       if (inFile != null) {
 		  callFindent(inFile,log,null);
-		  fcFolder = fc.getCurrentDirectory().getAbsolutePath();
+		  fcfolderParm = fc.getCurrentDirectory().getAbsolutePath();
 		  writeConfig();
 	       }
 	    }
@@ -387,10 +348,13 @@ public class Jfindent {
 	       bw.newLine();
 	    }
 	    bw.close();
+	    inputFile.close();
+	    return;
 	 } catch (Exception e) {
 	    errmsg += newline + "Something wrong";
 	    try{
 	       bw.close();
+	       inputFile.close();
 	    } catch (Exception e1){
 	    }
 	 }
@@ -441,7 +405,6 @@ public class Jfindent {
    JTextArea log;
    FormatOptions  formatPanel;
    IndentOptions  indentPanel;
-   IndentOptions1 indentPanel1;
    ConvertOption  convertPanel;
    PreviewOption  previewPanel;
    ExtraOptions   extraPanel;
@@ -457,7 +420,7 @@ public class Jfindent {
 
    String  extraParm;
    String  fixedfreeParm;
-   String  fcFolder;
+   String  fcfolderParm;
    boolean convertParm;
    boolean previewParm;
    int     indentParm;
@@ -465,15 +428,15 @@ public class Jfindent {
    public Jfindent() {
       UIManager.put("FileChooser.readOnly", true);
       readConfig();
-      log = new JTextArea(30,130);
+      log = new JTextArea(25,130);
       log.setMargin(new Insets(5,5,5,5));
       log.setEditable(false);
-      log.setFont(new Font(Font.MONOSPACED,Font.BOLD,14));
+      log.setFont(new Font(Font.MONOSPACED,Font.BOLD,12));
       JScrollPane logScrollPane = new JScrollPane(log);
-      fc = new JFileChooser(fcFolder) {
+      fc = new JFileChooser(fcfolderParm) {
 	 @Override
 	 public void approveSelection() {
-	    fcFolder = getCurrentDirectory().getAbsolutePath();
+	    fcfolderParm = getCurrentDirectory().getAbsolutePath();
 	    writeConfig();
 	    File[] ff = getSelectedFiles();
 	    for ( File f : ff ) {
@@ -500,7 +463,6 @@ public class Jfindent {
 
       formatPanel  = new FormatOptions();
       indentPanel  = new IndentOptions();
-      indentPanel1 = new IndentOptions1();
       convertPanel = new ConvertOption();
       extraPanel   = new ExtraOptions();
       previewPanel = new PreviewOption();
@@ -509,9 +471,8 @@ public class Jfindent {
       JPanel optionsPanel = new JPanel();
       optionsPanel.add(previewPanel);
       optionsPanel.add(formatPanel);
-      //optionsPanel.add(indentPanel);
       optionsPanel.add(convertPanel);
-      optionsPanel.add(indentPanel1);
+      optionsPanel.add(indentPanel);
 
       mainPane = new JPanel();
       mainPane.setLayout(new BoxLayout(mainPane, BoxLayout.PAGE_AXIS));
@@ -574,7 +535,7 @@ public class Jfindent {
       fixedfreeParm = "auto";
       indentParm    = 3;
       previewParm   = true;
-      fcFolder      = System.getProperty("user.home");
+      fcfolderParm  = System.getProperty("user.home");
 
       try {
 	 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -617,7 +578,7 @@ public class Jfindent {
 	       } catch (Exception e) {}
 
 	       try {
-		  fcFolder = elem.getElementsByTagName("fcfolder").item(0)
+		  fcfolderParm = elem.getElementsByTagName("fcfolder").item(0)
 		     .getChildNodes().item(0).getNodeValue();
 	       } catch (Exception e) {}
 	    }
@@ -637,7 +598,7 @@ public class Jfindent {
 	 writer.println("    <fixedfree>" + fixedfreeParm  +"</fixedfree>");
 	 writer.println("    <indent>"    + indentParm     +"</indent>");
 	 writer.println("    <extra>"     + extraParm      +"</extra>");
-	 writer.println("    <fcfolder>"  + fcFolder       +"</fcfolder>");
+	 writer.println("    <fcfolder>"  + fcfolderParm   +"</fcfolder>");
 	 writer.println("    <preview>"   + previewParm    +"</preview>");
 	 writer.println("  </parms>");
 	 writer.println("</jfindent>");
@@ -807,6 +768,9 @@ public class Jfindent {
 	 return;
       }
 
+      try{
+	 thread.join();
+      } catch (Exception e){}
       counterin = pipe.getcounterin();
       if (counterin != counterout){
 	 log.append(endl + 
@@ -827,11 +791,12 @@ public class Jfindent {
 	    Files.copy(temp.toPath(),outFile.toPath(),StandardCopyOption.REPLACE_EXISTING);
 	 }
 	 catch (Exception e){
+	    log.append(e.toString());
 	    log.append(endl+"Cannot copy from "+temp.getAbsolutePath()+" to "+outFile.getAbsolutePath()+endl);
 	    log.setCaretPosition(log.getDocument().getLength());
-	    //try{
-	     //  temp.delete();
-	    //} catch(Exception ee) {}
+	    try{
+	       temp.delete();
+	    } catch(Exception ee) {}
 	    return;
 	 }
 	 log.append("Indented "+counterin+" lines"+endl);
