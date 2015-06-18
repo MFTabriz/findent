@@ -1,3 +1,17 @@
+/* 
+ * jfindent: a graphical wrapper for findent, my Fortran indenting program.
+ * Take care that jfindent can find the findent executable.
+ *
+ * This is my first significant java project, I am glad to receive 
+ * suggestions for improvements.
+ *
+ * This program needs java >= 1.7
+ *
+ * Willem Vermin
+ * wvermin@gmail.com
+ *
+ * Many thanks for all information I found on many places on the WWW
+ */
 /*
  * Since this source contains code copied from and inspired from Oracle, I
  * inserted the following:
@@ -78,7 +92,7 @@ public class Jfindent {
 	    if (isWindows()) {
 	       configFileName = System.getProperty("user.home")+".\\jfindent.data";
 	    } else {
-	       configFileName =  System.getProperty("user.home")+"/.jfindent";
+	       configFileName = System.getProperty("user.home")+"/.jfindentrc";
 	    }
 	 }
 	 return configFileName;
@@ -98,6 +112,7 @@ public class Jfindent {
       JSpinner spinner;
       public IndentOptions() {
 	 JLabel indentLabel = new JLabel("Indent:");
+	 indentLabel.setToolTipText("specify indentation");
 
 	 if (indentParm < minIndent)
 	    indentParm = minIndent;
@@ -129,8 +144,11 @@ public class Jfindent {
 
 	 JLabel formatLabel = new JLabel("Input form:");
 	 JRadioButton fixedButton = new JRadioButton("fixed");
+	 fixedButton.setToolTipText("assume input is in fixed form");
 	 JRadioButton freeButton  = new JRadioButton("free");
+	 freeButton.setToolTipText("assume input is in free form");
 	 JRadioButton autoButton  = new JRadioButton("auto");
+	 autoButton.setToolTipText("let findent find out the form");
 
 	 fixedButton.setActionCommand("fixed");
 	 freeButton.setActionCommand("free");
@@ -173,12 +191,14 @@ public class Jfindent {
    class ConvertOption extends JPanel implements ActionListener {
       public ConvertOption() {
 
-	 JLabel convertLabel = new JLabel("Convert fixed->free:");
+	 JLabel convertLabel = new JLabel("Fixed->free:");
 	 JRadioButton yesButton = new JRadioButton("yes");
 	 JRadioButton noButton  = new JRadioButton("no");
 
 	 yesButton.setActionCommand("yes");
+	 yesButton.setToolTipText("convert from fixed to free form");
 	 noButton.setActionCommand("no");
+	 noButton.setToolTipText("do not convert from fixed to free form");
 
 	 yesButton.addActionListener(this);
 	 noButton.addActionListener(this);
@@ -209,35 +229,43 @@ public class Jfindent {
    }
 
    class ExtraOptions extends JPanel implements ActionListener {
-	 JTextField extraText;
+      JTextField extraText;
       public ExtraOptions() {
 
 	 JLabel extraLabel = new JLabel("Extra options:");
 	 extraText         = new JTextField(extraParm,40);
+	 extraText.setToolTipText("type here extra options for findent");
 	 extraText.setActionCommand("extra");
 	 extraText.addActionListener(this);
 	 extraText.setFont(new Font(Font.MONOSPACED,Font.BOLD,14));
 
-	 JButton enterButton = new JButton("enter");
-	 JButton clearButton = new JButton("clear");
+	 JButton enterButton   = new JButton("enter");
+	 JButton clearButton   = new JButton("clear");
+	 JButton optionsButton = new JButton("Show options");
 	 enterButton.addActionListener(this);
 	 enterButton.setActionCommand("enter");
 	 clearButton.addActionListener(this);
 	 clearButton.setActionCommand("clear");
+	 optionsButton.addActionListener(this);
+	 optionsButton.setActionCommand("options");
 	 add(extraLabel);
 	 add(extraText);
 	 add(enterButton);
 	 add(clearButton);
+	 add(optionsButton);
       }
 
       public void actionPerformed(ActionEvent e) {
 	 switch (e.getActionCommand()){
-	    case "clear": extraParm = "";
-			  extraText.setText(extraParm); 
-			  break;
+	    case "clear":   extraParm = "";
+			    extraText.setText(extraParm); 
+			    break;
 	    case "enter": 
-	    case "extra":
-			  extraParm = extraText.getText();
+	    case "extra":   extraParm = extraText.getText();
+			    break;
+	    case "options": System.out.println("HELP!");
+			    callFindent(null,log,null,true);
+			    return;
 	 }
 	 callFindent(inFile,log,null);
 	 writeConfig();
@@ -249,7 +277,9 @@ public class Jfindent {
 
 	 JLabel previewLabel    = new JLabel("Preview:");
 	 JRadioButton yesButton = new JRadioButton("yes");
+	 yesButton.setToolTipText("show preview of indented selected file");
 	 JRadioButton noButton  = new JRadioButton("no");
+	 noButton.setToolTipText("do not show preview of indented selected file");
 
 	 yesButton.setActionCommand("yes");
 	 noButton.setActionCommand("no");
@@ -467,7 +497,6 @@ public class Jfindent {
       extraPanel   = new ExtraOptions();
       previewPanel = new PreviewOption();
 
-
       JPanel optionsPanel = new JPanel();
       optionsPanel.add(previewPanel);
       optionsPanel.add(formatPanel);
@@ -559,12 +588,12 @@ public class Jfindent {
 
 	       try {
 		  convertParm = Boolean.parseBoolean(elem.getElementsByTagName("convert")
-		     .item(0).getChildNodes().item(0).getNodeValue());
+			.item(0).getChildNodes().item(0).getNodeValue());
 	       } catch (Exception e) {}
 
 	       try {
 		  previewParm = Boolean.parseBoolean(elem.getElementsByTagName("preview")
-		     .item(0).getChildNodes().item(0).getNodeValue());
+			.item(0).getChildNodes().item(0).getNodeValue());
 	       } catch (Exception e) {}
 
 	       try {
@@ -608,56 +637,76 @@ public class Jfindent {
       }
    }
 
-   void callFindent(File inFile, JTextArea log, File outFile) {
+   void callFindent(File inFile, JTextArea log, File outFile, Boolean... help) {
+      // help = true: run findent -h, show output on log
       // outFile = null: output to log, else output to outFile
       // outFile can be the same file as inFile
-      
+
+      // ok, this code got a bit hairy, suggestions are welcome
+
+      boolean doHelp = false;
+      if (help.length == 1){
+	 doHelp = help[0];
+      }
       boolean doFile = (outFile != null);
+      if (doHelp){
+	 doFile = false;
+      }
+      System.out.println("A "+doHelp+doFile);
 
       if (!doFile){
 	 log.setText(null);
       }
 
-      if (!doFile && !previewParm){
-	 return;
+      if (!doHelp){
+	 if (!doFile && !previewParm){
+	    return;
+	 }
       }
+      System.out.println("B");
+
       String endl  = OsUtils.getNewLine();
       String fendl = "\n";
 
-      if(inFile == null){
-	 if (doFile) {
-	    log.append("No inputfile ..."+endl);
-	    log.setCaretPosition(log.getDocument().getLength());
+      if (!doHelp){
+	 if(inFile == null){
+	    if (doFile) {
+	       log.append("No inputfile ..."+endl);
+	       log.setCaretPosition(log.getDocument().getLength());
+	    }
+	    return;
 	 }
-	 return;
+	 try{
+	    switch(FileFormat.discover(inFile.getAbsolutePath())){
+	       case WINDOWS: fendl = "\r\n"; break;
+	       case MAC:     fendl = "\r";   break;
+	       default:      fendl = "\n";   break;
+	    }
+	 } catch (Exception e) { 
+	    fendl = "\n"; }
       }
-
-      try{
-	 switch(FileFormat.discover(inFile.getAbsolutePath())){
-	    case WINDOWS: fendl = "\r\n"; break;
-	    case MAC:     fendl = "\r";   break;
-	    default:      fendl = "\n";   break;
-	 }
-      } catch (Exception e) { 
-	 fendl = "\n"; }
 
       java.util.List<String> parms = new ArrayList<String>();
       parms.add("findent");
+      if (doHelp){
+	 parms.add("-h");
+      } else {
 
-      String s;
-      s = "-i"+fixedfreeParm;
-      parms.add(s);
-
-      if (convertParm) {
-	 s = "-ofree";
+	 String s;
+	 s = "-i"+fixedfreeParm;
 	 parms.add(s);
-      }
-      s = "-i"+indentParm;
-      parms.add(s);
 
-      String[] extraparms = extraParm.split("[ \t]+");
-      for ( String sp : extraparms ){
-	 parms.add(sp);
+	 if (convertParm) {
+	    s = "-ofree";
+	    parms.add(s);
+	 }
+	 s = "-i"+indentParm;
+	 parms.add(s);
+
+	 String[] extraparms = extraParm.split("[ \t]+");
+	 for ( String sp : extraparms ){
+	    parms.add(sp);
+	 }
       }
 
       ProcessBuilder pb = new ProcessBuilder(parms);
@@ -674,29 +723,42 @@ public class Jfindent {
 	    log.append("Check if the folder of wfindent and findent is in $PATH"+OsUtils.getNewLine());
 	 }
 	 log.setCaretPosition(log.getDocument().getLength());
+	 return;
       }
 
       BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
       BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
       int mcount = 1000;
-      if (doFile){
+      if (doFile || doHelp){
 	 mcount = 0;
       }
-      PipeFromFile pipe = new PipeFromFile(inFile.getAbsolutePath(),bw,mcount);
-      Thread thread = new Thread(pipe);
-      thread.start();
+
+      PipeFromFile pipe = null;
+      Thread thread = null;
+      if (! doHelp){
+	 pipe = new PipeFromFile(inFile.getAbsolutePath(),bw,mcount);
+	 thread = new Thread(pipe);
+	 thread.start();
+      }
 
       int counterin = 0;
       int counterout = 0;
 
-      if (!doFile){
-	 log.append("Preview: ");
+      if (doHelp){
+	 log.setText("Findent options:"+endl);
+      } else {
+	 if (!doFile){
+	    log.append("Preview: ");
+	 }
       }
+
       for (String s1: parms){
 	 log.append(s1+" ");
       }
-      log.append(" < "+inFile.getName());
+      if (!doHelp){
+	 log.append(" < "+inFile.getName());
+      }
       if (doFile){
 	 log.append(" -- ");
       } else {
@@ -735,7 +797,12 @@ public class Jfindent {
 	    if (doFile){
 	       writer.write(currLine+fendl);
 	    } else {
-	       log.append(String.format("%06d ",counterout)+currLine+endl);
+	       if (doHelp){
+		  log.append("    ");
+	       } else {
+		  log.append(String.format("%06d ",counterout));
+	       }
+	       log.append(currLine+endl);
 	    }
 	 }
       } catch (IOException e) {
@@ -755,35 +822,37 @@ public class Jfindent {
 	 } catch (Exception e) {}
       }
 
-      String errmsg = pipe.getErrmsg();
+      if(!doHelp){
+	 String errmsg = pipe.getErrmsg();
 
-      if (errmsg !=null){
-	 log.append(endl+errmsg+endl);
-	 log.setCaretPosition(log.getDocument().getLength());
-	 if (doFile){
-	    try{
-	       temp.delete();
-	    } catch(Exception e) {}
+	 if (errmsg !=null){
+	    log.append(endl+errmsg+endl);
+	    log.setCaretPosition(log.getDocument().getLength());
+	    if (doFile){
+	       try{
+		  temp.delete();
+	       } catch(Exception e) {}
+	    }
+	    return;
 	 }
-	 return;
-      }
 
-      try{
-	 thread.join();
-      } catch (Exception e){}
-      counterin = pipe.getcounterin();
-      if (counterin != counterout){
-	 log.append(endl + 
-	       "Error: number of input lines("
-	       +counterin+") is not equal to number of output lines("
-	       +counterout+")"+endl);
-	 log.setCaretPosition(log.getDocument().getLength());
-	 if (doFile){
-	    try{
-	       temp.delete();
-	    } catch(Exception e) {}
+	 try{
+	    thread.join();
+	 } catch (Exception e){}
+	 counterin = pipe.getcounterin();
+	 if (counterin != counterout){
+	    log.append(endl + 
+		  "Error: number of input lines("
+		  +counterin+") is not equal to number of output lines("
+		  +counterout+")"+endl);
+	    log.setCaretPosition(log.getDocument().getLength());
+	    if (doFile){
+	       try{
+		  temp.delete();
+	       } catch(Exception e) {}
+	    }
+	    return;
 	 }
-	 return;
       }
 
       if (doFile){
@@ -802,7 +871,11 @@ public class Jfindent {
 	 log.append("Indented "+counterin+" lines"+endl);
 	 log.setCaretPosition(log.getDocument().getLength());
       } else {
-	 log.append("---> end of preview <---"+endl);
+	 if (doHelp){
+	    log.append("---> end of options <---"+endl);
+	 } else {
+	    log.append("---> end of preview <---"+endl);
+	 }
 	 log.setCaretPosition(0);
       }
    }
