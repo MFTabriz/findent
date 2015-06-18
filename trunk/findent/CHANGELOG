@@ -9,6 +9,10 @@ findent-2.1:
       finished ...
    Makefile:
       add support for jfindent
+   README:
+      add text for jfindent
+   README.1st:
+      add text for jfindent
 
 findent-2.0:
    Complete new code
