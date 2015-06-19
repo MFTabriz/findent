@@ -8,6 +8,7 @@ findent-2.1:
       added Oracle copyright text
       finished ...
       added file menu
+      added about menu
    Makefile:
       add support for jfindent
    README:

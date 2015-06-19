@@ -74,6 +74,9 @@ import javax.swing.*;
 
 
 public class Jfindent {
+   static final String VERSION = "1.0";
+   static final int DOHELP     = 1;
+   static final int DOVERSION  = 2;
    public static final class OsUtils {
       private static String OS             = null;
       private static String configFileName = null;
@@ -263,7 +266,7 @@ public class Jfindent {
 	    case "enter": 
 	    case "extra":   extraParm = extraText.getText();
 			    break;
-	    case "options": callFindent(null,log,null,true);
+	    case "options": callFindent(null,log,null,DOHELP);
 			    return;
 	 }
 	 callFindent(inFile,log,null);
@@ -644,19 +647,25 @@ public class Jfindent {
       }
    }
 
-   void callFindent(File inFile, JTextArea log, File outFile, Boolean... help) {
+   void callFindent(File inFile, JTextArea log, File outFile, Integer... what) {
       // help = true: run findent -h, show output on log
       // outFile = null: output to log, else output to outFile
       // outFile can be the same file as inFile
 
       // ok, this code got a bit hairy, suggestions are welcome
 
-      boolean doHelp = false;
-      if (help.length == 1){
-	 doHelp = help[0];
+      boolean doHelp    = false;
+      boolean doVersion = false;
+      if (what.length == 1){
+	 switch (what[0]){
+	    case DOHELP:    doHelp = true;
+			    break;
+	    case DOVERSION: doVersion = true;
+			    break;
+	 }
       }
       boolean doFile = (outFile != null);
-      if (doHelp){
+      if (doHelp || doVersion){
 	 doFile = false;
       }
 
@@ -893,10 +902,12 @@ public class Jfindent {
    }
 
    static class JfindentMenu implements ActionListener, ItemListener {
+      JFrame aboutFrame;
+      JFrame versionFrame;
       public JfindentMenu(JFrame frame){
 	 JMenuBar menuBar = new JMenuBar();
-	 JMenu jmenu = new JMenu("file");
-	 menuBar.add(jmenu);
+	 JMenu fileMenu = new JMenu("file");
+	 menuBar.add(fileMenu);
 
 	 JMenu locationMenu = new JMenu("location of findent");
 
@@ -916,20 +927,45 @@ public class Jfindent {
 	 quitItem.setActionCommand("quit");
 	 quitItem.addActionListener(this);
 
-	 jmenu.add(locationMenu);
-	 jmenu.addSeparator();
-	 jmenu.add(quitItem);
+	 fileMenu.add(locationMenu);
+	 fileMenu.addSeparator();
+	 fileMenu.add(quitItem);
+
+	 JMenu infoMenu = new JMenu("info");
+	 menuBar.add(infoMenu);
+
+	 JMenuItem versionItem = new JMenuItem ("version");
+	 versionItem.setActionCommand("version");
+	 versionItem.addActionListener(this);
+
+	 JMenuItem aboutItem = new JMenuItem("about");
+	 aboutItem.setActionCommand("about");
+	 aboutItem.addActionListener(this);
+
+	 infoMenu.add(aboutItem);
+	 infoMenu.addSeparator();
+	 infoMenu.add(versionItem);
 
 	 frame.setJMenuBar(menuBar);
       }
       public void actionPerformed(ActionEvent e){
 	 switch(e.getActionCommand()){
-	    case "fc": setFindentLocation();
-			    break;
+	    case "fc":          setFindentLocation();
+				break;
 	    case "defaultpath": findentParm = "findent";
 				writeConfig();
 				break;
-	    case "quit": System.exit(0);
+	    case "quit":        System.exit(0);
+	    case "about":       showAbout();
+				break;
+	    case "version":     showVersion();
+				break;
+	    case "doneabout":   aboutFrame.dispose();
+				aboutFrame = null;
+				break;
+	    case "doneversion": versionFrame.dispose();
+				versionFrame = null;
+				break;
 	 }
       }
 
@@ -950,6 +986,50 @@ public class Jfindent {
 	    writeConfig();
 	 }
       }
+
+      void showAbout(){
+	 aboutFrame = new JFrame("about");
+	 JPanel aboutPanel = new JPanel();
+	 aboutPanel.setLayout(new BoxLayout(aboutPanel, BoxLayout.PAGE_AXIS));
+	 aboutPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+	 JTextArea textArea = new JTextArea();
+	 textArea.setFont(new Font(Font.MONOSPACED,Font.BOLD,14));
+	 String endl = OsUtils.getNewLine();
+	 textArea.append("jfindent is a graphical wrapper for findent"+endl);
+	 textArea.append("findent indents Fortran sources"+endl);
+	 textArea.append(endl);
+	 textArea.append("Usage:"+endl);
+	 textArea.append("Select one or more Fortran sources"+endl);
+	 textArea.append("Have a look at the preview, adapt the options to your taste"+endl);
+	 textArea.append("and click 'indent'");
+	 aboutPanel.add(textArea);
+	 JButton doneButton = new JButton("done");
+	 doneButton.setActionCommand("doneabout");
+	 doneButton.addActionListener(this);
+	 aboutPanel.add(doneButton);
+	 aboutFrame.add(aboutPanel);
+	 aboutFrame.pack();
+	 aboutFrame.setVisible(true);
+      }
+
+      void showVersion(){
+	 versionFrame = new JFrame("version");
+	 JPanel versionPanel = new JPanel();
+	 versionPanel.setLayout(new BoxLayout(versionPanel, BoxLayout.PAGE_AXIS));
+	 versionPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+	 JTextArea textArea = new JTextArea();
+	 textArea.setFont(new Font(Font.MONOSPACED,Font.BOLD,14));
+	 textArea.append("jfindent version "+VERSION);
+	 versionPanel.add(textArea);
+	 JButton doneButton = new JButton("done");
+	 doneButton.setActionCommand("doneversion");
+	 doneButton.addActionListener(this);
+	 versionPanel.add(doneButton);
+	 versionFrame.add(versionPanel);
+	 versionFrame.pack();
+	 versionFrame.setVisible(true);
+      }
+
    }
 
    /**
