@@ -447,12 +447,13 @@ public class Jfindent {
 
    JPanel mainPane;
 
-   String  extraParm;
-   String  fixedfreeParm;
-   String  fcfolderParm;
-   boolean convertParm;
-   boolean previewParm;
-   int     indentParm;
+   static String  extraParm;         // extra parameters for findent
+   static String  fixedfreeParm;     // -ifixed -ifree -iauto
+   static String  fcfolderParm;      // last used folder
+   static String  findentParm;       // path to findent
+   static boolean convertParm;       // -ofree
+   static boolean previewParm;       // preview on or off
+   static int     indentParm;        // -i<n>
 
    public Jfindent() {
       UIManager.put("FileChooser.readOnly", true);
@@ -563,6 +564,7 @@ public class Jfindent {
       fixedfreeParm = "auto";
       indentParm    = 3;
       previewParm   = true;
+      findentParm   = "findent";
       fcfolderParm  = System.getProperty("user.home");
 
       try {
@@ -609,6 +611,11 @@ public class Jfindent {
 		  fcfolderParm = elem.getElementsByTagName("fcfolder").item(0)
 		     .getChildNodes().item(0).getNodeValue();
 	       } catch (Exception e) {}
+
+	       try {
+		  findentParm = elem.getElementsByTagName("findent").item(0)
+		     .getChildNodes().item(0).getNodeValue();
+	       } catch (Exception e) {}
 	    }
 	 }
       }
@@ -616,7 +623,7 @@ public class Jfindent {
       }
    }
 
-   void writeConfig() {
+   static void writeConfig() {
       try {
 	 PrintWriter writer = new PrintWriter(OsUtils.getConfigFileName(),"UTF-8");
 	 writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
@@ -628,6 +635,7 @@ public class Jfindent {
 	 writer.println("    <extra>"     + extraParm      +"</extra>");
 	 writer.println("    <fcfolder>"  + fcfolderParm   +"</fcfolder>");
 	 writer.println("    <preview>"   + previewParm    +"</preview>");
+	 writer.println("    <findent>"   + findentParm    +"</findent>");
 	 writer.println("  </parms>");
 	 writer.println("</jfindent>");
 	 writer.close();
@@ -650,6 +658,16 @@ public class Jfindent {
       boolean doFile = (outFile != null);
       if (doHelp){
 	 doFile = false;
+      }
+
+      String findentExe = findentParm;
+
+      if (findentExe == null){
+	 findentExe = "findent";
+      }
+
+      if (findentExe.trim().isEmpty()){
+	 findentExe = "findent";
       }
 
       if (!doFile){
@@ -684,7 +702,7 @@ public class Jfindent {
       }
 
       java.util.List<String> parms = new ArrayList<String>();
-      parms.add("findent");
+      parms.add(findentExe);
       if (doHelp){
 	 parms.add("-h");
       } else {
@@ -714,11 +732,8 @@ public class Jfindent {
 	 process = pb.start();
       } catch (IOException e) {
 	 log.append("Couldn't start findent."+endl);
-	 if (OsUtils.isWindows()) {
-	    log.append("Check if the folder of wfindent.bat and findent.exe is in %PATH%"+OsUtils.getNewLine());
-	 } else {
-	    log.append("Check if the folder of wfindent and findent is in $PATH"+OsUtils.getNewLine());
-	 }
+	 log.append("The command was '"+findentExe+"'"+endl);
+	 log.append("Fix this in the 'file->location of findent' menu"+endl);
 	 log.setCaretPosition(log.getDocument().getLength());
 	 return;
       }
@@ -877,6 +892,65 @@ public class Jfindent {
       }
    }
 
+   static class JfindentMenu implements ActionListener, ItemListener {
+      public JfindentMenu(JFrame frame){
+	 JMenuBar menuBar = new JMenuBar();
+	 JMenu jmenu = new JMenu("file");
+	 menuBar.add(jmenu);
+
+	 JMenu locationMenu = new JMenu("location of findent");
+
+	 JMenuItem fcItem = new JMenuItem("choose location of findent ...");
+	 fcItem.setActionCommand("fc");
+	 fcItem.addActionListener(this);
+
+	 JMenuItem defaultItem = new JMenuItem("find findent via PATH");
+	 defaultItem.setActionCommand("defaultpath");
+	 defaultItem.addActionListener(this);
+
+	 locationMenu.add(fcItem);
+	 locationMenu.addSeparator();
+	 locationMenu.add(defaultItem);
+
+	 JMenuItem quitItem = new JMenuItem("quit");
+	 quitItem.setActionCommand("quit");
+	 quitItem.addActionListener(this);
+
+	 jmenu.add(locationMenu);
+	 jmenu.addSeparator();
+	 jmenu.add(quitItem);
+
+	 frame.setJMenuBar(menuBar);
+      }
+      public void actionPerformed(ActionEvent e){
+	 switch(e.getActionCommand()){
+	    case "fc": setFindentLocation();
+			    break;
+	    case "defaultpath": findentParm = "findent";
+				writeConfig();
+				break;
+	    case "quit": System.exit(0);
+	 }
+      }
+
+      public void itemStateChanged(ItemEvent e){
+      }
+
+      void setFindentLocation(){
+	 JFileChooser fileChooser = new JFileChooser();
+	 int rc = fileChooser.showOpenDialog(null);
+	 if (rc == fileChooser.APPROVE_OPTION){
+	    File file = fileChooser.getSelectedFile();
+	    System.out.println("FILE:"+file.getAbsolutePath());
+	    findentParm = file.getAbsolutePath();
+	    writeConfig();
+	 }
+	 if (rc == fileChooser.CANCEL_OPTION){
+	    findentParm = "findent";
+	    writeConfig();
+	 }
+      }
+   }
 
    /**
     * Create the GUI and show it.  For thread safety,
@@ -895,6 +969,8 @@ public class Jfindent {
       Jfindent jfindent = new Jfindent();
       jfindent.mainPane.setOpaque(true); //content panes must be opaque
       frame.setContentPane(jfindent.mainPane);
+
+      JfindentMenu jfindentMenu = new JfindentMenu(frame);
 
       //Display the window.
       frame.pack();
