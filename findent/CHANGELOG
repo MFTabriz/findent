@@ -9,6 +9,9 @@ findent-2.1:
       finished ...
       added file menu
       added about menu
+      somewhat better menubar and better
+        texts for buttons and mor intuitive behaviour with
+	'show all options'
    Makefile:
       add support for jfindent
    README:
