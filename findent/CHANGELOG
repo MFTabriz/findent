@@ -12,6 +12,8 @@ findent-2.1:
       somewhat better menubar and better
         texts for buttons and mor intuitive behaviour with
 	'show all options'
+      removed 'show all options' button, extend help
+        with this information
    Makefile:
       add support for jfindent
    README:
