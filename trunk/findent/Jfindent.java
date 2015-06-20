@@ -77,7 +77,7 @@ public class Jfindent {
    static final String VERSION = "1.0";
    static final int DOHELP     = 1;
    static final int DOVERSION  = 2;
-   boolean optionsToggle = true;
+
    public static final class OsUtils {
       private static String OS             = null;
       private static String configFileName = null;
@@ -245,18 +245,14 @@ public class Jfindent {
 
 	 JButton enterButton   = new JButton("enter");
 	 JButton clearButton   = new JButton("clear extra options");
-	 JButton optionsButton = new JButton("show all options");
 	 enterButton.addActionListener(this);
 	 enterButton.setActionCommand("enter");
 	 clearButton.addActionListener(this);
 	 clearButton.setActionCommand("clear");
-	 optionsButton.addActionListener(this);
-	 optionsButton.setActionCommand("options");
 	 add(extraLabel);
 	 add(extraText);
 	 add(enterButton);
 	 add(clearButton);
-	 add(optionsButton);
       }
 
       public void actionPerformed(ActionEvent e) {
@@ -267,14 +263,7 @@ public class Jfindent {
 	    case "enter": 
 	    case "extra":   extraParm = extraText.getText();
 			    break;
-	    case "options": if (optionsToggle)
-			    {
-			       callFindent(null,log,null,DOHELP);
-			       optionsToggle = false;
-			       return;
-			    } 
 	 }
-	 optionsToggle = true;
 	 callFindent(inFile,log,null);
 	 writeConfig();
       }
@@ -342,19 +331,20 @@ public class Jfindent {
    static class PipeFromFile implements Runnable {
 
       BufferedReader inputFile;
-      int maxCount;
-      int counterin;
+      int            maxCount;
+      int            counterIn;
       BufferedWriter bw;
-      boolean canRun = true;
-      String errmsg;
-      static String newline = System.getProperty("line.separator");
+      boolean        canRun = true;
+      String         errmsg;
+      static         String newline = System.getProperty("line.separator");
 
       public PipeFromFile(String fileName, BufferedWriter bw, int maxCount){
 
-	 errmsg = null;
+	 errmsg        = null;
 	 this.maxCount = maxCount;
-	 this.bw = bw;
-	 counterin = 0;
+	 this.bw       = bw;
+	 counterIn     = 0;
+
 	 try{
 	    inputFile = new BufferedReader(
 		  new InputStreamReader(new FileInputStream(fileName)));
@@ -377,9 +367,9 @@ public class Jfindent {
 	 }
 	 try{
 	    while((currInputLine = inputFile.readLine()) != null) {
-	       counterin++;
-	       if (maxCount > 0 && counterin > maxCount){
-		  counterin--;
+	       counterIn++;
+	       if (maxCount > 0 && counterIn > maxCount){
+		  counterIn--;
 		  break;
 	       }
 	       bw.write(currInputLine);
@@ -398,8 +388,8 @@ public class Jfindent {
 	 }
       }
 
-      public int getcounterin(){
-	 return counterin;
+      public int getCounterIn(){
+	 return counterIn;
       }
 
       public String getErrmsg(){
@@ -439,16 +429,16 @@ public class Jfindent {
       }
    }
 
-   JFileChooser fc;
-   JTextArea log;
-   FormatOptions  formatPanel;
-   IndentOptions  indentPanel;
-   ConvertOption  convertPanel;
-   PreviewOption  previewPanel;
-   ExtraOptions   extraPanel;
+   JFileChooser     fc;
+   static JTextArea log;
+   FormatOptions    formatPanel;
+   IndentOptions    indentPanel;
+   ConvertOption    convertPanel;
+   PreviewOption    previewPanel;
+   ExtraOptions     extraPanel;
+   File             inFile = null;
 
    final static boolean MULTICOLORED = false;
-   File inFile = null; // used for preview
 
    //Specify the look and feel to use.  Valid values:
    //null (use the default), "Metal", "System", "Motif", "GTK+"
@@ -478,7 +468,7 @@ public class Jfindent {
 	    fcfolderParm = getCurrentDirectory().getAbsolutePath();
 	    writeConfig();
 	    File[] ff = getSelectedFiles();
-	       log.setText(null);
+	    log.setText(null);
 	    for ( File f : ff ) {
 	       callFindent(f,log,f);
 	    }
@@ -578,13 +568,11 @@ public class Jfindent {
 
       try {
 	 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-	 DocumentBuilder builder = factory.newDocumentBuilder();
-
-	 // Load the input XML document, parse it and return an instance of the
-	 // Document class.
+	 DocumentBuilder builder        = factory.newDocumentBuilder();
 
 	 Document document = builder.parse(new File(OsUtils.getConfigFileName()));
 	 NodeList nodeList = document.getDocumentElement().getChildNodes();
+
 	 for (int i = 0; i < nodeList.getLength(); i++) {
 	    Node node = nodeList.item(i);
 
@@ -653,8 +641,9 @@ public class Jfindent {
       }
    }
 
-   void callFindent(File inFile, JTextArea log, File outFile, Integer... what) {
-      // help = true: run findent -h, show output on log
+   static void callFindent(File inFile, JTextArea log, File outFile, Integer... what) {
+      // what == DOHELP:    runs findent -h
+      // what -- DOVERSION: runs findent -v
       // outFile = null: output to log, else output to outFile
       // outFile can be the same file as inFile
 
@@ -662,6 +651,7 @@ public class Jfindent {
 
       boolean doHelp    = false;
       boolean doVersion = false;
+
       if (what.length == 1){
 	 switch (what[0]){
 	    case DOHELP:    doHelp = true;
@@ -670,12 +660,11 @@ public class Jfindent {
 			    break;
 	 }
       }
+
       boolean doFile = (outFile != null);
       if (doHelp || doVersion){
 	 doFile = false;
       }
-
-      optionsToggle = true;
 
       String findentExe = findentParm;
 
@@ -687,11 +676,7 @@ public class Jfindent {
 	 findentExe = "findent";
       }
 
-      if (!doFile){
-	 log.setText(null);
-      }
-
-      if (!doHelp){
+      if (!(doHelp || doVersion)){
 	 if (!doFile && !previewParm){
 	    return;
 	 }
@@ -700,7 +685,7 @@ public class Jfindent {
       String endl  = OsUtils.getNewLine();
       String fendl = "\n";
 
-      if (!doHelp){
+      if (!(doHelp || doVersion)){
 	 if(inFile == null){
 	    if (doFile) {
 	       log.append("No inputfile ..."+endl);
@@ -720,10 +705,12 @@ public class Jfindent {
 
       java.util.List<String> parms = new ArrayList<String>();
       parms.add(findentExe);
+
       if (doHelp){
 	 parms.add("-h");
+      } else if (doVersion){
+	 parms.add("-v");
       } else {
-
 	 String s;
 	 s = "-i"+fixedfreeParm;
 	 parms.add(s);
@@ -759,42 +746,45 @@ public class Jfindent {
       BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 
       int mcount = 1000;
-      if (doFile || doHelp){
+      if (doFile || doHelp || doVersion){
 	 mcount = 0;
       }
 
       PipeFromFile pipe = null;
       Thread thread = null;
-      if (! doHelp){
+      if (!(doHelp || doVersion)){
 	 pipe = new PipeFromFile(inFile.getAbsolutePath(),bw,mcount);
 	 thread = new Thread(pipe);
 	 thread.start();
       }
 
-      int counterin = 0;
-      int counterout = 0;
+      int counterIn = 0;
+      int counterOut = 0;
 
-      if (doHelp){
-	 log.setText("Findent options:"+endl);
+      if (doHelp || doVersion){
+	 //log.setText("Findent options:"+endl);
       } else {
 	 if (!doFile){
-	    log.append("Preview: ");
+	    log.setText("Preview (max "+mcount+" lines)"+endl);
 	 }
       }
 
+      log.append("Running: ");
       for (String s1: parms){
 	 log.append(s1+" ");
       }
-      if (!doHelp){
+
+      if (!(doHelp || doVersion)){
 	 log.append(" < "+inFile.getName());
       }
+
       if (doFile){
 	 log.append(" -- ");
       } else {
 	 log.append(endl);
       }
 
-      File temp = null;
+      File temp     = null;
       Writer writer = null;
 
       if (doFile){
@@ -822,14 +812,14 @@ public class Jfindent {
       String currLine;
       try {
 	 while((currLine = br.readLine()) != null) {
-	    counterout++;
+	    counterOut++;
 	    if (doFile){
 	       writer.write(currLine+fendl);
 	    } else {
-	       if (doHelp){
+	       if (doHelp || doVersion){
 		  log.append("    ");
 	       } else {
-		  log.append(String.format("%06d ",counterout));
+		  log.append(String.format("%06d ",counterOut));
 	       }
 	       log.append(currLine+endl);
 	    }
@@ -851,7 +841,7 @@ public class Jfindent {
 	 } catch (Exception e) {}
       }
 
-      if(!doHelp){
+      if(!(doHelp || doVersion)){
 	 String errmsg = pipe.getErrmsg();
 
 	 if (errmsg !=null){
@@ -868,12 +858,12 @@ public class Jfindent {
 	 try{
 	    thread.join();
 	 } catch (Exception e){}
-	 counterin = pipe.getcounterin();
-	 if (counterin != counterout){
+	 counterIn = pipe.getCounterIn();
+	 if (counterIn != counterOut){
 	    log.append(endl + 
 		  "Error: number of input lines("
-		  +counterin+") is not equal to number of output lines("
-		  +counterout+")"+endl);
+		  +counterIn+") is not equal to number of output lines("
+		  +counterOut+")"+endl);
 	    log.setCaretPosition(log.getDocument().getLength());
 	    if (doFile){
 	       try{
@@ -897,11 +887,12 @@ public class Jfindent {
 	    } catch(Exception ee) {}
 	    return;
 	 }
-	 log.append("Indented "+counterin+" lines"+endl);
+	 log.append("Indented "+counterIn+" lines"+endl);
 	 log.setCaretPosition(log.getDocument().getLength());
       } else {
 	 if (doHelp){
 	    log.append("---> end of options <---"+endl);
+	 } else if (doVersion){
 	 } else {
 	    log.append("---> end of preview <---"+endl);
 	 }
@@ -912,7 +903,8 @@ public class Jfindent {
    static class JfindentMenu implements ActionListener, ItemListener {
       JFrame aboutFrame    = null;
       JFrame versionFrame  = null;
-      JFrame helpFrame     = null;
+      JFrame generalHelpFrame     = null;
+      JFrame extraOptionsFrame     = null;
 
       public JfindentMenu(JFrame frame){
 	 JMenuBar menuBar = new JMenuBar();
@@ -925,12 +917,18 @@ public class Jfindent {
 	 fcItem.addActionListener(this);
 
 	 JMenuItem defaultItem = new JMenuItem("find findent via PATH");
-	 defaultItem.setActionCommand("defaultpath");
+	 defaultItem.setActionCommand("defaultPath");
 	 defaultItem.addActionListener(this);
+
+	 JMenuItem testItem = new JMenuItem("test");
+	 testItem.setActionCommand("test");
+	 testItem.addActionListener(this);
 
 	 configMenu.add(fcItem);
 	 configMenu.addSeparator();
 	 configMenu.add(defaultItem);
+	 configMenu.addSeparator();
+	 configMenu.add(testItem);
 
 	 JMenuItem quitItem = new JMenuItem("quit");
 	 quitItem.setActionCommand("quit");
@@ -952,43 +950,61 @@ public class Jfindent {
 	 infoMenu.addSeparator();
 	 infoMenu.add(versionItem);
 
-	 JMenuItem helpItem = new JMenuItem("help");
-	 helpItem.setActionCommand("help");
-	 helpItem.addActionListener(this);
+	 JMenu helpMenu = new JMenu("help");
 
+	 JMenuItem generalusageItem = new JMenuItem("general usage");
+	 generalusageItem.setActionCommand("generalUsage");
+	 generalusageItem.addActionListener(this);
+
+	 JMenuItem extraoptionsItem = new JMenuItem("extra options");
+	 extraoptionsItem.setActionCommand("extraOptions");
+	 extraoptionsItem.addActionListener(this);
+
+	 helpMenu.add(generalusageItem);
+	 helpMenu.add(extraoptionsItem);
 
 	 menuBar.add(fileMenu);
 	 menuBar.add(configMenu);
 	 menuBar.add(infoMenu);
-	 menuBar.add(helpItem);
+	 menuBar.add(helpMenu);
 
 	 frame.setJMenuBar(menuBar);
       }
       public void actionPerformed(ActionEvent e){
+	 String endl = OsUtils.getNewLine();
 	 switch(e.getActionCommand()){
-	    case "fc":          setFindentLocation();
-				break;
-	    case "defaultpath": findentParm = "findent";
-				writeConfig();
-				break;
-	    case "quit":        System.exit(0);
-	    case "about":       showAbout();
-				break;
-	    case "version":     showVersion();
-				break;
-	    case "help":        showHelp();
-				break;
-	    case "config":      setFindentLocation();
-				break;
-	    case "doneabout":   aboutFrame.dispose();
-				aboutFrame = null;
-				break;
-	    case "doneversion": versionFrame.dispose();
-				versionFrame = null;
-				break;
-	    case "donehelp":    helpFrame.dispose();
-				helpFrame = null;
-				break;
+	    case "fc":                setFindentLocation();
+				      log.setText("Findent location: '"+findentParm+"'"+endl);
+				      break;
+	    case "defaultPath":       findentParm = "findent";
+				      log.setText("Findent location: '"+findentParm+"'"+endl);
+				      writeConfig();
+				      break;
+	    case "test":              log.setText("Test if findent runs. Expect 'findent version ...'"
+					    +endl);
+				      callFindent(null,log,null,DOVERSION);
+				      break;
+	    case "quit":              System.exit(0);
+	    case "about":             showAbout();
+				      break;
+	    case "version":           showVersion();
+				      break;
+	    case "generalUsage":      showGeneralUsage();
+				      break;
+	    case "extraOptions":      showExtraOptions();
+				      break;
+	    case "doneAbout":         aboutFrame.dispose();
+				      aboutFrame = null;
+				      break;
+	    case "doneVersion":       versionFrame.dispose();
+				      versionFrame = null;
+				      break;
+	    case "doneGeneralHelp":   generalHelpFrame.dispose();
+				      generalHelpFrame = null;
+				      break;
+	    case "doneExtraOptions":  extraOptionsFrame.dispose();
+				      extraOptionsFrame = null;
+				      break;
 	 }
       }
 
@@ -1000,13 +1016,11 @@ public class Jfindent {
 	 int rc = fileChooser.showOpenDialog(null);
 	 if (rc == fileChooser.APPROVE_OPTION){
 	    File file = fileChooser.getSelectedFile();
-	    System.out.println("FILE:"+file.getAbsolutePath());
 	    findentParm = file.getAbsolutePath();
 	    writeConfig();
 	 }
 	 if (rc == fileChooser.CANCEL_OPTION){
-	    findentParm = "findent";
-	    writeConfig();
+	    // keep current value
 	 }
       }
 
@@ -1023,43 +1037,93 @@ public class Jfindent {
 	 JTextArea textArea = new JTextArea();
 	 textArea.setFont(new Font(Font.MONOSPACED,Font.BOLD,14));
 	 String endl = OsUtils.getNewLine();
-	 textArea.append("jfindent is a graphical wrapper for findent"+endl);
+	 textArea.append(endl+"jfindent is a graphical wrapper for findent"+endl);
 	 textArea.append("findent indents Fortran sources"+endl);
 	 aboutPanel.add(textArea);
 	 JButton doneButton = new JButton("done");
-	 doneButton.setActionCommand("doneabout");
+	 doneButton.setActionCommand("doneAbout");
 	 doneButton.addActionListener(this);
 	 aboutPanel.add(doneButton);
 	 aboutFrame.add(aboutPanel);
 	 aboutFrame.pack();
+	 aboutFrame.setLocationRelativeTo(null);
 	 aboutFrame.setVisible(true);
       }
 
-      void showHelp(){
-	 if (helpFrame != null){
-	    helpFrame.setVisible(true);
-	    helpFrame.toFront();
+      void showGeneralUsage(){
+	 if (generalHelpFrame != null){
+	    generalHelpFrame.setVisible(true);
+	    generalHelpFrame.toFront();
 	    return;
 	 }
-	 helpFrame = new JFrame("help");
-	 JPanel helpPanel = new JPanel();
-	 helpPanel.setLayout(new BoxLayout(helpPanel, BoxLayout.PAGE_AXIS));
-	 helpPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+	 String endl = OsUtils.getNewLine();
+
+	 generalHelpFrame = new JFrame("general usage");
+
+	 JPanel generalHelpPanel = new JPanel();
+	 generalHelpPanel.setLayout(new BoxLayout(generalHelpPanel, BoxLayout.PAGE_AXIS));
+	 generalHelpPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+
 	 JTextArea textArea = new JTextArea();
 	 textArea.setFont(new Font(Font.MONOSPACED,Font.BOLD,14));
-	 String endl = OsUtils.getNewLine();
-	 textArea.append("Usage:"+endl);
+
+	 textArea.append(endl+"Usage:"+endl);
 	 textArea.append("Select one or more Fortran sources"+endl);
 	 textArea.append("Have a look at the preview, adapt the options to your taste"+endl);
-	 textArea.append("and click 'indent'");
-	 helpPanel.add(textArea);
+	 textArea.append("and click 'indent'"+endl);
+	 generalHelpPanel.add(textArea);
+
 	 JButton doneButton = new JButton("done");
-	 doneButton.setActionCommand("donehelp");
+	 doneButton.setActionCommand("doneGeneralHelp");
 	 doneButton.addActionListener(this);
-	 helpPanel.add(doneButton);
-	 helpFrame.add(helpPanel);
-	 helpFrame.pack();
-	 helpFrame.setVisible(true);
+
+	 generalHelpPanel.add(doneButton);
+	 generalHelpFrame.add(generalHelpPanel);
+	 generalHelpFrame.pack();
+	 generalHelpFrame.setLocationRelativeTo(null);
+	 generalHelpFrame.setVisible(true);
+      }
+
+      void showExtraOptions(){
+	 if (extraOptionsFrame != null){
+	    extraOptionsFrame.setVisible(true);
+	    extraOptionsFrame.toFront();
+	    return;
+	 }
+	 String endl = OsUtils.getNewLine();
+
+	 extraOptionsFrame = new JFrame("extraOptions");
+	 JPanel extraOptionsPanel = new JPanel();
+
+	 JTextArea textArea = new JTextArea(25,80);
+	 textArea.setFont(new Font(Font.MONOSPACED,Font.BOLD,14));
+
+	 textArea.append("Extra options"+endl);
+	 textArea.append("You can fill in extra options for findent in 'Extra options'"+endl);
+	 textArea.append("When done, click 'enter'"+endl);
+	 textArea.append("To remove extra options: click 'clear extra options'"+endl);
+	 textArea.append("Below follow the possible options (the output of 'findent -h'):"+endl);
+	 textArea.append("NOTE: not all options are really useful here,"+endl);
+	 textArea.append(" please have a look at the preview first"+endl);
+	 textArea.append("---------------------------"+endl);
+
+	 JScrollPane textAreaScrollPane = new JScrollPane(textArea);
+
+	 callFindent(null,textArea,null,DOHELP);
+
+	 JButton doneButton = new JButton("done");
+	 doneButton.setActionCommand("doneExtraOptions");
+	 doneButton.addActionListener(this);
+
+	 extraOptionsPanel.add(textAreaScrollPane);
+	 extraOptionsFrame.add(extraOptionsPanel);
+	 extraOptionsPanel.setLayout(new BoxLayout(extraOptionsPanel, BoxLayout.PAGE_AXIS));
+	 extraOptionsPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+	 extraOptionsPanel.add(doneButton);
+
+	 extraOptionsFrame.pack();
+	 extraOptionsFrame.setLocationRelativeTo(null);
+	 extraOptionsFrame.setVisible(true);
       }
 
       void showVersion(){
@@ -1068,20 +1132,30 @@ public class Jfindent {
 	    versionFrame.toFront();
 	    return;
 	 }
+	 String endl = OsUtils.getNewLine();
+
 	 versionFrame = new JFrame("version");
+
 	 JPanel versionPanel = new JPanel();
 	 versionPanel.setLayout(new BoxLayout(versionPanel, BoxLayout.PAGE_AXIS));
 	 versionPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+
 	 JTextArea textArea = new JTextArea();
 	 textArea.setFont(new Font(Font.MONOSPACED,Font.BOLD,14));
-	 textArea.append("jfindent version "+VERSION);
+	 textArea.append("jfindent version "+VERSION+endl);
+
+	 callFindent(null,textArea,null,DOVERSION);
+
 	 versionPanel.add(textArea);
+
 	 JButton doneButton = new JButton("done");
-	 doneButton.setActionCommand("doneversion");
+	 doneButton.setActionCommand("doneVersion");
 	 doneButton.addActionListener(this);
+
 	 versionPanel.add(doneButton);
 	 versionFrame.add(versionPanel);
 	 versionFrame.pack();
+	 versionFrame.setLocationRelativeTo(null);
 	 versionFrame.setVisible(true);
       }
 
@@ -1109,6 +1183,7 @@ public class Jfindent {
 
       //Display the window.
       frame.pack();
+      frame.setLocationRelativeTo(null);
       frame.setVisible(true);
    }
 
