@@ -14,6 +14,10 @@ findent-2.1:
 	'show all options'
       removed 'show all options' button, extend help
         with this information
+      some trivia
+      when previewing a file, the scroll position
+        remains the same when trying different options
+
    Makefile:
       add support for jfindent
    README:

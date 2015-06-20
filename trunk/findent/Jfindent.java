@@ -137,7 +137,7 @@ public class Jfindent {
 
 	 JSpinner source = (JSpinner)e.getSource();
 	 indentParm = (int)source.getValue();
-	 callFindent(inFile,log,null);
+	 callFindentPreview();
 	 writeConfig();
       }
    }
@@ -187,7 +187,7 @@ public class Jfindent {
 	    case "free":  fixedfreeParm = "free";  break;
 	    case "fixed": fixedfreeParm = "fixed"; break;
 	 }
-	 callFindent(inFile,log,null);
+	 callFindentPreview();
 	 writeConfig();
       }
    }
@@ -227,7 +227,7 @@ public class Jfindent {
 	    case "yes": convertParm = true;  break;
 	    case "no":  convertParm = false; break;
 	 }
-	 callFindent(inFile,log,null);
+	 callFindentPreview();
 	 writeConfig();
       }
    }
@@ -264,7 +264,7 @@ public class Jfindent {
 	    case "extra":   extraParm = extraText.getText();
 			    break;
 	 }
-	 callFindent(inFile,log,null);
+	 callFindentPreview();
 	 writeConfig();
       }
    }
@@ -301,12 +301,14 @@ public class Jfindent {
 
       public void actionPerformed(ActionEvent e) {
 	 String s = e.getActionCommand();
+	 String eoln = OsUtils.getNewLine();
 	 switch (s) {
 	    case "yes": previewParm = true;  break;
-	    case "no":  previewParm = false; break;
+	    case "no":  log.setText("Preview disabled"+eoln);
+			previewParm = false; break;
 	 }
-	 callFindent(inFile,log,null);
 	 writeConfig();
+	 callFindentPreview();
       }
    }
 
@@ -318,7 +320,7 @@ public class Jfindent {
 	    if (evt.getNewValue() != null) {
 	       inFile = new File(evt.getNewValue().toString());
 	       if (inFile != null) {
-		  callFindent(inFile,log,null);
+		  callFindentPreview();
 		  fcfolderParm = fc.getCurrentDirectory().getAbsolutePath();
 		  writeConfig();
 	       }
@@ -431,12 +433,14 @@ public class Jfindent {
 
    JFileChooser     fc;
    static JTextArea log;
+   static JScrollPane      logScrollPane;
    FormatOptions    formatPanel;
    IndentOptions    indentPanel;
    ConvertOption    convertPanel;
    PreviewOption    previewPanel;
    ExtraOptions     extraPanel;
-   File             inFile = null;
+   static File      inFile     = null;
+   static String    prevInFile = null;
 
    final static boolean MULTICOLORED = false;
 
@@ -461,7 +465,7 @@ public class Jfindent {
       log.setMargin(new Insets(5,5,5,5));
       log.setEditable(false);
       log.setFont(new Font(Font.MONOSPACED,Font.BOLD,12));
-      JScrollPane logScrollPane = new JScrollPane(log);
+      logScrollPane = new JScrollPane(log);
       fc = new JFileChooser(fcfolderParm) {
 	 @Override
 	 public void approveSelection() {
@@ -641,6 +645,33 @@ public class Jfindent {
       }
    }
 
+   static void callFindentPreview(){
+      if (!previewParm){
+	 return;
+      }
+      if (inFile == null){
+	 return;
+      }
+
+      // try to put the scrollbar postion on the same place if
+      // one is looking at the same file, using different
+      // indent options
+      
+      final Point vp  = logScrollPane.getViewport().getViewPosition();
+
+      callFindent(inFile,log,null);
+      if (prevInFile != null){
+	 if (prevInFile.equals(inFile.getAbsolutePath())){
+	    SwingUtilities.invokeLater(new Runnable() {
+	       public void run() {
+		  logScrollPane.getViewport().setViewPosition(vp);
+	       }
+	    });
+	 }
+      }
+      prevInFile = inFile.getAbsolutePath();
+   }
+
    static void callFindent(File inFile, JTextArea log, File outFile, Integer... what) {
       // what == DOHELP:    runs findent -h
       // what -- DOVERSION: runs findent -v
@@ -676,11 +707,11 @@ public class Jfindent {
 	 findentExe = "findent";
       }
 
-      if (!(doHelp || doVersion)){
-	 if (!doFile && !previewParm){
-	    return;
-	 }
-      }
+      //if (!(doHelp || doVersion)){
+//	 if (!doFile && !previewParm){
+//	    return;
+//	 }
+ //     }
 
       String endl  = OsUtils.getNewLine();
       String fendl = "\n";
@@ -1071,6 +1102,7 @@ public class Jfindent {
 	 textArea.append("Select one or more Fortran sources"+endl);
 	 textArea.append("Have a look at the preview, adapt the options to your taste"+endl);
 	 textArea.append("and click 'indent'"+endl);
+	 textArea.append("NOTE: this will over-write the original files"+endl);
 	 generalHelpPanel.add(textArea);
 
 	 JButton doneButton = new JButton("done");
