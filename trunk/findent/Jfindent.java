@@ -1066,6 +1066,7 @@ public class Jfindent {
 	 aboutPanel.setLayout(new BoxLayout(aboutPanel, BoxLayout.PAGE_AXIS));
 	 aboutPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 	 JTextArea textArea = new JTextArea();
+	 textArea.setEditable(false);
 	 textArea.setFont(new Font(Font.MONOSPACED,Font.BOLD,14));
 	 String endl = OsUtils.getNewLine();
 	 textArea.append(endl+"jfindent is a graphical wrapper for findent"+endl);
@@ -1096,6 +1097,7 @@ public class Jfindent {
 	 generalHelpPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
 	 JTextArea textArea = new JTextArea();
+	 textArea.setEditable(false);
 	 textArea.setFont(new Font(Font.MONOSPACED,Font.BOLD,14));
 
 	 textArea.append(endl+"Usage:"+endl);
@@ -1128,6 +1130,7 @@ public class Jfindent {
 	 JPanel extraOptionsPanel = new JPanel();
 
 	 JTextArea textArea = new JTextArea(25,80);
+	 textArea.setEditable(false);
 	 textArea.setFont(new Font(Font.MONOSPACED,Font.BOLD,14));
 
 	 textArea.append("Extra options"+endl);
@@ -1173,6 +1176,7 @@ public class Jfindent {
 	 versionPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 
 	 JTextArea textArea = new JTextArea();
+	 textArea.setEditable(false);
 	 textArea.setFont(new Font(Font.MONOSPACED,Font.BOLD,14));
 	 textArea.append("jfindent version "+VERSION+endl);
 

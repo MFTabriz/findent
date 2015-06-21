@@ -17,6 +17,7 @@ findent-2.1:
       some trivia
       when previewing a file, the scroll position
         remains the same when trying different options
+      Make menu textArea's non-editable
 
    Makefile:
       add support for jfindent
