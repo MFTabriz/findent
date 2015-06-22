@@ -19,6 +19,8 @@ findent-2.1:
       when previewing a file, the scroll position
         remains the same when trying different options
       Make menu textArea's non-editable
+   CHANGELOG
+      added subversion Id
 
    Makefile:
       add support for jfindent
