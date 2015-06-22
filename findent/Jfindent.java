@@ -657,18 +657,22 @@ public class Jfindent {
       // one is looking at the same file, using different
       // indent options
       
-      final Point vp  = logScrollPane.getViewport().getViewPosition();
+      final Point vp; 
+      
+      if (prevInFile == null || !prevInFile.equals(inFile.getAbsolutePath())){
+	 vp = new Point(0,0);
+      } else {
+	 vp  = logScrollPane.getViewport().getViewPosition();
+      }
 
       callFindent(inFile,log,null);
-      if (prevInFile != null){
-	 if (prevInFile.equals(inFile.getAbsolutePath())){
-	    SwingUtilities.invokeLater(new Runnable() {
-	       public void run() {
-		  logScrollPane.getViewport().setViewPosition(vp);
-	       }
-	    });
+
+      SwingUtilities.invokeLater(new Runnable() {
+	 public void run() {
+	    logScrollPane.getViewport().setViewPosition(vp);
 	 }
-      }
+      });
+
       prevInFile = inFile.getAbsolutePath();
    }
 
@@ -923,11 +927,12 @@ public class Jfindent {
       } else {
 	 if (doHelp){
 	    log.append("---> end of options <---"+endl);
+	    log.setCaretPosition(0);
 	 } else if (doVersion){
+	    log.setCaretPosition(0);
 	 } else {
 	    log.append("---> end of preview <---"+endl);
 	 }
-	 log.setCaretPosition(0);
       }
    }
 
