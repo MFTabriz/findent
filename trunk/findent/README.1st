@@ -1,3 +1,4 @@
+# $Id$
 findent: indents/beautifies/converts Fortran sources
          supports Fortran-2008
 

@@ -1,3 +1,4 @@
+# $Id$
 PROG      = findent
 
 ifdef MINGW
