@@ -11,8 +11,10 @@ cp findent/README.1st versions/README.txt                         || exit 1
 cp findent/README.1st versions/README                             || exit 1
 cp findent/findent.exe versions                                   || exit 1
 cp findent/jfindent.jar versions                                  || exit 1
+cp findent/wfindent.bat versions                                  || exit 1
 cd versions                                                       || exit 1
 unix2dos README.txt README                                        || exit 1
 rm -f "findent-$version.zip"
-zip   "findent-$version.zip" findent.exe README.txt findent.jar   || exit 1
+zip   "findent-$version.zip" findent.exe README.txt \
+   jfindent.jar wfindent.bat                                      || exit 1
 rm -f findent.exe README.txt findent.jar
