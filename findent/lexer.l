@@ -118,8 +118,8 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 }
 
 <state_identifier>{
-[[:alpha:]][[:alnum:]_]*  { D(O("IDENTIFIER");Y;);  lexer_name = yytext; return IDENTIFIER;  }
-[[:alpha:]][[:alnum:]_%]* { D(O("TIDENTIFIER");Y;); lexer_name = yytext; return TIDENTIFIER; }
+[[:alpha:]][[:alnum:]_$]*  { D(O("IDENTIFIER");Y;);  lexer_name = yytext; return IDENTIFIER;  }
+[[:alpha:]][[:alnum:]_$%]* { D(O("TIDENTIFIER");Y;); lexer_name = yytext; return TIDENTIFIER; }
 }
 
 <state_keyword>{

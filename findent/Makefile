@@ -71,7 +71,9 @@ INCLUDES    = findent.h $(PARHFILE) debug.h version.h line_prep.h
 $(EXE): $(EXEOBJS)
 	$(LD) $(LDFLAGS) -o $@ $(EXEOBJS)
 
-$(PARCFILES): $(PARYFILE)
+$(PARHFILE): $(PARCFILE)
+
+$(PARCFILE): $(PARYFILE)
 	$(YACC) -o $@ --report=all --report-file=$(PARREPORTFILE) --defines=$(PARHFILE) $<
 
 $(LEXCFILES): $(LEXLFILE)
