@@ -1,3 +1,4 @@
+// $Id$
 #ifndef DEBUG_H
 #define DEBUG_H
 #define O(x) {cerr << " [" << x << "] ";}

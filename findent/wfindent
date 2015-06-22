@@ -1,4 +1,5 @@
 #!/bin/sh
+# $Id$
 #
 # in-place indenting of fortran sources using findent
 # example:
