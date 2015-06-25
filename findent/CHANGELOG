@@ -1,4 +1,7 @@
 $Id$
+finednt-2.2:
+   Makefile: add support for creating 32 bit executable
+
 findent-2.1:
    wfindent.bat:
       added
