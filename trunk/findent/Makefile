@@ -33,9 +33,14 @@ else
    CXXFLAGS = -Wall -O3 
 endif
 
+ifdef M32
+   CXXFLAGS += -m32     #requires packages g++-multilib libc-dev-1386
+   LDFLAGS  += -m32
+endif
+
 ifdef STATIC
    CXXFLAGS += -static
-   LDFLAGS   = -static
+   LDFLAGS  += -static
 endif
 
 PARNAME   = parser
