@@ -1,4 +1,5 @@
 #!/bin/bash
+rc=0
 exe=${1:-../findent}
 $exe -v
 rm -f *.try.f
@@ -16,6 +17,7 @@ for i in *.f ; do
    gfortran -fcoarray=single -cpp $format $i >/dev/null 2>&1
    if [ $? -ne 0 ] ; then
       echo -n " original program does not compile "
+      rc=1
    fi
 
    parms=`head -n1 < $i | tr '!' ' '|tr '\r' ' '`
@@ -37,6 +39,7 @@ for i in *.f ; do
          echo -n "OK"
       else
          echo -n "WRONG"
+	 rc=1
       fi
       echo
    else
@@ -54,5 +57,7 @@ for i in *.f ; do
    gfortran -fcoarray=single -cpp $format $i.try.f >/dev/null 2>&1
    if [ $? -ne 0 ] ; then
       echo "        converted program does not compile "
+      rc=1
    fi
 done
+exit $rc

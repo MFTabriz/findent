@@ -91,8 +91,11 @@ contains
         integer, intent(in) :: x
         funcx = x
      end function
+#define GCC_VERSION (__GNUC__ * 10000  + __GNUC_MINOR__ * 100  + __GNUC_PATCHLEVEL__)
+          /* Test for GCC >= 4.8.0 */
+#if GCC_VERSION >= 40800
              subroutine handleP(p)
-            class(*), intent(in) :: p
+             class(*), intent(in) :: p
 
             select type(p)
             type is (character(len=*))
@@ -103,6 +106,7 @@ contains
                 write(*,*) 'Unknown type'
             end select
         end subroutine
+#endif
         double complex function compx(x)
        double complex x
        compx = x
