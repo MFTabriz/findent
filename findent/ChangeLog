@@ -2,7 +2,8 @@ $Id$
 version 2.2:
 	convert to autoconf
 findent-2.2:
-   Makefile: add support for creating 32 bit executable
+	Makefile: add support for creating 32 bit executable
+	findent.cpp: -H options produces man page
 
 findent-2.1:
    wfindent.bat:
