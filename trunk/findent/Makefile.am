@@ -1,7 +1,7 @@
 # AUTOMAKE_OPTIONS = foreign
 AUTOMAKE_OPTIONS = gnu
 SUBDIRS = src java scripts
-MAINTAINERCLEANFILES = bin/* configure
+MAINTAINERCLEANFILES = bin/*
 
 #CLEANFILES = hoppa
 #hoppa:
