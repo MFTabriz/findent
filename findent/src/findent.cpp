@@ -42,7 +42,8 @@ void empty_dolabels();
 void indent_and_output();
 
 void set_default_indents();
-void usage();
+void usage(const bool makeman);
+void manconv(const string flag, const string txt, const bool makeman);
 string trim(const string& str);
 string rtrim(const string& str);
 string ltab2sp(const string& s);
@@ -127,7 +128,7 @@ int main(int argc, char*argv[])
 
    int c,rc;
    opterr = 0;
-   while((c=getopt(argc,argv,"a:b:c:C:d:e:E:f:F:hi:I:j:l:L:m:o:qr:R:s:t:vw:x:"))!=-1)
+   while((c=getopt(argc,argv,"a:b:c:C:d:e:E:f:F:hHi:I:j:l:L:m:o:qr:R:s:t:vw:x:"))!=-1)
       switch(c)
          {
 	   case 'a' :
@@ -158,7 +159,11 @@ int main(int argc, char*argv[])
 	      forall_indent     = atoi(optarg);
 	      break;
 	   case 'h' :
-	      usage();
+	      usage(0);
+	      return 0;
+	      break;
+	   case 'H':
+	      usage(1);
 	      return 0;
 	      break;
 	   case 'i' :
@@ -1323,62 +1328,164 @@ void set_default_indents()
    entry_indent     = all_indent-all_indent/2; // -e
 }
 
-void usage()
+void usage(const bool makeman)
 {
-   cout << "findent [options]"                       << endl;
-   cout << "   format fortran program"               << endl;
-   cout << "   reads from STDIN, writes to STDOUT"   << endl;
-   cout << "options: (errors are silently ignored)"  << endl;
-   cout << "  general:"                              << endl;
-   cout << "-h       : print this text"              << endl;
-   cout << "-v       : prints findent version"       << endl;
-   cout << "-q       : guess free or fixed, prints fixed or free" << endl;
-   cout << "-l 0/1   : 1: statement labels to start of line (default:1)" << endl;
-   cout << "-i auto  : determine automatically input format (free or fixed)" << endl;
-   cout << "-i fixed : force input format fixed"     << endl;
-   cout << "-i free  : force input format free"      << endl;
-   cout << "                                     (default: auto)"     << endl;
-   cout << "-L nnn   : use only first nnn characters of each line"    << endl;
-   cout << "           default=0: take whole lines"                   << endl;
-   cout << "-L nnng  : same as above, but use gfortran convention"    << endl;
-   cout << "           for counting the characters with tabbed lines" << endl;
-   cout << "-o free  : force free format output"         << endl;
-   cout << "-Rr      : refactor routines: a single"      << endl;
-   cout << "           'end' is if possible replaced by" << endl;
-   cout << "           'end subroutine name'"            << endl;
-   cout << "           'end function name'"              << endl;
-   cout << "           'end program name'"               << endl;
-   cout << "           'end blockdata name'"             << endl;
-   cout << "           'end module name'"                << endl;
-   cout << "-RR      : same as -Rr, but 'SUBROUTINE'"    << endl;
-   cout << "           in stead of 'subroutine' etc"     << endl;
-   cout << "  indents:"                              << endl;
-   cout << "-I n     : starting  indent (default:0)" << endl;
-   cout << "-I a     : determine starting indent from first line" << endl;
-   cout << "-i n     : all       indents except I,c,C,e (default:" << default_indent << ")" <<endl;
-   cout << "-a n     : associate indent"             << endl;
-   cout << "-b n     : block     indent"             << endl;
-   cout << "-d n     : do        indent"             << endl;
-   cout << "-f n     : if        indent"             << endl;
-   cout << "-E n     : enum      indent"             << endl;
-   cout << "-F n     : forall    indent"             << endl;
-   cout << "-j n     : interface indent"             << endl;
-   cout << "-m n     : module    indent"             << endl;
-   cout << "-r n     : routine   indent"             << endl;
-   cout << "-s n     : select    indent"             << endl;
-   cout << "-t n     : type      indent"             << endl;
-   cout << "-w n     : where     indent"             << endl;
-   cout << "-x n     : critical  indent"             << endl;
-   cout << "next defaults are: all - all/2"          << endl;
-   cout << "-c n     : case      negative indent"    << endl;
-   cout << "-C n     : contains  negative indent"    << endl;
-   cout << "-e n     : entry     negative indent"    << endl;
-   cout << ""                                        << endl;
+   if (makeman)
+   {
+      cout << ".\\\" DO NOT MODIFY THIS FILE! It was created by findent -H" << endl;
+      cout << ".TH FINDENT \"1\" \"2015\" \"findent" << VERSION << "\" \"User Commands\"" << endl;
+      cout << ".SH NAME" << endl;
+      cout << "findent \\- Indents and optionally converts Fortran program source" << endl;
+      cout << ".SH SYNOPSIS" << endl;
+      cout << ".B findent" << endl;
+      cout << "[\\fIOPTION\\fR]..." << endl;
+      cout << ".PP"<<endl<< "findent reads from stdin and writes to stdout." << endl;
+      cout << ".SH DESCRIPTION" << endl;
+      cout << "I Findent indents a Fortran source. Findent uses various kinds of" << endl;
+      cout << "indentations, see OPTIONS. Findent can convert from fixed form to" << endl;
+      cout << "free form, and can supplement single END statements, see 'Refactor' below" << endl;
+      cout << ".PP" << endl << ".SS \"General options:" << endl;
+   }
+   else
+   {
+      cout << "findent [options]"                       << endl;
+      cout << "   format fortran program"               << endl;
+      cout << "   reads from STDIN, writes to STDOUT"   << endl;
+      cout << "options: (errors are silently ignored)"  << endl;
+      cout << "  general:"                              << endl;
+   }
+
+   manconv("-h","print this text",makeman);
+   // cout << "-h       : print this text"              << endl;
+   manconv("-v","prints findent version",makeman);
+   //cout << "-v       : prints findent version"       << endl;
+   manconv("-q","guess free or fixed, prints 'fixed' or 'free' and exits",makeman);
+   //cout << "-q       : guess free or fixed, prints fixed or free" << endl;
+   manconv("-l","(0/1) 1: statement labels to start of line (default:1)",makeman);
+   //cout << "-l 0/1   : 1: statement labels to start of line (default:1)" << endl;
+   manconv("-iauto","determine automatically input format (free or fixed)",makeman);
+   //cout << "-i auto  : determine automatically input format (free or fixed)" << endl;
+   manconv("-ifixed","force input format fixed",makeman);
+   //cout << "-i fixed : force input format fixed"     << endl;
+   manconv("-ifree","force input format free",makeman);
+   //cout << "-i free  : force input format free"      << endl;
+   manconv(" ","(default: auto)",makeman);
+   //cout << "                                     (default: auto)"     << endl;
+   manconv("-Lnnn","use only first nnn characters of each line",makeman);
+   //cout << "-L nnn   : use only first nnn characters of each line"    << endl;
+   manconv(" ","default=0: take whole lines",makeman);
+   //cout << "           default=0: take whole lines"                   << endl;
+   manconv("-Lnnng","same as above, but use gfortran convention",makeman);
+   //cout << "-L nnng  : same as above, but use gfortran convention"    << endl;
+   manconv(" ","for counting the characters with tabbed lines",makeman);
+   //cout << "           for counting the characters with tabbed lines" << endl;
+   manconv("-ofree","force free format output",makeman);
+   //cout << "-o free  : force free format output"         << endl;
+   manconv("-Rr","refactor routines: a single 'end'",makeman);
+   //cout << "-Rr      : refactor routines: a single"      << endl;
+   manconv(" ","\\is if possible replaced by",makeman);
+   //cout << "           'end' is if possible replaced by" << endl;
+   manconv(" ","\\'end subroutine name'",makeman);
+   // cout << "           'end subroutine name'"            << endl;
+   manconv(" ","\\'end function name'",makeman);
+   //cout << "           'end function name'"              << endl;
+   manconv(" ","\\'end program name'",makeman);
+   //cout << "           'end program name'"               << endl;
+   manconv(" ","\\'end blockdata name'",makeman);
+   //cout << "           'end blockdata name'"             << endl;
+   manconv(" ","\\'end module name'",makeman);
+   //cout << "           'end module name'"                << endl;
+   manconv("-RR","same as -Rr, but 'SUBROUTINE'",makeman);
+   //cout << "-RR      : same as -Rr, but 'SUBROUTINE'"    << endl;
+   manconv(" ","in stead of 'subroutine' etc",makeman);
+   //cout << "           in stead of 'subroutine' etc"     << endl;
+   if(makeman)
+   {
+      cout << ".PP" << endl << ".SS \"Indenting options:" << endl;
+   }
+   else
+   {
+      cout << "  indents:"                              << endl;
+   }
+   //cout << "-I n     : starting  indent (default:0)" << endl;
+   //cout << "-I a     : determine starting indent from first line" << endl;
+   //cout << "-i n     : all       indents except I,c,C,e (default:" << default_indent << ")" <<endl;
+   //cout << "-a n     : associate indent"             << endl;
+   //cout << "-b n     : block     indent"             << endl;
+   //cout << "-d n     : do        indent"             << endl;
+   //cout << "-f n     : if        indent"             << endl;
+   //cout << "-E n     : enum      indent"             << endl;
+   //cout << "-F n     : forall    indent"             << endl;
+   //cout << "-j n     : interface indent"             << endl;
+   //cout << "-m n     : module    indent"             << endl;
+   //cout << "-r n     : routine   indent"             << endl;
+   //cout << "-s n     : select    indent"             << endl;
+   //cout << "-t n     : type      indent"             << endl;
+   //cout << "-w n     : where     indent"             << endl;
+   //cout << "-x n     : critical  indent"             << endl;
+   //cout << "next defaults are: all - all/2"          << endl;
+   //cout << "-c n     : case      negative indent"    << endl;
+   //cout << "-C n     : contains  negative indent"    << endl;
+   //cout << "-e n     : entry     negative indent"    << endl;
+   manconv("-In","starting  indent (default:0)",makeman);
+   manconv("-Ia","determine starting indent from first line",makeman);
+   manconv("-in","all       indents except I,c,C,e (default: "+number2string(default_indent)+")",makeman);
+   manconv("-an","associate indent",makeman);
+   manconv("-bn","block     indent",makeman);
+   manconv("-dn","do        indent",makeman);
+   manconv("-fn","if        indent",makeman);
+   manconv("-En","enum      indent",makeman);
+   manconv("-Fn","forall    indent",makeman);
+   manconv("-jn","interface indent",makeman);
+   manconv("-mn","module    indent",makeman);
+   manconv("-rn","routine   indent",makeman);
+   manconv("-sn","select    indent",makeman);
+   manconv("-tn","type      indent",makeman);
+   manconv("-wn","where     indent",makeman);
+   manconv("-xn","critical  indent",makeman);
+   manconv(" ","next defaults are: all - all/2",makeman);
+   manconv("-cn","case      negative indent",makeman);
+   manconv("-Cn","contains  negative indent",makeman);
+   manconv("-en","entry     negative indent",makeman);
+   manconv(" "," ",makeman);
+   //cout << ""                                        << endl;
+   if(makeman)
+   {
+      cout << ".PP" << endl << ".SS \"Examples:" << endl;
+   }
+   else
+   {
    cout << "Examples"                                         << endl;
-   cout << "  indent:  findent < in.f > out.f"                << endl;
-   cout << "           findent -i2 -r0 < in.f > out.f"        << endl;
-   cout << "  convert: findent -ofree < prog.f > prog.f90"    << endl;
-   cout << "  refactor 'end': findent -Rr < in.f90 > out.f90" << endl;
+   }
+   manconv(" ","indent: findent < in.f > out.f",makeman);
+   manconv(" ","        findent -i2 -r0 < in.f > out.f",makeman);
+   manconv(" ","convert: findent -ofree < prog.f > prog.f90",makeman);
+   manconv(" ","refactor 'end': findent -Rr < in.f90 > out.f90",makeman);
+   if(makeman)
+   {
+      cout << ".SH COPYRIGHT" << endl;
+      cout << ".br" << endl;
+   }
+   else
+   {
+      cout << "COPYRIGHT" << endl;
+   }
+   cout << "This is free software; see the source for copying conditions.  There is NO"<<endl;
+   cout << "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE."<<endl;
+}
+
+void manconv(const string flag, const string txt, const bool makeman)
+{
+
+   if (makeman)
+   {
+      cout << ".TP" << endl << "\\fB\\"<<flag<<"\\fR"<<endl;
+      cout << txt << endl;
+   }
+   else
+   {
+      cout << flag << "\t" << ": " << txt << endl;
+   }
 }
 
 int guess_fixedfree(const string s)
