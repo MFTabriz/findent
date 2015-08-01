@@ -1,7 +1,10 @@
 $Id$
 jfindent 1.1:
+	jfindent now writes config file after reading (succesfull
+	or not) and after clicking 'Quit'
 	added 'recent folders' menu item under 'File'
 	some trivial changes
+	added menuitem 'File->Save configuration'
 version 2.2:
 	convert to autoconf
 findent-2.2:

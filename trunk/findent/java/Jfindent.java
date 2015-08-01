@@ -488,6 +488,7 @@ public class Jfindent {
 	 recentFolders[i] = "";
       }
       readConfig();
+      writeConfig();
       log = new JTextArea(25,130);
       log.setMargin(new Insets(5,5,5,5));
       log.setEditable(false);
@@ -807,7 +808,7 @@ public class Jfindent {
       } catch (IOException e) {
 	 log.append("Couldn't start findent."+endl);
 	 log.append("The command was '"+findentExe+"'"+endl);
-	 log.append("Fix this in the 'file->location of findent' menu"+endl);
+	 log.append("Fix this in the 'Config->Location of findent' menu"+endl);
 	 log.setCaretPosition(log.getDocument().getLength());
 	 return;
       }
@@ -1005,6 +1006,12 @@ public class Jfindent {
 
 	 makeRecentItems();
 
+	 JMenuItem saveItem = new JMenuItem("Save configuration");
+	 saveItem.setActionCommand("save");
+	 saveItem.addActionListener(this);
+
+	 fileMenu.add(saveItem);
+
 	 JMenuItem quitItem = new JMenuItem("Quit");
 	 quitItem.setActionCommand("quit");
 	 quitItem.addActionListener(this);
@@ -1081,7 +1088,11 @@ public class Jfindent {
 					    +endl);
 				      callFindent(null,log,null,DOVERSION);
 				      break;
-	    case "quit":              System.exit(0);
+	    case "quit":              writeConfig();
+				      System.exit(0);
+				      break;
+	    case "save":              writeConfig();
+	                              log.setText("Configuration saved"+endl);
 				      break;
 	    case "about":             showAbout();
 				      break;
