@@ -75,7 +75,7 @@ import javax.swing.*;
 
 
 public class Jfindent {
-   static final String VERSION = "1.0";
+   static final String VERSION = "1.1";
    static final int DOHELP     = 1;
    static final int DOVERSION  = 2;
 
@@ -323,13 +323,29 @@ public class Jfindent {
 	       if (inFile != null) {
 		  callFindentPreview();
 		  fcfolderParm = fc.getCurrentDirectory().getAbsolutePath();
+		  int k = -1;
+		  for (int i=0; i<maxRecentFolders; i++) {
+		     if( recentFolders[i].equals(fcfolderParm)) {
+			k = i;
+			break;
+		     }
+		  }
+		  if (k >= 0) {
+		     for (int i=k; i<maxRecentFolders-1; i++) {
+			recentFolders[i] = recentFolders[i+1];
+		     }
+		  }
+		  for (int i= maxRecentFolders-1; i>0; i--){
+		     recentFolders[i] = recentFolders[i-1];
+		  }
+		  recentFolders[0] = fcfolderParm;
+		  jfindentMenu.makeRecentItems();
 		  writeConfig();
 	       }
 	    }
 	 }
       }
    }
-
 
    static class PipeFromFile implements Runnable {
 
@@ -432,7 +448,7 @@ public class Jfindent {
       }
    }
 
-   JFileChooser     fc;
+   static JFileChooser     fc;
    static JTextArea log;
    static JScrollPane      logScrollPane;
    FormatOptions    formatPanel;
@@ -459,8 +475,18 @@ public class Jfindent {
    static boolean previewParm;       // preview on or off
    static int     indentParm;        // -i<n>
 
+   final static int maxRecentFolders = 8;
+   static String[] recentFolders;
+   static JMenuItem[] recentItems;
+   static JMenu recentMenu;
+   static JfindentMenu jfindentMenu;
+
    public Jfindent() {
       UIManager.put("FileChooser.readOnly", true);
+      recentFolders = new String[maxRecentFolders];
+      for (int i=0; i<maxRecentFolders; i++) {
+	 recentFolders[i] = "";
+      }
       readConfig();
       log = new JTextArea(25,130);
       log.setMargin(new Insets(5,5,5,5));
@@ -618,6 +644,13 @@ public class Jfindent {
 		  findentParm = elem.getElementsByTagName("findent").item(0)
 		     .getChildNodes().item(0).getNodeValue();
 	       } catch (Exception e) {}
+	       for (int j=0; j<maxRecentFolders; j++){
+		  try {
+		     recentFolders[j] = elem.getElementsByTagName("recent"+j).item(0)
+			.getChildNodes().item(0).getNodeValue();
+		  } catch (Exception e) {}
+	       }
+	       jfindentMenu.makeRecentItems();
 	    }
 	 }
       }
@@ -638,6 +671,13 @@ public class Jfindent {
 	 writer.println("    <fcfolder>"  + fcfolderParm   +"</fcfolder>");
 	 writer.println("    <preview>"   + previewParm    +"</preview>");
 	 writer.println("    <findent>"   + findentParm    +"</findent>");
+	 int k = 0;
+	 for(int i=0; i<maxRecentFolders; i++){
+	    if(!recentFolders[i].isEmpty()){
+	       writer.println("    <recent"+k+">" + recentFolders[i] +"</recent"+k+">");
+	       k++;
+	    }
+	 }
 	 writer.println("  </parms>");
 	 writer.println("</jfindent>");
 	 writer.close();
@@ -711,12 +751,6 @@ public class Jfindent {
       if (findentExe.trim().isEmpty()){
 	 findentExe = "findent";
       }
-
-      //if (!(doHelp || doVersion)){
-//	 if (!doFile && !previewParm){
-//	    return;
-//	 }
- //     }
 
       String endl  = OsUtils.getNewLine();
       String fendl = "\n";
@@ -798,7 +832,6 @@ public class Jfindent {
       int counterOut = 0;
 
       if (doHelp || doVersion){
-	 //log.setText("Findent options:"+endl);
       } else {
 	 if (!doFile){
 	    log.setText("Preview (max "+mcount+" lines)"+endl);
@@ -938,44 +971,49 @@ public class Jfindent {
    }
 
    static class JfindentMenu implements ActionListener, ItemListener {
-      JFrame aboutFrame    = null;
-      JFrame versionFrame  = null;
-      JFrame generalHelpFrame     = null;
-      JFrame extraOptionsFrame     = null;
+      JFrame aboutFrame        = null;
+      JFrame versionFrame      = null;
+      JFrame generalHelpFrame  = null;
+      JFrame extraOptionsFrame = null;
 
       public JfindentMenu(JFrame frame){
 	 JMenuBar menuBar = new JMenuBar();
-	 JMenu fileMenu = new JMenu("file");
+	 JMenu fileMenu = new JMenu("File");
 
-	 JMenu configMenu = new JMenu("config");
+	 JMenu configMenu = new JMenu("Config");
 
-	 JMenuItem fcItem = new JMenuItem("choose location of findent ...");
+	 JMenuItem fcItem = new JMenuItem("Choose location of findent ...");
 	 fcItem.setActionCommand("fc");
 	 fcItem.addActionListener(this);
 
-	 JMenuItem defaultItem = new JMenuItem("find findent via PATH");
+	 JMenuItem defaultItem = new JMenuItem("Find findent via PATH");
 	 defaultItem.setActionCommand("defaultPath");
 	 defaultItem.addActionListener(this);
 
-	 JMenuItem testItem = new JMenuItem("test");
+	 JMenuItem testItem = new JMenuItem("Test if findent works");
 	 testItem.setActionCommand("test");
 	 testItem.addActionListener(this);
 
 	 configMenu.add(fcItem);
-	 configMenu.addSeparator();
 	 configMenu.add(defaultItem);
-	 configMenu.addSeparator();
 	 configMenu.add(testItem);
 
-	 JMenuItem quitItem = new JMenuItem("quit");
+	 recentMenu = new JMenu("Recent folders:");
+	 fileMenu.add(recentMenu);
+
+	 recentItems = new JMenuItem[maxRecentFolders];
+
+	 makeRecentItems();
+
+	 JMenuItem quitItem = new JMenuItem("Quit");
 	 quitItem.setActionCommand("quit");
 	 quitItem.addActionListener(this);
 
 	 fileMenu.add(quitItem);
 
-	 JMenu infoMenu = new JMenu("info");
+	 JMenu infoMenu = new JMenu("Info");
 
-	 JMenuItem versionItem = new JMenuItem ("version");
+	 JMenuItem versionItem = new JMenuItem ("Version");
 	 versionItem.setActionCommand("version");
 	 versionItem.addActionListener(this);
 
@@ -984,16 +1022,15 @@ public class Jfindent {
 	 aboutItem.addActionListener(this);
 
 	 infoMenu.add(aboutItem);
-	 infoMenu.addSeparator();
 	 infoMenu.add(versionItem);
 
-	 JMenu helpMenu = new JMenu("help");
+	 JMenu helpMenu = new JMenu("Help");
 
-	 JMenuItem generalusageItem = new JMenuItem("general usage");
+	 JMenuItem generalusageItem = new JMenuItem("General usage");
 	 generalusageItem.setActionCommand("generalUsage");
 	 generalusageItem.addActionListener(this);
 
-	 JMenuItem extraoptionsItem = new JMenuItem("extra options");
+	 JMenuItem extraoptionsItem = new JMenuItem("Extra options");
 	 extraoptionsItem.setActionCommand("extraOptions");
 	 extraoptionsItem.addActionListener(this);
 
@@ -1007,8 +1044,31 @@ public class Jfindent {
 
 	 frame.setJMenuBar(menuBar);
       }
+
+      public void makeRecentItems() {
+	 recentMenu.removeAll();
+	 int k=0;
+	 for (int i=0; i<maxRecentFolders; i++) {
+	    if(!recentFolders[i].isEmpty()){
+	       recentItems[k] = new JMenuItem(recentFolders[i]);
+	       recentItems[k].setActionCommand("recent_"+String.valueOf(i));
+	       recentItems[k].addActionListener(this);
+	       recentMenu.add(recentItems[k]);
+	       k++;
+	    }
+	 }
+      }
+
       public void actionPerformed(ActionEvent e){
 	 String endl = OsUtils.getNewLine();
+
+	 for (int i=0; i<maxRecentFolders; i++) {
+	    if(e.getActionCommand().equals("recent_"+String.valueOf(i))) {
+	       fc.setCurrentDirectory(new File(recentFolders[i]));
+	       return;
+	    }
+	 }
+
 	 switch(e.getActionCommand()){
 	    case "fc":                setFindentLocation();
 				      log.setText("Findent location: '"+findentParm+"'"+endl);
@@ -1022,6 +1082,7 @@ public class Jfindent {
 				      callFindent(null,log,null,DOVERSION);
 				      break;
 	    case "quit":              System.exit(0);
+				      break;
 	    case "about":             showAbout();
 				      break;
 	    case "version":           showVersion();
@@ -1109,7 +1170,7 @@ public class Jfindent {
 	 textArea.append(endl+"Usage:"+endl);
 	 textArea.append("Select one or more Fortran sources"+endl);
 	 textArea.append("Have a look at the preview, adapt the options to your taste"+endl);
-	 textArea.append("and click 'indent'"+endl);
+	 textArea.append("and click 'indent selected files'"+endl);
 	 textArea.append("NOTE: this will over-write the original files"+endl);
 	 generalHelpPanel.add(textArea);
 
@@ -1132,7 +1193,7 @@ public class Jfindent {
 	 }
 	 String endl = OsUtils.getNewLine();
 
-	 extraOptionsFrame = new JFrame("extraOptions");
+	 extraOptionsFrame = new JFrame("extra options");
 	 JPanel extraOptionsPanel = new JPanel();
 
 	 JTextArea textArea = new JTextArea(25,80);
@@ -1200,7 +1261,6 @@ public class Jfindent {
 	 versionFrame.setLocationRelativeTo(null);
 	 versionFrame.setVisible(true);
       }
-
    }
 
    /**
@@ -1221,7 +1281,7 @@ public class Jfindent {
       jfindent.mainPane.setOpaque(true); //content panes must be opaque
       frame.setContentPane(jfindent.mainPane);
 
-      JfindentMenu jfindentMenu = new JfindentMenu(frame);
+      jfindentMenu = new JfindentMenu(frame);
 
       //Display the window.
       frame.pack();
