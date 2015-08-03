@@ -1,5 +1,6 @@
 #!/bin/bash
 # $Id$
+set -x
 ./bootstrap                                        || exit 1
 ./configure                                        || exit 1
 make maintainer-clean                              || exit 1
@@ -18,7 +19,7 @@ echo "version = $version"
 make distclean                                     || exit 1
 cd ..                                              || exit 1
 mkdir -p versions                                  || exit 1
-cp findent/src/README.1st versions/README          || exit 1
+cp findent/README.1st versions/README              || exit 1
 cd versions                                        || exit 1
 unix2dos README                                    || exit 1
 rm -rf "findent-$version"
