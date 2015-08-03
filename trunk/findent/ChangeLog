@@ -10,6 +10,8 @@ version 2.2:
 findent-2.2:
 	Makefile: add support for creating 32 bit executable
 	findent.cpp: -H options produces man page
+	findent.cpp: better support for preprocessor lines with
+	             continuation line
 
 findent-2.1:
    wfindent.bat:
