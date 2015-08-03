@@ -27,6 +27,8 @@ DISTCLEANFILES =
 
 MAINTAINERCLEANFILES = $(CLEANFILES)
 
+if MAKEMAN
+
 man1_MANS = findent.1
 
 findent.1: findent
@@ -34,6 +36,8 @@ findent.1: findent
 
 install-data-hook:
 	gzip -f $(mandir)/man1/$(man1_MANS)
+
+endif
 
 findent.o: parser.h
 

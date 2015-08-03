@@ -9,6 +9,7 @@ AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
 AC_SUBST([make_include], ["include"])
+
 AC_ARG_WITH(windows, [AS_HELP_STRING([--with-windows],[Build findent.exe @<:@default=no@:>@])],[],[with_windows=no])
 
 mingw32="i586-mingw32msvc-g++"
@@ -21,6 +22,8 @@ AS_IF( [test "x$with_windows" = xyes],
        [CXX=$MINGW32
         AC_MSG_NOTICE([mingw c++ compiler: $MINGW32])
         AC_MSG_NOTICE([Will create WINDOWS executable findent.exe])])
+
+AM_CONDITIONAL([MAKEMAN],[test "x$with_windows" != "xyes"])
 
 AC_PROG_CXX
 AC_PROG_AWK

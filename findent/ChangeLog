@@ -12,6 +12,9 @@ findent-2.2:
 	findent.cpp: -H options produces man page
 	findent.cpp: better support for preprocessor lines with
 	             continuation line
+	src/Makefile.am configure.ac:
+		take care that no manpage is made when compiling for
+		windows
 
 findent-2.1:
    wfindent.bat:
