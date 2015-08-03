@@ -14,9 +14,10 @@ using namespace std;
 extern "C" FILE *yyin;
 string mygetline();
 void get_full_statement();
-bool handle_free(string s);
+void handle_free(string s,bool &more);
 void remove_trailing_comment(string &s);
-bool handle_fixed(string s);
+void handle_fixed(string s, bool &more);
+void handle_preproc(string s, bool &more);
 void output_line();
 int pop_indent();
 int top_indent();
@@ -24,6 +25,8 @@ void push_indent(int p);
 void init_indent();
 string whatprop(struct propstruct p);
 string stoupper(const string s);
+char firstchar(const string s);
+char lastchar(const string s);
 
 void push_rprops(struct propstruct p);
 void init_rprops();
@@ -75,7 +78,7 @@ int num_lines;                    // number of lines read sofar
 bool non_blank_line_seen;
 bool indent_handled;
 
-stack<int> dolabels;          // to sotre labels, necessary for labelled do
+stack<int> dolabels;          // to store labels, necessary for labelled do
 int stlabel;
 int labelleng;
 
@@ -659,10 +662,54 @@ string mygetline()
 }
 
 void get_full_statement()
+   // this function collects 'full_statement': a complete
+   // fortran line, concatenated from possible continuation lines,
+   // comments and preprocessor lines removed
+   //
+   // full_statement is used to determine the indentation
+   //
+   // Also, every line is stored in 'lines'
+   // 
+   // If the input starts with a comment or a preprocessor line,
+   // full_statement = "", lines will contain the line, possibly
+   // followed by preprocessor continuation lines as in:
+   /* #define foo \   */
+   //           bar
+   //
+   // A totally empty line is treated as a comment line,
+   //
+   // Comment lines and preprocessor lines can be embedded in 
+   // fortran continuation lines as in:
+   //
+   //    subroutine compute( &
+   // #ifdef one
+   //      x &
+   // #else
+   //      x,y &
+   // #endif
+   //     )
+   //
+   // In this example, full_stataement will contain:
+   //
+   //    subroutine compute(x x,y)
+   // ( this is not correct, of course, but it will not prevent 
+   //   correct indenting)
+   //
+   // and lines will contain:
+   //
+   // #ifdef one
+   //      x &
+   // #else
+   //      x,y &
+   // #endif
+   //     )
+   //
 {
    string s;
-   full_statement                 = "";
-   indent_handled                 = 0;
+   full_statement       = "";
+   indent_handled       = 0;
+   bool preproc_more    = 0;
+   bool fortran_more    = 0;
 
    while(1)
    {
@@ -708,34 +755,67 @@ void get_full_statement()
 
       D(O("get_full_statement s leng:");O(s);O(s.length());O("endline:");O(endline.length()););
 
+      if(preproc_more || (firstchar(s) == '#'))
+      {
+	 D(O("preproc");O(s);O(preproc_more););
+	 handle_preproc(s, preproc_more);
+	 if (preproc_more || fortran_more)
+	    continue;
+	 else
+	    break;
+      }
+
       if (input_format == FREE)
       {
-	 if (handle_free(s))
+	 handle_free(s,fortran_more);
+	 if (fortran_more) 
 	    continue;
 	 else
 	    break;
       }
       else
       {
-	 if (handle_fixed(s))
+	 handle_fixed(s, fortran_more);
+	 if (fortran_more)
 	    continue;
 	 else
 	    break;
       }
    }
    D(O("full_statement:");O(num_lines);O(full_statement););
+   D(O("lines:"); for (unsigned int i=0; i<lines.size(); i++) { O(i);O(lines[i]); })
 }
 
-bool handle_free(string s)
+void handle_preproc(string s, bool &more)
+   // adds preprocessor continuation line s to full statement
+   // more = 1: more preprocessor lines are to expected
+   //        0: this line is complete
+{
+   if(end_of_file)
+   {
+      D(O("end of file"););
+      more = 0;
+      return;
+   }
+   string sl = rtrim(s);
+   lines.push_back(sl);
+   if(lastchar(sl) == '\\')
+      more = 1;
+   else
+      more = 0;
+}
+
+void handle_free(string s, bool &more)
 // adds input line s to full_statement
-// return 1: more lines are to expected
+// more 1: more lines are to expected
 //        0: this line is complete
 
 {
    if(end_of_file)
    {
       D(O("end of file"););
-      return 0;
+      more = 0;
+      return;
    }
 
    if (input_line_length !=0)
@@ -743,7 +823,7 @@ bool handle_free(string s)
 
    string sl     = trim(s);
 
-   if (sl != "" && sl[0] == '&')
+   if (firstchar(sl) == '&')
    {
       sl.erase(0,1);
       sl = trim(sl);
@@ -752,15 +832,10 @@ bool handle_free(string s)
    //  if this line is pure comment or empty or preprocessor statement:
    //     add it to lines
 
-   if (sl == "" || sl[0] == '!' || sl[0] == '#')
+   if (sl == "" || firstchar(sl) == '!' )
    {
       lines.push_back(trim(s));
-      // if there is now only one line in lines,
-      // we are not in a continuation:
-      if(lines.size() ==1)
-	 return 0;
-      // we are in a continuation, read more
-      return 1;
+      return;
    }
 
    // Investigate if this line wants a continuation.
@@ -773,27 +848,27 @@ bool handle_free(string s)
    // a possible trailing comment, and trim.
    // If the last character = '&', a continuation is expected.
 
-   bool expect_continuation = 0;
    string cs = full_statement + sl;
 
    remove_trailing_comment(cs);
    cs = rtrim(cs);
 
-   expect_continuation = ( cs[cs.length()-1] == '&');
-   if (expect_continuation)            // chop off '&' :
-      cs = cs.substr(0,cs.length()-1);
+   more = ( lastchar(cs) == '&');
+   if (more)            // chop off '&' :
+      cs.erase(cs.length()-1);
 
    full_statement = cs;
    lines.push_back(trim(s));
-   D(O("full_statement");O(full_statement);O(expect_continuation););
-
-   return expect_continuation;
+   D(O("full_statement");O(full_statement);O(more););
 }
 
-bool handle_fixed(string s)
+void handle_fixed(string s, bool &more)
 {
    if(end_of_file)
-      return 0;
+   {
+      more = 0;
+      return;
+   }
 
    string s0 = s;
 
@@ -816,8 +891,10 @@ bool handle_fixed(string s)
    {  // this is a blank or comment or preprocessor line
       lines.push_back(trim(s));
       if (lines.size() ==1)
-         return 0;   // do not expect continuation lines
-      return 1;      // but here we do
+         more = 0;   // do not expect continuation lines
+      else
+	 more = 1;      // but here we do
+      return;
    }
 
    // replace leading tabs by spaces
@@ -839,7 +916,8 @@ bool handle_fixed(string s)
       remove_trailing_comment(full_statement);
       full_statement = rtrim(full_statement);
       D(O("sl:");O(sl);O(full_statement);O(lines.size()););
-      return 1;      // maybe there are continuation lines
+      more = 1;      // maybe there are continuation lines
+      return;
    }
 
    // this is possibly a continuation line
@@ -849,7 +927,8 @@ bool handle_fixed(string s)
       // we push back the line in it's original state
       // to prevent double line truncation
       linestack.push(s0);
-      return 0;          // do not look for further continuation lines
+      more = 0;          // do not look for further continuation lines
+      return;
    }
    // this is a continuation line
    lines.push_back(s);
@@ -857,7 +936,8 @@ bool handle_fixed(string s)
    remove_trailing_comment(full_statement);
    full_statement = rtrim(full_statement);
    D(O(full_statement);O(rtrim(sl));O(sl););
-   return 1;   // look for more continuation lines
+   more = 1;   // look for more continuation lines
+   return;
 }
 
 void remove_trailing_comment(string &s)
@@ -976,42 +1056,51 @@ void output_line()
    if (input_format == FREE)
    {
       string firstline = lines.front();
-      handle_pre(firstline);
-      lines.pop_front();
       D(O("firstline");O(firstline););
-      int l;
-      if (firstline != "" || lines.size() > 1)
+      lines.pop_front();
+      if(firstchar(firstline) == '#')
       {
-	 if (label_left && labelleng > 0)
-	 {  // put label at start of line
-	    string label = firstline.substr(0,labelleng);
-	    firstline    = trim(firstline.substr(labelleng));
-	    cout << label;
-	    l = cur_indent - labelleng;
-	    if ( l <= 0 )
-	       l=1;
-	 }
-	 else
-	    l = cur_indent;
-
-	 if (l<0)
-	   l=0;
-	 if (firstline[0] != '#')
+	 handle_pre(firstline);
+      }
+      else
+      {
+	 int l;
+	 if (firstline != "" || lines.size() > 1)
 	 {
+	    if (label_left && labelleng > 0)
+	    {  // put label at start of line
+	       string label = firstline.substr(0,labelleng);
+	       firstline    = trim(firstline.substr(labelleng));
+	       cout << label;
+	       l = cur_indent - labelleng;
+	       if ( l <= 0 )
+		  l=1;
+	    }
+	    else
+	       l = cur_indent;
+
+	    if (l<0)
+	       l=0;
 	    cout << string(l,' '); 
 	    D(O("output indent before firstline");O(string(l,' ')););
 	 }
+	 cout << firstline << endline;
+	 D(O("output firstline");O(firstline););
       }
-      cout << firstline << endline;
-      D(O("output firstline");O(firstline););
       while (!lines.empty())
       {
       // sometimes, there are preprocessor statements within a continuation ...
-         handle_pre(lines.front());
-	 if (lines.front()[0] != '#')
-	    cout << string(max(cur_indent,0),' ');
-	 cout << lines.front()<<endline;
+         string s = lines.front();
 	 lines.pop_front();
+	 if(firstchar(s) == '#')
+	 {
+	    handle_pre(s);
+	 }
+	 else
+	 {
+	    cout << string(max(cur_indent,0),' ');
+	    cout << s <<endline;
+	 }
       }
    }
    else   // input_format = FIXED, output can be FREE or FIXED
@@ -1022,8 +1111,12 @@ void output_line()
       {
          lineno++;
          string s = lines.front();
-	 handle_pre(s);
 	 lines.pop_front();
+	 if (firstchar(s) == '#')
+	 {
+	    handle_pre(s);
+	    continue;
+	 }
 	 if(isfixedcmt(s))
 	 {  // this is an empty line or comment line or a preprocessing line
 	    if (output_format == FIXED)
@@ -1034,15 +1127,12 @@ void output_line()
 	          cout << endline;
 	       else
 	       {
-	          switch (s[0])
+	          switch (firstchar(s))
 		  {
 	             // special hack for lines starting with 'd' or 'D'
 	             case 'd' :
 		     case 'D' :
 		        cout << "!" + trim(s) << endline;
-			break;
-	             case '#' :
-			cout << trim(s) << endline;
 			break;
 	             default:
 			cout << string(max(cur_indent,0),' ') << "!" << trim(s.substr(1)) << endline;
@@ -1450,8 +1540,8 @@ int guess_fixedfree(const string s)
    // such as ^L
    // I cannot get the lexer to respond to [:cntrl:]
    // so I handle that here:
-   if (s != "" && s[0] != '\t')
-      if(s[0] < 32)
+   if (firstchar(s) != '\t')
+      if(firstchar(s) < 32)
          return UNSURE;
 
    lexer_set(ltab2sp(s));
@@ -1511,14 +1601,14 @@ string handle_dos(const string s)
    if (!endline_set)
    {
       D(O("setting endline");O(sl));
-      if (sl != "" && sl[sl.length()-1] == '\r')
+      if (sl != "" && lastchar(sl) == '\r')
       {
 	 endline = "\r\n";
          D(O(endline.length()););
       }
       endline_set = 1;
    }
-   if (sl != "" && sl[sl.length()-1] =='\r')
+   if (sl != "" && lastchar(sl) =='\r')
       sl.erase(sl.length()-1);
    return sl;
 }
@@ -1529,7 +1619,7 @@ bool isfixedcmt(const string s)
 //                                         or debug line ('d' or 'D' in column 1)
    if (s == "" || trim(s) == "")
       return 1;
-   char c = s[0];
+   char c = firstchar(s);
    return (c == 'C' || c == 'c' || c == '!' || c == '*' || c == '#' || c == 'd' || c == 'D'); 
 }
 
@@ -1584,7 +1674,7 @@ void handle_pre(const string s)
 {
    D(O("pre before");O(cur_indent);O(top_indent());O(s););
 
-   if (s == "" || s[0] != '#')
+   if (s == "" || firstchar(s) != '#')
       return;
 
    if (s.find("#if") == 0)   // covers #if #ifdef #ifndef
@@ -1640,5 +1730,30 @@ void handle_pre(const string s)
       }
    }
    D(O("pre after");O(cur_indent);O(top_indent()););
+   cout << s << endline;
+   char lchar = lastchar(s);
+   while (!lines.empty())
+   {
+      if (lchar != '\\')
+	 break;
+      cout <<lines.front() << endline;
+      lchar = lastchar(lines.front());
+      lines.pop_front();
+   }
 }
 
+char firstchar(const string s)
+{
+   size_t l = s.length();
+   if (l == 0)
+      return 0;
+   return s[0];
+}
+
+char lastchar(const string s)
+{
+   size_t l = s.length();
+   if (l == 0)
+      return 0;
+   return s[l-1];
+}
