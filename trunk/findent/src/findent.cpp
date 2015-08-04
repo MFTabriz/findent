@@ -1447,6 +1447,7 @@ void usage(const bool doman)
    }
 
    manout("-h","print this text",                                         doman);
+   manout("-H","print man page",                                          doman);
    manout("-v","prints findent version",                                  doman);
    manout("-q","guess free or fixed, prints 'fixed' or 'free' and exits", doman);
    manout("-l","(0/1) 1: statement labels to start of line (default:1)",  doman);

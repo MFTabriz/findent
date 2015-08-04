@@ -9,7 +9,7 @@ version=`bin/findent.exe -v | awk '{print $3}'|tr -d '\r'`        || exit 1
 echo "version = $version"
 cd ..                                                             || exit 1
 mkdir -p versions                                                 || exit 1
-cp findent/src/README.1st versions/README.txt                     || exit 1
+cp findent/README.windows versions/README.txt                     || exit 1
 cp findent/bin/findent.exe versions                               || exit 1
 cp findent/bin/jfindent.jar versions                              || exit 1
 cp findent/scripts/wfindent.bat versions                          || exit 1
