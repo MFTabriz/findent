@@ -1,4 +1,8 @@
 $Id$
+findent-2.3:
+	findent.cpp: fix bug in coverting fixed to free when dealing
+	with a preprocessor continuation
+
 jfindent 1.1:
 	jfindent now writes config file after reading (succesfull
 	or not) and after clicking 'Quit'
