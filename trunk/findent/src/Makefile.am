@@ -35,7 +35,7 @@ findent.1: findent
 	./findent -H > $@
 
 install-data-hook:
-	gzip -f $(mandir)/man1/$(man1_MANS)
+	gzip -f $(DESTDIR)$(mandir)/man1/$(man1_MANS)
 
 endif
 
