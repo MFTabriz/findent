@@ -1,6 +1,9 @@
 $Id$
 findent-2.3:
+	jfindent: is now in a separate folder: ../jfindent
+	   with it's on autoconf setup
 	Makefile.am: added $(DESTDIR) for the man page
+	   adapted to new jfindent location
 	findent.cpp: fix bug in coverting fixed to free when dealing
 	with a preprocessor continuation
 

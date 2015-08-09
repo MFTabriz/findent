@@ -1,4 +1,3 @@
-if BUILD_JFINDENT
 JAR   = jar
 CHMOD = chmod
 CP    = cp
@@ -12,8 +11,6 @@ bin_SCRIPTS = jfindent jfindent.jar
 man1_MANS = jfindent.1
 
 install-data-hook:
-	gzip -f $(mandir)/man1/$(man1_MANS)
-else
-all:
-endif
+	gzip -f $(DESTDIR)$(mandir)/man1/$(man1_MANS)
+
 CLEANFILES  = jfindent jfindent.jar *.class

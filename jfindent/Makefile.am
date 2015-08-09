@@ -1,3 +1,3 @@
 AUTOMAKE_OPTIONS = gnu
-SUBDIRS = src scripts
+SUBDIRS = src
 MAINTAINERCLEANFILES = bin/*
