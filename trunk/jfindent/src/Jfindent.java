@@ -75,7 +75,7 @@ import javax.swing.*;
 
 
 public class Jfindent {
-   static final String VERSION = "1.1";
+   static final String VERSION = "1.2";
    static final int DOHELP     = 1;
    static final int DOVERSION  = 2;
 
