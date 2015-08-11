@@ -1,4 +1,5 @@
 #!/bin/bash
+gfortran -v > /dev/null  || echo "Cannot check: gfortran not installed" ; exit 0
 rc=0
 exe=${1:-../findent}
 $exe -v
