@@ -1,12 +1,14 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(findent, 2.3-pre1, wvermin@gmail.com)
+AC_INIT(findent, 2.2.5, wvermin@gmail.com)
 AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
 AC_CONFIG_SRCDIR([src/findent.cpp])
 AC_CONFIG_HEADERS([config.h])
-AC_CONFIG_MACRO_DIR([m4])
+
+m4_include([m4/ax_prog_bison.m4])
+m4_include([m4/ax_prog_flex.m4])
 
 AC_SUBST([make_include], ["include"])
 
