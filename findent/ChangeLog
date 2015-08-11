@@ -5,7 +5,10 @@ findent-2.3:
 	Makefile.am: added $(DESTDIR) for the man page
 	   adapted to new jfindent location
 	findent.cpp: fix bug in coverting fixed to free when dealing
-	with a preprocessor continuation
+	   with a preprocessor continuation
+	configure.ac: explicitly include macros in m4, do not
+	   use AC_CONFIG_MACRO_DIR, this seems not to work
+	   in Debian wheezy
 
 jfindent 1.1:
 	jfindent now writes config file after reading (succesfull
