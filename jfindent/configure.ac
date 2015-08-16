@@ -2,10 +2,18 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_INIT(jfindent, 1.2, wvermin@gmail.com)
+m4_include([m4/ax_check_class.m4])
+m4_include([m4/ax_check_rqrd_class.m4])
+m4_include([m4/ax_java_options.m4])
+m4_include([m4/ax_java_works.m4])
+m4_include([m4/ax_prog_javac.m4])
+m4_include([m4/ax_prog_javac_works.m4])
+m4_include([m4/ax_prog_java.m4])
+m4_include([m4/ax_try_compile_java.m4])
+m4_include([m4/ax_try_run_java.m4])
 AM_MAINTAINER_MODE
 AC_CONFIG_SRCDIR([src/Jfindent.java])
 AC_CONFIG_HEADERS([config.h])
-AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE
 
 AS_IF( [test "x$JAVAC" = x],[JAVAC=javac])
