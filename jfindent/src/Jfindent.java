@@ -55,9 +55,6 @@ import java.util.*;
 import javax.swing.filechooser.*;
 import java.io.*;
 import java.text.*;
-import java.lang.ProcessBuilder.Redirect;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -70,9 +67,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import java.beans.*;
-
-import javax.swing.*;
-
 
 public class Jfindent {
    static final String VERSION = "1.2";
@@ -110,7 +104,22 @@ public class Jfindent {
       }
    }
 
+   public static void copyFile(File src, File dst) throws IOException {
+      InputStream in = new FileInputStream(src);
+      OutputStream out = new FileOutputStream(dst);
+
+      // Transfer bytes from in to out
+      byte[] buf = new byte[1024];
+      int len;
+      while ((len = in.read(buf)) > 0) {
+	 out.write(buf, 0, len);
+      }
+      in.close();
+      out.close();
+   }
+
    class IndentOptions extends JPanel implements ChangeListener {
+      static final long serialVersionUID = 1;
       static final int minIndent = 0;
       static final int maxIndent = 8;
 
@@ -137,13 +146,15 @@ public class Jfindent {
       public void stateChanged(ChangeEvent e) {
 
 	 JSpinner source = (JSpinner)e.getSource();
-	 indentParm = (int)source.getValue();
+	 //indentParm = (int)source.getValue();
+	 indentParm = (Integer)source.getValue();
 	 callFindentPreview();
 	 writeConfig();
       }
    }
 
    class FormatOptions extends JPanel implements ActionListener {
+      static final long serialVersionUID = 1;
 
       public FormatOptions() {
 
@@ -170,9 +181,11 @@ public class Jfindent {
 
 	 autoButton.setSelected(true);
 
-	 switch (fixedfreeParm) {
-	    case "fixed": fixedButton.setSelected(true); break;
-	    case "free":  freeButton.setSelected(true); break;
+	 if (fixedfreeParm.equals("fixed")){
+	    fixedButton.setSelected(true);
+	 }
+	 else if (fixedfreeParm.equals("free")){
+	    freeButton.setSelected(true);
 	 }
 
 	 add(formatLabel);
@@ -183,10 +196,15 @@ public class Jfindent {
 
       public void actionPerformed(ActionEvent e) {
 	 String s = e.getActionCommand();
-	 switch (s) {
-	    case "auto":  fixedfreeParm = "auto";  break;
-	    case "free":  fixedfreeParm = "free";  break;
-	    case "fixed": fixedfreeParm = "fixed"; break;
+
+	 if (s.equals("auto")){
+	    fixedfreeParm = "auto";
+	 }
+	 else if(s.equals("free")){
+	    fixedfreeParm = "free";
+	 }
+	 else if(s.equals("fixed")){
+	    fixedfreeParm = "fixed";
 	 }
 	 callFindentPreview();
 	 writeConfig();
@@ -194,6 +212,7 @@ public class Jfindent {
    }
 
    class ConvertOption extends JPanel implements ActionListener {
+      static final long serialVersionUID = 1;
       public ConvertOption() {
 
 	 JLabel convertLabel = new JLabel("Fixed->free:");
@@ -224,9 +243,12 @@ public class Jfindent {
       }
       public void actionPerformed(ActionEvent e) {
 	 String s = e.getActionCommand();
-	 switch (s) {
-	    case "yes": convertParm = true;  break;
-	    case "no":  convertParm = false; break;
+
+	 if(s.equals("yes")){
+	    convertParm = true;
+	 }
+	 else if(s.equals("no")){
+	    convertParm = false;
 	 }
 	 callFindentPreview();
 	 writeConfig();
@@ -234,6 +256,7 @@ public class Jfindent {
    }
 
    class ExtraOptions extends JPanel implements ActionListener {
+      static final long serialVersionUID = 1;
       JTextField extraText;
       public ExtraOptions() {
 
@@ -257,20 +280,23 @@ public class Jfindent {
       }
 
       public void actionPerformed(ActionEvent e) {
-	 switch (e.getActionCommand()){
-	    case "clear":   extraParm = "";
-			    extraText.setText(extraParm); 
-			    break;
-	    case "enter": 
-	    case "extra":   extraParm = extraText.getText();
-			    break;
+	 String s = e.getActionCommand();
+
+	 if(s.equals("clear")){
+	    extraParm = "";
+	    extraText.setText(extraParm); 
 	 }
+	 else if(s.equals("enter") || s.equals("extra")){
+	    extraParm = extraText.getText();
+	 }
+
 	 callFindentPreview();
 	 writeConfig();
       }
    }
 
    class PreviewOption extends JPanel implements ActionListener {
+      static final long serialVersionUID = 1;
       public PreviewOption() {
 
 	 JLabel previewLabel    = new JLabel("Preview:");
@@ -303,10 +329,13 @@ public class Jfindent {
       public void actionPerformed(ActionEvent e) {
 	 String s = e.getActionCommand();
 	 String eoln = OsUtils.getNewLine();
-	 switch (s) {
-	    case "yes": previewParm = true;  break;
-	    case "no":  log.setText("Preview disabled"+eoln);
-			previewParm = false; break;
+
+	 if(s.equals("yes")){
+	    previewParm = true;
+	 }
+	 else if(s.equals("no")){
+	    log.setText("Preview disabled"+eoln);
+	    previewParm = false;
 	 }
 	 writeConfig();
 	 callFindentPreview();
@@ -514,7 +543,7 @@ public class Jfindent {
       fc.setFont(new Font(Font.MONOSPACED,Font.BOLD,14));
       fc.setAcceptAllFileFilterUsed(true);
       FileNameExtensionFilter filter = new FileNameExtensionFilter(
-	    ".f .f90 f95 f03 f08 for ftn", 
+	    ".f .f90 .f95 .f03 .f08 .for .ftn", 
 	    "f","f90","f95","f03","f08","for","ftn");
       fc.setFileFilter(filter);
       fc.setMultiSelectionEnabled(true);
@@ -946,7 +975,8 @@ public class Jfindent {
 
       if (doFile){
 	 try{
-	    Files.copy(temp.toPath(),outFile.toPath(),StandardCopyOption.REPLACE_EXISTING);
+	    // Files.copy(temp.toPath(),outFile.toPath(),StandardCopyOption.REPLACE_EXISTING);
+	    copyFile(temp,outFile);
 	 }
 	 catch (Exception e){
 	    log.append(e.toString());
@@ -1076,44 +1106,56 @@ public class Jfindent {
 	    }
 	 }
 
-	 switch(e.getActionCommand()){
-	    case "fc":                setFindentLocation();
-				      log.setText("Findent location: '"+findentParm+"'"+endl);
-				      break;
-	    case "defaultPath":       findentParm = "findent";
-				      log.setText("Findent location: '"+findentParm+"'"+endl);
-				      writeConfig();
-				      break;
-	    case "test":              log.setText("Test if findent runs. Expect 'findent version ...'"
-					    +endl);
-				      callFindent(null,log,null,DOVERSION);
-				      break;
-	    case "quit":              writeConfig();
-				      System.exit(0);
-				      break;
-	    case "save":              writeConfig();
-	                              log.setText("Configuration saved"+endl);
-				      break;
-	    case "about":             showAbout();
-				      break;
-	    case "version":           showVersion();
-				      break;
-	    case "generalUsage":      showGeneralUsage();
-				      break;
-	    case "extraOptions":      showExtraOptions();
-				      break;
-	    case "doneAbout":         aboutFrame.dispose();
-				      aboutFrame = null;
-				      break;
-	    case "doneVersion":       versionFrame.dispose();
-				      versionFrame = null;
-				      break;
-	    case "doneGeneralHelp":   generalHelpFrame.dispose();
-				      generalHelpFrame = null;
-				      break;
-	    case "doneExtraOptions":  extraOptionsFrame.dispose();
-				      extraOptionsFrame = null;
-				      break;
+	 String s = e.getActionCommand();
+	 if (s.equals("fc")){
+	    setFindentLocation();
+	    log.setText("Findent location: '"+findentParm+"'"+endl);
+	 }
+	 else if(s.equals("defaultPath")){
+	    findentParm = "findent";
+	    log.setText("Findent location: '"+findentParm+"'"+endl);
+	    writeConfig();
+	 }
+	 else if(s.equals("test")){
+	    log.setText("Test if findent runs. Expect 'findent version ...'"
+		  +endl);
+	    callFindent(null,log,null,DOVERSION);
+	 }
+	 else if(s.equals("quit")){
+	    writeConfig();
+	    System.exit(0);
+	 }
+	 else if(s.equals("save")){
+	    writeConfig();
+	    log.setText("Configuration saved"+endl);
+	 }
+	 else if(s.equals("about")){
+	    showAbout();
+	 }
+	 else if(s.equals("version")){
+	    showVersion();
+	 }
+	 else if(s.equals("generalUsage")){
+	    showGeneralUsage();
+	 }
+	 else if(s.equals("ExtraOptions")){
+	    showExtraOptions();
+	 }
+	 else if(s.equals("doneAbout")){
+	    aboutFrame.dispose();
+	    aboutFrame = null;
+	 }
+	 else if(s.equals("doneVersion")){
+	    versionFrame.dispose();
+	    versionFrame = null;
+	 }
+	 else if(s.equals("doneGeneralHelp")){
+	    generalHelpFrame.dispose();
+	    generalHelpFrame = null;
+	 }
+	 else if(s.equals("doneExtraOptions")){
+	    extraOptionsFrame.dispose();
+	    extraOptionsFrame = null;
 	 }
       }
 

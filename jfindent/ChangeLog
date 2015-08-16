@@ -3,6 +3,9 @@ jfindent-1.2:
 	jfindent is now an executable script that
 	  calls java -jar <location of jfinent.jar>
 	  jfindent.jar is installed in $datadir/jfindent/
+	jfindent.java: adapted to java-1.6
+	  Alas, no compilation possible with gcj: 
+	    FileNameExtensionFilter not available
 
 jfindent-1.1: 
 	initial release
