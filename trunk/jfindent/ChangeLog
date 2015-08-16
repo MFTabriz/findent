@@ -6,6 +6,8 @@ jfindent-1.2:
 	jfindent.java: adapted to java-1.6
 	  Alas, no compilation possible with gcj: 
 	    FileNameExtensionFilter not available
+	Added debian/ , makedeb and getversion to create 
+	   Debian package
 
 jfindent-1.1: 
 	initial release
