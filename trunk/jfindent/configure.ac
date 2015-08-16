@@ -26,9 +26,12 @@ AX_TRY_COMPILE_JAVA([],
    [
      public static void main(String[] args){ 
         String a = "foo";
-	switch (a){
-	   case "foo": break;
-	   }
+	//switch (a){
+	 //  case "foo": break;
+	  // }
+	  if ( a.equals("foo")) {
+	     }
+
 	}
    ],
    [AC_MSG_NOTICE([Succesfully compiled simple java program])],
