@@ -137,6 +137,9 @@ public class Jfindent {
 	       minIndent, maxIndent,1);
 	 spinner = new JSpinner(spm);
 	 spinner.setEditor(new JSpinner.DefaultEditor(spinner));
+	 JComponent editor = spinner.getEditor();
+	 JFormattedTextField ftf = ((JSpinner.DefaultEditor)editor).getTextField();
+	 ftf.setColumns(2);
 
 	 spinner.addChangeListener(this);
 	 add(indentLabel);
@@ -146,8 +149,46 @@ public class Jfindent {
       public void stateChanged(ChangeEvent e) {
 
 	 JSpinner source = (JSpinner)e.getSource();
-	 //indentParm = (int)source.getValue();
 	 indentParm = (Integer)source.getValue();
+	 callFindentPreview();
+	 writeConfig();
+      }
+   }
+
+   class FontSizeOptions extends JPanel implements ChangeListener {
+      static final long serialVersionUID = 1;
+      static final int minFontSize = 8;
+      static final int maxFontSize = 32;
+
+      JSpinner spinner;
+      public FontSizeOptions() {
+	 JLabel fontSizeLabel = new JLabel("Font size:");
+	 fontSizeLabel.setToolTipText("specify font size");
+
+	 if (fontSizeParm < minFontSize)
+	    fontSizeParm = minFontSize;
+	 if (fontSizeParm >maxFontSize)
+	    fontSizeParm = maxFontSize;
+
+	 SpinnerModel spm = new SpinnerNumberModel(fontSizeParm,
+	       minFontSize, maxFontSize,2);
+	 spinner = new JSpinner(spm);
+	 spinner.setEditor(new JSpinner.DefaultEditor(spinner));
+	 JComponent editor = spinner.getEditor();
+	 JFormattedTextField ftf = ((JSpinner.DefaultEditor)editor).getTextField();
+	 ftf.setColumns(2);
+
+	 // JComponent ftf = editor.getTextField();
+	 spinner.addChangeListener(this);
+	 add(fontSizeLabel);
+	 add(spinner);
+      }
+
+      public void stateChanged(ChangeEvent e) {
+
+	 JSpinner source = (JSpinner)e.getSource();
+	 fontSizeParm    = (Integer)source.getValue();
+	 setLogFontSize();
 	 callFindentPreview();
 	 writeConfig();
       }
@@ -482,6 +523,7 @@ public class Jfindent {
    static JScrollPane      logScrollPane;
    FormatOptions    formatPanel;
    IndentOptions    indentPanel;
+   FontSizeOptions  fontSizePanel;
    ConvertOption    convertPanel;
    PreviewOption    previewPanel;
    ExtraOptions     extraPanel;
@@ -503,6 +545,7 @@ public class Jfindent {
    static boolean convertParm;       // -ofree
    static boolean previewParm;       // preview on or off
    static int     indentParm;        // -i<n>
+   static int     fontSizeParm;      // font size in log
 
    final static int maxRecentFolders = 8;
    static String[] recentFolders;
@@ -521,7 +564,9 @@ public class Jfindent {
       log = new JTextArea(25,130);
       log.setMargin(new Insets(5,5,5,5));
       log.setEditable(false);
-      log.setFont(new Font(Font.MONOSPACED,Font.BOLD,12));
+      //log.setFont(new Font(Font.MONOSPACED,Font.BOLD,12));
+      //log.setFont(new Font("Courier New",Font.BOLD,16));
+      setLogFontSize();
       logScrollPane = new JScrollPane(log);
       fc = new JFileChooser(fcfolderParm) {
 	 @Override
@@ -552,17 +597,19 @@ public class Jfindent {
       Preview preview = new Preview();
       fc.addPropertyChangeListener(preview);
 
-      formatPanel  = new FormatOptions();
-      indentPanel  = new IndentOptions();
-      convertPanel = new ConvertOption();
-      extraPanel   = new ExtraOptions();
-      previewPanel = new PreviewOption();
+      formatPanel   = new FormatOptions();
+      indentPanel   = new IndentOptions();
+      fontSizePanel = new FontSizeOptions();
+      convertPanel  = new ConvertOption();
+      extraPanel    = new ExtraOptions();
+      previewPanel  = new PreviewOption();
 
       JPanel optionsPanel = new JPanel();
       optionsPanel.add(previewPanel);
       optionsPanel.add(formatPanel);
       optionsPanel.add(convertPanel);
       optionsPanel.add(indentPanel);
+      optionsPanel.add(fontSizePanel);
 
       mainPane = new JPanel();
       mainPane.setLayout(new BoxLayout(mainPane, BoxLayout.PAGE_AXIS));
@@ -576,6 +623,11 @@ public class Jfindent {
       mainPane.add(extraPanel);
       mainPane.add(logScrollPane);
       mainPane.add(Box.createGlue());
+   }
+
+   private static void setLogFontSize()
+   {
+      log.setFont(new Font("Courier New",Font.BOLD,fontSizeParm));
    }
 
    private static void initLookAndFeel() {
@@ -623,6 +675,7 @@ public class Jfindent {
       convertParm   = false;
       fixedfreeParm = "auto";
       indentParm    = 3;
+      fontSizeParm  = 12;
       previewParm   = true;
       findentParm   = "findent";
       fcfolderParm  = System.getProperty("user.home");
@@ -666,6 +719,11 @@ public class Jfindent {
 	       } catch (Exception e) {}
 
 	       try {
+		  fontSizeParm = Integer.parseInt(elem.getElementsByTagName("fontsize")
+			.item(0).getChildNodes().item(0).getNodeValue());
+	       } catch (Exception e) {}
+
+	       try {
 		  fcfolderParm = elem.getElementsByTagName("fcfolder").item(0)
 		     .getChildNodes().item(0).getNodeValue();
 	       } catch (Exception e) {}
@@ -697,6 +755,7 @@ public class Jfindent {
 	 writer.println("    <convert>"   + convertParm    +"</convert>");
 	 writer.println("    <fixedfree>" + fixedfreeParm  +"</fixedfree>");
 	 writer.println("    <indent>"    + indentParm     +"</indent>");
+	 writer.println("    <fontsize>"  + fontSizeParm   +"</fontsize>");
 	 writer.println("    <extra>"     + extraParm      +"</extra>");
 	 writer.println("    <fcfolder>"  + fcfolderParm   +"</fcfolder>");
 	 writer.println("    <preview>"   + previewParm    +"</preview>");
