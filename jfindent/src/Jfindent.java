@@ -51,6 +51,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.*;
 import java.util.*;
 import javax.swing.filechooser.*;
 import java.io.*;
@@ -519,16 +520,17 @@ public class Jfindent {
    }
 
    static JFileChooser     fc;
-   static JTextArea log;
+   static JTextArea        log;
    static JScrollPane      logScrollPane;
-   FormatOptions    formatPanel;
-   IndentOptions    indentPanel;
-   FontSizeOptions  fontSizePanel;
-   ConvertOption    convertPanel;
-   PreviewOption    previewPanel;
-   ExtraOptions     extraPanel;
-   static File      inFile     = null;
-   static String    prevInFile = null;
+   FormatOptions           formatPanel;
+   IndentOptions           indentPanel;
+   FontSizeOptions         fontSizePanel;
+   ConvertOption           convertPanel;
+   PreviewOption           previewPanel;
+   ExtraOptions            extraPanel;
+   static File             inFile     = null;
+   static String           prevInFile = null;
+   static Set <String>     monospaceFontFamilyNames;
 
    final static boolean MULTICOLORED = false;
 
@@ -546,6 +548,7 @@ public class Jfindent {
    static boolean previewParm;       // preview on or off
    static int     indentParm;        // -i<n>
    static int     fontSizeParm;      // font size in log
+   static String  fontNameParm;      // font family name
 
    final static int maxRecentFolders = 8;
    static String[] recentFolders;
@@ -561,11 +564,9 @@ public class Jfindent {
       }
       readConfig();
       writeConfig();
-      log = new JTextArea(25,130);
+      log = new JTextArea(25,80);
       log.setMargin(new Insets(5,5,5,5));
       log.setEditable(false);
-      //log.setFont(new Font(Font.MONOSPACED,Font.BOLD,12));
-      //log.setFont(new Font("Courier New",Font.BOLD,16));
       setLogFontSize();
       logScrollPane = new JScrollPane(log);
       fc = new JFileChooser(fcfolderParm) {
@@ -627,7 +628,7 @@ public class Jfindent {
 
    private static void setLogFontSize()
    {
-      log.setFont(new Font("Courier New",Font.BOLD,fontSizeParm));
+      log.setFont(new Font(fontNameParm,Font.BOLD,fontSizeParm));
    }
 
    private static void initLookAndFeel() {
@@ -676,6 +677,7 @@ public class Jfindent {
       fixedfreeParm = "auto";
       indentParm    = 3;
       fontSizeParm  = 12;
+      fontNameParm  = "Courier 10 pitch";
       previewParm   = true;
       findentParm   = "findent";
       fcfolderParm  = System.getProperty("user.home");
@@ -701,6 +703,11 @@ public class Jfindent {
 	       try {
 		  convertParm = Boolean.parseBoolean(elem.getElementsByTagName("convert")
 			.item(0).getChildNodes().item(0).getNodeValue());
+	       } catch (Exception e) {}
+
+	       try {
+		  fontNameParm = elem.getElementsByTagName("fontname")
+			.item(0).getChildNodes().item(0).getNodeValue();
 	       } catch (Exception e) {}
 
 	       try {
@@ -756,6 +763,7 @@ public class Jfindent {
 	 writer.println("    <fixedfree>" + fixedfreeParm  +"</fixedfree>");
 	 writer.println("    <indent>"    + indentParm     +"</indent>");
 	 writer.println("    <fontsize>"  + fontSizeParm   +"</fontsize>");
+	 writer.println("    <fontname>"  + fontNameParm   +"</fontname>");
 	 writer.println("    <extra>"     + extraParm      +"</extra>");
 	 writer.println("    <fcfolder>"  + fcfolderParm   +"</fcfolder>");
 	 writer.println("    <preview>"   + previewParm    +"</preview>");
@@ -816,6 +824,8 @@ public class Jfindent {
 
       boolean doHelp    = false;
       boolean doVersion = false;
+
+      setLogFontSize();
 
       if (what.length == 1){
 	 switch (what[0]){
@@ -1197,7 +1207,7 @@ public class Jfindent {
 	 else if(s.equals("generalUsage")){
 	    showGeneralUsage();
 	 }
-	 else if(s.equals("ExtraOptions")){
+	 else if(s.equals("extraOptions")){
 	    showExtraOptions();
 	 }
 	 else if(s.equals("doneAbout")){
@@ -1399,6 +1409,50 @@ public class Jfindent {
       frame.pack();
       frame.setLocationRelativeTo(null);
       frame.setVisible(true);
+   }
+
+   public static void createIsmono() {
+      monospaceFontFamilyNames    = new HashSet <String>();
+      BufferedImage bufferedImage = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+      Graphics graphics           = bufferedImage.createGraphics();
+
+      GraphicsEnvironment e     = GraphicsEnvironment.getLocalGraphicsEnvironment();
+      String [] fontFamilyNames = e.getAvailableFontFamilyNames();
+      for (String fontFamilyName : fontFamilyNames) {
+	 boolean isMonospaced = true;
+
+	 int fontStyle = Font.PLAIN;
+	 int fontSize = 12;
+	 Font font = new Font(fontFamilyName, fontStyle, fontSize);
+	 FontMetrics fontMetrics = graphics.getFontMetrics(font);
+
+	 int firstCharacterWidth = 0;
+	 boolean hasFirstCharacterWidth = false;
+	 for (int codePoint = 0; codePoint < 128; codePoint++) { 
+	    if (Character.isValidCodePoint(codePoint) && (Character.isLetter(codePoint) || Character.isDigit(codePoint))) {
+	       char character = (char) codePoint;
+	       int characterWidth = fontMetrics.charWidth(character);
+	       if (hasFirstCharacterWidth) {
+		  if (characterWidth != firstCharacterWidth) {
+		     isMonospaced = false;
+		     break;
+		  }
+	       } else {
+		  firstCharacterWidth = characterWidth;
+		  hasFirstCharacterWidth = true;
+	       }
+	    }
+	 }
+
+	 if (isMonospaced) {
+	    String u = fontFamilyName.toUpperCase();
+	    if (u.contains("COURIER") || u.contains("MONO") || u.contains("DEJAVU")){
+	       monospaceFontFamilyNames.add(fontFamilyName);
+	    }
+	 }
+      }
+
+      graphics.dispose();
    }
 
    public static void main(String[] args) {
