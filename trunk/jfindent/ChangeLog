@@ -8,6 +8,7 @@ jfindent-1.2:
 	    FileNameExtensionFilter not available
 	Added debian/ , makedeb and getversion to create 
 	   Debian package
+	Added spinner for font size, set font to "Courier New"
 
 jfindent-1.1: 
 	initial release
