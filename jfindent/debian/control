@@ -9,7 +9,7 @@ Homepage: http://findent.sourceforge.net
 #Vcs-Browser: http://git.debian.org/?p=collab-maint/findent.git;a=summary
 
 Package: jfindent
-Architecture: any
+Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}, findent (>= 1.0)
 Description:  Graphical frontend for findent
  Written in java-1.6
