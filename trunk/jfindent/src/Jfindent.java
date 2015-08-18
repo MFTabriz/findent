@@ -6,7 +6,7 @@
  * This is my first significant java project, I am glad to receive 
  * suggestions for improvements.
  *
- * This program needs java >= 1.7
+ * This program needs java >= 1.6
  *
  * Willem Vermin
  * wvermin@gmail.com
@@ -156,44 +156,6 @@ public class Jfindent {
       }
    }
 
-   class FontSizeOptions extends JPanel implements ChangeListener {
-      static final long serialVersionUID = 1;
-      static final int minFontSize = 8;
-      static final int maxFontSize = 32;
-
-      JSpinner spinner;
-      public FontSizeOptions() {
-	 JLabel fontSizeLabel = new JLabel("Font size:");
-	 fontSizeLabel.setToolTipText("specify font size");
-
-	 if (fontSizeParm < minFontSize)
-	    fontSizeParm = minFontSize;
-	 if (fontSizeParm >maxFontSize)
-	    fontSizeParm = maxFontSize;
-
-	 SpinnerModel spm = new SpinnerNumberModel(fontSizeParm,
-	       minFontSize, maxFontSize,2);
-	 spinner = new JSpinner(spm);
-	 spinner.setEditor(new JSpinner.DefaultEditor(spinner));
-	 JComponent editor = spinner.getEditor();
-	 JFormattedTextField ftf = ((JSpinner.DefaultEditor)editor).getTextField();
-	 ftf.setColumns(2);
-
-	 // JComponent ftf = editor.getTextField();
-	 spinner.addChangeListener(this);
-	 add(fontSizeLabel);
-	 add(spinner);
-      }
-
-      public void stateChanged(ChangeEvent e) {
-
-	 JSpinner source = (JSpinner)e.getSource();
-	 fontSizeParm    = (Integer)source.getValue();
-	 setLogFontSize();
-	 callFindentPreview();
-	 writeConfig();
-      }
-   }
 
    class FormatOptions extends JPanel implements ActionListener {
       static final long serialVersionUID = 1;
@@ -307,7 +269,7 @@ public class Jfindent {
 	 extraText.setToolTipText("type here extra options for findent");
 	 extraText.setActionCommand("extra");
 	 extraText.addActionListener(this);
-	 extraText.setFont(new Font(Font.MONOSPACED,Font.BOLD,14));
+	 extraText.setFont(myFont);
 
 	 JButton enterButton   = new JButton("enter");
 	 JButton clearButton   = new JButton("clear extra options");
@@ -524,15 +486,21 @@ public class Jfindent {
    static JScrollPane      logScrollPane;
    FormatOptions           formatPanel;
    IndentOptions           indentPanel;
-   FontSizeOptions         fontSizePanel;
    ConvertOption           convertPanel;
    PreviewOption           previewPanel;
    ExtraOptions            extraPanel;
    static File             inFile     = null;
    static String           prevInFile = null;
-   static Set <String>     monospaceFontFamilyNames;
 
    final static boolean MULTICOLORED = false;
+
+   static String    fontChooserFamily;
+   static int       fontChooserSize;
+   static int       fontChooserType;
+   static JList     fontChooserList;
+   static JList     sizeChooserList;
+   static JCheckBox cbChooserBold;
+   static JCheckBox cbChooserItalic;
 
    //Specify the look and feel to use.  Valid values:
    //null (use the default), "Metal", "System", "Motif", "GTK+"
@@ -549,6 +517,9 @@ public class Jfindent {
    static int     indentParm;        // -i<n>
    static int     fontSizeParm;      // font size in log
    static String  fontNameParm;      // font family name
+   static int     fontStyleParm;     // font style (plain, bold, italic)
+
+   static Font    myFont;            // font used in this program
 
    final static int maxRecentFolders = 8;
    static String[] recentFolders;
@@ -586,7 +557,7 @@ public class Jfindent {
 	 }
       };
 
-      fc.setFont(new Font(Font.MONOSPACED,Font.BOLD,14));
+      fc.setFont(myFont);
       fc.setAcceptAllFileFilterUsed(true);
       FileNameExtensionFilter filter = new FileNameExtensionFilter(
 	    ".f .f90 .f95 .f03 .f08 .for .ftn", 
@@ -600,7 +571,6 @@ public class Jfindent {
 
       formatPanel   = new FormatOptions();
       indentPanel   = new IndentOptions();
-      fontSizePanel = new FontSizeOptions();
       convertPanel  = new ConvertOption();
       extraPanel    = new ExtraOptions();
       previewPanel  = new PreviewOption();
@@ -610,7 +580,6 @@ public class Jfindent {
       optionsPanel.add(formatPanel);
       optionsPanel.add(convertPanel);
       optionsPanel.add(indentPanel);
-      optionsPanel.add(fontSizePanel);
 
       mainPane = new JPanel();
       mainPane.setLayout(new BoxLayout(mainPane, BoxLayout.PAGE_AXIS));
@@ -628,7 +597,7 @@ public class Jfindent {
 
    private static void setLogFontSize()
    {
-      log.setFont(new Font(fontNameParm,Font.BOLD,fontSizeParm));
+      log.setFont(myFont);
    }
 
    private static void initLookAndFeel() {
@@ -677,7 +646,7 @@ public class Jfindent {
       fixedfreeParm = "auto";
       indentParm    = 3;
       fontSizeParm  = 12;
-      fontNameParm  = "Courier 10 pitch";
+      fontNameParm  = "";
       previewParm   = true;
       findentParm   = "findent";
       fcfolderParm  = System.getProperty("user.home");
@@ -707,7 +676,7 @@ public class Jfindent {
 
 	       try {
 		  fontNameParm = elem.getElementsByTagName("fontname")
-			.item(0).getChildNodes().item(0).getNodeValue();
+		     .item(0).getChildNodes().item(0).getNodeValue();
 	       } catch (Exception e) {}
 
 	       try {
@@ -731,6 +700,11 @@ public class Jfindent {
 	       } catch (Exception e) {}
 
 	       try {
+		  fontStyleParm = Integer.parseInt(elem.getElementsByTagName("fontstyle")
+			.item(0).getChildNodes().item(0).getNodeValue());
+	       } catch (Exception e) {}
+
+	       try {
 		  fcfolderParm = elem.getElementsByTagName("fcfolder").item(0)
 		     .getChildNodes().item(0).getNodeValue();
 	       } catch (Exception e) {}
@@ -745,12 +719,23 @@ public class Jfindent {
 			.getChildNodes().item(0).getNodeValue();
 		  } catch (Exception e) {}
 	       }
-	       jfindentMenu.makeRecentItems();
 	    }
 	 }
       }
       catch (Exception e) {
       }
+      if (fontNameParm.isEmpty()) {
+	 GraphicsEnvironment e = GraphicsEnvironment.getLocalGraphicsEnvironment();
+	 String [] names       = e.getAvailableFontFamilyNames();
+
+	 for (String name : names) {
+	    if (name.toLowerCase().contains("courier")){
+	       fontNameParm = name;
+	       break;
+	    }
+	 }
+      }
+      myFont = new Font(fontNameParm,fontStyleParm,fontSizeParm);
    }
 
    static void writeConfig() {
@@ -764,6 +749,7 @@ public class Jfindent {
 	 writer.println("    <indent>"    + indentParm     +"</indent>");
 	 writer.println("    <fontsize>"  + fontSizeParm   +"</fontsize>");
 	 writer.println("    <fontname>"  + fontNameParm   +"</fontname>");
+	 writer.println("    <fontstyle>" + fontStyleParm  +"</fontstyle>");
 	 writer.println("    <extra>"     + extraParm      +"</extra>");
 	 writer.println("    <fcfolder>"  + fcfolderParm   +"</fcfolder>");
 	 writer.println("    <preview>"   + previewParm    +"</preview>");
@@ -794,9 +780,9 @@ public class Jfindent {
       // try to put the scrollbar postion on the same place if
       // one is looking at the same file, using different
       // indent options
-      
+
       final Point vp; 
-      
+
       if (prevInFile == null || !prevInFile.equals(inFile.getAbsolutePath())){
 	 vp = new Point(0,0);
       } else {
@@ -1075,6 +1061,7 @@ public class Jfindent {
       JFrame versionFrame      = null;
       JFrame generalHelpFrame  = null;
       JFrame extraOptionsFrame = null;
+      JFrame chooseFontFrame   = null;
 
       public JfindentMenu(JFrame frame){
 	 JMenuBar menuBar = new JMenuBar();
@@ -1094,8 +1081,13 @@ public class Jfindent {
 	 testItem.setActionCommand("test");
 	 testItem.addActionListener(this);
 
+	 JMenuItem fontselItem = new JMenuItem("Choose font ...");
+	 fontselItem.setActionCommand("fontsel");
+	 fontselItem.addActionListener(this);
+
 	 configMenu.add(fcItem);
 	 configMenu.add(defaultItem);
+	 configMenu.add(fontselItem);
 	 configMenu.add(testItem);
 
 	 recentMenu = new JMenu("Recent folders:");
@@ -1185,6 +1177,11 @@ public class Jfindent {
 	    log.setText("Findent location: '"+findentParm+"'"+endl);
 	    writeConfig();
 	 }
+	 else if(s.equals("fontsel")){
+
+	    chooseFont();
+	 }
+
 	 else if(s.equals("test")){
 	    log.setText("Test if findent runs. Expect 'findent version ...'"
 		  +endl);
@@ -1244,19 +1241,239 @@ public class Jfindent {
 	 }
       }
 
+      String[] monoFonts() {
+	 Set <String> monospaceFontFamilyNames;
+	 monospaceFontFamilyNames    = new HashSet <String>();
+	 BufferedImage bufferedImage = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+	 Graphics graphics           = bufferedImage.createGraphics();
+
+	 GraphicsEnvironment e     = GraphicsEnvironment.getLocalGraphicsEnvironment();
+	 String [] fontFamilyNames = e.getAvailableFontFamilyNames();
+	 for (String fontFamilyName : fontFamilyNames) {
+	    boolean isMonospaced = true;
+
+	    int fontStyle = Font.PLAIN;
+	    int fontSize = 12;
+	    Font font = new Font(fontFamilyName, fontStyle, fontSize);
+	    FontMetrics fontMetrics = graphics.getFontMetrics(font);
+
+	    int firstCharacterWidth = 0;
+	    boolean hasFirstCharacterWidth = false;
+	    for (int codePoint = 0; codePoint < 128; codePoint++) { 
+	       if (Character.isValidCodePoint(codePoint) && (Character.isLetter(codePoint) || Character.isDigit(codePoint))) {
+		  char character = (char) codePoint;
+		  int characterWidth = fontMetrics.charWidth(character);
+		  if (hasFirstCharacterWidth) {
+		     if (characterWidth != firstCharacterWidth) {
+			isMonospaced = false;
+			break;
+		     }
+		  } else {
+		     firstCharacterWidth = characterWidth;
+		     hasFirstCharacterWidth = true;
+		  }
+	       }
+	    }
+
+	    if (isMonospaced) {
+	       String u = fontFamilyName.toUpperCase();
+	       if (u.contains("COURIER") || u.contains("MONO") || u.contains("DEJAVU")){
+		  monospaceFontFamilyNames.add(fontFamilyName);
+	       }
+	    }
+	 }
+	 graphics.dispose();
+	 return monospaceFontFamilyNames.toArray(new String[0]);
+      }
+
+      void getChooserFont(){
+	 fontChooserFamily = (String)fontChooserList.getSelectedValue();
+	 fontChooserSize = Integer.parseInt((String)sizeChooserList.getSelectedValue());
+	 fontChooserType = Font.PLAIN;
+
+	 if(cbChooserBold.isSelected()){
+	    fontChooserType += Font.BOLD;
+	 }
+	 if(cbChooserItalic.isSelected()){
+	    fontChooserType += Font.ITALIC;
+	 }
+      }
+
+      void initChooseFont(){
+	 fontChooserList.setSelectedValue(fontNameParm, true);
+	 fontChooserList.ensureIndexIsVisible(fontChooserList.getSelectedIndex()); 
+	 sizeChooserList.setSelectedValue("" + fontSizeParm, true);
+	 sizeChooserList.ensureIndexIsVisible(sizeChooserList.getSelectedIndex());
+
+	 switch(fontStyleParm){
+	    case 0: cbChooserBold.setSelected(false);
+		    cbChooserItalic.setSelected(false);
+		    break;
+	    case 1: cbChooserBold.setSelected(true);
+		    break;
+	    case 2: cbChooserItalic.setSelected(true);
+		    break;
+	    case 3: cbChooserBold.setSelected(true);
+		    cbChooserItalic.setSelected(true);
+		    break;
+	 }
+      }
+
+      void chooseFont() {
+	 /* Based on JFontChooser 
+	    $Creator: Tim Eeckhaut
+	    $Alias: zoeloeboeloe
+	    $Company: ZoeloeSoft
+	    $Website: http://users.pandora.be/ZoeloeSoft
+	    */
+	 if (chooseFontFrame != null){
+	    chooseFontFrame.setVisible(true);
+	    chooseFontFrame.toFront();
+	    return;
+	 }
+	 chooseFontFrame        = new JFrame("Choose font");
+	 JPanel chooseFontPanel = new JPanel();
+
+	 JButton btnOK = new JButton("OK");
+	 btnOK.addActionListener(new ActionListener()
+	       {
+		  public void actionPerformed(ActionEvent e)
+	 {
+	    fontNameParm  = fontChooserFamily;
+	    fontSizeParm  = fontChooserSize;
+	    fontStyleParm = fontChooserType;
+	    myFont = new Font(fontNameParm, fontStyleParm, fontSizeParm);
+	    writeConfig();
+	    log.setFont(myFont);
+	    chooseFontFrame.setVisible(false);
+	 }
+	 });
+
+
+	 JButton btnCancel = new JButton("Cancel");
+	 btnCancel.addActionListener(new ActionListener()
+	       {
+		  public void actionPerformed(ActionEvent e)
+	 {
+	    log.setFont(myFont);
+	    chooseFontFrame.setVisible(false);
+	 }
+	 });
+
+	 fontChooserList = new JList(monoFonts()) {
+	    public Dimension getPreferredScrollableViewportSize()
+	    { return new Dimension(150, 144); }
+	 };
+
+	 fontChooserList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+	 final String[] sizes = new String[]
+	 { "8","10","12","14","16","18","20","22","24","30","36","48","72" };
+	 sizeChooserList = new JList(sizes)
+	 {
+	    public Dimension getPreferredScrollableViewportSize()
+	    { return new Dimension(25, 144); }
+	 };
+	 sizeChooserList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+	 cbChooserBold = new JCheckBox("Bold");
+
+	 cbChooserItalic = new JCheckBox("Italic");
+
+	 final JTextArea txtSample = new JTextArea()
+	 {
+	    public Dimension getPreferredScrollableViewportSize()
+	    { return new Dimension(385, 80); }	
+	 };
+	 txtSample.setText("The quick brown fox jumped over the lazy dog");
+
+	 initChooseFont();
+
+	 // add the listeners
+	 
+	 ListSelectionListener listListener = new ListSelectionListener()
+	 {
+	    public void valueChanged(ListSelectionEvent e) { 
+	       getChooserFont();
+	       Font font = new Font(fontChooserFamily, fontChooserType, fontChooserSize);
+	       txtSample.setFont(font); 
+	       log.setFont(font);
+	    }
+	 };
+
+	 fontChooserList.addListSelectionListener(listListener);
+	 sizeChooserList.addListSelectionListener(listListener);
+
+	 ActionListener cbListener = new ActionListener()
+	 {
+	    public void actionPerformed(ActionEvent e) {
+	       getChooserFont();
+	       Font font = new Font(fontChooserFamily, fontChooserType, fontChooserSize);
+	       txtSample.setFont(font); 
+	       log.setFont(font);
+	    }
+	 };
+
+	 cbChooserBold.addActionListener(cbListener);
+	 cbChooserItalic.addActionListener(cbListener);
+
+	 // build the container
+
+	 chooseFontPanel.setLayout(new java.awt.BorderLayout());
+
+	 JPanel leftPanel = new JPanel();
+	 leftPanel.setLayout(new java.awt.BorderLayout());
+
+	 leftPanel.add(new JScrollPane(fontChooserList), java.awt.BorderLayout.CENTER);
+	 leftPanel.add(new JScrollPane(sizeChooserList), java.awt.BorderLayout.EAST);
+
+	 chooseFontPanel.add(leftPanel, java.awt.BorderLayout.CENTER);
+	 JPanel rightPanel = new JPanel();
+	 rightPanel.setLayout(new java.awt.BorderLayout());
+
+	 JPanel rightPanelSub1 = new JPanel();
+	 rightPanelSub1.setLayout(new java.awt.FlowLayout());
+
+	 rightPanelSub1.add(cbChooserBold);
+	 rightPanelSub1.add(cbChooserItalic);
+
+	 rightPanel.add(rightPanelSub1, java.awt.BorderLayout.NORTH);
+
+	 JPanel rightPanelSub2 = new JPanel();
+	 rightPanelSub2.setLayout(new java.awt.GridLayout(2, 1));
+
+	 rightPanelSub2.add(btnOK);
+	 rightPanelSub2.add(btnCancel);
+
+	 rightPanel.add(rightPanelSub2, java.awt.BorderLayout.SOUTH);
+
+	 chooseFontPanel.add(rightPanel, java.awt.BorderLayout.EAST);
+
+	 chooseFontPanel.add(new JScrollPane(txtSample), java.awt.BorderLayout.SOUTH);
+
+	 chooseFontPanel.setSize(200, 200);
+	 //chooseFontFrame.setResizable(false);
+
+	 chooseFontFrame.add(chooseFontPanel);
+	 chooseFontFrame.pack();
+	 chooseFontFrame.setLocationRelativeTo(null);
+	 chooseFontFrame.setVisible(true);
+	 initChooseFont();  // again, indeed, otherwise the selection is not visible
+      }
+
       void showAbout(){
 	 if (aboutFrame != null){
 	    aboutFrame.setVisible(true);
 	    aboutFrame.toFront();
 	    return;
 	 }
-	 aboutFrame = new JFrame("What is this?");
+	 aboutFrame        = new JFrame("What is this?");
 	 JPanel aboutPanel = new JPanel();
 	 aboutPanel.setLayout(new BoxLayout(aboutPanel, BoxLayout.PAGE_AXIS));
 	 aboutPanel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
 	 JTextArea textArea = new JTextArea();
 	 textArea.setEditable(false);
-	 textArea.setFont(new Font(Font.MONOSPACED,Font.BOLD,14));
+	 textArea.setFont(myFont);
 	 String endl = OsUtils.getNewLine();
 	 textArea.append(endl+"jfindent is a graphical wrapper for findent"+endl);
 	 textArea.append("findent indents Fortran sources"+endl);
@@ -1287,7 +1504,7 @@ public class Jfindent {
 
 	 JTextArea textArea = new JTextArea();
 	 textArea.setEditable(false);
-	 textArea.setFont(new Font(Font.MONOSPACED,Font.BOLD,14));
+	 textArea.setFont(myFont);
 
 	 textArea.append(endl+"Usage:"+endl);
 	 textArea.append("Select one or more Fortran sources"+endl);
@@ -1320,7 +1537,7 @@ public class Jfindent {
 
 	 JTextArea textArea = new JTextArea(25,80);
 	 textArea.setEditable(false);
-	 textArea.setFont(new Font(Font.MONOSPACED,Font.BOLD,14));
+	 textArea.setFont(myFont);
 
 	 textArea.append("Extra options"+endl);
 	 textArea.append("You can fill in extra options for findent in 'Extra options'"+endl);
@@ -1366,7 +1583,7 @@ public class Jfindent {
 
 	 JTextArea textArea = new JTextArea();
 	 textArea.setEditable(false);
-	 textArea.setFont(new Font(Font.MONOSPACED,Font.BOLD,14));
+	 textArea.setFont(myFont);
 	 textArea.append("jfindent version "+VERSION+endl);
 
 	 callFindent(null,textArea,null,DOVERSION);
@@ -1404,6 +1621,7 @@ public class Jfindent {
       frame.setContentPane(jfindent.mainPane);
 
       jfindentMenu = new JfindentMenu(frame);
+      jfindentMenu.makeRecentItems();
 
       //Display the window.
       frame.pack();
@@ -1411,49 +1629,6 @@ public class Jfindent {
       frame.setVisible(true);
    }
 
-   public static void createIsmono() {
-      monospaceFontFamilyNames    = new HashSet <String>();
-      BufferedImage bufferedImage = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
-      Graphics graphics           = bufferedImage.createGraphics();
-
-      GraphicsEnvironment e     = GraphicsEnvironment.getLocalGraphicsEnvironment();
-      String [] fontFamilyNames = e.getAvailableFontFamilyNames();
-      for (String fontFamilyName : fontFamilyNames) {
-	 boolean isMonospaced = true;
-
-	 int fontStyle = Font.PLAIN;
-	 int fontSize = 12;
-	 Font font = new Font(fontFamilyName, fontStyle, fontSize);
-	 FontMetrics fontMetrics = graphics.getFontMetrics(font);
-
-	 int firstCharacterWidth = 0;
-	 boolean hasFirstCharacterWidth = false;
-	 for (int codePoint = 0; codePoint < 128; codePoint++) { 
-	    if (Character.isValidCodePoint(codePoint) && (Character.isLetter(codePoint) || Character.isDigit(codePoint))) {
-	       char character = (char) codePoint;
-	       int characterWidth = fontMetrics.charWidth(character);
-	       if (hasFirstCharacterWidth) {
-		  if (characterWidth != firstCharacterWidth) {
-		     isMonospaced = false;
-		     break;
-		  }
-	       } else {
-		  firstCharacterWidth = characterWidth;
-		  hasFirstCharacterWidth = true;
-	       }
-	    }
-	 }
-
-	 if (isMonospaced) {
-	    String u = fontFamilyName.toUpperCase();
-	    if (u.contains("COURIER") || u.contains("MONO") || u.contains("DEJAVU")){
-	       monospaceFontFamilyNames.add(fontFamilyName);
-	    }
-	 }
-      }
-
-      graphics.dispose();
-   }
 
    public static void main(String[] args) {
       //Schedule a job for the event-dispatching thread:
