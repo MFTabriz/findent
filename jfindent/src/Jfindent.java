@@ -269,7 +269,6 @@ public class Jfindent {
 	 extraText.setToolTipText("type here extra options for findent");
 	 extraText.setActionCommand("extra");
 	 extraText.addActionListener(this);
-	 extraText.setFont(myFont);
 
 	 JButton enterButton   = new JButton("enter");
 	 JButton clearButton   = new JButton("clear extra options");
@@ -1382,10 +1381,12 @@ public class Jfindent {
 
 	 final JTextArea txtSample = new JTextArea()
 	 {
-	    public Dimension getPreferredScrollableViewportSize()
-	    { return new Dimension(385, 80); }	
+	    public Dimension getPreferredScrollableViewportSize() {
+	       return new Dimension(600, 120);
+	    }	
 	 };
-	 txtSample.setText("The quick brown fox jumped over the lazy dog");
+	 txtSample.setFont(myFont); 
+	 txtSample.setText(String.format("     do i=1,30%n         DIST(i) = SQRT(dx(i)**2+dy(i)**2)%n     end do"));
 
 	 initChooseFont();
 
@@ -1450,9 +1451,6 @@ public class Jfindent {
 	 chooseFontPanel.add(rightPanel, java.awt.BorderLayout.EAST);
 
 	 chooseFontPanel.add(new JScrollPane(txtSample), java.awt.BorderLayout.SOUTH);
-
-	 chooseFontPanel.setSize(200, 200);
-	 //chooseFontFrame.setResizable(false);
 
 	 chooseFontFrame.add(chooseFontPanel);
 	 chooseFontFrame.pack();
