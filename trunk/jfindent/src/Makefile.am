@@ -1,8 +1,7 @@
-JAR   = jar
 CHMOD = chmod
 CP    = cp
 jfindent.jar:           Jfindent.java
-	$(JAVAC)        Jfindent.java
+	$(JAVAC) $(JAVACFLAGS)       Jfindent.java
 	$(JAR)   cfe $@ Jfindent Jfindent*.class
 	$(CHMOD) +x  $@
 

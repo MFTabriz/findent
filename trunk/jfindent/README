@@ -1,1 +1,3 @@
-jfindent(.jar) is a graphical frontend for findent, written in java
+jfindent.jar is a graphical frontend for findent, written in java
+jfindent is a shell script calling jfindent.jar
+findent (in a separate package) indents Fortran sources
