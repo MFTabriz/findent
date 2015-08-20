@@ -9,6 +9,11 @@ jfindent-1.2:
 	Added debian/ , makedeb and getversion to create 
 	   Debian package
 	Added config->choose font ...
+	configure.ac:
+	  added AC_ARG_VAR for JAVAC and JAVA
+	m4/ax_java_works.m4 : some code cleanup, see source
+	added m4/ax_prog_jar.m4
+	added m4/ax_jar_works.m4
 
 jfindent-1.1: 
 	initial release
