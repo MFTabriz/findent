@@ -1,3 +1,29 @@
 jfindent.jar is a graphical frontend for findent, written in java
 jfindent is a shell script calling jfindent.jar
 findent (in a separate package) indents Fortran sources
+
+jfindent requires Java version >= 1.6
+
+Installing with recompiling:
+
+   This is accomplished using the familiar commands: 
+      ./configure 
+      make clean
+      make 
+      make install 
+   Use
+      ./configure --help
+   for details.
+
+Installing using pre-build files:
+
+   The tarball contains the folders 'bin' and 'share'
+
+   bin/jfindent                    : a script to call jfindent.jar
+   share/jfindent/lib/jfindent.jar : the findent jar file
+   share/man/man1/jfindent.1       : the jfindent man page
+
+   You can copy these files to your favorite locations.
+   TAKE CARE to adapt the script jfindent to contain the
+   proper location of jfindent.jar.
+
