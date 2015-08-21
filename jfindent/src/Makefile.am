@@ -17,7 +17,4 @@ jfindent:
 	echo "#/bin/sh" > $@
 	echo "$(JAVA) -jar $(jfindentdir)/jfindent.jar" >> $@
 
-install-data-hook:
-	gzip -f $(DESTDIR)$(mandir)/man1/$(man1_MANS)
-
 CLEANFILES  = jfindent jfindent.jar *.class

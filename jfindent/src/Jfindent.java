@@ -1086,8 +1086,8 @@ public class Jfindent {
 
 	 configMenu.add(fcItem);
 	 configMenu.add(defaultItem);
-	 configMenu.add(fontselItem);
 	 configMenu.add(testItem);
+	 configMenu.add(fontselItem);
 
 	 recentMenu = new JMenu("Recent folders:");
 	 fileMenu.add(recentMenu);
