@@ -1,5 +1,8 @@
-#!/bin/bash
-gfortran -v > /dev/null  || echo "Cannot check: gfortran not installed" ; exit 0
+#!/bin/sh
+{
+echo "TESTING FINDENT ... "
+gfortran=gfortran
+$gfortran -v > /dev/null 2>&1  || { echo "Cannot compile: gfortran not installed" ; gfortran=: ; }
 rc=0
 exe=${1:-../findent}
 $exe -v
@@ -15,7 +18,7 @@ for i in *.f ; do
 	 ;;
    esac
 
-   gfortran -fcoarray=single -cpp $format $i >/dev/null 2>&1
+   $gfortran -fcoarray=single -cpp $format $i >/dev/null 2>&1
    if [ $? -ne 0 ] ; then
       echo -n " original program does not compile "
       rc=1
@@ -55,10 +58,12 @@ for i in *.f ; do
 	 format="-ffixed-form -ffixed-line-length-none -fd-lines-as-comments"
 	 ;;
    esac
-   gfortran -fcoarray=single -cpp $format $i.try.f >/dev/null 2>&1
+   $gfortran -fcoarray=single -cpp $format $i.try.f >/dev/null 2>&1
    if [ $? -ne 0 ] ; then
       echo "        converted program does not compile "
       rc=1
    fi
 done
+echo "END TESTING FINDENT rc=$rc"
 exit $rc
+} 1>&9 2>&9

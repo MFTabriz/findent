@@ -7,9 +7,7 @@ findent: indents/beautifies/converts Fortran sources
       for Unix and Windows (wfindent and wfindent.bat respectively)
  - (g)vim users: findent can act as a plug-in to format your
       edit file with the '=' command
- - gui frontent available: jfindent and jfindent.jar 
-      (Java 1.7 or better required)
-
+ - gui frontent available as a separate package: jfindent 
 
 Windows users: download findent-x.y.zip
                $ unzip findent-x.y.zip
@@ -22,8 +20,6 @@ Usage:    $ findent -h
 Examples: $ findent < in.f90 > out.f90
           $ findent -i4 -Rr < in.f > out.f90
           $ wfindent -i4 -Rr *.f
-   gui:	  $ jfindent.jar
-   or:    $ java jfindent.jar
 
 (g)vim users:
    Install findent, and add the following to your .vimrc:

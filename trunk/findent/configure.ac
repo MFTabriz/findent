@@ -7,7 +7,6 @@ AM_MAINTAINER_MODE
 AC_CONFIG_SRCDIR([src/findent.cpp])
 AC_CONFIG_HEADERS([config.h])
 
-m4_include([m4/ax_prog_bison.m4])
 m4_include([m4/ax_prog_flex.m4])
 
 AC_SUBST([make_include], ["include"])
@@ -29,8 +28,8 @@ AM_CONDITIONAL([MAKEMAN],[test "x$with_windows" != "xyes"])
 
 AC_PROG_CXX
 AC_PROG_AWK
-AX_PROG_BISON([YACC=$(echo ${YACC} | ${AWK} '{print $1}')],AC_MSG_ERROR([No valid bison found]))
-AC_MSG_NOTICE([bison: ${YACC}])
+AC_PROG_YACC
+AC_MSG_NOTICE([yacc: ${YACC}])
 AC_ARG_VAR([LEX],[The 'Fast lexical analyser generator' to use])
 AX_PROG_FLEX([],AC_MSG_ERROR([No valid flex found]))
 AC_MSG_NOTICE([flex: ${LEX}])
