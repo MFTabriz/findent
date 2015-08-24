@@ -57,14 +57,6 @@ Examples: $ findent < in.f90 > out.f90
           $ findent -i4 -Rr < in.f > out.f90
           $ wfindent -i4 -Rr *.f
 
-   There exists an issue concerning garbled text when scrolling horizontally
-   with java programs in Ubuntu, maybe also in other environments.
-   I found this reference: 
-     https://bugs.launchpad.net/ubuntu/+source/openjdk-6/+bug/1032936
-   The solution proposed is:
-     export _JAVA_OPTIONS='-Dsun.java2d.xrender=true'
-   which works fine for me.
-
 (g)vim users:
    Install findent, and add the following to your .vimrc:
 
