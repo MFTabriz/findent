@@ -1,5 +1,4 @@
 #!/bin/sh
-{
 echo "TESTING FINDENT ... "
 gfortran=gfortran
 $gfortran -v > /dev/null 2>&1  || { echo "Cannot compile: gfortran not installed" ; gfortran=: ; }
@@ -66,4 +65,3 @@ for i in *.f ; do
 done
 echo "END TESTING FINDENT rc=$rc"
 exit $rc
-} 1>&9 2>&9
