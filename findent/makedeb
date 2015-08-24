@@ -17,7 +17,10 @@ cp -r $curdir/* .                   || exit 1
 sed -i "1s/(.*)/($version)/" debian/changelog || exit 1
 
 ./bootstrap                         || exit 1
+./configure                         || exit 1
+make maintainer-clean               || exit 1
+./bootstrap                         || exit 1
 
 debuild -i -us -uc --lintian-opts --profile debian || exit 1
 cd ..                               || exit 1
-rm -rf $package
+rm -rf $dir
