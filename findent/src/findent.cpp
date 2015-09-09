@@ -1466,6 +1466,7 @@ void usage(const bool doman)
    manout("-v","prints findent version",                                  doman);
    manout("-q","guess free or fixed, prints 'fixed' or 'free' and exits", doman);
    manout("-l","(0/1) 1: statement labels to start of line (default:1)",  doman);
+   manout("  ","      (only for free format)",                            doman);
    manout("-iauto","determine automatically input format (free or fixed)",doman);
    manout("-ifixed","force input format fixed",                           doman);
    manout("-ifree","force input format free",                             doman);
