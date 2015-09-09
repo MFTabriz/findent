@@ -1,4 +1,7 @@
 $Id$
+findent-2.3.1:
+	correct explanation of -l flag in usage()
+
 findent-2.3:
 	jfindent: is now in a separate folder: ../jfindent
 	   with it's on autoconf setup
