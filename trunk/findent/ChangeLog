@@ -1,4 +1,6 @@
 $Id$
+findent-2.4:
+	release 2.4
 findent-2.3.1:
 	findent.cpp: correct explanation of -l flag in usage()
 	maketar: fix a few nearly-bugs
