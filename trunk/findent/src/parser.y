@@ -7,9 +7,6 @@ using namespace std;
 struct propstruct properties;
 %}
 
-%code requires {
-}
-
 %token MODULE SUBFUN ENTRY SUBMODULE
 %token MODULESUBROUTINE MODULEFUNCTION
 %token END ENDSUBROUTINE ENDFUNCTION ENDPROGRAM ENDMODULE ENDSUBMODULE
