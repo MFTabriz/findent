@@ -1438,7 +1438,7 @@ void usage(const bool doman)
    if (doman)
    {
       cout << ".\\\" DO NOT MODIFY THIS FILE! It was created by findent -H"                << endl;
-      cout << ".TH FINDENT \"1\" \"2015\" \"findent" << VERSION << "\" \"User Commands\""  << endl;
+      cout << ".TH FINDENT \"1\" \"2015\" \"findent-" << VERSION << "\" \"User Commands\"" << endl;
       cout << ".SH NAME"                                                                   << endl;
       cout << "findent \\- Indents and optionally converts Fortran program source"         << endl;
       cout << ".SH SYNOPSIS"                                                               << endl;
@@ -1446,7 +1446,7 @@ void usage(const bool doman)
       cout << "[\\fIOPTION\\fR]..."                                                        << endl;
       cout << ".PP"<<endl<< "findent reads from stdin and writes to stdout."               << endl;
       cout << ".SH DESCRIPTION"                                                            << endl;
-      cout << "I Findent indents a Fortran source. Findent uses various kinds of"          << endl;
+      cout << "Findent indents a Fortran source. Findent uses various kinds of"            << endl;
       cout << "indentations, see OPTIONS. Findent can convert from fixed form to"          << endl;
       cout << "free form, and can supplement single END statements, see 'Refactor' below." << endl;
       cout << "Errors in OPTIONS are silently ignored."                                    << endl;
