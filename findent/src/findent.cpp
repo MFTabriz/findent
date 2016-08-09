@@ -84,6 +84,7 @@ int labelleng;
 
 string full_statement;        // current statement, including continuation lines, &'s removed
 deque <string> lines;         // current line, one continuation line per item
+deque <char> firstc;          // the first characters of the original lines above
 queue <string> linebuffer;    // used when determining fixed or free
 stack <string> linestack;     // used for fixed format
 bool end_of_file;
@@ -97,6 +98,7 @@ int do_indent;
 int entry_indent;
 int select_indent, case_indent;
 int contains_indent;
+bool indent_contain;
 int if_indent;
 int where_indent;
 int associate_indent;
@@ -144,7 +146,10 @@ int main(int argc, char*argv[])
 	      case_indent       = atoi(optarg);
 	      break;
 	   case 'C' :
-	      contains_indent   = atoi(optarg);
+	      if(string(optarg) == "-")
+		 indent_contain = 0;
+	      else
+		 contains_indent   = atoi(optarg);
 	      break;
 	   case 'd' :
 	      do_indent         = atoi(optarg);
@@ -454,7 +459,14 @@ void indent_and_output()
 	    break;
 	 case CONTAINS:
 	    D(O("CONTAINS"););
-	    cur_indent -= contains_indent;
+	    if (indent_contain)
+	       cur_indent -= contains_indent;
+	    else
+	    {
+	       cur_indent = start_indent;
+	       pop_indent();
+	       push_indent(cur_indent);
+	    }
 	    break;
 	 case IF:
 	    D(O("IFCONSTRUCT"););
@@ -799,6 +811,7 @@ void handle_preproc(string s, bool &more)
    }
    string sl = rtrim(s);
    lines.push_back(sl);
+   firstc.push_back(firstchar(s));
    if(lastchar(sl) == '\\')
       more = 1;
    else
@@ -835,6 +848,7 @@ void handle_free(string s, bool &more)
    if (sl == "" || firstchar(sl) == '!' )
    {
       lines.push_back(trim(s));
+      firstc.push_back(firstchar(s));
       return;
    }
 
@@ -859,6 +873,7 @@ void handle_free(string s, bool &more)
 
    full_statement = cs;
    lines.push_back(trim(s));
+   firstc.push_back(firstchar(s));
    D(O("full_statement");O(full_statement);O(more););
 }
 
@@ -890,6 +905,7 @@ void handle_fixed(string s, bool &more)
    if (isfixedcmt(s))
    {  // this is a blank or comment or preprocessor line
       lines.push_back(trim(s));
+      firstc.push_back(firstchar(s));
       if (lines.size() ==1)
          more = 0;   // do not expect continuation lines
       else
@@ -912,6 +928,7 @@ void handle_fixed(string s, bool &more)
    if (lines.empty())
    {  // this is the first line
       lines.push_back(s);
+      firstc.push_back(firstchar(s));
       full_statement += trim(sl);
       remove_trailing_comment(full_statement);
       full_statement = rtrim(full_statement);
@@ -932,6 +949,7 @@ void handle_fixed(string s, bool &more)
    }
    // this is a continuation line
    lines.push_back(s);
+   firstc.push_back(firstchar(s));
    full_statement += rtrim((rtrim(sl)+"      ").substr(6));
    remove_trailing_comment(full_statement);
    full_statement = rtrim(full_statement);
@@ -1056,8 +1074,10 @@ void output_line()
    if (input_format == FREE)
    {
       string firstline = lines.front();
+      char fc = firstc.front();
       D(O("firstline");O(firstline););
       lines.pop_front();
+      firstc.pop_front();
       if(firstchar(firstline) == '#')
       {
 	 handle_pre(firstline);
@@ -1079,6 +1099,12 @@ void output_line()
 	    else
 	       l = cur_indent;
 
+	    // If first character of original line is '!', do not indent
+	    // Do not use start_indent: on the next run the first char could
+	    // be space and not '!'
+	    if(fc == '!')
+	       l=0;
+
 	    if (l<0)
 	       l=0;
 	    cout << string(l,' '); 
@@ -1089,16 +1115,37 @@ void output_line()
       }
       while (!lines.empty())
       {
-      // sometimes, there are preprocessor statements within a continuation ...
-         string s = lines.front();
+	 // sometimes, there are preprocessor statements within a continuation ...
+	 string s = lines.front();
+	 char fc  = firstc.front();
 	 lines.pop_front();
+	 firstc.pop_front();
 	 if(firstchar(s) == '#')
 	 {
 	    handle_pre(s);
 	 }
 	 else
 	 {
-	    cout << string(max(cur_indent,0),' ');
+	    int l = 0;
+	    // if first character of original line == '!', do not indent
+	    // Do not use start_indent: on the next run the first char could
+	    // be space and not '!'
+	    if (fc == '!')
+	       l = 0;
+	    else
+	    {
+	       if (firstchar(s) == '&')
+	       {
+		  // if continuation starts with '&', use current indentation
+		  // else use current indentation + all_indent 
+		  l = max(cur_indent,0);
+	       }
+	       else
+	       {
+		  l = max(cur_indent+all_indent,0);
+	       }
+	    }
+	    cout << string(l,' ');
 	    cout << s <<endline;
 	 }
       }
@@ -1111,7 +1158,9 @@ void output_line()
       {
          lineno++;
          string s = lines.front();
+	 char fc  = firstc.front();
 	 lines.pop_front();
+	 firstc.pop_front();
 	 if (firstchar(s) == '#')
 	 {
 	    handle_pre(s);
@@ -1429,7 +1478,8 @@ void set_default_indents()
    critical_indent  = all_indent;              // -x
    enum_indent      = all_indent;              // -E
    case_indent      = all_indent-all_indent/2; // -c
-   contains_indent  = all_indent;              // -C
+   contains_indent  = all_indent;              // -Cn
+   indent_contain   = 1;                       // -C-
    entry_indent     = all_indent-all_indent/2; // -e
 }
 
@@ -1496,24 +1546,25 @@ void usage(const bool doman)
    manout("-In","starting  indent (default:0)",                                                 doman);
    manout("-Ia","determine starting indent from first line",                                    doman);
    manout("-in","all       indents except I,c,C,e (default: "+number2string(default_indent)+")",doman);
-   manout("-an","associate indent",            doman);
-   manout("-bn","block     indent",            doman);
-   manout("-dn","do        indent",            doman);
-   manout("-fn","if        indent",            doman);
-   manout("-En","enum      indent",            doman);
-   manout("-Fn","forall    indent",            doman);
-   manout("-jn","interface indent",            doman);
-   manout("-mn","module    indent",            doman);
-   manout("-rn","routine   indent",            doman);
-   manout("-sn","select    indent",            doman);
-   manout("-tn","type      indent",            doman);
-   manout("-wn","where     indent",            doman);
-   manout("-xn","critical  indent",            doman);
-   manout(" ","next defaults are: all - all/2",doman);
-   manout("-cn","case      negative indent",   doman);
-   manout("-Cn","contains  negative indent",   doman);
-   manout("-en","entry     negative indent",   doman);
-   manout(" "," ",                             doman);
+   manout("-an","associate indent",                doman);
+   manout("-bn","block     indent",                doman);
+   manout("-dn","do        indent",                doman);
+   manout("-fn","if        indent",                doman);
+   manout("-En","enum      indent",                doman);
+   manout("-Fn","forall    indent",                doman);
+   manout("-jn","interface indent",                doman);
+   manout("-mn","module    indent",                doman);
+   manout("-rn","routine   indent",                doman);
+   manout("-sn","select    indent",                doman);
+   manout("-tn","type      indent",                doman);
+   manout("-wn","where     indent",                doman);
+   manout("-xn","critical  indent",                doman);
+   manout(" ","next defaults are: all - all/2",    doman);
+   manout("-cn","case      negative indent",       doman);
+   manout("-Cn","contains  negative indent",       doman);
+   manout("-C-","restart indent after contains",   doman);
+   manout("-en","entry     negative indent",       doman);
+   manout(" "," ",                                 doman);
    if(doman)
    {
       cout << ".PP" << endl << ".SS" << endl;
@@ -1756,6 +1807,7 @@ void handle_pre(const string s)
       cout <<lines.front() << endline;
       lchar = lastchar(lines.front());
       lines.pop_front();
+      firstc.pop_front();
    }
 }
 
