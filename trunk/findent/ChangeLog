@@ -1,8 +1,15 @@
 $Id$
 findent-2.5.0:
-	- lines starting with '!' are not indented
-	- added -C- flag: resets indent with 'contains'
-	- continuation lines not starting with '&' are extra intented
+	findent.cpp:
+	   - lines starting originally with '!' are not indented
+	   - pure comment lines, not starting with '!' get an indent
+	     of at least 1
+	   - added -C- flag: resets indent with 'contains'
+	   - continuation lines not starting with '&' are extra intented
+	     flag: -kn
+	   - flag -k-: continuation lines are untouched
+	README:
+	   - add remark about not wanting irreversible changes to sources
 findent-2.4.1:
 	fixed typo in help text.
 findent-2.4:
