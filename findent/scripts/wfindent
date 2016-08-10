@@ -12,7 +12,7 @@
 #
 
 FINDENT=findent
-parms=$( getopt -o a:b:c:C:d:e:E:f:F:hHi:I:j:l:L:m:o:qr:R:s:t:vw:x: -- "$@" )
+parms=$( getopt -o a:b:c:C:d:e:E:f:F:hHi:I:j:k:l:L:m:o:qr:R:s:t:vw:x: -- "$@" )
 if [ $? -ne 0 ] ; then
    exit 1
 fi
