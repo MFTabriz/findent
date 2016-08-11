@@ -8,6 +8,7 @@ findent-2.5.0:
 	   - continuation lines not starting with '&' are extra intented
 	     flag: -kn
 	   - flag -k-: continuation lines are untouched
+	   - findent.cpp: somewhat better layout of man page
 	README:
 	   - add remark about not wanting irreversible changes to sources
 	wfindent:
