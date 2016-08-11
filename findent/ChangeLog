@@ -12,6 +12,13 @@ findent-2.5.0:
 	   - add remark about not wanting irreversible changes to sources
 	wfindent:
 	   - use installation path of findent in stead of 'findent'
+	   - recognize -v, -h and -H flags: run findent using only this flag
+	   - ignore -q flag
+	wfindent.bat:
+	   - recognize -v, -h and -H flags: run findent using only this flag
+	   - ignore -q flag
+	test:
+	   - adapted progfree.f.try.f.ref and progfree-dos.f.try.f.ref
 findent-2.4.1:
 	fixed typo in help text.
 findent-2.4:
