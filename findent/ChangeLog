@@ -10,6 +10,8 @@ findent-2.5.0:
 	   - flag -k-: continuation lines are untouched
 	README:
 	   - add remark about not wanting irreversible changes to sources
+	wfindent:
+	   - use installation path of findent in stead of 'findent'
 findent-2.4.1:
 	fixed typo in help text.
 findent-2.4:
