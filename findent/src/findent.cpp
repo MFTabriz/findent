@@ -1554,7 +1554,7 @@ void usage(const bool doman)
    manout("-v","prints findent version",                                  doman);
    manout("-q","guess free or fixed, prints 'fixed' or 'free' and exits", doman);
    manout("-l","(0/1) 1: statement labels to start of line (default:1)",  doman);
-   manout("  ","      (only for free format)",                            doman);
+   manout(" ","      (only for free format)",                            doman);
    manout("-iauto","determine automatically input format (free or fixed)",doman);
    manout("-ifixed","force input format fixed",                           doman);
    manout("-ifree","force input format free",                             doman);
@@ -1604,7 +1604,7 @@ void usage(const bool doman)
    manout("-k-","continuation lines not preceded",   doman);
    manout(" ","  by '&' are untouched",              doman);
    manout(" ","     free to free only",              doman);
-   manout(" ","next defaults are: all - all/2",      doman);
+   manout("  ","next defaults are: all - all/2",      doman);
    manout("-cn","case      negative indent",         doman);
    manout("-Cn","contains  negative indent",         doman);
    manout("-en","entry     negative indent",         doman);
@@ -1631,13 +1631,23 @@ void usage(const bool doman)
    cout << "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE." <<endl;
 }
 
+// doman == 1: output in man page format
+// flag: " ": normal continuation line
+//       otherwize : skip to new paragraph and use bold format
+// txt: Line to be output
+//
 void manout(const string flag, const string txt, const bool doman)
 {
 
    if (doman)
    {
-      cout << ".TP" << endl << "\\fB\\"<<flag<<"\\fR"<<endl;
-      cout << txt << endl;
+      if (flag == " ")
+	 cout << txt << endl;
+      else
+      {
+	 cout << ".TP" << endl << "\\fB\\"<<flag<<"\\fR"<<endl;
+	 cout << txt << endl;
+      }
    }
    else
    {
