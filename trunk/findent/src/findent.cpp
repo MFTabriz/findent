@@ -771,6 +771,7 @@ void get_full_statement()
 	    start_indent = guess_indent(s);
 	    cur_indent   = start_indent;
 	    init_indent();
+	    indent_handled = 1;
 	 }
       }
 
