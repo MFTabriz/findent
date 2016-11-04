@@ -111,6 +111,8 @@ int routine_indent, module_indent;
 int select_indent; 
 int type_indent;
 int where_indent;
+int last_indent;
+bool last_indent_only;
 
 bool label_left;            // 1: put statement labels on the start of the line
 const bool label_left_default = 1;
@@ -133,6 +135,7 @@ int main(int argc, char*argv[])
    non_blank_line_seen = 0;
    input_format        = 0;
    output_format       = 0;
+   last_indent_only    = 0;
 
    int c,rc;
    opterr = 0;
@@ -210,7 +213,10 @@ int main(int argc, char*argv[])
 		 cont_indent = atoi(optarg);
 	      break;
 	   case 'l' :
-	      label_left        = (atoi(optarg) != 0);
+	      if(string(optarg) == "astindent")
+		 last_indent_only = 1;
+	      else
+		 label_left     = (atoi(optarg) != 0);
 	      break;
 	   case 'L' :
 	      input_line_length = atoi(optarg);
@@ -283,14 +289,22 @@ int main(int argc, char*argv[])
    init_indent();
    indent_and_output();
    if(end_of_file)
+   {
+      if(last_indent_only)
+	 cout << last_indent << endline;
       return 0;
+   }
 
    while(1)
    {
       get_full_statement();
       indent_and_output();
       if (end_of_file)
+      {
+	 if(last_indent_only)
+	    cout << last_indent << endline;
 	 return 0;
+      }
    }
    return 0;
 }
@@ -1102,7 +1116,8 @@ void output_line()
 	    {  // put label at start of line
 	       string label = firstline.substr(0,labelleng);
 	       firstline    = trim(firstline.substr(labelleng));
-	       cout << label;
+	       if (!last_indent_only)
+		  cout << label;
 	       l = cur_indent - labelleng;
 	       if ( l <= 0 )
 		  l=1;
@@ -1125,11 +1140,18 @@ void output_line()
 
 	    if (l<0)
 	       l=0;
-	    cout << string(l,' '); 
+	    if (!last_indent_only)
+	       cout << string(l,' '); 
 	    D(O("output indent before firstline");O(string(l,' ')););
+	    if (label_left && labelleng > 0)
+	       last_indent = 0;
+	    else
+	       last_indent = l;
 	 }
-	 cout << firstline << endline;
+	 if (!last_indent_only)
+	    cout << firstline << endline;
 	 D(O("output firstline");O(firstline););
+	 D(O("last_indent");O(last_indent));
       }
       while (!lines.empty())
       {
@@ -1173,12 +1195,20 @@ void output_line()
 	       //
 	       if (ofc != '!' && fc == '!' && cur_indent == 0)
 		  l=max(1,cont_indent);
-	       cout << string(l,' ');
-	       cout << s <<endline;
+	       if (!last_indent_only)
+	       {
+		  cout << string(l,' ');
+		  cout << s <<endline;
+	       }
+	       last_indent = l;
+	       D(O("last_indent");O(last_indent));
 	    }
 	    else
 	    {
-	       cout << os << endline;
+	       if (!last_indent_only)
+		  cout << os << endline;
+	       last_indent = guess_indent(os);
+	       D(O("last_indent");O(last_indent));
 	    }
 	 }
       }
@@ -1856,13 +1886,18 @@ void handle_pre(const string s)
       }
    }
    D(O("pre after");O(cur_indent);O(top_indent()););
-   cout << s << endline;
+   if(!last_indent_only)
+      cout << s << endline;
+   last_indent = 0;
    char lchar = lastchar(s);
    while (!lines.empty())
    {
       if (lchar != '\\')
 	 break;
-      cout <<lines.front() << endline;
+
+      if(!last_indent_only)
+	 cout <<lines.front() << endline;
+      last_indent = guess_indent(lines.front());
       lchar = lastchar(lines.front());
       lines.pop_front();
       olines.pop_front();
