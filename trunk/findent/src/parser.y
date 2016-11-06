@@ -1,7 +1,6 @@
 %{
 // $Id$
 #include <iostream>
-using namespace std;
 #include "findent.h"
 #include "line_prep.h"
 struct propstruct properties;

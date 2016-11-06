@@ -2,26 +2,24 @@
 #ifndef FINDENT_H
 #define FINDENT_H
 
-using namespace std;
-
 #include "line_prep.h"
 
 int yyparse();
 void yyerror(const char *c);
 extern "C" int yylex();
 void lexer_set(class line_prep p);
-void lexer_set(string s);
+void lexer_set(std::string s);
 
-string lexer_getname();
-string lexer_getstlabel();
-string lexer_geti_number();
+std::string lexer_getname();
+std::string lexer_getstlabel();
+std::string lexer_geti_number();
 
 struct propstruct
 {
    int kind;
-   string name;
-   string label;
-   string dolabel;
+   std::string name;
+   std::string label;
+   std::string dolabel;
 } ;
 
 propstruct is_it    (class line_prep p, int what);
