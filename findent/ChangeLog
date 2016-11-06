@@ -1,4 +1,12 @@
 $Id$
+findent-2.7.0:
+	findent.cpp:
+	   - add option -lastindent to output only the indentation level
+	     of the last line
+	   - recognise '#  if' etc
+	   - fixed minor bug: code starting with preprocessor directive
+	     in combination with -Ia did not function properly
+	   - omit 'using namespace std'
 findent-2.6.0:
 	findent.cpp:
 	   - -Ia now also works correct if source starts with 'end',

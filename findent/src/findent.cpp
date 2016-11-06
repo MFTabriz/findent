@@ -7,26 +7,26 @@
 #include <unistd.h>
 #include <algorithm>
 #include <string.h>
-using namespace std;
 #include "findent.h"
 #include "version.h"
 #include "parser.h"
+#include "simpleostream.h"
 extern "C" FILE *yyin;
-string mygetline();
+std::string mygetline();
 void get_full_statement();
-void handle_free(string s,bool &more);
-void remove_trailing_comment(string &s);
-void handle_fixed(string s, bool &more);
-void handle_preproc(string s, bool &more);
+void handle_free(std::string s,bool &more);
+void remove_trailing_comment(std::string &s);
+void handle_fixed(std::string s, bool &more);
+void handle_preproc(std::string s, bool &more);
 void output_line();
 int pop_indent();
 int top_indent();
 void push_indent(int p);
 void init_indent();
-string whatprop(struct propstruct p);
-string stoupper(const string s);
-char firstchar(const string s);
-char lastchar(const string s);
+std::string whatprop(struct propstruct p);
+std::string stoupper(const std::string s);
+char firstchar(const std::string s);
+char lastchar(const std::string s);
 
 void push_rprops(struct propstruct p);
 void init_rprops();
@@ -34,7 +34,7 @@ struct propstruct pop_rprops();
 struct propstruct top_rprops();
 const  struct propstruct empty_rprop={0,"","",""};
 
-void handle_pre(const string s);
+void handle_pre(const std::string s);
 
 void handle_reading_from_tty();
 
@@ -46,50 +46,53 @@ void indent_and_output();
 
 void set_default_indents();
 void usage(const bool doman);
-void manout(const string flag, const string txt, const bool doman);
-string trim(const string& str);
-string rtrim(const string& str);
-string ltab2sp(const string& s);
-string handle_dos(const string s);
+void manout(const std::string flag, const std::string txt, const bool doman);
+std::string trim(const std::string& str);
+std::string rtrim(const std::string& str);
+std::string ltrim(const std::string& str);
+std::string ltab2sp(const std::string& s);
+std::string handle_dos(const std::string s);
 
 int input_format, output_format;
-int guess_indent(const string str);
+int guess_indent(const std::string str);
 bool reading_from_tty = 0;
 int lines_read        = 0;
 int input_line_length = 0;
 bool input_format_gnu = 0;
 int determine_fix_or_free(const bool store);
-bool isfixedcmt(const string s);
-char fixedmissingquote(const string s);
+bool isfixedcmt(const std::string s);
+char fixedmissingquote(const std::string s);
 
-stack<int> indent;                 // to store indents
-stack<stack <int> > indent_stack;  // to store indent stack
-stack<bool> pre_stack;             // to note if there is an #else after #if for indenting
-stack<bool> prep_stack;            // to note if there is an #else after #if for routines
+bool nbseen;                                 // true if non-blank-line is seen
+
+std::stack<int> indent;                      // to store indents
+std::stack<bool> nbseen_stack;               // to store nbseen
+std::stack<std::stack <int> > indent_stack;  // to store indent stack
+std::stack<bool> pre_stack;                  // to note if there is an #else after #if for indenting
+std::stack<bool> prep_stack;                 // to note if there is an #else after #if for routines
 
 struct propstruct prev_props;
-stack<struct propstruct> rprops;     // to store routines (module, subroutine ...)
-stack<stack <struct propstruct> > rprops_stack;
+std::stack<struct propstruct> rprops;     // to store routines (module, subroutine ...)
+std::stack<std::stack <struct propstruct> > rprops_stack;
 struct propstruct cur_rprop = empty_rprop;
 
 int cur_indent, start_indent;
 bool auto_firstindent;
-int num_lines;                    // number of lines read sofar
-bool non_blank_line_seen;
+int num_lines;                          // number of lines read sofar
 bool indent_handled;
 
-stack<int> dolabels;          // to store labels, necessary for labelled do
+std::stack<int> dolabels;               // to store labels, necessary for labelled do
 int stlabel;
 int labelleng;
 
-string full_statement;        // current statement, including continuation lines, &'s removed
-deque <string> lines;         // current line, one continuation line per item
-deque <string> olines;        // the original line
-queue <string> linebuffer;    // used when determining fixed or free
-stack <string> linestack;     // used for fixed format
+std::string full_statement;             // current statement, including continuation lines, &'s removed
+std::deque <std::string> lines;         // current line, one continuation line per item
+std::deque <std::string> olines;        // the original line
+std::queue <std::string> linebuffer;    // used when determining fixed or free
+std::stack <std::string> linestack;     // used for fixed format
 bool end_of_file;
 
-string endline   = "\n";
+std::string endline   = "\n";
 bool endline_set = 0;
 const int default_indent = 3;
 int all_indent;
@@ -111,13 +114,13 @@ int routine_indent, module_indent;
 int select_indent; 
 int type_indent;
 int where_indent;
-int last_indent;
 bool last_indent_only;
+simpleostream mycout;
 
-bool label_left;            // 1: put statement labels on the start of the line
+bool label_left;              // 1: put statement labels on the start of the line
 const bool label_left_default = 1;
 
-bool refactor_routines = 0; // 1: refactor routine-end statements
+bool refactor_routines = 0;   // 1: refactor routine-end statements
 bool upcase_routine_type = 0; // 1: use 'SUBROUTINE' etc in stead of 'subroutine'
 
 bool simple_end_found  = 0;
@@ -132,7 +135,7 @@ int main(int argc, char*argv[])
    set_default_indents();
    num_lines           = 0;
    label_left          = label_left_default;
-   non_blank_line_seen = 0;
+   nbseen              = 0;
    input_format        = 0;
    output_format       = 0;
    last_indent_only    = 0;
@@ -181,11 +184,11 @@ int main(int argc, char*argv[])
 	      return 0;
 	      break;
 	   case 'i' :
-	      if      (string(optarg) == "fixed")
+	      if      (std::string(optarg) == "fixed")
 	         input_format = FIXED;
-	      else if (string(optarg) == "free")
+	      else if (std::string(optarg) == "free")
 	         input_format = FREE;
-	      else if (string(optarg) == "auto")
+	      else if (std::string(optarg) == "auto")
 	         input_format = determine_fix_or_free(1);
 	      else
 	      {
@@ -213,7 +216,7 @@ int main(int argc, char*argv[])
 		 cont_indent = atoi(optarg);
 	      break;
 	   case 'l' :
-	      if(string(optarg) == "astindent")
+	      if(std::string(optarg) == "astindent")
 		 last_indent_only = 1;
 	      else
 		 label_left     = (atoi(optarg) != 0);
@@ -225,7 +228,7 @@ int main(int argc, char*argv[])
 	      module_indent     = atoi(optarg);
 	      break;
 	   case 'o' :
-	      if(string(optarg) == "free")
+	      if(std::string(optarg) == "free")
 	         output_format = FREE;
 	      break;
 	   case 'q' :
@@ -234,9 +237,9 @@ int main(int argc, char*argv[])
 	      rc = determine_fix_or_free(0);
 	      switch(rc)
 	      {
-	         case FIXED : cout << "fixed" << endl;
+		 case FIXED : std::cout << "fixed" << endline;
 		 break;
-		 case FREE : cout << "free" << endl;
+		 case FREE :  std::cout << "free" << endline;
 		 break;
 	      }
 	      return 0;
@@ -261,7 +264,7 @@ int main(int argc, char*argv[])
 	      type_indent       = atoi(optarg);
 	      break;
 	   case 'v' :
-	      cout << "findent version "<<VERSION<<endl;
+	      std::cout << "findent version "<<VERSION<<std::endl;
 	      return 0;
 	      break;
 	   case 'w' :
@@ -283,15 +286,18 @@ int main(int argc, char*argv[])
    labelleng        = 0;
    end_of_file      = 0;
    cur_rprop        = empty_rprop;
+   D(O("main calling init_indent");O("start_indent:");O(start_indent));
+   init_indent();
    get_full_statement();
    cur_semi_eol     = 0;
    cur_indent       = start_indent;
-   init_indent();
+   //D(O("main calling init_indent");O("start_indent:");O(start_indent));
+   //init_indent();
    indent_and_output();
    if(end_of_file)
    {
       if(last_indent_only)
-	 cout << last_indent << endline;
+	 std::cout << guess_indent(mycout.get()) << endline;
       return 0;
    }
 
@@ -302,7 +308,7 @@ int main(int argc, char*argv[])
       if (end_of_file)
       {
 	 if(last_indent_only)
-	    cout << last_indent << endline;
+	    std::cout << guess_indent(mycout.get()) << endline;
 	 return 0;
       }
    }
@@ -311,15 +317,15 @@ int main(int argc, char*argv[])
 
 void indent_and_output()
 {
-   D(O("entering indent_and_output");O(full_statement););
-   string rest=full_statement;
-   bool first_time = 1;
+   D(O("entering indent_and_output");O(full_statement);O("cur_indent:");O(cur_indent));
+   std::string rest = full_statement;
+   bool first_time  = 1;
    while(1)
    {
-      D(O("indent_and_output");O(rest););
+      D(O("indent_and_output");O(rest);O("cur_indent:");O(cur_indent));
       line_prep p(rest);
       propstruct props = parseline(p); 
-      D(O("props.kind");O(props.kind);O(props.label););
+      D(O("props.kind");O(props.kind);O(props.label);O("cur_indent:");O(cur_indent));
       labelleng = props.label.size();
       if (labelleng > 0)
 	 // if there was a previous labeled do, handle it:
@@ -367,6 +373,7 @@ void indent_and_output()
 	 }
       }
       cur_indent = top_indent();
+      D(O("cur_indent:");O(cur_indent));
       simple_end_found = 0;
       switch(props.kind)
       {
@@ -374,7 +381,7 @@ void indent_and_output()
 	 case FUNCTION:
 	 case PROGRAM:
 	 case BLOCKDATA:
-	    D(O("SUBFUN");O(whatprop(props));O(props.name););
+	    D(O("SUBFUN");O(whatprop(props));O(props.name);O("cur_indent:");O(cur_indent));
 	    cur_indent = top_indent();
 	    D(O("cur_indent:");O(cur_indent););
 	    push_indent(cur_indent + routine_indent);
@@ -544,7 +551,7 @@ void indent_and_output()
       }
       if(first_time)
       {
-	 D(O("calling output_line"););
+	 D(O("calling output_line");O("cur_indent:");O(cur_indent));
 	 output_line();
 	 first_time = 0;
       }
@@ -559,37 +566,41 @@ void handle_reading_from_tty()
    reading_from_tty = isatty(fileno(stdin));
    if (reading_from_tty)
    {
-      cerr << "! Warning: reading from terminal"                << endl;
-      cerr << "! End this session by typing a single dot ('.')" << endl;
-      cerr << "!     on a new line"                             << endl;
-      cerr << "! "                                              << endl;
-      cerr << "! Examples of typical usage:"                    << endl;
-      cerr << "!   help:    findent -h"                         << endl;
-      cerr << "!   indent:  findent < in.f > out.f"             << endl;
-      cerr << "!   convert: findent -ofree < prog.f > prog.f90" << endl;
+      std::cerr << "! Warning: reading from terminal"                << std::endl;
+      std::cerr << "! End this session by typing a single dot ('.')" << std::endl;
+      std::cerr << "!     on a new line"                             << std::endl;
+      std::cerr << "! "                                              << std::endl;
+      std::cerr << "! Examples of typical usage:"                    << std::endl;
+      std::cerr << "!   help:    findent -h"                         << std::endl;
+      std::cerr << "!   indent:  findent < in.f > out.f"             << std::endl;
+      std::cerr << "!   convert: findent -ofree < prog.f > prog.f90" << std::endl;
    }
 }
 
 void init_indent()
 // fills the indent-stack until indent 0
 {
-   D(O("init_indent");O(indent.size()););
+   D(O("init_indent");O(indent.size());O("start_indent:");O(start_indent));
    while(!indent.empty())
       indent.pop();
    int l=0;
    for (int i=0; l<start_indent; i++)
    {
-      indent.push(l);
-      l = i*default_indent;
+      //indent.push(l);
+      D(O("init_indent calling push");O(indent.size()););
+      push_indent(l);
+      l = i*all_indent;
    }
-   indent.push(start_indent);
+   //indent.push(start_indent);
+   D(O("init_indent calling push");O(indent.size()););
+   push_indent(start_indent);
 }
 
-string trim(const string& str)
+std::string trim(const std::string& str)
 {
-    const string whitespace = " \t";
+    const std::string whitespace = " \t";
     const size_t strBegin = str.find_first_not_of(whitespace);
-    if (strBegin == string::npos)
+    if (strBegin == std::string::npos)
         return ""; // no content
 
     const size_t strEnd = str.find_last_not_of(whitespace);
@@ -598,17 +609,27 @@ string trim(const string& str)
     return str.substr(strBegin, strRange);
 }
 
-string rtrim(const string& str)
+std::string rtrim(const std::string& str)
 {
-    const string whitespace = " \t";
+    const std::string whitespace = " \t";
 
     const size_t strEnd = str.find_last_not_of(whitespace);
-    if (strEnd == string::npos)
+    if (strEnd == std::string::npos)
         return ""; // no content
     return str.substr(0,strEnd+1);
 }
 
-string ltab2sp(const string& s)
+std::string ltrim(const std::string& str)
+{
+    const std::string whitespace = " \t";
+    const size_t strBegin = str.find_first_not_of(whitespace);
+    if (strBegin == std::string::npos)
+        return ""; // no content
+
+    return str.substr(strBegin);
+}
+
+std::string ltab2sp(const std::string& s)
 {  // converts leading white space and white space after a statement label
    //   to spaces and removes trailing white space
    // if line starts with 0-5 spaces or digits followed by a tab, followed
@@ -620,12 +641,12 @@ string ltab2sp(const string& s)
    //   this character is the first of a statement, so in this case
    //   this is counted as 6 spaces
 
-   int si         = 0;
-   bool ready     = 0;
-   const int tabl = 6;
-   bool firsttab  = 1;
-   string leader  = "";
-   int removed    = 0;
+   int si              = 0;
+   bool ready          = 0;
+   const int tabl      = 6;
+   bool firsttab       = 1;
+   std::string leader  = "";
+   int removed         = 0;
 
    for (unsigned int j=0; j<s.length(); j++)
    {
@@ -647,12 +668,12 @@ string ltab2sp(const string& s)
 		     {
 		        si = 5;
 			removed++;
-			leader = string(5,' ');
+			leader = std::string(5,' ');
 			break;
 		     }
 	    }
 	    si = (si/tabl)*tabl + tabl;
-	    leader = leader + string(si - leader.length(),' ');
+	    leader = leader + std::string(si - leader.length(),' ');
 	    break;
 	    case '0': case '1': case '2': case '3': case '4':
 	    case '5': case '6': case '7': case '8': case '9':
@@ -671,7 +692,7 @@ string ltab2sp(const string& s)
    return leader + trim(s.substr(removed));
 }
 
-string mygetline()
+std::string mygetline()
 {
    // reads next line from cin.
    // side effects:
@@ -679,13 +700,13 @@ string mygetline()
    //   endline is set to \n or \r\n
    //   lines_read is incremented
 
-   string s;
+   std::string s;
 
-   getline(cin,s);
-   D(O("getline:");O(s);O("eofbit");O(cin.eofbit);O(cin.eof()););
+   getline(std::cin,s);
+   D(O("getline:");O(s);O("eofbit");O(std::cin.eofbit);O(std::cin.eof()););
 
    // sometimes, files do not end with (cr)lf, hence the test for s=="":
-   end_of_file = (cin.eof() && s == "");
+   end_of_file = (std::cin.eof() && s == "");
 
    lines_read ++;
 
@@ -724,7 +745,7 @@ void get_full_statement()
    // #endif
    //     )
    //
-   // In this example, full_stataement will contain:
+   // In this example, full_statement will contain:
    //
    //    subroutine compute(x x,y)
    // ( this is not correct, of course, but it will not prevent 
@@ -740,7 +761,7 @@ void get_full_statement()
    //     )
    //
 {
-   string s;
+   std::string s;
    full_statement       = "";
    indent_handled       = 0;
    bool preproc_more    = 0;
@@ -752,10 +773,12 @@ void get_full_statement()
       {
          s = linestack.top();
 	 linestack.pop();
+	 D(O("get_full_statement linestack");O(s));
       }
       else if (linebuffer.empty())
       {
          s = mygetline();
+	 D(O("get_full_statement mygetline");O(s));
       }
       else
       {
@@ -763,33 +786,40 @@ void get_full_statement()
 	 linebuffer.pop();
 	 if (reading_from_tty && s == ".")
 	    end_of_file = 1;
+	 D(O("get_full_statement linebuffer");O(s));
       }
 
       num_lines++;
 
       D(O(s););
 
-      if (!non_blank_line_seen)
+      if (!nbseen)
       {
-         if (input_format == FREE)
-	    non_blank_line_seen = (trim(s) != "");
+	 char fcts = firstchar(trim(s));
+	 if (input_format == FREE)
+	    nbseen = (fcts != 0 && fcts != '!' && fcts != '#');
+	    //nbseen = (trim(s) != "");
+
 	 else
 	    {
-	       string s1;
-	       s1 = ltab2sp(s);
+	       std::string s1 = ltab2sp(s);
 	       if (s1.length() > 6)
-	          non_blank_line_seen = (s[0] != 'c' && s[0] != 'C' && s[0] != '!' && s[0] != '*' && s[0] != '#');
+	          nbseen = (s[0] != 'c' && s[0] != 'C' && s[0] != 'd' && s[0] != 'D' 
+			&& fcts != '!' && s[0] != '*' && fcts != '#');
 	    }
-	 if (auto_firstindent && non_blank_line_seen)
+	 D(O("get_full_statement fcts");O(fcts);O("s");O(s);O("nbseen");O(nbseen));
+	 if (auto_firstindent && nbseen)
 	 {
 	    start_indent = guess_indent(s);
 	    cur_indent   = start_indent;
 	    init_indent();
 	    indent_handled = 1;
 	 }
+	 D(O("get_full_statement auto_fi");O(auto_firstindent);O("curindent:");O(cur_indent);O("nbseen");O(nbseen));
       }
 
       D(O("get_full_statement s leng:");O(s);O(s.length());O("endline:");O(endline.length()););
+      D(O("get_full_statement auto_fi");O(auto_firstindent);O("curindent:");O(cur_indent);O("nbseen");O(nbseen));
 
       if(preproc_more || (firstchar(s) == '#'))
       {
@@ -822,7 +852,7 @@ void get_full_statement()
    D(O("lines:"); for (unsigned int i=0; i<lines.size(); i++) { O(i);O(lines[i]); })
 }
 
-void handle_preproc(string s, bool &more)
+void handle_preproc(std::string s, bool &more)
    // adds preprocessor continuation line s to full statement
    // more = 1: more preprocessor lines are to expected
    //        0: this line is complete
@@ -833,7 +863,7 @@ void handle_preproc(string s, bool &more)
       more = 0;
       return;
    }
-   string sl = rtrim(s);
+   std::string sl = rtrim(s);
    lines.push_back(sl);
    olines.push_back(s);
    if(lastchar(sl) == '\\')
@@ -842,7 +872,7 @@ void handle_preproc(string s, bool &more)
       more = 0;
 }
 
-void handle_free(string s, bool &more)
+void handle_free(std::string s, bool &more)
 // adds input line s to full_statement
 // more 1: more lines are to expected
 //        0: this line is complete
@@ -858,7 +888,7 @@ void handle_free(string s, bool &more)
    if (input_line_length !=0)
       s = s.substr(0,input_line_length);
 
-   string sl     = trim(s);
+   std::string sl = trim(s);
 
    if (firstchar(sl) == '&')
    {
@@ -866,7 +896,7 @@ void handle_free(string s, bool &more)
       sl = trim(sl);
    }
 
-   //  if this line is pure comment or empty or preprocessor statement:
+   //  if this line is pure comment or empty
    //     add it to lines
 
    if (sl == "" || firstchar(sl) == '!' )
@@ -886,7 +916,7 @@ void handle_free(string s, bool &more)
    // a possible trailing comment, and trim.
    // If the last character = '&', a continuation is expected.
 
-   string cs = full_statement + sl;
+   std::string cs = full_statement + sl;
 
    remove_trailing_comment(cs);
    cs = rtrim(cs);
@@ -898,10 +928,10 @@ void handle_free(string s, bool &more)
    full_statement = cs;
    lines.push_back(trim(s));
    olines.push_back(s);
-   D(O("full_statement");O(full_statement);O(more););
+   D(O("full_statement");O(full_statement);O("more:");O(more);O("cur_indent");O(cur_indent));
 }
 
-void handle_fixed(string s, bool &more)
+void handle_fixed(std::string s, bool &more)
 {
    if(end_of_file)
    {
@@ -909,7 +939,7 @@ void handle_fixed(string s, bool &more)
       return;
    }
 
-   string s0 = s;
+   std::string s0 = s;
 
    D(O("fixed s");O(s););
 
@@ -941,7 +971,7 @@ void handle_fixed(string s, bool &more)
    s = ltab2sp(s);
    D(O("fixed:");O("s");O(s););
 
-   string sl;
+   std::string sl;
    sl = s.substr(0,5);
    if (s.length() >6)
       sl = sl+' '+s.substr(6);
@@ -982,7 +1012,7 @@ void handle_fixed(string s, bool &more)
    return;
 }
 
-void remove_trailing_comment(string &s)
+void remove_trailing_comment(std::string &s)
 {
    // removes trailing comment
 
@@ -1004,7 +1034,7 @@ void remove_trailing_comment(string &s)
 	       q = s[i];
 	       break;
 	    case '!':
-	       s.erase(i,string::npos);
+	       s.erase(i,std::string::npos);
 	       return;
 	 }
       }
@@ -1012,7 +1042,7 @@ void remove_trailing_comment(string &s)
    return;
 }
 
-int guess_indent(const string s)
+int guess_indent(const std::string s)
 { // count spaces at start of line, correct for tabs and & and label
    int si         = 0;
    bool ready     = 0;
@@ -1022,8 +1052,8 @@ int guess_indent(const string s)
 
    if (input_format == FIXED)
    {
-      string s1 = ltab2sp(s);
-      si        = s1.find_first_not_of(' ') -6;
+      std::string s1 = ltab2sp(s);
+      si             = s1.find_first_not_of(' ') -6;
       if (si <0)
          si = 0;
       return si;
@@ -1053,9 +1083,9 @@ int guess_indent(const string s)
    return si;
 }
 
-string stoupper(const string s)
+std::string stoupper(const std::string s)
 {
-   string sl = s;
+   std::string sl = s;
    int l     = sl.size();
    for (int i=0; i<l; i++)
       sl[i] = toupper(sl[i]);
@@ -1068,10 +1098,13 @@ void output_line()
    if (lines.empty())
       return;
    int lineno                     = 0;
-   string needamp                 = "";
+   std::string needamp            = "";
    char prevquote                 = ' ';
    char preprevquote              = ' ';
-   string outputline;
+   std::string outputline;
+
+   mycout.setoutput(!last_indent_only);
+   mycout.reset();
 
    D(O("refactor");O(refactor_routines);O(simple_end_found);O(lines.size());O(cur_rprop.kind););
    if (refactor_routines && simple_end_found)
@@ -1080,12 +1113,12 @@ void output_line()
       {
 	// modify first line to match the corrsponding module, subroutine ... line  
 	// find the location of 'end'
-	string s = stoupper(lines[0]);
+	 std::string s = stoupper(lines[0]);
 	size_t p = s.find("END");
 	D(O("p");O(p););
-	if ( p != string::npos)
+	if ( p != std::string::npos)
 	{
-	   string routinetype = whatprop(cur_rprop);
+	   std::string routinetype = whatprop(cur_rprop);
 	   if (upcase_routine_type)
 	      routinetype = stoupper(routinetype);
 	   lines[0] = lines[0].substr(0,p+3)+
@@ -1097,8 +1130,8 @@ void output_line()
 
    if (input_format == FREE)
    {
-      string firstline = lines.front();
-      string ofirstline = olines.front();
+      std::string firstline = lines.front();
+      std::string ofirstline = olines.front();
       char ofc = firstchar(ofirstline);
       D(O("firstline");O(firstline););
       lines.pop_front();
@@ -1114,10 +1147,9 @@ void output_line()
 	 {
 	    if (label_left && labelleng > 0)
 	    {  // put label at start of line
-	       string label = firstline.substr(0,labelleng);
+	       std::string label = firstline.substr(0,labelleng);
 	       firstline    = trim(firstline.substr(labelleng));
-	       if (!last_indent_only)
-		  cout << label;
+	       mycout << label;
 	       l = cur_indent - labelleng;
 	       if ( l <= 0 )
 		  l=1;
@@ -1140,24 +1172,17 @@ void output_line()
 
 	    if (l<0)
 	       l=0;
-	    if (!last_indent_only)
-	       cout << string(l,' '); 
-	    D(O("output indent before firstline");O(string(l,' ')););
-	    if (label_left && labelleng > 0)
-	       last_indent = 0;
-	    else
-	       last_indent = l;
+	    mycout << std::string(l,' '); 
+	    D(O("output indent before firstline");O(std::string(l,' ')););
 	 }
-	 if (!last_indent_only)
-	    cout << firstline << endline;
+	 mycout << firstline << endline;
 	 D(O("output firstline");O(firstline););
-	 D(O("last_indent");O(last_indent));
       }
       while (!lines.empty())
       {
 	 // sometimes, there are preprocessor statements within a continuation ...
-	 string s = lines.front();
-	 string os = olines.front();
+	 std::string s  = lines.front();
+	 std::string os = olines.front();
 	 char fc  = firstchar(s);
 	 char ofc  = firstchar(os);
 	 lines.pop_front();
@@ -1182,11 +1207,11 @@ void output_line()
 		  {
 		     // if continuation starts with '&', use current indentation
 		     // else use current indentation + cont_indent 
-		     l = max(cur_indent,0);
+		     l = std::max(cur_indent,0);
 		  }
 		  else
 		  {
-		     l = max(cur_indent+cont_indent,0);
+		     l = std::max(cur_indent+cont_indent,0);
 		  }
 	       }
 	       // if this is a comment line, and the original line did not start
@@ -1194,21 +1219,13 @@ void output_line()
 	       // to make sure that re-indenting will give the same result
 	       //
 	       if (ofc != '!' && fc == '!' && cur_indent == 0)
-		  l=max(1,cont_indent);
-	       if (!last_indent_only)
-	       {
-		  cout << string(l,' ');
-		  cout << s <<endline;
-	       }
-	       last_indent = l;
-	       D(O("last_indent");O(last_indent));
+		  l=std::max(1,cont_indent);
+	       mycout << std::string(l,' ');
+	       mycout << s <<endline;
 	    }
 	    else
 	    {
-	       if (!last_indent_only)
-		  cout << os << endline;
-	       last_indent = guess_indent(os);
-	       D(O("last_indent");O(last_indent));
+	       mycout << os << endline;
 	    }
 	 }
       }
@@ -1220,8 +1237,8 @@ void output_line()
       while(!lines.empty())
       {
          lineno++;
-         string s = lines.front();
-	 string os = olines.front();
+	 std::string s = lines.front();
+	 std::string os = olines.front();
 	 char ofc  = firstchar(os);
 	 lines.pop_front();
 	 olines.pop_front();
@@ -1233,11 +1250,11 @@ void output_line()
 	 if(isfixedcmt(s))
 	 {  // this is an empty line or comment line or a preprocessing line
 	    if (output_format == FIXED)
-	       cout << trim(s) << endline;
+	       std::cout << trim(s) << endline;
 	    else  // output_format = FREE
 	    {
 	       if (trim(s) == "")
-	          cout << endline;
+	          std::cout << endline;
 	       else
 	       {
 	          switch (firstchar(s))
@@ -1245,10 +1262,10 @@ void output_line()
 	             // special hack for lines starting with 'd' or 'D'
 	             case 'd' :
 		     case 'D' :
-		        cout << "!" + trim(s) << endline;
+			std::cout << "!" + trim(s) << endline;
 			break;
 	             default:
-			cout << string(max(cur_indent,0),' ') << "!" << trim(s.substr(1)) << endline;
+			std::cout << std::string(std::max(cur_indent,0),' ') << "!" << trim(s.substr(1)) << endline;
 		  }
 	       }
 	    }
@@ -1257,7 +1274,7 @@ void output_line()
 	 {
 	    if (output_format == FIXED)
 	    {
-	       cout << s.substr(0,6);
+	       std::cout << s.substr(0,6);
 	       
 	       if(s.length() > 6)
 	       {
@@ -1268,12 +1285,12 @@ void output_line()
 		  // of spaces after column 6.
 		  if (iscont)
 		  {
-		     string s6 = ltab2sp(s.substr(6))+'x';
+		     std::string s6 = ltab2sp(s.substr(6))+'x';
 		     old_indent = s6.find_first_not_of(' ');
 		  }
 		  else
 		  {  // count the number of spaces after column 6 of the first line
-		     string s6 = ltab2sp(s.substr(6))+'x';
+		     std::string s6 = ltab2sp(s.substr(6))+'x';
 		     first_indent = s6.find_first_not_of(' ');
 		  }
 		  int adjust_indent = old_indent - first_indent;
@@ -1283,10 +1300,10 @@ void output_line()
 		  switch(prevquote)
 		  {
 		     case ' ' :   // no dangling strings, output with indent
-			cout << string(max(adjust_indent+cur_indent,0),' ') << trim(s.substr(6));
+			std::cout << std::string(std::max(adjust_indent+cur_indent,0),' ') << trim(s.substr(6));
 			break;
 		     default:  // dangling string, output asis
-			cout << s.substr(6);
+			std::cout << s.substr(6);
 			break;
 		  }
 		  // investigate if this line terminates a string
@@ -1294,7 +1311,7 @@ void output_line()
 		  prevquote = fixedmissingquote(prevquote + s);
 	       }
 		        
-	       cout << endline;
+	       std::cout << endline;
 	    }
 	    else  // output_format == FREE
 	    {
@@ -1305,7 +1322,7 @@ void output_line()
 		  int l;
 		  if (s.length()>6)
 		  {
-		     string s6 = ltab2sp(s.substr(6))+'x';
+		     std::string s6 = ltab2sp(s.substr(6))+'x';
 		     first_indent = s6.find_first_not_of(' ');
 		  }
 		  if (s != "" || lines.size() > 1)
@@ -1313,9 +1330,9 @@ void output_line()
 		     if (label_left && labelleng > 0)
 		     {  // put label at start of line
 		        s = trim(s);
-			string label = s.substr(0,labelleng);
+			std::string label = s.substr(0,labelleng);
 			s    = trim(s.substr(labelleng));
-			cout << label;
+			std::cout << label;
 			l = cur_indent - labelleng;
 			if ( l <= 0 )
 			   l=1;
@@ -1323,7 +1340,7 @@ void output_line()
 		     else
 			l = cur_indent;
 
-		     cout <<string(max(l,0),' '); 
+		     std::cout <<std::string(std::max(l,0),' '); 
 		  }
 		  outputline += trim(s);
 		  // we need the value of prevquote later on:
@@ -1334,13 +1351,13 @@ void output_line()
 	       {
 	          if (s.length() >6)
 		  {
-		     cout << string(max(cur_indent,0),' ');
+		     std::cout << std::string(std::max(cur_indent,0),' ');
 		     // try to honor current indentation
 		     // if this is a continuation line, count the number
 		     // of spaces after column 6.
 		     if (s[5] != ' ' && s[5] != '0')
 		     {
-			string s6 = ltab2sp(s.substr(6))+'x';
+			std::string s6 = ltab2sp(s.substr(6))+'x';
 			old_indent = s6.find_first_not_of(' ');
 			D(O(s6);O(old_indent););
 		     }
@@ -1349,11 +1366,11 @@ void output_line()
 		     if (adjust_indent < 0 || prevquote!=' ')
 			adjust_indent = 0;
 
-		     string s1 = s.substr(6);
+		     std::string s1 = s.substr(6);
 		     if (prevquote == ' ')
 			s1 = trim(s1);
 		     if (s1 != "")
-			outputline += string(adjust_indent,' ');
+			outputline += std::string(adjust_indent,' ');
 		     outputline += s1;
 		     // we need the value of prevquote later on:
 		     preprevquote = prevquote;
@@ -1366,7 +1383,7 @@ void output_line()
 	       // and the non-comment line needs a leading &
 
 	       needamp="";
-	       deque<string>::iterator it= lines.begin();
+	       std::deque<std::string>::iterator it= lines.begin();
                char prevlchar = 0;
                bool inpreproc = 0;
 	       while(it != lines.end())
@@ -1408,7 +1425,7 @@ void output_line()
 		     // is there a !comment outside a string?
 		     // here we need the value of preprevquote:
 
-		     string work = preprevquote + outputline;
+		     std::string work = preprevquote + outputline;
 		     int p0 = work.size();
 		     remove_trailing_comment(work);
 		     int p = work.size();
@@ -1418,7 +1435,7 @@ void output_line()
 			// the number of characters before the comment
 			// has to be decreased by one, because
 			// of the prepending of preprevquote
-			p = max(p-1,0);
+			p = std::max(p-1,0);
 			outputline = outputline.substr(0, p) + '&' + outputline.substr(p);
 			break;
 		     }
@@ -1430,7 +1447,7 @@ void output_line()
 		     }
 		  }
 	       }
-	       cout << outputline << endline;
+	       std::cout << outputline << endline;
 	    }
 	 }
       }
@@ -1447,6 +1464,7 @@ int pop_indent()
 
 int top_indent()
 {
+   //D(O("top_indent size:");O(indent.size());O("top:");O(indent.top()));
    if (indent.empty())
       return 0;
    return indent.top();
@@ -1455,6 +1473,7 @@ int top_indent()
 void push_indent(int p)
 {
    indent.push(p);
+   D(O("push_indent size:");O(indent.size());O("top:");O(indent.top());O("p:");O(p));
 }
 
 void push_rprops(struct propstruct p)
@@ -1485,7 +1504,7 @@ struct propstruct top_rprops()
    return rprops.top();
 }
 
-string whatprop(struct propstruct p)
+std::string whatprop(struct propstruct p)
 {
     switch(p.kind)
     { 
@@ -1555,29 +1574,29 @@ void usage(const bool doman)
 {
    if (doman)
    {
-      cout << ".\\\" DO NOT MODIFY THIS FILE! It was created by findent -H"                << endl;
-      cout << ".TH FINDENT \"1\" \"2015\" \"findent-" << VERSION << "\" \"User Commands\"" << endl;
-      cout << ".SH NAME"                                                                   << endl;
-      cout << "findent \\- Indents and optionally converts Fortran program source"         << endl;
-      cout << ".SH SYNOPSIS"                                                               << endl;
-      cout << ".B findent"                                                                 << endl;
-      cout << "[\\fIOPTION\\fR]..."                                                        << endl;
-      cout << ".PP"<<endl<< "findent reads from stdin and writes to stdout."               << endl;
-      cout << ".SH DESCRIPTION"                                                            << endl;
-      cout << "Findent indents a Fortran source. Findent uses various kinds of"            << endl;
-      cout << "indentations, see OPTIONS. Findent can convert from fixed form to"          << endl;
-      cout << "free form, and can supplement single END statements, see 'Refactor' below." << endl;
-      cout << "Errors in OPTIONS are silently ignored."                                    << endl;
-      cout << ".PP" << endl << ".SS \"General options:"                                    << endl;
+      std::cout << ".\\\" DO NOT MODIFY THIS FILE! It was created by findent -H"                << std::endl;
+      std::cout << ".TH FINDENT \"1\" \"2015\" \"findent-" << VERSION << "\" \"User Commands\"" << std::endl;
+      std::cout << ".SH NAME"                                                                   << std::endl;
+      std::cout << "findent \\- Indents and optionally converts Fortran program source"         << std::endl;
+      std::cout << ".SH SYNOPSIS"                                                               << std::endl;
+      std::cout << ".B findent"                                                                 << std::endl;
+      std::cout << "[\\fIOPTION\\fR]..."                                                        << std::endl;
+      std::cout << ".PP"<<std::endl<< "findent reads from stdin and writes to stdout."          << std::endl;
+      std::cout << ".SH DESCRIPTION"                                                            << std::endl;
+      std::cout << "Findent indents a Fortran source. Findent uses various kinds of"            << std::endl;
+      std::cout << "indentations, see OPTIONS. Findent can convert from fixed form to"          << std::endl;
+      std::cout << "free form, and can supplement single END statements, see 'Refactor' below." << std::endl;
+      std::cout << "Errors in OPTIONS are silently ignored."                                    << std::endl;
+      std::cout << ".PP" << std::endl << ".SS \"General options:"                               << std::endl;
    }
    else
    {
-      cout << "findent [options]"                       << endl;
-      cout << "   format fortran program"               << endl;
-      cout << "   reads from STDIN, writes to STDOUT"   << endl;
-      cout << "   comment lines with '!' in column one are not indented" << endl;
-      cout << "options: (errors are silently ignored)"  << endl;
-      cout << "  general:"                              << endl;
+      std::cout << "findent [options]"                                        << std::endl;
+      std::cout << "   format fortran program"                                << std::endl;
+      std::cout << "   reads from STDIN, writes to STDOUT"                    << std::endl;
+      std::cout << "   comment lines with '!' in column one are not indented" << std::endl;
+      std::cout << "options: (errors are silently ignored)"                   << std::endl;
+      std::cout << "  general:"                                               << std::endl;
    }
 
    manout("-h","print this text",                                         doman);
@@ -1608,11 +1627,11 @@ void usage(const bool doman)
    manout(" ","in stead of 'subroutine' etc",                             doman);
    if(doman)
    {
-      cout << ".PP" << endl << ".SS \"Indenting options:" << endl;
+      std::cout << ".PP" << std::endl << ".SS \"Indenting options:" << std::endl;
    }
    else
    {
-      cout << "  indents:"                              << endl;
+      std::cout << "  indents:"                                     << std::endl;
    }
    manout("-In","starting  indent (default:0)",                                                 doman);
    manout("-Ia","determine starting indent from first line",                                    doman);
@@ -1645,24 +1664,24 @@ void usage(const bool doman)
    manout(" "," ",                                   doman);
    if(doman)
    {
-      cout << ".PP" << endl << ".SS" << endl;
+      std::cout << ".PP" << std::endl << ".SS" << std::endl;
    }
-   cout << "Examples:"                                         << endl;
+   std::cout << "Examples:"                    << std::endl;
    manout(" ","indent: findent < in.f > out.f",                doman);
    manout(" ","        findent -i2 -r0 < in.f > out.f",        doman);
    manout(" ","convert: findent -ofree < prog.f > prog.f90",   doman);
    manout(" ","refactor 'end': findent -Rr < in.f90 > out.f90",doman);
    if(doman)
    {
-      cout << ".SH COPYRIGHT" << endl;
-      cout << ".br"           << endl;
+      std::cout << ".SH COPYRIGHT" << std::endl;
+      std::cout << ".br"           << std::endl;
    }
    else
    {
-      cout << "COPYRIGHT" << endl;
+      std::cout << "COPYRIGHT"     << std::endl;
    }
-   cout << "This is free software; see the source for copying conditions.  There is NO"  <<endl;
-   cout << "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE." <<endl;
+   std::cout << "This is free software; see the source for copying conditions.  There is NO"  <<std::endl;
+   std::cout << "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE." <<std::endl;
 }
 
 // doman == 1: output in man page format
@@ -1670,26 +1689,26 @@ void usage(const bool doman)
 //       otherwize : skip to new paragraph and use bold format
 // txt: Line to be output
 //
-void manout(const string flag, const string txt, const bool doman)
+void manout(const std::string flag, const std::string txt, const bool doman)
 {
 
    if (doman)
    {
       if (flag == " ")
-	 cout << txt << endl;
+	 std::cout << txt   << std::endl;
       else
       {
-	 cout << ".TP" << endl << "\\fB\\"<<flag<<"\\fR"<<endl;
-	 cout << txt << endl;
+	 std::cout << ".TP" << std::endl << "\\fB\\"<<flag<<"\\fR"<<std::endl;
+	 std::cout << txt   << std::endl;
       }
    }
    else
    {
-      cout << flag << "\t" << ": " << txt << endl;
+      std::cout << flag << "\t" << ": " << txt << std::endl;
    }
 }
 
-int guess_fixedfree(const string s)
+int guess_fixedfree(const std::string s)
 {
    D(O("entering guess_fixedfree"););
    // sometimes, program sources contain carriage control characters
@@ -1708,7 +1727,7 @@ int guess_fixedfree(const string s)
 int determine_fix_or_free(const bool store)
 {
    int rc;
-   string s;
+   std::string s;
    int n = 0;
    const int nmax = 4000;
    while ( n < nmax)
@@ -1748,11 +1767,11 @@ int determine_fix_or_free(const bool store)
    return FIXED;
 }
 
-string handle_dos(const string s)
+std::string handle_dos(const std::string s)
 //  determine if the input is dos format:
 // side effect: sets endline if not already been set
 {
-   string sl;
+   std::string sl;
    sl = s;
    if (!endline_set)
    {
@@ -1769,17 +1788,18 @@ string handle_dos(const string s)
    return sl;
 }
  
-bool isfixedcmt(const string s)
+bool isfixedcmt(const std::string s)
 {
 // returns 1 if this is a fixed empty line or fixed comment line or preprocessor line
 //                                         or debug line ('d' or 'D' in column 1)
    if (s == "" || trim(s) == "")
       return 1;
    char c = firstchar(s);
-   return (c == 'C' || c == 'c' || c == '!' || c == '*' || c == '#' || c == 'd' || c == 'D'); 
+   char cts = firstchar(trim(s));
+   return (cts == 0 || c == 'C' || c == 'c' || cts == '!' || c == '*' || cts == '#' || c == 'd' || c == 'D'); 
 }
 
-char fixedmissingquote(const string s)
+char fixedmissingquote(const std::string s)
 {
    // investigate if this line terminates a string
    // returns ' ' if there is no unterminated string
@@ -1826,28 +1846,32 @@ char fixedmissingquote(const string s)
 
 // something like this has been done for the rprops stack
 
-void handle_pre(const string s)
+void handle_pre(const std::string s)
 {
    D(O("pre before");O(cur_indent);O(top_indent());O(s););
 
    if (s == "" || firstchar(s) != '#')
       return;
 
-   if (s.find("#if") == 0)   // covers #if #ifdef #ifndef
+   std::string sl = "#" + ltrim(s.substr(1));
+   if (sl.find("#if") == 0)   // covers #if #ifdef #ifndef
    {
       indent_stack.push(indent);
+      nbseen_stack.push(nbseen);
       pre_stack.push(0);
       rprops_stack.push(rprops);
       prep_stack.push(0);
    }
-   else if (s.find("#elif") == 0)
+   else if (sl.find("#elif") == 0)
    {
       if (!indent_stack.empty())
 	 indent = indent_stack.top();
+      if (!nbseen_stack.empty())
+	 nbseen = nbseen_stack.top();
       if (!rprops_stack.empty())
 	 rprops = rprops_stack.top();
    }
-   else if (s.find("#else") == 0)
+   else if (sl.find("#else") == 0)
    {
       if (!indent_stack.empty())
       {
@@ -1855,6 +1879,11 @@ void handle_pre(const string s)
 	 indent_stack.pop();
 	 pre_stack.pop();
 	 pre_stack.push(1);
+      }
+      if (!nbseen_stack.empty())
+      {
+	 nbseen = nbseen_stack.top();
+	 nbseen_stack.pop();
       }
       if (!rprops_stack.empty())
       {
@@ -1864,7 +1893,7 @@ void handle_pre(const string s)
 	 prep_stack.push(1);
       }
    }
-   else if (s.find("#endif") == 0)
+   else if (sl.find("#endif") == 0)
    {
       if (!indent_stack.empty())
       {
@@ -1872,6 +1901,11 @@ void handle_pre(const string s)
 	 {
 	    indent = indent_stack.top();
 	    indent_stack.pop();
+	    if (!nbseen_stack.empty())
+	    {
+	       nbseen = nbseen_stack.top();
+	       nbseen_stack.pop();
+	    }
 	 }
 	 pre_stack.pop();
       }
@@ -1886,25 +1920,21 @@ void handle_pre(const string s)
       }
    }
    D(O("pre after");O(cur_indent);O(top_indent()););
-   if(!last_indent_only)
-      cout << s << endline;
-   last_indent = 0;
+   mycout << s << endline;
    char lchar = lastchar(s);
    while (!lines.empty())
    {
       if (lchar != '\\')
 	 break;
 
-      if(!last_indent_only)
-	 cout <<lines.front() << endline;
-      last_indent = guess_indent(lines.front());
+      mycout <<lines.front() << endline;
       lchar = lastchar(lines.front());
       lines.pop_front();
       olines.pop_front();
    }
 }
 
-char firstchar(const string s)
+char firstchar(const std::string s)
 {
    size_t l = s.length();
    if (l == 0)
@@ -1912,7 +1942,7 @@ char firstchar(const string s)
    return s[0];
 }
 
-char lastchar(const string s)
+char lastchar(const std::string s)
 {
    size_t l = s.length();
    if (l == 0)
