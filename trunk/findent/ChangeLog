@@ -6,6 +6,7 @@ findent-2.7.0:
 	   - recognise '#  if' etc
 	   - fixed minor bug: code starting with preprocessor directive
 	     in combination with -Ia did not function properly
+	all:
 	   - omit 'using namespace std'
 findent-2.6.0:
 	findent.cpp:

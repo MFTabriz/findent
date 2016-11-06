@@ -17,7 +17,7 @@ void get_full_statement();
 void handle_free(std::string s,bool &more);
 void remove_trailing_comment(std::string &s);
 void handle_fixed(std::string s, bool &more);
-void handle_preproc(std::string s, bool &more);
+void handle_prc(std::string s, bool &more);
 void output_line();
 int pop_indent();
 int top_indent();
@@ -55,6 +55,7 @@ std::string handle_dos(const std::string s);
 
 int input_format, output_format;
 int guess_indent(const std::string str);
+int num_leading_spaces(const std::string &s);
 bool reading_from_tty = 0;
 int lines_read        = 0;
 int input_line_length = 0;
@@ -297,7 +298,9 @@ int main(int argc, char*argv[])
    if(end_of_file)
    {
       if(last_indent_only)
-	 std::cout << guess_indent(mycout.get()) << endline;
+      {
+	 std::cout << num_leading_spaces(mycout.get()) << endline;
+      }
       return 0;
    }
 
@@ -308,7 +311,9 @@ int main(int argc, char*argv[])
       if (end_of_file)
       {
 	 if(last_indent_only)
-	    std::cout << guess_indent(mycout.get()) << endline;
+	 {
+	    std::cout << num_leading_spaces(mycout.get()) << endline;
+	 }
 	 return 0;
       }
    }
@@ -824,7 +829,7 @@ void get_full_statement()
       if(preproc_more || (firstchar(s) == '#'))
       {
 	 D(O("preproc");O(s);O(preproc_more););
-	 handle_preproc(s, preproc_more);
+	 handle_prc(s, preproc_more);
 	 if (preproc_more || fortran_more)
 	    continue;
 	 else
@@ -852,7 +857,7 @@ void get_full_statement()
    D(O("lines:"); for (unsigned int i=0; i<lines.size(); i++) { O(i);O(lines[i]); })
 }
 
-void handle_preproc(std::string s, bool &more)
+void handle_prc(std::string s, bool &more)
    // adds preprocessor continuation line s to full statement
    // more = 1: more preprocessor lines are to expected
    //        0: this line is complete
@@ -1042,13 +1047,21 @@ void remove_trailing_comment(std::string &s)
    return;
 }
 
+int num_leading_spaces(const std::string &s)
+{
+   size_t p = s.find_first_not_of(' ');
+   if (p == std::string::npos)
+      return s.size();
+   return p;
+}
+
 int guess_indent(const std::string s)
 { // count spaces at start of line, correct for tabs and & and label
    int si         = 0;
    bool ready     = 0;
    const int tabl = 8;
 
-   D(O("guess_indent entered"););
+   //D(O("guess_indent entered"););
 
    if (input_format == FIXED)
    {
@@ -1180,6 +1193,7 @@ void output_line()
       }
       while (!lines.empty())
       {
+	 mycout.reset();
 	 // sometimes, there are preprocessor statements within a continuation ...
 	 std::string s  = lines.front();
 	 std::string os = olines.front();
@@ -1222,6 +1236,7 @@ void output_line()
 		  l=std::max(1,cont_indent);
 	       mycout << std::string(l,' ');
 	       mycout << s <<endline;
+	       D(O("output_line s");O(s);O("mycout.get:");O(mycout.get());)
 	    }
 	    else
 	    {
@@ -1236,6 +1251,7 @@ void output_line()
       unsigned int first_indent = 0;
       while(!lines.empty())
       {
+	 mycout.reset();
          lineno++;
 	 std::string s = lines.front();
 	 std::string os = olines.front();
@@ -1250,11 +1266,11 @@ void output_line()
 	 if(isfixedcmt(s))
 	 {  // this is an empty line or comment line or a preprocessing line
 	    if (output_format == FIXED)
-	       std::cout << trim(s) << endline;
+	       mycout << trim(s) << endline;
 	    else  // output_format = FREE
 	    {
 	       if (trim(s) == "")
-	          std::cout << endline;
+	          mycout << endline;
 	       else
 	       {
 	          switch (firstchar(s))
@@ -1262,10 +1278,10 @@ void output_line()
 	             // special hack for lines starting with 'd' or 'D'
 	             case 'd' :
 		     case 'D' :
-			std::cout << "!" + trim(s) << endline;
+			mycout << "!" + trim(s) << endline;
 			break;
 	             default:
-			std::cout << std::string(std::max(cur_indent,0),' ') << "!" << trim(s.substr(1)) << endline;
+			mycout << std::string(std::max(cur_indent,0),' ') << "!" << trim(s.substr(1)) << endline;
 		  }
 	       }
 	    }
@@ -1274,7 +1290,7 @@ void output_line()
 	 {
 	    if (output_format == FIXED)
 	    {
-	       std::cout << s.substr(0,6);
+	       mycout << s.substr(0,6);
 	       
 	       if(s.length() > 6)
 	       {
@@ -1300,10 +1316,10 @@ void output_line()
 		  switch(prevquote)
 		  {
 		     case ' ' :   // no dangling strings, output with indent
-			std::cout << std::string(std::max(adjust_indent+cur_indent,0),' ') << trim(s.substr(6));
+			mycout << std::string(std::max(adjust_indent+cur_indent,0),' ') << trim(s.substr(6));
 			break;
 		     default:  // dangling string, output asis
-			std::cout << s.substr(6);
+			mycout << s.substr(6);
 			break;
 		  }
 		  // investigate if this line terminates a string
@@ -1311,7 +1327,7 @@ void output_line()
 		  prevquote = fixedmissingquote(prevquote + s);
 	       }
 		        
-	       std::cout << endline;
+	       mycout << endline;
 	    }
 	    else  // output_format == FREE
 	    {
@@ -1332,7 +1348,7 @@ void output_line()
 		        s = trim(s);
 			std::string label = s.substr(0,labelleng);
 			s    = trim(s.substr(labelleng));
-			std::cout << label;
+			mycout << label;
 			l = cur_indent - labelleng;
 			if ( l <= 0 )
 			   l=1;
@@ -1340,7 +1356,7 @@ void output_line()
 		     else
 			l = cur_indent;
 
-		     std::cout <<std::string(std::max(l,0),' '); 
+		     mycout <<std::string(std::max(l,0),' '); 
 		  }
 		  outputline += trim(s);
 		  // we need the value of prevquote later on:
@@ -1351,7 +1367,7 @@ void output_line()
 	       {
 	          if (s.length() >6)
 		  {
-		     std::cout << std::string(std::max(cur_indent,0),' ');
+		     mycout << std::string(std::max(cur_indent,0),' ');
 		     // try to honor current indentation
 		     // if this is a continuation line, count the number
 		     // of spaces after column 6.
@@ -1447,7 +1463,7 @@ void output_line()
 		     }
 		  }
 	       }
-	       std::cout << outputline << endline;
+	       mycout << outputline << endline;
 	    }
 	 }
       }
