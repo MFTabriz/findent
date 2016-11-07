@@ -123,6 +123,7 @@ bool refactor_routines = 0;   // 1: refactor routine-end statements
 bool upcase_routine_type = 0; // 1: use 'SUBROUTINE' etc in stead of 'subroutine'
 bool simple_end_found  = 0;
 bool return_format = 0;       // 1: return 2 if format==free, 4 if format==fixed
+bool only_fix_free = 0;       // 1: determine only if fixed or free (-q)
 
 simpleostream mycout;
 
@@ -141,7 +142,7 @@ int main(int argc, char*argv[])
    output_format       = 0;
    last_indent_only    = 0;
 
-   int c,rc;
+   int c;
    opterr = 0;
    while((c=getopt(argc,argv,"a:b:c:C:d:e:E:f:F:hHi:I:j:k:l:L:m:o:qQr:R:s:t:vw:x:"))!=-1)
       switch(c)
@@ -233,17 +234,7 @@ int main(int argc, char*argv[])
 	         output_format = FREE;
 	      break;
 	   case 'q' :
-	      D(O("finding fix or free"););
-	      handle_reading_from_tty();
-	      rc = determine_fix_or_free(0);
-	      switch(rc)
-	      {
-		 case FIXED : std::cout << "fixed" << endline;
-		 break;
-		 case FREE :  std::cout << "free" << endline;
-		 break;
-	      }
-	      return 0;
+	      only_fix_free = 1;
 	      break;
 	   case 'Q':
 	      return_format = 1;
@@ -283,6 +274,18 @@ int main(int argc, char*argv[])
 
    if (input_format == 0)
       input_format = determine_fix_or_free(1);
+
+   if (only_fix_free)
+   {
+      switch(input_format)
+      {
+	 case FIXED : mycout << "fixed" << endline;
+		      break;
+	 case FREE :  mycout << "free" << endline;
+		      break;
+      }
+      return what_to_return();
+   }
 
    if(output_format == 0)
       output_format = input_format;
@@ -602,17 +605,25 @@ void handle_reading_from_tty()
 
 void init_indent()
 // fills the indent-stack until indent 0
+// if all_indent <= 0: build indent_stack with a number of start_indent's
 {
    D(O("init_indent");O(indent.size());O("start_indent:");O(start_indent));
    while(!indent.empty())
       indent.pop();
    int l=0;
-   for (int i=0; l<start_indent; i++)
+   if(all_indent > 0)
    {
-      //indent.push(l);
-      D(O("init_indent calling push");O(indent.size()););
-      push_indent(l);
-      l = i*default_indent; // do not use all_indent: could be zero
+      for (int i=0; l<start_indent; i++)
+      {
+	 D(O("init_indent calling push");O(indent.size()););
+	 push_indent(l);
+	 l = i*all_indent;
+      }
+   }
+   else
+   {
+      for (int i=0; i<100; i++)
+	 push_indent(start_indent);
    }
    //indent.push(start_indent);
    D(O("init_indent calling push");O(indent.size()););
@@ -1637,6 +1648,8 @@ void usage(const bool doman)
    manout("-H","print man page",                                          doman);
    manout("-v","prints findent version",                                  doman);
    manout("-q","guess free or fixed, prints 'fixed' or 'free' and exits", doman);
+   manout("-Q","returncode=2 for free, 4 for fixed",                      doman);
+   manout(" ","      (for usage with vim)",                               doman);
    manout("-l","(0/1) 1: statement labels to start of line (default:1)",  doman);
    manout(" ","      (only for free format)",                             doman);
    manout("-lastindent","prints computed indentation of last line",       doman);
