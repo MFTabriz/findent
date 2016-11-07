@@ -6,6 +6,8 @@ findent-2.7.0:
 	   - recognise '#  if' etc
 	   - fixed minor bug: code starting with preprocessor directive
 	     in combination with -Ia did not function properly
+	   - add flag -Q. returncode =2 for free, 4 for fixed
+	     for usage in vim
 	all:
 	   - omit 'using namespace std'
 findent-2.6.0:
