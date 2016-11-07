@@ -63,6 +63,7 @@ bool input_format_gnu = 0;
 int determine_fix_or_free(const bool store);
 bool isfixedcmt(const std::string s);
 char fixedmissingquote(const std::string s);
+int what_to_return(void);
 
 bool nbseen;                                 // true if non-blank-line is seen
 
@@ -116,15 +117,14 @@ int select_indent;
 int type_indent;
 int where_indent;
 bool last_indent_only;
-simpleostream mycout;
-
 bool label_left;              // 1: put statement labels on the start of the line
 const bool label_left_default = 1;
-
 bool refactor_routines = 0;   // 1: refactor routine-end statements
 bool upcase_routine_type = 0; // 1: use 'SUBROUTINE' etc in stead of 'subroutine'
-
 bool simple_end_found  = 0;
+bool return_format = 0;       // 1: return 2 if format==free, 4 if format==fixed
+
+simpleostream mycout;
 
 bool cur_semi_eol;
 
@@ -143,7 +143,7 @@ int main(int argc, char*argv[])
 
    int c,rc;
    opterr = 0;
-   while((c=getopt(argc,argv,"a:b:c:C:d:e:E:f:F:hHi:I:j:k:l:L:m:o:qr:R:s:t:vw:x:"))!=-1)
+   while((c=getopt(argc,argv,"a:b:c:C:d:e:E:f:F:hHi:I:j:k:l:L:m:o:qQr:R:s:t:vw:x:"))!=-1)
       switch(c)
          {
 	   case 'a' :
@@ -245,6 +245,9 @@ int main(int argc, char*argv[])
 	      }
 	      return 0;
 	      break;
+	   case 'Q':
+	      return_format = 1;
+	      break;
 	   case 'r' :
 	      routine_indent    = atoi(optarg);
 	      break;
@@ -301,7 +304,7 @@ int main(int argc, char*argv[])
       {
 	 std::cout << num_leading_spaces(mycout.get()) << endline;
       }
-      return 0;
+      return what_to_return();
    }
 
    while(1)
@@ -314,9 +317,24 @@ int main(int argc, char*argv[])
 	 {
 	    std::cout << num_leading_spaces(mycout.get()) << endline;
 	 }
-	 return 0;
+	 return what_to_return();
       }
    }
+   return what_to_return();
+}
+
+int what_to_return()
+{
+   if (return_format)
+      switch(input_format)
+      {
+	 case FREE:
+	    return 2;
+	    break;
+	 case FIXED:
+	    return 4;
+	    break;
+      }
    return 0;
 }
 
@@ -594,7 +612,7 @@ void init_indent()
       //indent.push(l);
       D(O("init_indent calling push");O(indent.size()););
       push_indent(l);
-      l = i*all_indent;
+      l = i*default_indent; // do not use all_indent: could be zero
    }
    //indent.push(start_indent);
    D(O("init_indent calling push");O(indent.size()););
@@ -1620,7 +1638,9 @@ void usage(const bool doman)
    manout("-v","prints findent version",                                  doman);
    manout("-q","guess free or fixed, prints 'fixed' or 'free' and exits", doman);
    manout("-l","(0/1) 1: statement labels to start of line (default:1)",  doman);
-   manout(" ","      (only for free format)",                            doman);
+   manout(" ","      (only for free format)",                             doman);
+   manout("-lastindent","prints computed indentation of last line",       doman);
+   manout(" ","      (for usage with vim)",                               doman);
    manout("-iauto","determine automatically input format (free or fixed)",doman);
    manout("-ifixed","force input format fixed",                           doman);
    manout(" ","(default: auto)",                                          doman);
@@ -1631,8 +1651,8 @@ void usage(const bool doman)
    manout("-Lnnng","same as above, but use gfortran convention",          doman);
    manout(" ","for counting the characters with tabbed lines",            doman);
    manout("-ofree","force free format output",                            doman);
-   manout("-Rr","refactor blocks: a single 'end'",                      doman);
-   manout(" "," is, if possible, replaced by",                              doman);
+   manout("-Rr","refactor blocks: a single 'end'",                        doman);
+   manout(" "," is, if possible, replaced by",                            doman);
    manout(" "," 'end subroutine <name>' or",                              doman);
    manout(" "," 'end function <name>' or",                                doman);
    manout(" "," 'end program <name>' or",                                 doman);
