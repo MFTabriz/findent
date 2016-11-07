@@ -298,8 +298,6 @@ int main(int argc, char*argv[])
    get_full_statement();
    cur_semi_eol     = 0;
    cur_indent       = start_indent;
-   //D(O("main calling init_indent");O("start_indent:");O(start_indent));
-   //init_indent();
    indent_and_output();
    if(end_of_file)
    {
