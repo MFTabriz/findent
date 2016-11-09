@@ -68,8 +68,8 @@ int what_to_return(void);
 bool nbseen;                                 // true if non-blank-line is seen
 
 std::stack<int> indent;                      // to store indents
-std::stack<bool> nbseen_stack;               // to store nbseen
 std::stack<std::stack <int> > indent_stack;  // to store indent stack
+std::stack<bool> nbseen_stack;               // to store nbseen
 std::stack<bool> pre_stack;                  // to note if there is an #else after #if for indenting
 std::stack<bool> prep_stack;                 // to note if there is an #else after #if for routines
 
@@ -84,6 +84,7 @@ int num_lines;                          // number of lines read sofar
 bool indent_handled;
 
 std::stack<int> dolabels;               // to store labels, necessary for labelled do
+std::stack<std::stack <int> > dolabels_stack;  // to store dolabels stack
 int stlabel;
 int labelleng;
 
@@ -1280,12 +1281,13 @@ void output_line()
       {
 	 mycout.reset();
          lineno++;
-	 std::string s = lines.front();
+	 std::string s  = lines.front();
 	 std::string os = olines.front();
-	 char ofc  = firstchar(os);
+	 char ofc       = firstchar(os);
+	 char ftc       = firstchar(trim(s));
 	 lines.pop_front();
 	 olines.pop_front();
-	 if (firstchar(s) == '#')
+	 if ( ftc == '#')
 	 {
 	    handle_pre(s);
 	    continue;
@@ -1293,7 +1295,14 @@ void output_line()
 	 if(isfixedcmt(s))
 	 {  // this is an empty line or comment line or a preprocessing line
 	    if (output_format == FIXED)
-	       mycout << trim(s) << endline;
+	    {
+	       if (ofc == '!')                   // do not change lines starting with !
+		  mycout << rtrim(os) << endline;
+	       else if ( ftc == '!')             // indent indented comments
+		  mycout << std::string(6+cur_indent,' ') << trim(s) << endline;
+	       else
+		  mycout << trim(s) << endline;
+	    }
 	    else  // output_format = FREE
 	    {
 	       if (trim(s) == "")
@@ -1908,6 +1917,7 @@ void handle_pre(const std::string s)
       pre_stack.push(0);
       rprops_stack.push(rprops);
       prep_stack.push(0);
+      dolabels_stack.push(dolabels);
    }
    else if (sl.find("#elif") == 0)
    {
@@ -1917,6 +1927,8 @@ void handle_pre(const std::string s)
 	 nbseen = nbseen_stack.top();
       if (!rprops_stack.empty())
 	 rprops = rprops_stack.top();
+      if (!dolabels_stack.empty())
+	 dolabels = dolabels_stack.top();
    }
    else if (sl.find("#else") == 0)
    {
@@ -1939,6 +1951,11 @@ void handle_pre(const std::string s)
 	 prep_stack.pop();
 	 prep_stack.push(1);
       }
+      if (!dolabels_stack.empty())
+      {
+	 dolabels = dolabels_stack.top();
+	 dolabels_stack.pop();
+      }
    }
    else if (sl.find("#endif") == 0)
    {
@@ -1952,6 +1969,11 @@ void handle_pre(const std::string s)
 	    {
 	       nbseen = nbseen_stack.top();
 	       nbseen_stack.pop();
+	    }
+	    if (!dolabels_stack.empty())
+	    {
+	       dolabels = dolabels_stack.top();
+	       dolabels_stack.pop();
 	    }
 	 }
 	 pre_stack.pop();
