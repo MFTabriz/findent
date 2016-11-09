@@ -8,6 +8,14 @@ findent-2.7.0:
 	     in combination with -Ia did not function properly
 	   - add flag -Q. returncode =2 for free, 4 for fixed
 	     for usage in vim
+	   - add stack for dolabels to obtain correct indenting in cases
+	     like this:
+	     do 1 i=1,2
+	     #if x
+	     1 continue
+	     #else
+	     1 continue
+	   - make fixed ! comment output as in free
 	all:
 	   - omit 'using namespace std'
 findent-2.6.0:
