@@ -23,6 +23,8 @@ int pop_indent();
 int top_indent();
 void push_indent(int p);
 void init_indent();
+void handle_last_usable_only();
+
 std::string whatprop(struct propstruct p);
 std::string stoupper(const std::string s);
 char firstchar(const std::string s);
@@ -118,6 +120,7 @@ int select_indent;
 int type_indent;
 int where_indent;
 bool last_indent_only;
+bool last_usable_only;
 bool label_left;              // 1: put statement labels on the start of the line
 const bool label_left_default = 1;
 bool refactor_routines = 0;   // 1: refactor routine-end statements
@@ -127,8 +130,6 @@ bool return_format = 0;       // 1: return 2 if format==free, 4 if format==fixed
 bool only_fix_free = 0;       // 1: determine only if fixed or free (-q)
 
 simpleostream mycout;
-
-bool cur_semi_eol;
 
 int main(int argc, char*argv[])
 {
@@ -142,6 +143,7 @@ int main(int argc, char*argv[])
    input_format        = 0;
    output_format       = 0;
    last_indent_only    = 0;
+   last_usable_only    = 0;
 
    int c;
    opterr = 0;
@@ -221,6 +223,8 @@ int main(int argc, char*argv[])
 	   case 'l' :
 	      if(std::string(optarg) == "astindent")
 		 last_indent_only = 1;
+	      else if(std::string(optarg) == "astusable")
+		 last_usable_only = 1;
 	      else
 		 label_left     = (atoi(optarg) != 0);
 	      break;
@@ -296,8 +300,12 @@ int main(int argc, char*argv[])
    cur_rprop        = empty_rprop;
    D(O("main calling init_indent");O("start_indent:");O(start_indent));
    init_indent();
+   if (last_usable_only)
+   {
+      handle_last_usable_only();
+      return what_to_return();
+   }
    get_full_statement();
-   cur_semi_eol     = 0;
    cur_indent       = start_indent;
    indent_and_output();
    if(end_of_file)
@@ -339,6 +347,77 @@ int what_to_return()
       }
    return 0;
 }
+
+// search for the last line that is usable to start indenting
+// using findent.
+void handle_last_usable_only()
+{
+   int usable_line=1;
+   init_indent();
+   int ifcounter = 0;
+   while(1)
+   {
+      int prev       = num_lines;
+      bool usable    = 0;
+      bool elsefound = 0;
+      get_full_statement();
+      if (ifcounter == 0)
+      {
+	 line_prep p(full_statement);
+	 propstruct props = parseline(p);
+	 switch (props.kind)
+	 {
+	    case BLANK:
+	    case CASE:
+	    case CONTAINS:
+	    case ENTRY:
+	    case ELSE:
+	    case ELSEIF:
+	    case ELSEWHERE:
+	       break;
+	    default: 
+	       usable = 1;
+	       break;
+	 }
+	 if (usable)
+	    usable_line = prev+1;
+      }
+      while (!lines.empty())
+      {
+	 // lines in a #if block are not to be used,
+	 // unless they follow the last #else
+	 std::string sl = trim(lines.front());
+	 if (firstchar(sl) == '#')
+	 {
+	    sl = "#" + ltrim(sl.substr(1));
+	    if (sl.find("#if") == 0)   // covers #if #ifdef #ifndef
+	    {
+	       ifcounter ++;
+	       elsefound = 0;
+	    }
+	    if (sl.find("#else") == 0)
+	    {
+	       ifcounter = std::max(ifcounter-1,0);
+	       elsefound  = 1;
+	    }
+	    if (sl.find("#endif") == 0)
+	       if (!elsefound)
+	       {
+		  ifcounter = std::max(ifcounter-1,0);
+		  elsefound = 0;
+	       }
+	 }
+	 lines.pop_front();
+	 olines.pop_front();
+      }
+      if (end_of_file)
+      {
+	 std::cout << usable_line << endline;
+	 return;
+      }
+   }
+}
+
 
 void indent_and_output()
 {
@@ -612,11 +691,9 @@ void init_indent()
    int l=0;
    if(all_indent > 0)
    {
-      for (int i=0; l<start_indent; i++)
+      for (l = start_indent%all_indent; l<start_indent; l+=all_indent)
       {
-	 D(O("init_indent calling push");O(indent.size()););
 	 push_indent(l);
-	 l = i*all_indent;
       }
    }
    else
@@ -1031,6 +1108,7 @@ void handle_fixed(std::string s, bool &more)
       // we push back the line in it's original state
       // to prevent double line truncation
       linestack.push(s0);
+      num_lines--;
       more = 0;          // do not look for further continuation lines
       return;
    }
@@ -1661,6 +1739,8 @@ void usage(const bool doman)
    manout(" ","      (only for free format)",                             doman);
    manout("-lastindent","prints computed indentation of last line",       doman);
    manout(" ","      (for usage with vim)",                               doman);
+   manout("-lastusable","prints line number of last line usable",         doman);
+   manout(" ","      as start for indenting(for usage with vim)",         doman);
    manout("-iauto","determine automatically input format (free or fixed)",doman);
    manout("-ifixed","force input format fixed",                           doman);
    manout(" ","(default: auto)",                                          doman);
