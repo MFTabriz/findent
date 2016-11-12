@@ -209,7 +209,10 @@ int main(int argc, char*argv[])
 	      if (optarg[0] == 'a')
 	         auto_firstindent = 1;
 	      else
-		 start_indent   = atoi(optarg);
+	      {
+		 start_indent     = atoi(optarg);
+		 auto_firstindent = 0;
+	      }
 	      break;
 	   case 'j' :
 	      interface_indent  = atoi(optarg);
