@@ -2,9 +2,19 @@
 " Installation: Place this script in the $HOME/.vim/after/indent/ directory
 "               as fortran.vim   and use it with Vim > 7.1 and findent:
 "               findent.sourceforge.net
-"Author: Willem Vermin wvermin@gmail.com
-"Licence: fair
-"Date: nov 2016
+"               Author: Willem Vermin wvermin@gmail.com
+"               Licence: fair
+
+if !exists("b:use_findent")
+   finish
+endif
+if !b:use_findent
+   finish
+endif
+
+if !exists("b:use_findent_indentexpr")
+   let b:use_findent_indentexpr = 1
+endif
 
 autocmd BufEnter * unlet! g:fortran_free_source g:fortran_fixed_source
 autocmd BufEnter * unlet! b:fortran_free_source b:fortran_fixed_source
@@ -31,14 +41,14 @@ endfunction
 " return string that represents external command to determine
 " if input is free or fixed format.
 " If no suitable command is found, return ""
-" The output of this external command will be "free" or "fixed"
+" The output of this external command must be "free" or "fixed"
 function! Findent_get_freefixed()
    let indentparmsq = ' -q'
-   let findent_freefixed = g:findent.indentparmsq.' 2>/dev/null'
-   if strpart(system(findent_freefixed," continue"),0,4) != "free"
-      let findent_freefixed = ""
+   let f = g:findent.indentparmsq.' 2>/dev/null'
+   if strpart(system(f," continue"),0,4) != "free"
+      let f = ""
    endif
-   return findent_freefixed
+   return f
 endfunction
 
 " Return external command to get the indent of the last line of the input
@@ -71,17 +81,15 @@ endfunction
 
 " Returns the indentation of the current line
 function! Findent_getindent()
-
    if b:findent_use_whole_buffer
       let startline = 1
    else
       let startline = system(g:findent." -lastusable -i".b:fortran_format,join(getline(1,v:lnum-1),"\n"))
    endif
-
    let startline = max([1,startline])
-
-   let b:findent_getindent = Findent_get_getindent()
-   let ind = system(b:findent_getindent, join(getline(startline,v:lnum),"\n"))
+   let getindent = Findent_get_getindent()
+   let lnum = prevnonblank(v:lnum)
+   let ind  = system(getindent, join(getline(startline,lnum),"\n"))
    return ind
 endfunction
 
@@ -141,6 +149,20 @@ function! Findent_use_wb_toggle()
    let b:findent_use_whole_buffer = !b:findent_use_whole_buffer
 endfunction
 
+function! Get_free_or_fixed_default()
+   if exists("b:fortran_fixed_source")
+      if b:fortran_fixed_source
+	 return "fixed"
+      endif
+   endif
+   if exists("b:fortran_free_source")
+      if b:fortran_free_source
+	 return "free"
+      endif
+   endif
+   return "fixed"
+endfunction
+
 "======================================================================================
 
 if exists("g:findent_flags")
@@ -168,8 +190,8 @@ if b:fortran_format == "unknown"
    " determine command to determine free or fixed
    let b:findent_freefixed = Findent_get_freefixed()
    if b:findent_freefixed == ""
-      let b:fortran_format = "free"
-      echomsg "Cannot determine format (free/fixed), will use" b:fortran_format
+      let b:fortran_format = Get_free_or_fixed_default()
+      echomsg "Cannot determine format using findent, will use" b:fortran_format
    else
       let r=system(b:findent_freefixed,join(getline(1,10000),"\n"))
       if r =~ "free"
@@ -192,5 +214,7 @@ endif
 
 call Findent_set_indentprog()
 
-call Findent_set_getindent()
+if b:use_findent_indentexpr
+   call Findent_set_getindent()
+endif
 

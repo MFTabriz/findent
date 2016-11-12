@@ -3,6 +3,9 @@ findent: indents/beautifies/converts Fortran sources
  - findent supports Fortran-2008
  - findent can convert from fixed form to free form
  - binaries for Unix and Windows (findent and findent.exe respectively)
+ - high speed: 50K - 100K lines per second
+ - since version 2.7.0, findent is very vim-aware an can be used
+   in equalprg and indentexpr
  - wrapper for processing one or more files in one call available
       for Unix and Windows (wfindent and wfindent.bat respectively)
  - (g)vim users: findent can act as a plug-in to format your
@@ -32,7 +35,7 @@ Unix-Linux users:
 	     $ ./configure --prefix=<Your installation directory, default /usr/local>
 	     $ make clean
              $ make
-	     $ make install
+	     $ sudo make install
 
     if necessary, remake the Windows executable (requires package mingw32):
 	     $ ./configure --with-windows
@@ -58,18 +61,16 @@ Examples: $ findent < in.f90 > out.f90
           $ wfindent -i4 -Rr *.f
 
 (g)vim users:
-   Install findent, and add the following to your .vimrc:
+   Install findent, and put the following files in place:
 
-      augroup fortfiletype
-	autocmd!
-	autocmd Filetype fortran :execute ":setl sw=3"
-	autocmd Filetype fortran :execute ":setl equalprg=findent\\ -Ia\\ -i3"
-	autocmd Filetype fortran :execute ":setl expandtab"
-      augroup END
+   vim/findent.vim -> ~/.vim/plugin/findent.vim
+   vim/fortran.vim -> ~/.vim/after/indent/fortran.vim
 
-   Read
-     :help =
-   in vim or gvim.
+   Documentation:
+     in (g)vim:
+	:help equalprg
+	:help indentexpr
+     and the comments in the files vim/findent.vim and vim/fortran.vim
 
 
 # $Id$
