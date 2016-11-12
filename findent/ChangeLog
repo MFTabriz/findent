@@ -17,6 +17,7 @@ findent-2.7.0:
 	     1 continue
 	   - make fixed ! comment output as in free
 	   - better initialization of indents if startindent>0
+	   - -Innn now sets auto_firstindent = 0
 	all:
 	   - omit 'using namespace std'
 	vim:
