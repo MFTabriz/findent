@@ -17,3 +17,4 @@ unix2dos README.txt                                               || exit 1
 rm -f "findent-$version.zip"
 zip   "findent-$version.zip" findent.exe README.txt wfindent.bat  || exit 1
 rm -f findent.exe README.txt wfindent.bat
+echo "$0 done"
