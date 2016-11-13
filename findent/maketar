@@ -26,3 +26,4 @@ rm -rf "findent-$version"
 cp -r $curdir "findent-$version"                   || exit 1
 tar zcf "findent-$version.tgz" "findent-$version"  || exit 1
 rm -rf "findent-$version"
+echo "$0 done"

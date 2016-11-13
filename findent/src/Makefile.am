@@ -40,5 +40,3 @@ findent.o: parser.h
 
 bin_PROGRAMS    = findent
 findent_SOURCES = findent.cpp lexer.cpp parser.cpp line_prep.cpp
-
-TESTS = test.sh

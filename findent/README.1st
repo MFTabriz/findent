@@ -21,6 +21,10 @@ Linux users: the tar ball contains a static linked executable,
 	     $ cd bin
 	     $ install findent wfindent $HOME/bin
 	 or: $ sudo install findent wfindent /usr/local/bin
+	     $ edit wfindent, such that the line with
+	     $   FINDENT=/some/path
+	     $   points to the location of findent, for example
+	     $   FINDENT=$HOME/bin/findent
 
 	     If the pre compiled version does not work,
 	     ( try: $ ./findent -h )

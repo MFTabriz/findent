@@ -245,6 +245,8 @@ int main(int argc, char*argv[])
 	      only_fix_free = 1;
 	      break;
 	   case 'Q':
+	      // return 2 if free, 4 if fixed
+	      // not dodumented, maybe useful in the future
 	      return_format = 1;
 	      break;
 	   case 'r' :
@@ -1736,8 +1738,8 @@ void usage(const bool doman)
    manout("-H","print man page",                                          doman);
    manout("-v","prints findent version",                                  doman);
    manout("-q","guess free or fixed, prints 'fixed' or 'free' and exits", doman);
-   manout("-Q","returncode=2 for free, 4 for fixed",                      doman);
-   manout(" ","      (for usage with vim)",                               doman);
+   //manout("-Q","returncode=2 for free, 4 for fixed",                      doman);
+   //manout(" ","      (for usage with vim)",                               doman);
    manout("-l","(0/1) 1: statement labels to start of line (default:1)",  doman);
    manout(" ","      (only for free format)",                             doman);
    manout("-lastindent","prints computed indentation of last line",       doman);
