@@ -5,26 +5,6 @@
 "Licence: fair
 "Date: nov 2016
 
-" use findent for indenting,  unless use_findent == 0
-if !exists("g:use_findent")
-   let b:use_findent = 1
-else
-   let b:use_findent = g:use_findent
-endif
-
-" use findent for indenting using indentexpr (see :help indentexpr)
-"     unless use_findent_indentexpr == 0
-if !exists("g:use_findent_indentexpr")
-   let b:use_findent_indentexpr = 1
-else
-   let b:use_findent_indentexpr = g:use_findent_indentexpr
-endif
-
-" The location of findent:
-if !exists("g:findent")
-   let g:findent = "/usr/bin/findent"
-endif
-
 filetype plugin indent on
 
 " set default indent flag, if not already set
@@ -75,20 +55,6 @@ augroup fortfiletype
    " on input: do not create tabs on input 
    autocmd Filetype fortran setlocal expandtab
 
-   if exists("b:use_findent")
-      if b:use_findent
-	 " adapted status line
-	 " b:fortran_format and b:findent_use_whole_buffer are determined in
-	 " after/indent/fortran.vim
-	 autocmd Filetype fortran setlocal statusline=%<%t\ %m\ %r\ %y\ %{b:fortran_format}\ %{b:findent_use_whole_buffer}%=%l\ %c\ %LL\ %P
-	 " toggle b:findent_use_whole_buffer:
-	 " 1: use whole buffer up to cursor to determine indent at cursor
-	 " 0: use just enough lines from buffer
-	 " Findent_use_wb_toggle defined in after/indent/fortran.vim
-	 autocmd Filetype fortran nnoremap <buffer> <LocalLeader>w :call Findent_use_wb_toggle()<Return>
-      endif
-   endif
-
    " no max line length
    autocmd Filetype fortran setlocal textwidth=0
 
@@ -96,7 +62,7 @@ augroup fortfiletype
    autocmd Filetype fortran setlocal laststatus=2
 
    " use indent of previous line
-   autocmd Filetype fortran setlocal autoindent
+   "autocmd Filetype fortran setlocal autoindent
 
    " make syntax aware of above
    autocmd Filetype fortran syntax on
