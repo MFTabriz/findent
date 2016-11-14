@@ -5,6 +5,26 @@
 "               Author: Willem Vermin wvermin@gmail.com
 "               Licence: fair
 
+" use findent for indenting,  unless use_findent == 0
+if !exists("g:use_findent")
+   let b:use_findent = 1
+else
+   let b:use_findent = g:use_findent
+endif
+
+" use findent for indenting using indentexpr (see :help indentexpr)
+"     unless use_findent_indentexpr == 0
+if !exists("g:use_findent_indentexpr")
+   let b:use_findent_indentexpr = 1
+else
+   let b:use_findent_indentexpr = g:use_findent_indentexpr
+endif
+
+" The location of findent:
+if !exists("g:findent")
+   let g:findent = "/usr/bin/findent"
+endif
+
 if !exists("b:use_findent")
    finish
 endif
@@ -96,7 +116,7 @@ endfunction
 function! Findent_set_flags()
    if !b:have_findent && !b:have_findent_getindent
       return
-   endif
+   endifinitialize.F90
    let old = b:findent_flags
    let b:findent_flags = input("findent flags:",b:findent_flags)
    if b:have_findent
@@ -140,7 +160,7 @@ function! Findent_set_getindent()
       let b:have_findent_getindent = 0
    else
       setlocal indentexpr=Findent_getindent()
-      setlocal indentkeys=*<Return>,*<Up>,*<Down>,*<Esc>,!^F
+      setlocal indentkeys=*<Return>,*<Up>,*<Down>,*<Esc>,!^F,!<Tab>,o,O
       let b:have_findent_getindent = 1
    endif
 endfunction
@@ -161,6 +181,15 @@ function! Get_free_or_fixed_default()
       endif
    endif
    return "fixed"
+endfunction
+
+function! Get_fortran_format()
+   " returns the value of b:fortran_format
+   return b:fortran_format
+endfunction
+
+function! Get_findent_use_whole_buffer()
+   return b:findent_use_whole_buffer
 endfunction
 
 "======================================================================================
@@ -211,6 +240,9 @@ else
    let b:fortran_fixed_source = 1
    let b:fortran_free_source = 0
 endif
+
+setlocal statusline=%<%t\ %m\ %r\ %y\ %{Get_fortran_format()}\ %{Get_findent_use_whole_buffer()}%=%l\ %c\ %LL\ %P
+nnoremap <buffer> <LocalLeader>w :call Findent_use_wb_toggle()<Return>
 
 call Findent_set_indentprog()
 
