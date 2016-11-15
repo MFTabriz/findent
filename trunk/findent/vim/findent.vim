@@ -29,6 +29,24 @@ endfunction
 " indent whole buffer:
 nnoremap <buffer> <LocalLeader>= :call Indent()<Return>
 
+function! Get_fortran_format()
+   " b:fortran_format defined in auto/indent/fortran.vim
+   if exists("b:fortran_format")
+      return b:fortran_format
+   endif
+   return "unknown"
+endfunction
+
+function! Get_findent_use_whole_buffer()
+   " b:findent_use_whole_buffer defined in auto/indent/fortran.vim
+   if exists("b:findent_use_whole_buffer")
+      if b:findent_use_whole_buffer
+	 return "wb"
+      endif
+   endif
+   return ""
+endfunction
+
 augroup fortfiletype
 
    autocmd!
@@ -62,7 +80,13 @@ augroup fortfiletype
    autocmd Filetype fortran setlocal laststatus=2
 
    " use indent of previous line
-   "autocmd Filetype fortran setlocal autoindent
+   autocmd Filetype fortran setlocal autoindent
+
+   " define statusline
+   autocmd Filetype fortran setlocal statusline=%<%t\ %m\ %r\ %y\ %{Get_fortran_format()}\ %{Get_findent_use_whole_buffer()}%=%l\ %c\ %LL\ %P
+
+   " define toggle: use whole buffer for indenting or not
+   autocmd Filetype fortran nnoremap <buffer> <LocalLeader>w :call Findent_use_wb_toggle()<Return>:echomsg "toggled 'use whole buffer'"<Return>
 
    " make syntax aware of above
    autocmd Filetype fortran syntax on

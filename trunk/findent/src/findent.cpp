@@ -149,136 +149,136 @@ int main(int argc, char*argv[])
    opterr = 0;
    while((c=getopt(argc,argv,"a:b:c:C:d:e:E:f:F:hHi:I:j:k:l:L:m:o:qQr:R:s:t:vw:x:"))!=-1)
       switch(c)
-         {
-	   case 'a' :
-	      associate_indent  = atoi(optarg);
-	      break;
-	   case 'b' :
-	      block_indent      = atoi(optarg);
-	      break;
-	   case 'c' :
-	      case_indent       = atoi(optarg);
-	      break;
-	   case 'C' :
-	      if(optarg[0] == '-')
-		 indent_contain = 0;
-	      else
-		 contains_indent   = atoi(optarg);
-	      break;
-	   case 'd' :
-	      do_indent         = atoi(optarg);
-	      break;
-	   case 'e' :
-	      entry_indent      = atoi(optarg);
-	      break;
-	   case 'E' :
-	      enum_indent       = atoi(optarg);
-	      break;
-	   case 'f' :
-	      if_indent         = atoi(optarg);
-	      break;
-	   case 'F' :   
-	      forall_indent     = atoi(optarg);
-	      break;
-	   case 'h' :
-	      usage(0);
-	      return 0;
-	      break;
-	   case 'H':
-	      usage(1);
-	      return 0;
-	      break;
-	   case 'i' :
-	      if      (std::string(optarg) == "fixed")
-	         input_format = FIXED;
-	      else if (std::string(optarg) == "free")
-	         input_format = FREE;
-	      else if (std::string(optarg) == "auto")
-	         input_format = determine_fix_or_free(1);
-	      else
-	      {
-		 all_indent        = atoi(optarg);
-		 set_default_indents();
-	      }
-	      D(O("i flag:");O(optarg);O(" format:");
-	        if (input_format == FIXED) O("fixed")
-		if (input_format == FREE)  O("free")
-		)
-	      break;
-	   case 'I' :
-	      if (optarg[0] == 'a')
-	         auto_firstindent = 1;
-	      else
-	      {
-		 start_indent     = atoi(optarg);
-		 auto_firstindent = 0;
-	      }
-	      break;
-	   case 'j' :
-	      interface_indent  = atoi(optarg);
-	      break;
-	   case 'k' :
-	      if (optarg[0] == '-')
-		 indent_cont = 0;
-	      else
-		 cont_indent = atoi(optarg);
-	      break;
-	   case 'l' :
-	      if(std::string(optarg) == "astindent")
-		 last_indent_only = 1;
-	      else if(std::string(optarg) == "astusable")
-		 last_usable_only = 1;
-	      else
-		 label_left     = (atoi(optarg) != 0);
-	      break;
-	   case 'L' :
-	      input_line_length = atoi(optarg);
-	      input_format_gnu  = (optarg[strlen(optarg)-1] == 'g');
-	   case 'm' :
-	      module_indent     = atoi(optarg);
-	      break;
-	   case 'o' :
-	      if(std::string(optarg) == "free")
-	         output_format = FREE;
-	      break;
-	   case 'q' :
-	      only_fix_free = 1;
-	      break;
-	   case 'Q':
-	      // return 2 if free, 4 if fixed
-	      // not dodumented, maybe useful in the future
-	      return_format = 1;
-	      break;
-	   case 'r' :
-	      routine_indent    = atoi(optarg);
-	      break;
-	   case 'R':
-	      switch(optarg[0])
-	      {
-	         case 'R' :
-		    upcase_routine_type = 1;
-		 case 'r' :
-		    refactor_routines = 1;
-		    break;
-	      }
-	      break;
-	   case 's' :
-	      select_indent     = atoi(optarg);
-	      break;
-	   case 't' :
-	      type_indent       = atoi(optarg);
-	      break;
-	   case 'v' :
-	      std::cout << "findent version "<<VERSION<<std::endl;
-	      return 0;
-	      break;
-	   case 'w' :
-	      where_indent      = atoi(optarg);
-	      break;
-	   case 'x' :
-	      critical_indent   = atoi(optarg);
-	      break;
-	 }
+      {
+	 case 'a' :
+	    associate_indent  = atoi(optarg);
+	    break;
+	 case 'b' :
+	    block_indent      = atoi(optarg);
+	    break;
+	 case 'c' :
+	    case_indent       = atoi(optarg);
+	    break;
+	 case 'C' :
+	    if(optarg[0] == '-')
+	       indent_contain = 0;
+	    else
+	       contains_indent   = atoi(optarg);
+	    break;
+	 case 'd' :
+	    do_indent         = atoi(optarg);
+	    break;
+	 case 'e' :
+	    entry_indent      = atoi(optarg);
+	    break;
+	 case 'E' :
+	    enum_indent       = atoi(optarg);
+	    break;
+	 case 'f' :
+	    if_indent         = atoi(optarg);
+	    break;
+	 case 'F' :   
+	    forall_indent     = atoi(optarg);
+	    break;
+	 case 'h' :
+	    usage(0);
+	    return 0;
+	    break;
+	 case 'H':
+	    usage(1);
+	    return 0;
+	    break;
+	 case 'i' :
+	    if      (std::string(optarg) == "fixed")
+	       input_format = FIXED;
+	    else if (std::string(optarg) == "free")
+	       input_format = FREE;
+	    else if (std::string(optarg) == "auto")
+	       input_format = determine_fix_or_free(1);
+	    else
+	    {
+	       all_indent        = atoi(optarg);
+	       set_default_indents();
+	    }
+	    D(O("i flag:");O(optarg);O(" format:");
+		  if (input_format == FIXED) O("fixed")
+		  if (input_format == FREE)  O("free")
+	     )
+	       break;
+	 case 'I' :
+	    if (optarg[0] == 'a')
+	       auto_firstindent = 1;
+	    else
+	    {
+	       start_indent     = atoi(optarg);
+	       auto_firstindent = 0;
+	    }
+	    break;
+	 case 'j' :
+	    interface_indent  = atoi(optarg);
+	    break;
+	 case 'k' :
+	    if (optarg[0] == '-')
+	       indent_cont = 0;
+	    else
+	       cont_indent = atoi(optarg);
+	    break;
+	 case 'l' :
+	    if(std::string(optarg) == "astindent")
+	       last_indent_only = 1;
+	    else if(std::string(optarg) == "astusable")
+	       last_usable_only = 1;
+	    else
+	       label_left     = (atoi(optarg) != 0);
+	    break;
+	 case 'L' :
+	    input_line_length = atoi(optarg);
+	    input_format_gnu  = (optarg[strlen(optarg)-1] == 'g');
+	 case 'm' :
+	    module_indent     = atoi(optarg);
+	    break;
+	 case 'o' :
+	    if(std::string(optarg) == "free")
+	       output_format = FREE;
+	    break;
+	 case 'q' :
+	    only_fix_free = 1;
+	    break;
+	 case 'Q':
+	    // return 2 if free, 4 if fixed
+	    // not dodumented, maybe useful in the future
+	    return_format = 1;
+	    break;
+	 case 'r' :
+	    routine_indent    = atoi(optarg);
+	    break;
+	 case 'R':
+	    switch(optarg[0])
+	    {
+	       case 'R' :
+		  upcase_routine_type = 1;
+	       case 'r' :
+		  refactor_routines = 1;
+		  break;
+	    }
+	    break;
+	 case 's' :
+	    select_indent     = atoi(optarg);
+	    break;
+	 case 't' :
+	    type_indent       = atoi(optarg);
+	    break;
+	 case 'v' :
+	    std::cout << "findent version "<<VERSION<<std::endl;
+	    return 0;
+	    break;
+	 case 'w' :
+	    where_indent      = atoi(optarg);
+	    break;
+	 case 'x' :
+	    critical_indent   = atoi(optarg);
+	    break;
+      }
 
    handle_reading_from_tty();
 
@@ -357,17 +357,16 @@ int what_to_return()
 // using findent.
 void handle_last_usable_only()
 {
-   int usable_line=1;
+   int usable_line = 1;
+   std::stack<int> usables;     // to store usable lines
+   std::stack<int> prevs;       // to store prev-usable lines
+
    init_indent();
-   int ifcounter = 0;
    while(1)
    {
       int prev       = num_lines;
       bool usable    = 0;
-      bool elsefound = 0;
       get_full_statement();
-      if (ifcounter == 0)
-      {
 	 line_prep p(full_statement);
 	 propstruct props = parseline(p);
 	 switch (props.kind)
@@ -386,7 +385,6 @@ void handle_last_usable_only()
 	 }
 	 if (usable)
 	    usable_line = prev+1;
-      }
       while (!lines.empty())
       {
 	 // lines in a #if block are not to be used,
@@ -397,19 +395,34 @@ void handle_last_usable_only()
 	    sl = "#" + ltrim(sl.substr(1));
 	    if (sl.find("#if") == 0)   // covers #if #ifdef #ifndef
 	    {
-	       ifcounter ++;
-	       elsefound = 0;
+	       usables.push(usable_line);
+	       prevs.push(prev);
+	    }
+	    if (sl.find("#elif") == 0)
+	    {
+	       if(!usables.empty())
+	       {
+		  usable_line = usables.top();
+		  prev        = prevs.top();
+	       }
 	    }
 	    if (sl.find("#else") == 0)
 	    {
-	       ifcounter = std::max(ifcounter-1,0);
-	       elsefound  = 1;
+	       if(!usables.empty())
+	       {
+		  usable_line = usables.top();
+		  usables.pop();
+		  prev = prevs.top();
+		  prevs.pop();
+	       }
 	    }
 	    if (sl.find("#endif") == 0)
-	       if (!elsefound)
+	       if (!usables.empty())
 	       {
-		  ifcounter = std::max(ifcounter-1,0);
-		  elsefound = 0;
+		  usable_line = usables.top();
+		  usables.pop();
+		  prev = prevs.top();
+		  prevs.pop();
 	       }
 	 }
 	 lines.pop_front();
@@ -588,7 +601,7 @@ void indent_and_output()
 	    if (!indent_handled)
 	       cur_indent = pop_indent();
 	    D(O(whatprop(cur_rprop));O(cur_rprop.name););
-	       pop_rprops();
+	    pop_rprops();
 	    break;
 	 case PROCEDURE:  // in fact: moduleprocedure
 	    D(O("PROCEDURE");O(whatprop(props));O(props.name););
@@ -687,8 +700,8 @@ void handle_reading_from_tty()
 }
 
 void init_indent()
-// fills the indent-stack until indent 0
-// if all_indent <= 0: build indent_stack with a number of start_indent's
+   // fills the indent-stack until indent 0
+   // if all_indent <= 0: build indent_stack with a number of start_indent's
 {
    D(O("init_indent");O(indent.size());O("start_indent:");O(start_indent));
    while(!indent.empty())
@@ -713,35 +726,35 @@ void init_indent()
 
 std::string trim(const std::string& str)
 {
-    const std::string whitespace = " \t";
-    const size_t strBegin = str.find_first_not_of(whitespace);
-    if (strBegin == std::string::npos)
-        return ""; // no content
+   const std::string whitespace = " \t";
+   const size_t strBegin = str.find_first_not_of(whitespace);
+   if (strBegin == std::string::npos)
+      return ""; // no content
 
-    const size_t strEnd = str.find_last_not_of(whitespace);
-    const size_t strRange = strEnd - strBegin + 1;
+   const size_t strEnd = str.find_last_not_of(whitespace);
+   const size_t strRange = strEnd - strBegin + 1;
 
-    return str.substr(strBegin, strRange);
+   return str.substr(strBegin, strRange);
 }
 
 std::string rtrim(const std::string& str)
 {
-    const std::string whitespace = " \t";
+   const std::string whitespace = " \t";
 
-    const size_t strEnd = str.find_last_not_of(whitespace);
-    if (strEnd == std::string::npos)
-        return ""; // no content
-    return str.substr(0,strEnd+1);
+   const size_t strEnd = str.find_last_not_of(whitespace);
+   if (strEnd == std::string::npos)
+      return ""; // no content
+   return str.substr(0,strEnd+1);
 }
 
 std::string ltrim(const std::string& str)
 {
-    const std::string whitespace = " \t";
-    const size_t strBegin = str.find_first_not_of(whitespace);
-    if (strBegin == std::string::npos)
-        return ""; // no content
+   const std::string whitespace = " \t";
+   const size_t strBegin = str.find_first_not_of(whitespace);
+   if (strBegin == std::string::npos)
+      return ""; // no content
 
-    return str.substr(strBegin);
+   return str.substr(strBegin);
 }
 
 std::string ltab2sp(const std::string& s)
@@ -777,11 +790,11 @@ std::string ltab2sp(const std::string& s)
 	    {
 	       firsttab = 0;
 	       if (si < 6)
-	          // investigate next char: if 1-9, count this tab as 5 spaces
-	          if (s.length() > j+1)
+		  // investigate next char: if 1-9, count this tab as 5 spaces
+		  if (s.length() > j+1)
 		     if (s[j+1] >= '1' && s[j+1] <= '9')
 		     {
-		        si = 5;
+			si = 5;
 			removed++;
 			leader = std::string(5,' ');
 			break;
@@ -790,8 +803,8 @@ std::string ltab2sp(const std::string& s)
 	    si = (si/tabl)*tabl + tabl;
 	    leader = leader + std::string(si - leader.length(),' ');
 	    break;
-	    case '0': case '1': case '2': case '3': case '4':
-	    case '5': case '6': case '7': case '8': case '9':
+	 case '0': case '1': case '2': case '3': case '4':
+	 case '5': case '6': case '7': case '8': case '9':
 	    si++;
 	    removed++;
 	    leader += s[j];
@@ -886,18 +899,18 @@ void get_full_statement()
    {
       if (!linestack.empty())
       {
-         s = linestack.top();
+	 s = linestack.top();
 	 linestack.pop();
 	 D(O("get_full_statement linestack");O(s));
       }
       else if (linebuffer.empty())
       {
-         s = mygetline();
+	 s = mygetline();
 	 D(O("get_full_statement mygetline");O(s));
       }
       else
       {
-         s = linebuffer.front();
+	 s = linebuffer.front();
 	 linebuffer.pop();
 	 if (reading_from_tty && s == ".")
 	    end_of_file = 1;
@@ -913,15 +926,15 @@ void get_full_statement()
 	 char fcts = firstchar(trim(s));
 	 if (input_format == FREE)
 	    nbseen = (fcts != 0 && fcts != '!' && fcts != '#');
-	    //nbseen = (trim(s) != "");
+	 //nbseen = (trim(s) != "");
 
 	 else
-	    {
-	       std::string s1 = ltab2sp(s);
-	       if (s1.length() > 6)
-	          nbseen = (s[0] != 'c' && s[0] != 'C' && s[0] != 'd' && s[0] != 'D' 
-			&& fcts != '!' && s[0] != '*' && fcts != '#');
-	    }
+	 {
+	    std::string s1 = ltab2sp(s);
+	    if (s1.length() > 6)
+	       nbseen = (s[0] != 'c' && s[0] != 'C' && s[0] != 'd' && s[0] != 'D' 
+		     && fcts != '!' && s[0] != '*' && fcts != '#');
+	 }
 	 D(O("get_full_statement fcts");O(fcts);O("s");O(s);O("nbseen");O(nbseen));
 	 if (auto_firstindent && nbseen)
 	 {
@@ -988,9 +1001,9 @@ void handle_prc(std::string s, bool &more)
 }
 
 void handle_free(std::string s, bool &more)
-// adds input line s to full_statement
-// more 1: more lines are to expected
-//        0: this line is complete
+   // adds input line s to full_statement
+   // more 1: more lines are to expected
+   //        0: this line is complete
 
 {
    if(end_of_file)
@@ -1067,7 +1080,7 @@ void handle_fixed(std::string s, bool &more)
       // continuation character is in column 6
       // so this needs extra attention:
       if (input_format_gnu) // convert leading tabs to spaces
-         s = ltab2sp(s);
+	 s = ltab2sp(s);
       s = s.substr(0,input_line_length);
    }
 
@@ -1076,7 +1089,7 @@ void handle_fixed(std::string s, bool &more)
       lines.push_back(trim(s));
       olines.push_back(s);
       if (lines.size() ==1)
-         more = 0;   // do not expect continuation lines
+	 more = 0;   // do not expect continuation lines
       else
 	 more = 1;      // but here we do
       return;
@@ -1179,7 +1192,7 @@ int guess_indent(const std::string s)
       std::string s1 = ltab2sp(s);
       si             = s1.find_first_not_of(' ') -6;
       if (si <0)
-         si = 0;
+	 si = 0;
       return si;
    }
 
@@ -1235,20 +1248,20 @@ void output_line()
    {
       if (cur_rprop.kind != 0)
       {
-	// modify first line to match the corrsponding module, subroutine ... line  
-	// find the location of 'end'
+	 // modify first line to match the corrsponding module, subroutine ... line  
+	 // find the location of 'end'
 	 std::string s = stoupper(lines[0]);
-	size_t p = s.find("END");
-	D(O("p");O(p););
-	if ( p != std::string::npos)
-	{
-	   std::string routinetype = whatprop(cur_rprop);
-	   if (upcase_routine_type)
-	      routinetype = stoupper(routinetype);
-	   lines[0] = lines[0].substr(0,p+3)+
-	   " "+routinetype+" "+cur_rprop.name + lines[0].substr(p+3);
-	   D(O(s);O(lines[0]););
-	}
+	 size_t p = s.find("END");
+	 D(O("p");O(p););
+	 if ( p != std::string::npos)
+	 {
+	    std::string routinetype = whatprop(cur_rprop);
+	    if (upcase_routine_type)
+	       routinetype = stoupper(routinetype);
+	    lines[0] = lines[0].substr(0,p+3)+
+	       " "+routinetype+" "+cur_rprop.name + lines[0].substr(p+3);
+	    D(O(s);O(lines[0]););
+	 }
       }
    }
 
@@ -1363,7 +1376,7 @@ void output_line()
       while(!lines.empty())
       {
 	 mycout.reset();
-         lineno++;
+	 lineno++;
 	 std::string s  = lines.front();
 	 std::string os = olines.front();
 	 char ofc       = firstchar(os);
@@ -1389,17 +1402,17 @@ void output_line()
 	    else  // output_format = FREE
 	    {
 	       if (trim(s) == "")
-	          mycout << endline;
+		  mycout << endline;
 	       else
 	       {
-	          switch (firstchar(s))
+		  switch (firstchar(s))
 		  {
-	             // special hack for lines starting with 'd' or 'D'
-	             case 'd' :
+		     // special hack for lines starting with 'd' or 'D'
+		     case 'd' :
 		     case 'D' :
 			mycout << "!" + trim(s) << endline;
 			break;
-	             default:
+		     default:
 			mycout << std::string(std::max(cur_indent,0),' ') << "!" << trim(s.substr(1)) << endline;
 		  }
 	       }
@@ -1410,7 +1423,7 @@ void output_line()
 	    if (output_format == FIXED)
 	    {
 	       mycout << s.substr(0,6);
-	       
+
 	       if(s.length() > 6)
 	       {
 		  bool iscont = (s[5] != ' ' && s[5] != '0');
@@ -1445,7 +1458,7 @@ void output_line()
 
 		  prevquote = fixedmissingquote(prevquote + s);
 	       }
-		        
+
 	       mycout << endline;
 	    }
 	    else  // output_format == FREE
@@ -1464,7 +1477,7 @@ void output_line()
 		  {
 		     if (label_left && labelleng > 0)
 		     {  // put label at start of line
-		        s = trim(s);
+			s = trim(s);
 			std::string label = s.substr(0,labelleng);
 			s    = trim(s.substr(labelleng));
 			mycout << label;
@@ -1484,7 +1497,7 @@ void output_line()
 	       }
 	       else
 	       {
-	          if (s.length() >6)
+		  if (s.length() >6)
 		  {
 		     mycout << std::string(std::max(cur_indent,0),' ');
 		     // try to honor current indentation
@@ -1519,25 +1532,25 @@ void output_line()
 
 	       needamp="";
 	       std::deque<std::string>::iterator it= lines.begin();
-               char prevlchar = 0;
-               bool inpreproc = 0;
+	       char prevlchar = 0;
+	       bool inpreproc = 0;
 	       while(it != lines.end())
 	       {
-                  // if previous lastchar was '\\', do not consider this 
-                  // line, if we are in a preprocessor statement
-                  D(O(*it);O(firstchar(*it));O(lastchar(*it));O(prevlchar);O(inpreproc););
-                  if (inpreproc && prevlchar == '\\')
-                  {
-                     D(O("skipit"););
-                     prevlchar = lastchar(*it);
-                     *it++;
-                     continue;
-                  }
-                  prevlchar = lastchar(*it);
-                  inpreproc = (firstchar(*it) == '#');
+		  // if previous lastchar was '\\', do not consider this 
+		  // line, if we are in a preprocessor statement
+		  D(O(*it);O(firstchar(*it));O(lastchar(*it));O(prevlchar);O(inpreproc););
+		  if (inpreproc && prevlchar == '\\')
+		  {
+		     D(O("skipit"););
+		     prevlchar = lastchar(*it);
+		     *it++;
+		     continue;
+		  }
+		  prevlchar = lastchar(*it);
+		  inpreproc = (firstchar(*it) == '#');
 		  if (!isfixedcmt(*it++))
 		  {
-                     D(O("!isfixedcmt"););
+		     D(O("!isfixedcmt"););
 		     needamp =  '&';
 		     // we have to put an '&' at the end of the line,
 		     // but what if the line ends in a ! comment, as in
@@ -1549,14 +1562,14 @@ void output_line()
 		     // we have to place the '&' like this:
 		     //  x = ' a string ! no comment&
 
-                     // if there is an unterminated string, then:
+		     // if there is an unterminated string, then:
 		     if (prevquote != ' ')
 		     {
-		        outputline = outputline + '&';
+			outputline = outputline + '&';
 			break;
 		     }
 
-                     // the line does not contain an unterminated string,
+		     // the line does not contain an unterminated string,
 		     // is there a !comment outside a string?
 		     // here we need the value of preprevquote:
 
@@ -1576,7 +1589,7 @@ void output_line()
 		     }
 		     else
 		     {
-		        // no !comment, simply put '&' at the end
+			// no !comment, simply put '&' at the end
 			outputline += '&';
 			break;
 		     }
@@ -1617,7 +1630,7 @@ void push_rprops(struct propstruct p)
 }
 
 void init_rprops()
-// empties the rprops-stack
+   // empties the rprops-stack
 {
    D(O("rprops");O(rprops.size()););
    while(!rprops.empty())
@@ -1641,20 +1654,20 @@ struct propstruct top_rprops()
 
 std::string whatprop(struct propstruct p)
 {
-    switch(p.kind)
-    { 
-       case SUBROUTINE:
-       case MODULESUBROUTINE: return("subroutine");
-       case PROGRAM:          return("program");
-       case BLOCKDATA:        return("blockdata");
-       case FUNCTION:
-       case MODULEFUNCTION:   return("function");
-       case MODULE:           return("module");
-       case SUBMODULE:        return("submodule");
-       case PROCEDURE:        return("procedure");
-       default:               return("UNKNOWN");
-    }
- }
+   switch(p.kind)
+   { 
+      case SUBROUTINE:
+      case MODULESUBROUTINE: return("subroutine");
+      case PROGRAM:          return("program");
+      case BLOCKDATA:        return("blockdata");
+      case FUNCTION:
+      case MODULEFUNCTION:   return("function");
+      case MODULE:           return("module");
+      case SUBMODULE:        return("submodule");
+      case PROCEDURE:        return("procedure");
+      default:               return("UNKNOWN");
+   }
+}
 
 int pop_dolabel()
 {
@@ -1858,7 +1871,7 @@ int guess_fixedfree(const std::string s)
    // so I handle that here:
    if (firstchar(s) != '\t')
       if(firstchar(s) < 32)
-         return UNSURE;
+	 return UNSURE;
 
    lexer_set(ltab2sp(s));
    int rc = yylex();
@@ -1877,12 +1890,12 @@ int determine_fix_or_free(const bool store)
       s = mygetline();
       if (end_of_file)
       {
-         // to avoid to have to type twice a dot to
+	 // to avoid to have to type twice a dot to
 	 // end input from terminal:
 
-         if(store && reading_from_tty)
+	 if(store && reading_from_tty)
 	    linebuffer.push(s);       // s == "."
-         break;
+	 break;
       }
 
       if (store)
@@ -1891,7 +1904,7 @@ int determine_fix_or_free(const bool store)
       rc = guess_fixedfree(s);
       switch(rc)
       {
-         case UNSURE : 
+	 case UNSURE : 
 	    D(O(s);O("UNSURE"););
 	    break;
 	 case PROBFREE : 
@@ -1909,8 +1922,8 @@ int determine_fix_or_free(const bool store)
 }
 
 std::string handle_dos(const std::string s)
-//  determine if the input is dos format:
-// side effect: sets endline if not already been set
+   //  determine if the input is dos format:
+   // side effect: sets endline if not already been set
 {
    std::string sl;
    sl = s;
@@ -1920,7 +1933,7 @@ std::string handle_dos(const std::string s)
       if (sl != "" && lastchar(sl) == '\r')
       {
 	 endline = "\r\n";
-         D(O(endline.length()););
+	 D(O(endline.length()););
       }
       endline_set = 1;
    }
@@ -1928,11 +1941,11 @@ std::string handle_dos(const std::string s)
       sl.erase(sl.length()-1);
    return sl;
 }
- 
+
 bool isfixedcmt(const std::string s)
 {
-// returns 1 if this is a fixed empty line or fixed comment line or preprocessor line
-//                                         or debug line ('d' or 'D' in column 1)
+   // returns 1 if this is a fixed empty line or fixed comment line or preprocessor line
+   //                                         or debug line ('d' or 'D' in column 1)
    if (s == "" || trim(s) == "")
       return 1;
    char c = firstchar(s);
@@ -1984,8 +1997,6 @@ char fixedmissingquote(const std::string s)
 //
 // So, after #endif, the indentation is taken from the code after #else
 //     or, if there is no #else, from the code before the #if{,def,ndef}
-
-// something like this has been done for the rprops stack
 
 void handle_pre(const std::string s)
 {
