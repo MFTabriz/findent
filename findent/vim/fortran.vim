@@ -22,7 +22,7 @@ endif
 
 " The location of findent:
 if !exists("g:findent")
-   let g:findent = "/usr/bin/findent"
+   let g:findent = "findent"
 endif
 
 if !exists("b:use_findent")
@@ -160,7 +160,11 @@ function! Findent_set_getindent()
       let b:have_findent_getindent = 0
    else
       setlocal indentexpr=Findent_getindent()
-      setlocal indentkeys=*<Return>,*<Up>,*<Down>,*<Esc>,!^F,!<Tab>,o,O
+      setlocal indentkeys=*<Return>,*<Up>,*<Down>,*<Esc>,!^F,o,O,0#
+      " fixed format: if first character is tab, indent the line
+      if b:fortran_format == "fixed"
+	 setlocal indentkeys+=!0<Tab>
+      endif
       let b:have_findent_getindent = 1
    endif
 endfunction
@@ -181,15 +185,6 @@ function! Get_free_or_fixed_default()
       endif
    endif
    return "fixed"
-endfunction
-
-function! Get_fortran_format()
-   " returns the value of b:fortran_format
-   return b:fortran_format
-endfunction
-
-function! Get_findent_use_whole_buffer()
-   return b:findent_use_whole_buffer
 endfunction
 
 "======================================================================================
@@ -240,9 +235,6 @@ else
    let b:fortran_fixed_source = 1
    let b:fortran_free_source = 0
 endif
-
-setlocal statusline=%<%t\ %m\ %r\ %y\ %{Get_fortran_format()}\ %{Get_findent_use_whole_buffer()}%=%l\ %c\ %LL\ %P
-nnoremap <buffer> <LocalLeader>w :call Findent_use_wb_toggle()<Return>
 
 call Findent_set_indentprog()
 
