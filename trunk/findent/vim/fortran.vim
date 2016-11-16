@@ -48,9 +48,9 @@ endif
 " get fortran format from extension ext
 " return "free", "fixed" or "unknown"
 function! Get_format_from_extension(ext)
-   if a:ext =~? '^f$\|for\|fpp\|ftn'
+   if a:ext =~? '^f$\|^for$\|^fpp$\|^ftn$\|^fortran$\|^f77$'
       let format = "fixed"
-   elseif a:ext =~? 'f90\|f95\|f03\|f08'
+   elseif a:ext =~? '^f90$\|^f95$\|^f03$\|^f08$'
       let format = "free"
    else
       let format = "unknown"
