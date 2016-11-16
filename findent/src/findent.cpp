@@ -11,6 +11,7 @@
 #include "version.h"
 #include "parser.h"
 #include "simpleostream.h"
+#include "pre_analyzer.h"
 extern "C" FILE *yyin;
 std::string mygetline();
 void get_full_statement();
@@ -72,8 +73,9 @@ bool nbseen;                                 // true if non-blank-line is seen
 std::stack<int> indent;                      // to store indents
 std::stack<std::stack <int> > indent_stack;  // to store indent stack
 std::stack<bool> nbseen_stack;               // to store nbseen
-std::stack<bool> pre_stack;                  // to note if there is an #else after #if for indenting
 std::stack<bool> prep_stack;                 // to note if there is an #else after #if for routines
+
+pre_analyzer prea;
 
 struct propstruct prev_props;
 std::stack<struct propstruct> rprops;     // to store routines (module, subroutine ...)
@@ -360,6 +362,7 @@ void handle_last_usable_only()
    int usable_line = 1;
    std::stack<int> usables;     // to store usable lines
    std::stack<int> prevs;       // to store prev-usable lines
+   pre_analyzer prea;
 
    init_indent();
    while(1)
@@ -367,56 +370,44 @@ void handle_last_usable_only()
       int prev       = num_lines;
       bool usable    = 0;
       get_full_statement();
-	 line_prep p(full_statement);
-	 propstruct props = parseline(p);
-	 switch (props.kind)
-	 {
-	    case BLANK:
-	    case CASE:
-	    case CONTAINS:
-	    case ENTRY:
-	    case ELSE:
-	    case ELSEIF:
-	    case ELSEWHERE:
-	       break;
-	    default: 
-	       usable = 1;
-	       break;
-	 }
-	 if (usable)
-	    usable_line = prev+1;
+      line_prep p(full_statement);
+      propstruct props = parseline(p);
+      switch (props.kind)
+      {
+	 case BLANK:
+	 case CASE:
+	 case CONTAINS:
+	 case ENTRY:
+	 case ELSE:
+	 case ELSEIF:
+	 case ELSEWHERE:
+	    break;
+	 default: 
+	    usable = 1;
+	    break;
+      }
+      if (usable)
+	 usable_line = prev+1;
       while (!lines.empty())
       {
-	 // lines in a #if block are not to be used,
-	 // unless they follow the last #else
-	 std::string sl = trim(lines.front());
-	 if (firstchar(sl) == '#')
+	 int ifelse = prea.analyze(trim(lines.front()));
+	 switch(ifelse)
 	 {
-	    sl = "#" + ltrim(sl.substr(1));
-	    if (sl.find("#if") == 0)   // covers #if #ifdef #ifndef
-	    {
+	    case pre_analyzer::PRE_IF:
 	       usables.push(usable_line);
 	       prevs.push(prev);
-	    }
-	    if (sl.find("#elif") == 0)
-	    {
+	       break;
+
+	    case pre_analyzer::PRE_ELIF:
 	       if(!usables.empty())
 	       {
 		  usable_line = usables.top();
 		  prev        = prevs.top();
 	       }
-	    }
-	    if (sl.find("#else") == 0)
-	    {
-	       if(!usables.empty())
-	       {
-		  usable_line = usables.top();
-		  usables.pop();
-		  prev = prevs.top();
-		  prevs.pop();
-	       }
-	    }
-	    if (sl.find("#endif") == 0)
+	       break;
+
+	    case pre_analyzer::PRE_ELSE:
+	    case pre_analyzer::PRE_ENDIF:
 	       if (!usables.empty())
 	       {
 		  usable_line = usables.top();
@@ -424,6 +415,13 @@ void handle_last_usable_only()
 		  prev = prevs.top();
 		  prevs.pop();
 	       }
+	       break;
+
+	    case pre_analyzer::PRE_ENDIFE:
+	       break;
+
+	    case pre_analyzer::PRE_NONE:
+	       break;
 	 }
 	 lines.pop_front();
 	 olines.pop_front();
@@ -2005,85 +2003,91 @@ void handle_pre(const std::string s)
    if (s == "" || firstchar(s) != '#')
       return;
 
-   std::string sl = "#" + ltrim(s.substr(1));
-   if (sl.find("#if") == 0)   // covers #if #ifdef #ifndef
+   int ifelse = prea.analyze(s);
+
+   switch(ifelse)
    {
-      indent_stack.push(indent);
-      nbseen_stack.push(nbseen);
-      pre_stack.push(0);
-      rprops_stack.push(rprops);
-      prep_stack.push(0);
-      dolabels_stack.push(dolabels);
-   }
-   else if (sl.find("#elif") == 0)
-   {
-      if (!indent_stack.empty())
-	 indent = indent_stack.top();
-      if (!nbseen_stack.empty())
-	 nbseen = nbseen_stack.top();
-      if (!rprops_stack.empty())
-	 rprops = rprops_stack.top();
-      if (!dolabels_stack.empty())
-	 dolabels = dolabels_stack.top();
-   }
-   else if (sl.find("#else") == 0)
-   {
-      if (!indent_stack.empty())
-      {
-	 indent = indent_stack.top();
-	 indent_stack.pop();
-	 pre_stack.pop();
-	 pre_stack.push(1);
-      }
-      if (!nbseen_stack.empty())
-      {
-	 nbseen = nbseen_stack.top();
-	 nbseen_stack.pop();
-      }
-      if (!rprops_stack.empty())
-      {
-	 rprops = rprops_stack.top();
-	 rprops_stack.pop();
-	 prep_stack.pop();
-	 prep_stack.push(1);
-      }
-      if (!dolabels_stack.empty())
-      {
-	 dolabels = dolabels_stack.top();
-	 dolabels_stack.pop();
-      }
-   }
-   else if (sl.find("#endif") == 0)
-   {
-      if (!indent_stack.empty())
-      {
-	 if (!pre_stack.top())
+      case pre_analyzer::PRE_IF:
+	 indent_stack.push(indent);
+	 nbseen_stack.push(nbseen);
+	 rprops_stack.push(rprops);
+	 prep_stack.push(0);
+	 dolabels_stack.push(dolabels);
+	 break;
+
+      case pre_analyzer::PRE_ELIF:
+	 if (!indent_stack.empty())
+	    indent = indent_stack.top();
+	 if (!nbseen_stack.empty())
+	    nbseen = nbseen_stack.top();
+	 if (!rprops_stack.empty())
+	    rprops = rprops_stack.top();
+	 if (!dolabels_stack.empty())
+	    dolabels = dolabels_stack.top();
+	 break;
+
+      case pre_analyzer::PRE_ELSE:
+	 if (!indent_stack.empty())
 	 {
 	    indent = indent_stack.top();
 	    indent_stack.pop();
-	    if (!nbseen_stack.empty())
-	    {
-	       nbseen = nbseen_stack.top();
-	       nbseen_stack.pop();
-	    }
-	    if (!dolabels_stack.empty())
-	    {
-	       dolabels = dolabels_stack.top();
-	       dolabels_stack.pop();
-	    }
 	 }
-	 pre_stack.pop();
-      }
-      if (!rprops_stack.empty())
-      {
-	 if (!prep_stack.top())
+	 if (!nbseen_stack.empty())
+	 {
+	    nbseen = nbseen_stack.top();
+	    nbseen_stack.pop();
+	 }
+	 if (!rprops_stack.empty())
 	 {
 	    rprops = rprops_stack.top();
 	    rprops_stack.pop();
+	    prep_stack.pop();
+	    prep_stack.push(1);
 	 }
-	 prep_stack.pop();
-      }
+	 if (!dolabels_stack.empty())
+	 {
+	    dolabels = dolabels_stack.top();
+	    dolabels_stack.pop();
+	 }
+	 break;
+
+      case pre_analyzer::PRE_ENDIF:
+	 if (!indent_stack.empty())
+	 {
+	    indent = indent_stack.top();
+	    indent_stack.pop();
+	 }
+	 if (!nbseen_stack.empty())
+	 {
+	    nbseen = nbseen_stack.top();
+	    nbseen_stack.pop();
+	 }
+	 if (!dolabels_stack.empty())
+	 {
+	    dolabels = dolabels_stack.top();
+	    dolabels_stack.pop();
+	 }
+	 // not forgotten: break;
+      case pre_analyzer::PRE_ENDIFE:
+	 // TODO: have to look into this
+	 if (!rprops_stack.empty())
+	 {
+	    if (!prep_stack.empty())
+	    {
+	       if (!prep_stack.top())
+	       {
+		  rprops = rprops_stack.top();
+		  rprops_stack.pop();
+	       }
+	       prep_stack.pop();
+	    }
+	 }
+	 break;
+
+      default:
+	 break;
    }
+
    D(O("pre after");O(cur_indent);O(top_indent()););
    mycout << s << endline;
    char lchar = lastchar(s);
