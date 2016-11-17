@@ -20,6 +20,7 @@ findent-2.7.0:
 	   - make fixed ! comment output as in free
 	   - better initialization of indents if startindent>0
 	   - -Innn now sets auto_firstindent = 0
+	   - better #if ... handling
 	wfindent:
 	   - add code to look for findent in default PATH if
 	     the given location (FINDENT=) does not work

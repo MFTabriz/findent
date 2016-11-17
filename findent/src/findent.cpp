@@ -20,11 +20,15 @@ void remove_trailing_comment(std::string &s);
 void handle_fixed(std::string s, bool &more);
 void handle_prc(std::string s, bool &more);
 void output_line();
+
 int pop_indent();
 int top_indent();
 void push_indent(int p);
 void init_indent();
 void handle_last_usable_only();
+void push_all(void);
+void top_all(void);
+void pop_all(void);
 
 std::string whatprop(struct propstruct p);
 std::string stoupper(const std::string s);
@@ -32,7 +36,6 @@ char firstchar(const std::string s);
 char lastchar(const std::string s);
 
 void push_rprops(struct propstruct p);
-void init_rprops();
 struct propstruct pop_rprops();
 struct propstruct top_rprops();
 const  struct propstruct empty_rprop={0,"","",""};
@@ -73,7 +76,6 @@ bool nbseen;                                 // true if non-blank-line is seen
 std::stack<int> indent;                      // to store indents
 std::stack<std::stack <int> > indent_stack;  // to store indent stack
 std::stack<bool> nbseen_stack;               // to store nbseen
-std::stack<bool> prep_stack;                 // to note if there is an #else after #if for routines
 
 pre_analyzer prea;
 
@@ -393,12 +395,12 @@ void handle_last_usable_only()
 	 int ifelse = prea.analyze(trim(lines.front()));
 	 switch(ifelse)
 	 {
-	    case pre_analyzer::PRE_IF:
+	    case pre_analyzer::IF_pre:
 	       usables.push(usable_line);
 	       prevs.push(prev);
 	       break;
 
-	    case pre_analyzer::PRE_ELIF:
+	    case pre_analyzer::ELIF_pre:
 	       if(!usables.empty())
 	       {
 		  usable_line = usables.top();
@@ -406,8 +408,8 @@ void handle_last_usable_only()
 	       }
 	       break;
 
-	    case pre_analyzer::PRE_ELSE:
-	    case pre_analyzer::PRE_ENDIF:
+	    case pre_analyzer::ELSE_pre:
+	    case pre_analyzer::ENDIF_pre:
 	       if (!usables.empty())
 	       {
 		  usable_line = usables.top();
@@ -417,10 +419,10 @@ void handle_last_usable_only()
 	       }
 	       break;
 
-	    case pre_analyzer::PRE_ENDIFE:
+	    case pre_analyzer::ENDIFE_pre:
 	       break;
 
-	    case pre_analyzer::PRE_NONE:
+	    case pre_analyzer::NONE_pre:
 	       break;
 	 }
 	 lines.pop_front();
@@ -1610,7 +1612,6 @@ int pop_indent()
 
 int top_indent()
 {
-   //D(O("top_indent size:");O(indent.size());O("top:");O(indent.top()));
    if (indent.empty())
       return 0;
    return indent.top();
@@ -1625,14 +1626,6 @@ void push_indent(int p)
 void push_rprops(struct propstruct p)
 {
    rprops.push(p);
-}
-
-void init_rprops()
-   // empties the rprops-stack
-{
-   D(O("rprops");O(rprops.size()););
-   while(!rprops.empty())
-      rprops.pop();
 }
 
 struct propstruct pop_rprops()
@@ -1981,6 +1974,37 @@ char fixedmissingquote(const std::string s)
    return ' ';
 }
 
+void push_all()
+{
+   indent_stack.push(indent);
+   nbseen_stack.push(nbseen);
+   rprops_stack.push(rprops);
+   dolabels_stack.push(dolabels);
+}
+
+void top_all()
+{
+   if (!indent_stack.empty())
+      indent = indent_stack.top();
+   if (!nbseen_stack.empty())
+      nbseen = nbseen_stack.top();
+   if (!rprops_stack.empty())
+      rprops = rprops_stack.top();
+   if (!dolabels_stack.empty())
+      dolabels = dolabels_stack.top();
+}
+
+void pop_all()
+{
+   if (!indent_stack.empty())
+      indent_stack.pop();
+   if (!nbseen_stack.empty())
+      nbseen_stack.pop();
+   if (!rprops_stack.empty())
+      rprops_stack.pop();
+   if (!dolabels_stack.empty())
+      dolabels_stack.pop();
+}
 // #if, #ifdef, #ifndef, #else, #elif and #endif
 
 // after an #if{,def,ndef} the indent stack is pushed
@@ -2007,81 +2031,21 @@ void handle_pre(const std::string s)
 
    switch(ifelse)
    {
-      case pre_analyzer::PRE_IF:
-	 indent_stack.push(indent);
-	 nbseen_stack.push(nbseen);
-	 rprops_stack.push(rprops);
-	 prep_stack.push(0);
-	 dolabels_stack.push(dolabels);
+      case pre_analyzer::IF_pre:
+	 push_all();
 	 break;
 
-      case pre_analyzer::PRE_ELIF:
-	 if (!indent_stack.empty())
-	    indent = indent_stack.top();
-	 if (!nbseen_stack.empty())
-	    nbseen = nbseen_stack.top();
-	 if (!rprops_stack.empty())
-	    rprops = rprops_stack.top();
-	 if (!dolabels_stack.empty())
-	    dolabels = dolabels_stack.top();
+      case pre_analyzer::ELIF_pre:
+	 top_all();
 	 break;
 
-      case pre_analyzer::PRE_ELSE:
-	 if (!indent_stack.empty())
-	 {
-	    indent = indent_stack.top();
-	    indent_stack.pop();
-	 }
-	 if (!nbseen_stack.empty())
-	 {
-	    nbseen = nbseen_stack.top();
-	    nbseen_stack.pop();
-	 }
-	 if (!rprops_stack.empty())
-	 {
-	    rprops = rprops_stack.top();
-	    rprops_stack.pop();
-	    prep_stack.pop();
-	    prep_stack.push(1);
-	 }
-	 if (!dolabels_stack.empty())
-	 {
-	    dolabels = dolabels_stack.top();
-	    dolabels_stack.pop();
-	 }
+      case pre_analyzer::ELSE_pre:
+	 top_all();
+      case pre_analyzer::ENDIF_pre:
+	 pop_all();
 	 break;
 
-      case pre_analyzer::PRE_ENDIF:
-	 if (!indent_stack.empty())
-	 {
-	    indent = indent_stack.top();
-	    indent_stack.pop();
-	 }
-	 if (!nbseen_stack.empty())
-	 {
-	    nbseen = nbseen_stack.top();
-	    nbseen_stack.pop();
-	 }
-	 if (!dolabels_stack.empty())
-	 {
-	    dolabels = dolabels_stack.top();
-	    dolabels_stack.pop();
-	 }
-	 // not forgotten: break;
-      case pre_analyzer::PRE_ENDIFE:
-	 // TODO: have to look into this
-	 if (!rprops_stack.empty())
-	 {
-	    if (!prep_stack.empty())
-	    {
-	       if (!prep_stack.top())
-	       {
-		  rprops = rprops_stack.top();
-		  rprops_stack.pop();
-	       }
-	       prep_stack.pop();
-	    }
-	 }
+      case pre_analyzer::ENDIFE_pre:
 	 break;
 
       default:
