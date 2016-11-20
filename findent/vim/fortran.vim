@@ -116,7 +116,7 @@ endfunction
 function! Findent_set_flags()
    if !b:have_findent && !b:have_findent_getindent
       return
-   endifinitialize.F90
+   endif
    let old = b:findent_flags
    let b:findent_flags = input("findent flags:",b:findent_flags)
    if b:have_findent
@@ -170,7 +170,12 @@ function! Findent_set_getindent()
 endfunction
 
 function! Findent_use_wb_toggle()
-   let b:findent_use_whole_buffer = !b:findent_use_whole_buffer
+   if b:use_findent_indentexpr
+      let b:findent_use_whole_buffer = !b:findent_use_whole_buffer
+      echomsg "toggled 'use whole buffer'"
+   else
+      echomsg "not using findent for indentexpr"
+   endif
 endfunction
 
 function! Get_free_or_fixed_default()
@@ -187,7 +192,7 @@ function! Get_free_or_fixed_default()
    return "fixed"
 endfunction
 
-"======================================================================================
+"=========================================================================
 
 if exists("g:findent_flags")
    let b:findent_flags = g:findent_flags

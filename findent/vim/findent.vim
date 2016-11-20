@@ -5,6 +5,12 @@
 "Licence: fair
 "Date: nov 2016
 
+if exists("g:use_findent")
+   if !g:use_findent
+      finish
+   endif
+endif
+
 filetype plugin indent on
 
 " set default indent flag, if not already set
@@ -41,7 +47,9 @@ function! Get_findent_use_whole_buffer()
    " b:findent_use_whole_buffer defined in auto/indent/fortran.vim
    if exists("b:findent_use_whole_buffer")
       if b:findent_use_whole_buffer
-	 return "wb"
+	 if b:use_findent_indentexpr
+	    return "wb"
+	 endif
       endif
    endif
    return ""
@@ -86,7 +94,7 @@ augroup fortfiletype
    autocmd Filetype fortran setlocal statusline=%<%t\ %m\ %r\ %y\ %{Get_fortran_format()}\ %{Get_findent_use_whole_buffer()}%=%l\ %c\ %LL\ %P
 
    " define toggle: use whole buffer for indenting or not
-   autocmd Filetype fortran nnoremap <buffer> <LocalLeader>w :call Findent_use_wb_toggle()<Return>:echomsg "toggled 'use whole buffer'"<Return>
+   autocmd Filetype fortran nnoremap <buffer> <LocalLeader>w :call Findent_use_wb_toggle()<Return>
 
    " make syntax aware of above
    autocmd Filetype fortran syntax on
