@@ -74,6 +74,7 @@ Examples: $ findent < in.f90 > out.f90
      in (g)vim:
 	:help equalprg
 	:help indentexpr
+     vim/README
      and the comments in the files vim/findent.vim and vim/fortran.vim
 
 
