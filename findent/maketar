@@ -16,6 +16,9 @@ make clean                                         || exit 1
 make install-strip                                 || exit 1
 version=`./getversion`                             || exit 1
 echo "version = $version"
+if [ -e debian/changelog ]; then
+   sed -i "1s/(.*)/($version)/" debian/changelog   || exit 1
+fi
 make distclean                                     || exit 1
 cd ..                                              || exit 1
 mkdir -p versions                                  || exit 1
@@ -24,6 +27,6 @@ cd versions                                        || exit 1
 unix2dos README                                    || exit 1
 rm -rf "findent-$version"
 cp -r $curdir "findent-$version"                   || exit 1
-tar zcf "findent-$version.tgz" "findent-$version"  || exit 1
+tar zcf "findent-$version.tar.gz" "findent-$version"  || exit 1
 rm -rf "findent-$version"
 echo "$0 done"
