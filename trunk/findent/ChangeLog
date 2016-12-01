@@ -1,4 +1,6 @@
 $Id$
+findent-2.7.1:
+	maketar: adapt version in debian/changelog
 findent-2.7.0:
 	findent.cpp:
 	   - add option -lastindent to output only the indentation level
