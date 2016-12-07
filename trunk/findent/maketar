@@ -16,10 +16,12 @@ make clean                                         || exit 1
 make install-strip                                 || exit 1
 version=`./getversion`                             || exit 1
 echo "version = $version"
-if [ -e debian/changelog ]; then
-   sed -i "1s/(.*)/($version)/" debian/changelog   || exit 1
-fi
+sed -i "1s/(.*)/($version)/" debian/changelog      || exit 1
+echo 'running svn commit ...'
+svn commit -m 'adapted debian/changelog' \
+              debian/changelog
 make distclean                                     || exit 1
+dh clean                                           || exit 1
 cd ..                                              || exit 1
 mkdir -p versions                                  || exit 1
 cp $curdir/README.1st versions/README              || exit 1
@@ -27,6 +29,7 @@ cd versions                                        || exit 1
 unix2dos README                                    || exit 1
 rm -rf "findent-$version"
 cp -r $curdir "findent-$version"                   || exit 1
-tar zcf "findent-$version.tar.gz" "findent-$version"  || exit 1
-rm -rf "findent-$version"
+tar zcf "findent-$version.tar.gz" \
+        "findent-$version"                         || exit 1
+rm -rf "findent-$version"                          || exit 1
 echo "$0 done"
