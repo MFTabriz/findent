@@ -1,27 +1,29 @@
 #!/bin/bash
-curdir=$PWD
-version=$(./getversion)             || exit 1
-package=findent
-dir=$package
-debiandir=${package}-${version}-debian
-mkdir -p ../debian
-cd ../debian                        || exit 1
-rm -rf $debiandir
-mkdir -p $debiandir                 || exit 1
-cd $debiandir                       || exit 1
-
-mkdir -p $dir                       || exit 1
-cd $dir                             || exit 1
-cp -r $curdir/* .                   || exit 1
-
+# $Id: makedeb 152 2016-12-01 15:11:07Z willem_vermin $
+dir=`pwd`                                     || exit 1
+version=$(./getversion)                       || exit 1
+arch=`dpkg --print-architecture`              || exit 1
+tar=findent-$version.tar.gz                   || exit 1
+export DEB_BUILD_MAINT_OPTIONS=hardening=+all
 sed -i "1s/(.*)/($version)/" debian/changelog || exit 1
+echo 'running svn commit ...'
+svn commit -m 'adapted debian/changelog' \
+              debian/changelog
+#dpkg-buildpackage -us -uc                     || exit 1
+#debuild -b || exit 1
+debuild  || exit 1
+#debsign                                       || exit 1
+cd ..                                         || exit 1
+gpg --verify findent_${version}_$arch.changes || exit 1
+gpg --verify findent_$version.dsc             || exit 1
+#echo "running lintian ..."
+#lintian -i -I findent_$version*.changes       || exit 1
+echo "running debc ..."
+debc findent_${version}_$arch.changes         || exit 1
+echo "running debi ..."
+sudo debi findent_${version}_$arch.changes    || exit 1
+mkdir -p debian                               || exit 1
+mv findent_$version* debian                   || exit 1
+echo "files in ../debian/findent_$version*"   || exit 1
 
-./bootstrap                         || exit 1
-./configure                         || exit 1
-make maintainer-clean               || exit 1
-./bootstrap                         || exit 1
-
-debuild -i -us -uc --lintian-opts --profile debian || exit 1
-cd ..                               || exit 1
-rm -rf $dir
-echo "$0 done"
+echo $0 done

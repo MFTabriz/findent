@@ -1,19 +1,22 @@
 Source: findent
-Section: misc
+Section: contrib/devel
 Priority: optional
 Maintainer: Willem Vermin <wvermin@gmail.com>
-Build-Depends: debhelper (>= 8.0.0), autotools-dev
-Standards-Version: 3.9.4
-Homepage: http://findent.sourceforge.net
-#Vcs-Git: git://git.debian.org/collab-maint/findent.git
-#Vcs-Browser: http://git.debian.org/?p=collab-maint/findent.git;a=summary
+Build-Depends: debhelper (>=9),autotools-dev
+Standards-Version: 3.9.7
+Homepage:http://findent.sourceforge.net
+#Vcs-Git: git://anonscm.debian.org/collab-maint/findent.git
+#Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/findent.git
 
 Package: findent
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description:  Indent Fortran sources
- Findent indents Fortran source, fixed and free format, 
- and converts Fortran fixed format to Fortran free format.
- Fortran 2008 compliant
- Interfaces with vim
- Linux and Windows
+Description: indent Fortran sources and convert fro fixed to free
+ indents Fortran sources and optionally converts from free
+   to fixed format.
+ findent supports:
+   free and fixed format
+   preprocessor statements
+   Fortran-2008
+   high speed: 50K - 100K lines/second
+   easy incorporation in vim
