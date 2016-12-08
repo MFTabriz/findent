@@ -1383,13 +1383,13 @@ void output_line()
 	 char ftc       = firstchar(trim(s));
 	 lines.pop_front();
 	 olines.pop_front();
-	 if ( ftc == '#')
+	 if (ftc == '#')
 	 {
 	    handle_pre(s);
 	    continue;
 	 }
 	 if(isfixedcmt(s))
-	 {  // this is an empty line or comment line or a preprocessing line
+	 {  // this is an empty line or comment line
 	    if (output_format == FIXED)
 	    {
 	       if (ofc == '!')                   // do not change lines starting with !
@@ -1405,15 +1405,21 @@ void output_line()
 		  mycout << endline;
 	       else
 	       {
-		  switch (firstchar(s))
+		  switch (ofc)
 		  {
 		     // special hack for lines starting with 'd' or 'D'
 		     case 'd' :
 		     case 'D' :
-			mycout << "!" + trim(s) << endline;
+			mycout << "!" + rtrim(os) << endline;
 			break;
-		     default:
-			mycout << std::string(std::max(cur_indent,0),' ') << "!" << trim(s.substr(1)) << endline;
+		     case 'c':
+		     case 'C':
+		     case '*':
+		     case '!':
+			mycout << '!' << rtrim(os.substr(1)) << endline;
+			break;
+		     default:  // this must be a ! comment, not starting in column 1
+			mycout << std::string(std::max(cur_indent,0),' ') << trim(os) << endline;
 		  }
 	       }
 	    }

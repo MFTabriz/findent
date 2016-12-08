@@ -1,6 +1,16 @@
 $Id$
 findent-2.7.2:
-	some slight modifications for debian
+	debian/, makedeb, maketar:
+	   some slight modifications for debian packaging
+	findent.cpp:
+	   changed output of pure comment lines while converting
+	     from fixed to free:
+	     - comment starts with [cC*!] in column one:
+		  the first character is replaced by '!' and the comment
+		  is ouput un-indented
+	     - comment starting with '!', not in column 1, is indented
+	     - comment with [dD] in column one:
+		  is output as-is, prepended with '!', starting in column one
 findent-2.7.1:
 	maketar: adapt version in debian/changelog
 	vim somewhat better findent.vim and fortran.vim
