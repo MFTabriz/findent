@@ -1419,7 +1419,7 @@ void output_line()
 			mycout << '!' << rtrim(os.substr(1)) << endline;
 			break;
 		     default:  // this must be a ! comment, not starting in column 1
-			mycout << std::string(std::max(cur_indent,0),' ') << trim(os) << endline;
+			mycout << std::string(std::max(cur_indent,1),' ') << trim(os) << endline;
 		  }
 	       }
 	    }
