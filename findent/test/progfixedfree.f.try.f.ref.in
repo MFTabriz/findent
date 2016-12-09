@@ -35,6 +35,8 @@
    program progfixed
         type mytype  ! mytype
              integer i
+! a comment
+             ! a floating comment
              real x
         end type mytype
 #ifdef abcde
