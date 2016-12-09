@@ -6,9 +6,9 @@ arch=`dpkg --print-architecture`              || exit 1
 tar=findent-$version.tar.gz                   || exit 1
 export DEB_BUILD_MAINT_OPTIONS=hardening=+all
 sed -i "1s/(.*)/($version)/" debian/changelog || exit 1
-echo 'running svn commit ...'
-svn commit -m 'adapted debian/changelog' \
-              debian/changelog
+#echo 'running svn commit ...'
+#svn commit -m 'adapted debian/changelog' \
+#              debian/changelog
 #dpkg-buildpackage -us -uc                     || exit 1
 #debuild -b || exit 1
 debuild  || exit 1
