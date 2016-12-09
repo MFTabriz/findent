@@ -24,8 +24,9 @@ echo "running debi ..."                       || exit 1
 sudo debi findent_${version}_$arch.changes    || exit 1
 mkdir -p debian                               || exit 1
 mv findent_$version* debian                   || exit 1
+cd $dir                                       || exit 1
+make maintainer-clean                         || exit 1
 echo "running svn status ..."                 || exit 1
-pwd
 svn status
 echo "files are in ../debian/findent_$version*" || exit 1
 
