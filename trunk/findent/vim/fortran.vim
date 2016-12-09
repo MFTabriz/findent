@@ -240,12 +240,12 @@ if b:fortran_format == "free"
    let g:fortran_free_source = 1
    let b:fortran_free_source = 1
    let b:fortran_fixed_source = 0
-   set colorcolumn=133
+   setlocal colorcolumn=133
 else
    let g:fortran_fixed_source = 1
    let b:fortran_fixed_source = 1
    let b:fortran_free_source = 0
-   set colorcolumn=6,73
+   setlocal colorcolumn=6,73
 endif
 
 call Findent_set_indentprog()
