@@ -779,7 +779,7 @@ uninstall-am:
 .PRECIOUS: Makefile
 
 maintainer-clean-local:
-	rm -rf bin share
+	rm -rf bin share autom4te.cache
 	dh clean
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
