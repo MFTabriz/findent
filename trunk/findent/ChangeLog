@@ -11,6 +11,8 @@ findent-2.7.2:
 	     - comment starting with '!', not in column 1, is indented
 	     - comment with [dD] in column one:
 		  is output as-is, prepended with '!', starting in column one
+	   fixed format: if garbage is detected in label field,
+	      output that line as-is
 findent-2.7.1:
 	maketar: adapt version in debian/changelog
 	vim somewhat better findent.vim and fortran.vim
