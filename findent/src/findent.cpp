@@ -59,6 +59,8 @@ std::string ltrim(const std::string& str);
 std::string ltab2sp(const std::string& s);
 std::string handle_dos(const std::string s);
 
+bool cleanfive(const std::string s);
+
 int input_format, output_format;
 int guess_indent(const std::string str);
 int num_leading_spaces(const std::string &s);
@@ -1424,6 +1426,10 @@ void output_line()
 	       }
 	    }
 	 }
+	 else if(!cleanfive(os)) // check for valid label field
+	 {
+	    mycout << os << endline;  // garbage in, garbage out
+	 }
 	 else
 	 {
 	    if (output_format == FIXED)
@@ -2088,3 +2094,21 @@ char lastchar(const std::string s)
       return 0;
    return s[l-1];
 }
+
+bool cleanfive(const std::string s)
+// returns 1, if columns 1-5 contain only [0-9 \t]
+// else returns 0
+{
+   int l = std::min((int)s.size(), 5);
+   for (int i=0; i<l; i++)
+   {
+      char c = s[i];
+      if (c == '\t')
+	 return 1;
+      if (c == ' ' || (c >='0' && c <='9'))
+	 continue;
+      return 0;
+   }
+   return 1;
+}
+
