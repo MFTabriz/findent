@@ -3,11 +3,11 @@ Upstream-Name: findent
 Source: http://findent.sourceforge.net
 
 Files: *
-Copyright: 2015 Willem Vermin wvermin@gmail.com
+Copyright: 2015,2016 Willem Vermin wvermin@gmail.com
 License: BSD-3-Clause
 
 Files: debian/*
-Copyright: 2015 Willem Vermin wvermin@gmail.com
+Copyright: 2015,2016 Willem Vermin wvermin@gmail.com
 License: BSD-3-Clause
 
 License: BSD-3-Clause

@@ -12,9 +12,11 @@ mkdir -p versions                                                 || exit 1
 cp findent/README.windows versions/README.txt                     || exit 1
 cp findent/bin/findent.exe versions                               || exit 1
 cp findent/scripts/wfindent.bat versions                          || exit 1
+cp findent/COPYING versions/COPYING.txt
 cd versions                                                       || exit 1
-unix2dos README.txt                                               || exit 1
+unix2dos README.txt COPYING.txt                                   || exit 1
 rm -f "findent-$version.zip"
-zip   "findent-$version.zip" findent.exe README.txt wfindent.bat  || exit 1
-rm -f findent.exe README.txt wfindent.bat
+zip   "findent-$version.zip" findent.exe README.txt \
+                             COPYING.txt wfindent.bat             || exit 1
+rm -f findent.exe README.txt wfindent.bat COPYING.txt
 echo "$0 done"
