@@ -1,5 +1,8 @@
 $Id$
 findent-2.7.2:
+	copyright: BSD-3
+	debial/rules: add 
+	  export DEB_BUILD_MAINT_OPTIONS=hardening=+all
 	debian/, makedeb, maketar:
 	   some slight modifications for debian packaging
 	findent.cpp:
