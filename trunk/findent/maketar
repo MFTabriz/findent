@@ -33,4 +33,7 @@ cp -r $curdir "findent-$version"                   || exit 1
 tar zcf "findent-$version.tar.gz" \
         "findent-$version"                         || exit 1
 rm -rf "findent-$version"                          || exit 1
+cd "$curdir"                                       || exit 1
+./configure                                        || exit 1
+make maintainer-clean                              || exit 1
 echo "$0 done"
