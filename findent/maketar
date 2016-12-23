@@ -11,10 +11,10 @@ export CXX='g++ -m32 -static'                      || exit 1
 make clean                                         || exit 1
 make install-strip                                 || exit 1
 make check                                         || exit 1
-unset CXX                                          || exit 1
-./configure --with-windows --prefix=$PWD           || exit 1
-make clean                                         || exit 1
-make install-strip                                 || exit 1
+#unset CXX                                          || exit 1
+#./configure --with-windows --prefix=$PWD           || exit 1
+#make clean                                         || exit 1
+#make install-strip                                 || exit 1
 version=`./getversion`                             || exit 1
 echo "version = $version"
 sed -i "1s/(.*)/($version)/" debian/changelog      || exit 1
@@ -30,6 +30,8 @@ cd versions                                        || exit 1
 unix2dos README                                    || exit 1
 rm -rf "findent-$version"
 cp -r $curdir "findent-$version"                   || exit 1
+rm -r findent-$version/debian
+rm -r findent-$version/makedeb
 tar zcf "findent-$version.tar.gz" \
         "findent-$version"                         || exit 1
 rm -rf "findent-$version"                          || exit 1
