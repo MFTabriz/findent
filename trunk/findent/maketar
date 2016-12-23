@@ -17,12 +17,16 @@ make check                                         || exit 1
 #make install-strip                                 || exit 1
 version=`./getversion`                             || exit 1
 echo "version = $version"
-sed -i "1s/(.*)/($version)/" debian/changelog      || exit 1
+if [ -e debian/changelog] ; then
+   sed -i "1s/(.*)/($version)/" debian/changelog   || exit 1
+fi
 #echo 'running svn commit ...'
 #svn commit -m 'adapted debian/changelog' \
 #              debian/changelog
 make distclean                                     || exit 1
-dh clean                                           || exit 1
+if [ -d debian ] ; then
+   dh clean                                           || exit 1
+fi
 cd ..                                              || exit 1
 mkdir -p versions                                  || exit 1
 cp $curdir/README.1st versions/README              || exit 1
