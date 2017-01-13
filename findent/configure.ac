@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(findent, 2.7.3 ,wvermin@gmail.com)
+AC_INIT(findent, 2.7.4 ,wvermin@gmail.com)
 AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
 AC_CONFIG_SRCDIR([src/findent.cpp])
@@ -50,15 +50,56 @@ AS_IF( [test "x$with_windows" = xyes],
 
 AM_CONDITIONAL([MAKEMAN],[test "x$with_windows" != "xyes"])
 
+# test if bison available etc...
+
+AC_ARG_WITH(bison, [AS_HELP_STRING([--with-bison],[Use bison to create parser @<:@default=use-if-bison-available@:>@])],[],[with_bison=use-if-bison-available])
+
+AS_IF( [test "x$with_bison" = "xyes"],
+       [AX_PROG_BISON([],AC_MSG_ERROR([No valid bison found. Try --without-bison]))])
+
+AS_IF( [test "x$with_bison" = "xuse-if-bison-available"],
+       [AX_PROG_BISON(AC_MSG_NOTICE([Will use bison if necessary to create parser]
+        ) 
+	[with_bison=yes],
+        AC_MSG_NOTICE([No bison found. Will use pre-build parser])
+	[with_bison=no])])
+
+AS_IF( [test "x$with_bison" = "xno"],
+       [ AC_CONFIG_FILES([src/buildparser.cpp])
+         AC_CONFIG_FILES([src/buildparser.h])])
+
+AM_CONDITIONAL([USEBISON],[test "x$with_bison" = "xyes"])
+
+# test if flex available etc...
+
+#AC_ARG_VAR([LEX],[The 'Fast lexical analyser generator' to use])
+
+AC_ARG_WITH(flex, [AS_HELP_STRING([--with-flex],[Use flex to create parser @<:@default=use-if-flex-available@:>@])],[],[with_flex=use-if-flex-available])
+
+AS_IF( [test "x$with_flex" = "xyes"],
+       [AX_PROG_FLEX([],AC_MSG_ERROR([No valid flex found. Try --without-flex]))])
+
+AS_IF( [test "x$with_flex" = "xuse-if-flex-available"],
+       [AX_PROG_FLEX(AC_MSG_NOTICE([Will use flex if necessary to create lexer]
+        ) 
+	[with_flex=yes],
+        AC_MSG_NOTICE([No flex found. Will use pre-build lexer])
+	[with_flex=no])])
+
+AS_IF( [test "x$with_flex" = "xno"],
+       [ AC_CONFIG_FILES([src/buildlexer.cpp])])
+
+AM_CONDITIONAL([USEFLEX],[test "x$with_flex" = "xyes"])
+
 AC_PROG_CXX
 AC_PROG_AWK
 AC_PROG_YACC
 AC_PROG_SED
 AC_MSG_NOTICE([yacc: ${YACC}])
-AC_ARG_VAR([LEX],[The 'Fast lexical analyser generator' to use])
-AX_PROG_FLEX([],AC_MSG_ERROR([No valid flex found]))
+#AC_ARG_VAR([LEX],[The 'Fast lexical analyser generator' to use])
+#AX_PROG_FLEX([],AC_MSG_ERROR([No valid flex found]))
 AC_MSG_NOTICE([flex: ${LEX}])
-AX_PROG_BISON([],AC_MSG_ERROR([No valid bison found]))
+#AX_PROG_BISON([],AC_MSG_ERROR([No valid bison found]))
 AC_MSG_NOTICE([bison: ${BISON}])
 
 AC_LANG([C++])

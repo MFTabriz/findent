@@ -1,22 +1,20 @@
 Source: findent
-Section: contrib/devel
+Section: devel
 Priority: optional
 Maintainer: Willem Vermin <wvermin@gmail.com>
-Build-Depends: debhelper (>=9),autotools-dev
-Standards-Version: 3.9.7
-Homepage:http://findent.sourceforge.net
-#Vcs-Git: git://anonscm.debian.org/collab-maint/findent.git
-#Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/findent.git
+Build-Depends: debhelper (>= 9), autotools-dev, flex, bison, gfortran
+Standards-Version: 3.9.8
+Homepage: https://sourceforge.net/projects/findent/
 
 Package: findent
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: indent Fortran sources and convert fro fixed to free
- indents Fortran sources and optionally converts from free
-   to fixed format.
- findent supports:
-   free and fixed format
-   preprocessor statements
-   Fortran-2008
-   high speed: 50K - 100K lines/second
-   easy incorporation in vim
+Description: indents/converts Fortran sources
+ Indents Fortran sources: free or fixed format.
+ Optionally converts from fixed format to free format.
+ Supports Fortran2008.
+ Indentation is controlled by a number of flags.
+ Easy integration with (g)vim.
+ .
+ wfindent is a wrapper for findent and facilitates
+ in-place indenting of Fortran sources.
