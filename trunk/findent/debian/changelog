@@ -1,5 +1,5 @@
-findent (2.7.3) unstable; urgency=low
+findent (2.7.3-1) unstable; urgency=low
 
   * Initial release (Closes: #842166)
 
- -- Willem Vermin <wvermin@gmail.com>  Fri, 02 Dec 2016 13:51:52 +0100
+ -- Willem Vermin <wvermin@gmail.com>  Tue, 20 Dec 2016 12:22:24 +0100

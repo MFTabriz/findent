@@ -1,31 +1,45 @@
 AM_LDFLAGS =
 
-PARYFILE   = parser.y
-PARCFILE   = parser.cpp
-PARHFILE   = parser.h
-PARCFILES  = $(PARCFILE) $(PARHFILE)
+PARFILES      =      parser.cpp      parser.h
+BUILDPARFILES = buildparser.cpp buildparser.h
 
-LEXLFILE   = lexer.l
-LEXCFILE   = lexer.cpp
-LEXCFILES  = $(LEXCFILE)
+LEXFILES      =      lexer.cpp
+BUILDLEXFILES = buildlexer.cpp
 
-$(PARHFILE): $(PARCFILE)
+if USEBISON
+parser.h: parser.cpp
 
-$(PARCFILE): $(PARYFILE)
+parser.cpp: parser.y
 	$(YACC) -o $@ -d $<
-	if test -f $(PARCFILE).h ; then mv $(PARCFILE).h $(PARHFILE) ; fi
-	if test -f $(PARHFILE)pp ; then mv $(PARHFILE)pp $(PARHFILE) ; fi
+	if test -f parser.cpp.h ; then mv parser.cpp.h parser.h ; fi
+	if test -f parser.hpp ; then mv parser.hpp parser.h ; fi
+	cp parser.cpp buildparser.cpp.in
+	cp parser.h buildparser.h.in
+else
+parser.cpp: buildparser.cpp 
+	cp $< $@
 
-$(LEXCFILES): $(LEXLFILE)
+parser.h: buildparser.h
+	cp $< $@
+endif
+
+if USEFLEX
+lexer.cpp: lexer.l
 	$(LEX) -i -o $@ $<
+	cp lexer.cpp buildlexer.cpp.in
+else
+lexer.cpp: buildlexer.cpp
+	cp $< $@
+endif
 
 MOSTLYCLEANFILES =
 
-CLEANFILES = $(LEXCFILES) $(PARCFILES) findent findent.exe test/*.try.f test/a.out test/*.mod findent.1 $(PARCFILE).h $(PARHFILE)pp parser_report.txt
+CLEANFILES = $(LEXFILES) $(PARFILES) findent findent.exe test/*.try.f test/a.out test/*.mod findent.1 parser.cpp.h parser.hpp parser_report.txt
+
 
 DISTCLEANFILES = 
 
-MAINTAINERCLEANFILES = $(CLEANFILES)
+MAINTAINERCLEANFILES = $(BUILDPARFILES) $(BUILDLEXFILES)
 
 if MAKEMAN
 
