@@ -1,5 +1,7 @@
 $Id$
 findent-2.7.4:
+	maketar: remove creating executable 
+	Readme.1st: adapted to previous line
 	Change build process: no bison or flex needed when
 	building from tarball.
 	Update debian directory.
