@@ -691,7 +691,7 @@ uninstall-man: uninstall-man1
 @USEBISON_FALSE@parser.cpp: buildparser.cpp dummyparser 
 @USEBISON_FALSE@	cp $< $@
 
-@USEBISON_FALSE@parser.h: buildparser.h
+@USEBISON_FALSE@parser.h: buildparser.h dummyparser
 @USEBISON_FALSE@	cp $< $@
 
 @USEFLEX_TRUE@lexer.cpp: lexer.l

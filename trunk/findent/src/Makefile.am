@@ -28,7 +28,7 @@ dummyparser: parser.y
 parser.cpp: buildparser.cpp dummyparser 
 	cp $< $@
 
-parser.h: buildparser.h
+parser.h: buildparser.h dummyparser
 	cp $< $@
 endif
 
