@@ -15,8 +15,17 @@ parser.cpp: parser.y
 	if test -f parser.hpp ; then mv parser.hpp parser.h ; fi
 	cp parser.cpp buildparser.cpp.in
 	cp parser.h buildparser.h.in
+	touch dummyparser
 else
-parser.cpp: buildparser.cpp 
+dummyparser: parser.y
+	@echo "***************************************************************"
+	@echo "*** Need to create parser, but during configuration was     ***"
+	@echo "*** specified not to use bison, or bison was not available. ***"
+	@echo "*** Please correct this, and configure again.               ***"
+	@echo "***************************************************************"
+	exit 1
+
+parser.cpp: buildparser.cpp dummyparser 
 	cp $< $@
 
 parser.h: buildparser.h
@@ -27,8 +36,17 @@ if USEFLEX
 lexer.cpp: lexer.l
 	$(LEX) -i -o $@ $<
 	cp lexer.cpp buildlexer.cpp.in
+	touch dummylexer
 else
-lexer.cpp: buildlexer.cpp
+dummylexer: lexer.l
+	@echo "*************************************************************"
+	@echo "*** Need to create lexer, but during configuration was    ***"
+	@echo "*** specified not to use flex, or flex was not available. ***"
+	@echo "*** Please correct this, and configure again.             ***"
+	@echo "*************************************************************"
+	exit 1
+
+lexer.cpp: buildlexer.cpp dummylexer
 	cp $< $@
 endif
 
