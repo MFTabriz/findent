@@ -679,7 +679,16 @@ uninstall-man: uninstall-man1
 @USEBISON_TRUE@	if test -f parser.hpp ; then mv parser.hpp parser.h ; fi
 @USEBISON_TRUE@	cp parser.cpp buildparser.cpp.in
 @USEBISON_TRUE@	cp parser.h buildparser.h.in
-@USEBISON_FALSE@parser.cpp: buildparser.cpp 
+@USEBISON_TRUE@	touch dummyparser
+@USEBISON_FALSE@dummyparser: parser.y
+@USEBISON_FALSE@	@echo "***************************************************************"
+@USEBISON_FALSE@	@echo "*** Need to create parser, but during configuration was     ***"
+@USEBISON_FALSE@	@echo "*** specified not to use bison, or bison was not available. ***"
+@USEBISON_FALSE@	@echo "*** Please correct this, and configure again.               ***"
+@USEBISON_FALSE@	@echo "***************************************************************"
+@USEBISON_FALSE@	exit 1
+
+@USEBISON_FALSE@parser.cpp: buildparser.cpp dummyparser 
 @USEBISON_FALSE@	cp $< $@
 
 @USEBISON_FALSE@parser.h: buildparser.h
@@ -688,7 +697,16 @@ uninstall-man: uninstall-man1
 @USEFLEX_TRUE@lexer.cpp: lexer.l
 @USEFLEX_TRUE@	$(LEX) -i -o $@ $<
 @USEFLEX_TRUE@	cp lexer.cpp buildlexer.cpp.in
-@USEFLEX_FALSE@lexer.cpp: buildlexer.cpp
+@USEFLEX_TRUE@	touch dummylexer
+@USEFLEX_FALSE@dummylexer: lexer.l
+@USEFLEX_FALSE@	@echo "*************************************************************"
+@USEFLEX_FALSE@	@echo "*** Need to create lexer, but during configuration was    ***"
+@USEFLEX_FALSE@	@echo "*** specified not to use flex, or flex was not available. ***"
+@USEFLEX_FALSE@	@echo "*** Please correct this, and configure again.             ***"
+@USEFLEX_FALSE@	@echo "*************************************************************"
+@USEFLEX_FALSE@	exit 1
+
+@USEFLEX_FALSE@lexer.cpp: buildlexer.cpp dummylexer
 @USEFLEX_FALSE@	cp $< $@
 
 @MAKEMAN_TRUE@findent.1: findent
