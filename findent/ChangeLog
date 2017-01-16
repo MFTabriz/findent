@@ -1,5 +1,8 @@
 $Id$
 findent-2.7.4:
+	src/Makefile.am, configure.ac: if flex/bison is not
+	  to beused, but lexer.l or parser.y has been changed,
+	  produce an error message.
 	maketar: remove creating executable 
 	Readme.1st: adapted to previous line
 	Change build process: no bison or flex needed when
