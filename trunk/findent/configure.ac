@@ -72,7 +72,7 @@ AM_CONDITIONAL([USEBISON],[test "x$with_bison" = "xyes"])
 
 # test if flex available etc...
 
-#AC_ARG_VAR([LEX],[The 'Fast lexical analyser generator' to use])
+AC_ARG_VAR([LEX],[The 'Fast lexical analyser generator' to use])
 
 AC_ARG_WITH(flex, [AS_HELP_STRING([--with-flex],[Use flex to create parser @<:@default=use-if-flex-available@:>@])],[],[with_flex=use-if-flex-available])
 
@@ -93,13 +93,9 @@ AM_CONDITIONAL([USEFLEX],[test "x$with_flex" = "xyes"])
 
 AC_PROG_CXX
 AC_PROG_AWK
-AC_PROG_YACC
 AC_PROG_SED
 AC_MSG_NOTICE([yacc: ${YACC}])
-#AC_ARG_VAR([LEX],[The 'Fast lexical analyser generator' to use])
-#AX_PROG_FLEX([],AC_MSG_ERROR([No valid flex found]))
 AC_MSG_NOTICE([flex: ${LEX}])
-#AX_PROG_BISON([],AC_MSG_ERROR([No valid bison found]))
 AC_MSG_NOTICE([bison: ${BISON}])
 
 AC_LANG([C++])

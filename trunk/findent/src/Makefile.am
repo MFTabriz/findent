@@ -18,12 +18,17 @@ parser.cpp: parser.y
 	touch dummyparser
 else
 dummyparser: parser.y
-	@echo "***************************************************************"
-	@echo "*** Need to create parser, but during configuration was     ***"
-	@echo "*** specified not to use bison, or bison was not available. ***"
-	@echo "*** Please correct this, and configure again.               ***"
-	@echo "***************************************************************"
-	exit 1
+	@echo ""
+	@echo "**********************************************************"
+	@echo "*** Apparently, parser.y has been changed, so we need  ***"
+	@echo "*** to re-create the parser. However, at configuration ***"
+	@echo "*** time, bison (or yacc) was not available, or it was ***"
+	@echo "*** specified not to use bison.                        ***"
+	@echo "*** I will use the pre-build parser.                   ***"
+	@echo "**********************************************************"
+	@echo sleeping 10 seconds so you can read this.
+	@sleep 10
+	touch $@
 
 parser.cpp: buildparser.cpp dummyparser 
 	cp $< $@
@@ -39,12 +44,17 @@ lexer.cpp: lexer.l
 	touch dummylexer
 else
 dummylexer: lexer.l
-	@echo "*************************************************************"
-	@echo "*** Need to create lexer, but during configuration was    ***"
-	@echo "*** specified not to use flex, or flex was not available. ***"
-	@echo "*** Please correct this, and configure again.             ***"
-	@echo "*************************************************************"
-	exit 1
+	@echo ""
+	@echo "*********************************************************"
+	@echo "*** Apparently, lexer.l has been changed, so we need  ***"
+	@echo "*** to re-create the lexer. However, at configuration ***"
+	@echo "*** time, flex (or lex) was not available, or it was  ***"
+	@echo "*** specified not to use flex.                        ***"
+	@echo "*** I will use the pre-build lexer.                   ***"
+	@echo "*********************************************************"
+	@echo sleeping 10 seconds so you can read this.
+	@sleep 10
+	touch $@
 
 lexer.cpp: buildlexer.cpp dummylexer
 	cp $< $@

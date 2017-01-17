@@ -681,12 +681,17 @@ uninstall-man: uninstall-man1
 @USEBISON_TRUE@	cp parser.h buildparser.h.in
 @USEBISON_TRUE@	touch dummyparser
 @USEBISON_FALSE@dummyparser: parser.y
-@USEBISON_FALSE@	@echo "***************************************************************"
-@USEBISON_FALSE@	@echo "*** Need to create parser, but during configuration was     ***"
-@USEBISON_FALSE@	@echo "*** specified not to use bison, or bison was not available. ***"
-@USEBISON_FALSE@	@echo "*** Please correct this, and configure again.               ***"
-@USEBISON_FALSE@	@echo "***************************************************************"
-@USEBISON_FALSE@	exit 1
+@USEBISON_FALSE@	@echo ""
+@USEBISON_FALSE@	@echo "**********************************************************"
+@USEBISON_FALSE@	@echo "*** Apparently, parser.y has been changed, so we need  ***"
+@USEBISON_FALSE@	@echo "*** to re-create the parser. However, at configuration ***"
+@USEBISON_FALSE@	@echo "*** time, bison (or yacc) was not available, or it was ***"
+@USEBISON_FALSE@	@echo "*** specified not to use bison.                        ***"
+@USEBISON_FALSE@	@echo "*** I will use the pre-build parser.                   ***"
+@USEBISON_FALSE@	@echo "**********************************************************"
+@USEBISON_FALSE@	@echo sleeping 10 seconds so you can read this.
+@USEBISON_FALSE@	@sleep 10
+@USEBISON_FALSE@	touch $@
 
 @USEBISON_FALSE@parser.cpp: buildparser.cpp dummyparser 
 @USEBISON_FALSE@	cp $< $@
@@ -699,12 +704,17 @@ uninstall-man: uninstall-man1
 @USEFLEX_TRUE@	cp lexer.cpp buildlexer.cpp.in
 @USEFLEX_TRUE@	touch dummylexer
 @USEFLEX_FALSE@dummylexer: lexer.l
-@USEFLEX_FALSE@	@echo "*************************************************************"
-@USEFLEX_FALSE@	@echo "*** Need to create lexer, but during configuration was    ***"
-@USEFLEX_FALSE@	@echo "*** specified not to use flex, or flex was not available. ***"
-@USEFLEX_FALSE@	@echo "*** Please correct this, and configure again.             ***"
-@USEFLEX_FALSE@	@echo "*************************************************************"
-@USEFLEX_FALSE@	exit 1
+@USEFLEX_FALSE@	@echo ""
+@USEFLEX_FALSE@	@echo "*********************************************************"
+@USEFLEX_FALSE@	@echo "*** Apparently, lexer.l has been changed, so we need  ***"
+@USEFLEX_FALSE@	@echo "*** to re-create the lexer. However, at configuration ***"
+@USEFLEX_FALSE@	@echo "*** time, flex (or lex) was not available, or it was  ***"
+@USEFLEX_FALSE@	@echo "*** specified not to use flex.                        ***"
+@USEFLEX_FALSE@	@echo "*** I will use the pre-build lexer.                   ***"
+@USEFLEX_FALSE@	@echo "*********************************************************"
+@USEFLEX_FALSE@	@echo sleeping 10 seconds so you can read this.
+@USEFLEX_FALSE@	@sleep 10
+@USEFLEX_FALSE@	touch $@
 
 @USEFLEX_FALSE@lexer.cpp: buildlexer.cpp dummylexer
 @USEFLEX_FALSE@	cp $< $@
