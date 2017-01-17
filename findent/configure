@@ -3030,6 +3030,8 @@ fi
 
 # test if bison available etc...
 
+touch src/dummyparser
+
 
 # Check whether --with-bison was given.
 if test "${with_bison+set}" = set; then :
@@ -3297,6 +3299,8 @@ fi
 
 
 # test if flex available etc...
+
+touch src/dummylexer
 
 
 
