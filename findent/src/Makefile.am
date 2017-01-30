@@ -62,7 +62,7 @@ endif
 
 MOSTLYCLEANFILES =
 
-CLEANFILES = $(LEXFILES) $(PARFILES) findent findent.exe test/*.try.f test/a.out test/*.mod findent.1 parser.cpp.h parser.hpp parser_report.txt
+CLEANFILES = findent findent.exe test/*.try.f test/a.out test/*.mod findent.1 parser.cpp.h parser.hpp parser_report.txt
 
 
 DISTCLEANFILES = 
