@@ -1400,9 +1400,9 @@ Optional Packages:
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-windows          Build findent.exe [default=no]
   --with-bison            Use bison to create parser
-                          [default=use-if-bison-available]
-  --with-flex             Use flex to create parser
-                          [default=use-if-flex-available]
+                          [default=use-bison-if-available]
+  --with-flex             Use flex to create lexer
+                          [default=use-flex-if-available]
 
 Some influential environment variables:
   YACC        The `Yet Another Compiler Compiler' implementation to use.
@@ -2856,103 +2856,6 @@ ac_config_files="$ac_config_files test/test10.sh"
 ac_config_files="$ac_config_files test/test11.sh"
 
 
-# ===========================================================================
-#       http://www.gnu.org/software/autoconf-archive/ax_prog_flex.html
-# ===========================================================================
-#
-# SYNOPSIS
-#
-#   AX_PROG_FLEX(ACTION-IF-TRUE,ACTION-IF-FALSE)
-#
-# DESCRIPTION
-#
-#   Check whether flex is the scanner generator. Run ACTION-IF-TRUE if
-#   successful, ACTION-IF-FALSE otherwise
-#
-# LICENSE
-#
-#   Copyright (c) 2009 Francesco Salvestrini <salvestrini@users.sourceforge.net>
-#   Copyright (c) 2010 Diego Elio Petteno` <flameeyes@gmail.com>
-#
-#   This program is free software; you can redistribute it and/or modify it
-#   under the terms of the GNU General Public License as published by the
-#   Free Software Foundation; either version 2 of the License, or (at your
-#   option) any later version.
-#
-#   This program is distributed in the hope that it will be useful, but
-#   WITHOUT ANY WARRANTY; without even the implied warranty of
-#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
-#   Public License for more details.
-#
-#   You should have received a copy of the GNU General Public License along
-#   with this program. If not, see <http://www.gnu.org/licenses/>.
-#
-#   As a special exception, the respective Autoconf Macro's copyright owner
-#   gives unlimited permission to copy, distribute and modify the configure
-#   scripts that are the output of Autoconf when processing the Macro. You
-#   need not follow the terms of the GNU General Public License when using
-#   or distributing such scripts, even though portions of the text of the
-#   Macro appear in them. The GNU General Public License (GPL) does govern
-#   all other use of the material that constitutes the Autoconf Macro.
-#
-#   This special exception to the GPL applies to versions of the Autoconf
-#   Macro released by the Autoconf Archive. When you make and distribute a
-#   modified version of the Autoconf Macro, you may extend this special
-#   exception to the GPL to apply to your modified version as well.
-
-#serial 12
-
-
-
-# ===========================================================================
-#       http://www.gnu.org/software/autoconf-archive/ax_prog_bison.html
-# ===========================================================================
-#
-# SYNOPSIS
-#
-#   AX_PROG_BISON(ACTION-IF-TRUE,ACTION-IF-FALSE)
-#
-# DESCRIPTION
-#
-#   Check whether bison is the parser generator. Run ACTION-IF-TRUE if
-#   successful, ACTION-IF-FALSE otherwise
-#
-# LICENSE
-#
-#   Copyright (c) 2009 Francesco Salvestrini <salvestrini@users.sourceforge.net>
-#   Copyright (c) 2010 Diego Elio Petteno` <flameeyes@gmail.com>
-#
-#   This program is free software; you can redistribute it and/or modify it
-#   under the terms of the GNU General Public License as published by the
-#   Free Software Foundation; either version 2 of the License, or (at your
-#   option) any later version.
-#
-#   This program is distributed in the hope that it will be useful, but
-#   WITHOUT ANY WARRANTY; without even the implied warranty of
-#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
-#   Public License for more details.
-#
-#   You should have received a copy of the GNU General Public License along
-#   with this program. If not, see <http://www.gnu.org/licenses/>.
-#
-#   As a special exception, the respective Autoconf Macro's copyright owner
-#   gives unlimited permission to copy, distribute and modify the configure
-#   scripts that are the output of Autoconf when processing the Macro. You
-#   need not follow the terms of the GNU General Public License when using
-#   or distributing such scripts, even though portions of the text of the
-#   Macro appear in them. The GNU General Public License (GPL) does govern
-#   all other use of the material that constitutes the Autoconf Macro.
-#
-#   This special exception to the GPL applies to versions of the Autoconf
-#   Macro released by the Autoconf Archive. When you make and distribute a
-#   modified version of the Autoconf Macro, you may extend this special
-#   exception to the GPL to apply to your modified version as well.
-
-#serial 9
-
-
-
-
 make_include="include"
 
 
@@ -3037,9 +2940,62 @@ touch src/dummyparser
 if test "${with_bison+set}" = set; then :
   withval=$with_bison;
 else
-  with_bison=use-if-bison-available
+  with_bison=use-bison-if-available
 fi
 
+
+usebison=$with_bison
+
+if test "x$with_bison" != "xno"; then :
+   # ===========================================================================
+#       http://www.gnu.org/software/autoconf-archive/ax_prog_bison.html
+# ===========================================================================
+#
+# SYNOPSIS
+#
+#   AX_PROG_BISON(ACTION-IF-TRUE,ACTION-IF-FALSE)
+#
+# DESCRIPTION
+#
+#   Check whether bison is the parser generator. Run ACTION-IF-TRUE if
+#   successful, ACTION-IF-FALSE otherwise
+#
+# LICENSE
+#
+#   Copyright (c) 2009 Francesco Salvestrini <salvestrini@users.sourceforge.net>
+#   Copyright (c) 2010 Diego Elio Petteno` <flameeyes@gmail.com>
+#
+#   This program is free software; you can redistribute it and/or modify it
+#   under the terms of the GNU General Public License as published by the
+#   Free Software Foundation; either version 2 of the License, or (at your
+#   option) any later version.
+#
+#   This program is distributed in the hope that it will be useful, but
+#   WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+#   Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License along
+#   with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+#   As a special exception, the respective Autoconf Macro's copyright owner
+#   gives unlimited permission to copy, distribute and modify the configure
+#   scripts that are the output of Autoconf when processing the Macro. You
+#   need not follow the terms of the GNU General Public License when using
+#   or distributing such scripts, even though portions of the text of the
+#   Macro appear in them. The GNU General Public License (GPL) does govern
+#   all other use of the material that constitutes the Autoconf Macro.
+#
+#   This special exception to the GPL applies to versions of the Autoconf
+#   Macro released by the Autoconf Archive. When you make and distribute a
+#   modified version of the Autoconf Macro, you may extend this special
+#   exception to the GPL to apply to your modified version as well.
+
+#serial 9
+
+
+
+fi
 
 for ac_prog in 'bison -y' byacc
 do
@@ -3245,7 +3201,7 @@ fi
 
 fi
 
-if test "x$with_bison" = "xuse-if-bison-available"; then :
+if test "x$with_bison" = "xuse-bison-if-available"; then :
 
 
 
@@ -3268,28 +3224,26 @@ $as_echo "$ax_cv_prog_bison" >&6; }
   if test "$ax_cv_prog_bison" = "yes"; then :
 
                               YACC="${YACC% -y} -o y.tab.c"
-     { $as_echo "$as_me:${as_lineno-$LINENO}: Will use bison if necessary to create parser
-        " >&5
-$as_echo "$as_me: Will use bison if necessary to create parser
-        " >&6;}
-	with_bison=yes
+     { $as_echo "$as_me:${as_lineno-$LINENO}: Will use bison if necessary to create parser." >&5
+$as_echo "$as_me: Will use bison if necessary to create parser." >&6;}
+	usebison=yes
 else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: No bison found. Will use pre-build parser" >&5
-$as_echo "$as_me: No bison found. Will use pre-build parser" >&6;}
-	with_bison=no
+  { $as_echo "$as_me:${as_lineno-$LINENO}: No bison found. Will use pre-build parser." >&5
+$as_echo "$as_me: No bison found. Will use pre-build parser." >&6;}
+	usebison=no
 
 fi
 
 fi
 
-if test "x$with_bison" = "xno"; then :
+if test "x$usebison" = "xno"; then :
    ac_config_files="$ac_config_files src/buildparser.cpp"
 
          ac_config_files="$ac_config_files src/buildparser.h"
 
 fi
 
- if test "x$with_bison" = "xyes"; then
+ if test "x$usebison" = "xyes"; then
   USEBISON_TRUE=
   USEBISON_FALSE='#'
 else
@@ -3309,9 +3263,62 @@ touch src/dummylexer
 if test "${with_flex+set}" = set; then :
   withval=$with_flex;
 else
-  with_flex=use-if-flex-available
+  with_flex=use-flex-if-available
 fi
 
+
+useflex=$with_flex
+
+if test "x$with_flex" != "xno"; then :
+   # ===========================================================================
+#       http://www.gnu.org/software/autoconf-archive/ax_prog_flex.html
+# ===========================================================================
+#
+# SYNOPSIS
+#
+#   AX_PROG_FLEX(ACTION-IF-TRUE,ACTION-IF-FALSE)
+#
+# DESCRIPTION
+#
+#   Check whether flex is the scanner generator. Run ACTION-IF-TRUE if
+#   successful, ACTION-IF-FALSE otherwise
+#
+# LICENSE
+#
+#   Copyright (c) 2009 Francesco Salvestrini <salvestrini@users.sourceforge.net>
+#   Copyright (c) 2010 Diego Elio Petteno` <flameeyes@gmail.com>
+#
+#   This program is free software; you can redistribute it and/or modify it
+#   under the terms of the GNU General Public License as published by the
+#   Free Software Foundation; either version 2 of the License, or (at your
+#   option) any later version.
+#
+#   This program is distributed in the hope that it will be useful, but
+#   WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+#   Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License along
+#   with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+#   As a special exception, the respective Autoconf Macro's copyright owner
+#   gives unlimited permission to copy, distribute and modify the configure
+#   scripts that are the output of Autoconf when processing the Macro. You
+#   need not follow the terms of the GNU General Public License when using
+#   or distributing such scripts, even though portions of the text of the
+#   Macro appear in them. The GNU General Public License (GPL) does govern
+#   all other use of the material that constitutes the Autoconf Macro.
+#
+#   This special exception to the GPL applies to versions of the Autoconf
+#   Macro released by the Autoconf Archive. When you make and distribute a
+#   modified version of the Autoconf Macro, you may extend this special
+#   exception to the GPL to apply to your modified version as well.
+
+#serial 12
+
+
+
+fi
 
 DEPDIR="${am__leading_dot}deps"
 
@@ -4544,7 +4551,7 @@ fi
 
 fi
 
-if test "x$with_flex" = "xuse-if-flex-available"; then :
+if test "x$with_flex" = "xuse-flex-if-available"; then :
 
 
 
@@ -4565,21 +4572,19 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ax_cv_prog_flex" >&5
 $as_echo "$ax_cv_prog_flex" >&6; }
   if test "$ax_cv_prog_flex" = "yes"; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: Will use flex if necessary to create lexer
-        " >&5
-$as_echo "$as_me: Will use flex if necessary to create lexer
-        " >&6;}
-	with_flex=yes
+  { $as_echo "$as_me:${as_lineno-$LINENO}: Will use flex if necessary to create lexer." >&5
+$as_echo "$as_me: Will use flex if necessary to create lexer." >&6;}
+	useflex=yes
 else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: No flex found. Will use pre-build lexer" >&5
-$as_echo "$as_me: No flex found. Will use pre-build lexer" >&6;}
-	with_flex=no
+  { $as_echo "$as_me:${as_lineno-$LINENO}: No flex found. Will use pre-build lexer." >&5
+$as_echo "$as_me: No flex found. Will use pre-build lexer." >&6;}
+	useflex=no
 
 fi
 
 fi
 
-if test "x$with_flex" = "xno"; then :
+if test "x$useflex" = "xno"; then :
    ac_config_files="$ac_config_files src/buildlexer.cpp"
 
 fi
@@ -5089,12 +5094,6 @@ $as_echo "$ac_cv_path_SED" >&6; }
  SED="$ac_cv_path_SED"
   rm -f conftest.sed
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: yacc: ${YACC}" >&5
-$as_echo "$as_me: yacc: ${YACC}" >&6;}
-{ $as_echo "$as_me:${as_lineno-$LINENO}: flex: ${LEX}" >&5
-$as_echo "$as_me: flex: ${LEX}" >&6;}
-{ $as_echo "$as_me:${as_lineno-$LINENO}: bison: ${BISON}" >&5
-$as_echo "$as_me: bison: ${BISON}" >&6;}
 
 ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'

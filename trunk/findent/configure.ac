@@ -30,9 +30,6 @@ AC_CONFIG_FILES([test/test6.sh],[chmod +x test/test6.sh])
 AC_CONFIG_FILES([test/test10.sh],[chmod +x test/test10.sh])
 AC_CONFIG_FILES([test/test11.sh],[chmod +x test/test11.sh])
 
-m4_include([m4/ax_prog_flex.m4])
-m4_include([m4/ax_prog_bison.m4])
-
 AC_SUBST([make_include], ["include"])
 
 AC_ARG_WITH(windows, [AS_HELP_STRING([--with-windows],[Build findent.exe @<:@default=no@:>@])],[],[with_windows=no])
@@ -54,23 +51,27 @@ AM_CONDITIONAL([MAKEMAN],[test "x$with_windows" != "xyes"])
 
 touch src/dummyparser
 
-AC_ARG_WITH(bison, [AS_HELP_STRING([--with-bison],[Use bison to create parser @<:@default=use-if-bison-available@:>@])],[],[with_bison=use-if-bison-available])
+AC_ARG_WITH(bison, [AS_HELP_STRING([--with-bison],[Use bison to create parser @<:@default=use-bison-if-available@:>@])],[],[with_bison=use-bison-if-available])
+
+usebison=$with_bison
+
+AS_IF( [test "x$with_bison" != "xno"],
+      [ m4_include([m4/ax_prog_bison.m4]) ] )
 
 AS_IF( [test "x$with_bison" = "xyes"],
-       [AX_PROG_BISON([],AC_MSG_ERROR([No valid bison found. Try --without-bison]))])
+       [AX_PROG_BISON([],[AC_MSG_ERROR([No valid bison found. Try --without-bison])])])
 
-AS_IF( [test "x$with_bison" = "xuse-if-bison-available"],
-       [AX_PROG_BISON(AC_MSG_NOTICE([Will use bison if necessary to create parser]
-        ) 
-	[with_bison=yes],
-        AC_MSG_NOTICE([No bison found. Will use pre-build parser])
-	[with_bison=no])])
+AS_IF( [test "x$with_bison" = "xuse-bison-if-available"],
+       [AX_PROG_BISON(AC_MSG_NOTICE([Will use bison if necessary to create parser.]) 
+	[usebison=yes],
+        AC_MSG_NOTICE([No bison found. Will use pre-build parser.])
+	[usebison=no])])
 
-AS_IF( [test "x$with_bison" = "xno"],
+AS_IF( [test "x$usebison" = "xno"],
        [ AC_CONFIG_FILES([src/buildparser.cpp])
          AC_CONFIG_FILES([src/buildparser.h])])
 
-AM_CONDITIONAL([USEBISON],[test "x$with_bison" = "xyes"])
+AM_CONDITIONAL([USEBISON],[test "x$usebison" = "xyes"])
 
 # test if flex available etc...
 
@@ -78,19 +79,23 @@ touch src/dummylexer
 
 AC_ARG_VAR([LEX],[The 'Fast lexical analyser generator' to use])
 
-AC_ARG_WITH(flex, [AS_HELP_STRING([--with-flex],[Use flex to create parser @<:@default=use-if-flex-available@:>@])],[],[with_flex=use-if-flex-available])
+AC_ARG_WITH(flex, [AS_HELP_STRING([--with-flex],[Use flex to create lexer @<:@default=use-flex-if-available@:>@])],[],[with_flex=use-flex-if-available])
+
+useflex=$with_flex
+
+AS_IF( [test "x$with_flex" != "xno"],
+    [ m4_include([m4/ax_prog_flex.m4]) ] )
 
 AS_IF( [test "x$with_flex" = "xyes"],
-       [AX_PROG_FLEX([],AC_MSG_ERROR([No valid flex found. Try --without-flex]))])
+       [AX_PROG_FLEX([],[AC_MSG_ERROR([No valid flex found. Try --without-flex])])])
 
-AS_IF( [test "x$with_flex" = "xuse-if-flex-available"],
-       [AX_PROG_FLEX(AC_MSG_NOTICE([Will use flex if necessary to create lexer]
-        ) 
-	[with_flex=yes],
-        AC_MSG_NOTICE([No flex found. Will use pre-build lexer])
-	[with_flex=no])])
+AS_IF( [test "x$with_flex" = "xuse-flex-if-available"],
+       [AX_PROG_FLEX(AC_MSG_NOTICE([Will use flex if necessary to create lexer.]) 
+	[useflex=yes],
+        AC_MSG_NOTICE([No flex found. Will use pre-build lexer.])
+	[useflex=no])])
 
-AS_IF( [test "x$with_flex" = "xno"],
+AS_IF( [test "x$useflex" = "xno"],
        [ AC_CONFIG_FILES([src/buildlexer.cpp])])
 
 AM_CONDITIONAL([USEFLEX],[test "x$with_flex" = "xyes"])
@@ -98,9 +103,6 @@ AM_CONDITIONAL([USEFLEX],[test "x$with_flex" = "xyes"])
 AC_PROG_CXX
 AC_PROG_AWK
 AC_PROG_SED
-AC_MSG_NOTICE([yacc: ${YACC}])
-AC_MSG_NOTICE([flex: ${LEX}])
-AC_MSG_NOTICE([bison: ${BISON}])
 
 AC_LANG([C++])
 AC_HEADER_STDC
