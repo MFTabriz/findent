@@ -2944,7 +2944,7 @@ else
 fi
 
 
-usebison=$with_bison
+usebison="$with_bison"
 
 if test "x$with_bison" != "xno"; then :
    # ===========================================================================
@@ -3226,11 +3226,11 @@ $as_echo "$ax_cv_prog_bison" >&6; }
                               YACC="${YACC% -y} -o y.tab.c"
      { $as_echo "$as_me:${as_lineno-$LINENO}: Will use bison if necessary to create parser." >&5
 $as_echo "$as_me: Will use bison if necessary to create parser." >&6;}
-	usebison=yes
+	usebison="yes"
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: No bison found. Will use pre-build parser." >&5
 $as_echo "$as_me: No bison found. Will use pre-build parser." >&6;}
-	usebison=no
+	usebison="no"
 
 fi
 
@@ -3267,7 +3267,7 @@ else
 fi
 
 
-useflex=$with_flex
+useflex="$with_flex"
 
 if test "x$with_flex" != "xno"; then :
    # ===========================================================================
@@ -4574,11 +4574,11 @@ $as_echo "$ax_cv_prog_flex" >&6; }
   if test "$ax_cv_prog_flex" = "yes"; then :
   { $as_echo "$as_me:${as_lineno-$LINENO}: Will use flex if necessary to create lexer." >&5
 $as_echo "$as_me: Will use flex if necessary to create lexer." >&6;}
-	useflex=yes
+	useflex="yes"
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: No flex found. Will use pre-build lexer." >&5
 $as_echo "$as_me: No flex found. Will use pre-build lexer." >&6;}
-	useflex=no
+	useflex="no"
 
 fi
 
