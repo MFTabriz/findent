@@ -49,8 +49,6 @@ AM_CONDITIONAL([MAKEMAN],[test "x$with_windows" != "xyes"])
 
 # test if bison available etc...
 
-touch src/dummyparser
-
 AC_ARG_WITH(bison, [AS_HELP_STRING([--with-bison],[Use bison to create parser @<:@default=use-bison-if-available@:>@])],[],[with_bison=use-bison-if-available])
 
 usebison="$with_bison"
@@ -74,8 +72,6 @@ AS_IF( [test "x$usebison" = "xno"],
 AM_CONDITIONAL([USEBISON],[test "x$usebison" = "xyes"])
 
 # test if flex available etc...
-
-touch src/dummylexer
 
 AC_ARG_VAR([LEX],[The 'Fast lexical analyser generator' to use])
 

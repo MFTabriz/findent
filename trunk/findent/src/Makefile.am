@@ -15,19 +15,14 @@ parser.cpp parser.h: parser.y
 	   then  cp parser.cpp buildparser.cpp.in ; fi
 	if test -f buildparser.h.in ; \
 	   then cp parser.h buildparser.h.in ; fi
-	if test -f dummyparser ; then touch dummyparser ; fi
 else
 dummyparser: parser.y
 	@echo ""
-	@echo "**********************************************************"
-	@echo "*** Apparently, parser.y has been changed, so we need  ***"
-	@echo "*** to re-create the parser. However, at configuration ***"
-	@echo "*** time, bison (or yacc) was not available, or it was ***"
-	@echo "*** specified not to use bison.                        ***"
-	@echo "*** I will use the pre-build parser.                   ***"
-	@echo "**********************************************************"
-	@echo sleeping 5 seconds so you can read this.
-	@sleep 5
+	@echo "********************************************************"
+	@echo "*** At configuration time, bison (or yacc) was not   ***"
+	@echo "*** available, or it was specified not to use bison. ***"
+	@echo "*** I will use the pre-build parser.                 ***"
+	@echo "********************************************************"
 	touch $@
 
 parser.cpp: buildparser.cpp dummyparser 
@@ -42,19 +37,14 @@ lexer.cpp: lexer.l
 	$(LEX) -i -o $@ $<
 	if test -f buildlexer.cpp.in ; \
 	   then cp lexer.cpp buildlexer.cpp.in ; fi
-	if test -f dummylexer ; then touch dummylexer ; fi
 else
 dummylexer: lexer.l
 	@echo ""
-	@echo "*********************************************************"
-	@echo "*** Apparently, lexer.l has been changed, so we need  ***"
-	@echo "*** to re-create the lexer. However, at configuration ***"
-	@echo "*** time, flex (or lex) was not available, or it was  ***"
-	@echo "*** specified not to use flex.                        ***"
-	@echo "*** I will use the pre-build lexer.                   ***"
-	@echo "*********************************************************"
-	@echo sleeping 5 seconds so you can read this.
-	@sleep 5
+	@echo "*******************************************************"
+	@echo "*** At configuration time, flex (or lex) was not    ***"
+	@echo "*** available, or it was specified not to use flex. ***"
+	@echo "*** I will use the pre-build lexer.                 ***"
+	@echo "*******************************************************"
 	touch $@
 
 lexer.cpp: buildlexer.cpp dummylexer
@@ -66,7 +56,7 @@ MOSTLYCLEANFILES =
 CLEANFILES = $(LEXFILES) $(PARFILES) findent findent.exe test/*.try.f test/a.out test/*.mod findent.1 parser.cpp.h parser.hpp parser_report.txt
 
 
-DISTCLEANFILES =
+DISTCLEANFILES = dummylexer dummyparser
 
 MAINTAINERCLEANFILES = $(BUILDPARFILES) $(BUILDLEXFILES)
 
