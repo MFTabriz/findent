@@ -1,3 +1,8 @@
 #!/bin/bash
+for f in src/buildlexer.cpp.in src/buildparser.cpp.in src/buildparser.h.in ; do
+   if [ ! -e "$f" ] ; then
+      touch "$f"
+   fi
+done
 sed -i "/^AC_INIT(findent/s/^.*/AC_INIT(findent, `./getversion`, wvermin@gmail.com)/" configure.ac
 autoreconf -fvi

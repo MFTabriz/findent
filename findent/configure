@@ -4589,7 +4589,7 @@ if test "x$useflex" = "xno"; then :
 
 fi
 
- if test "x$with_flex" = "xyes"; then
+ if test "x$useflex" = "xyes"; then
   USEFLEX_TRUE=
   USEFLEX_FALSE='#'
 else

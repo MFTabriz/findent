@@ -98,7 +98,7 @@ AS_IF( [test "x$with_flex" = "xuse-flex-if-available"],
 AS_IF( [test "x$useflex" = "xno"],
        [ AC_CONFIG_FILES([src/buildlexer.cpp])])
 
-AM_CONDITIONAL([USEFLEX],[test "x$with_flex" = "xyes"])
+AM_CONDITIONAL([USEFLEX],[test "x$useflex" = "xyes"])
 
 AC_PROG_CXX
 AC_PROG_AWK
