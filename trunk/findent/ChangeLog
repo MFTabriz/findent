@@ -8,6 +8,7 @@ findent-2.7.4:
 	Change build process: no bison or flex needed when
 	building from tarball.
 	Update debian directory.
+	bootstrap: fix bug wich prevented 'make dist' to run
 findent-2.7.3:
 findent-2.7.2:
 	copyright: BSD-3
