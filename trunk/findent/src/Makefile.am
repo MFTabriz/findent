@@ -7,10 +7,8 @@ LEXFILES      =      lexer.cpp
 BUILDLEXFILES = buildlexer.cpp
 
 if USEBISON
-parser.h: parser.cpp
-
-parser.cpp: parser.y
-	$(YACC) -o $@ -d $<
+parser.cpp parser.h: parser.y
+	$(YACC) -o parser.cpp -d $<
 	if test -f parser.cpp.h ; then mv parser.cpp.h parser.h ; fi
 	if test -f parser.hpp ; then mv parser.hpp parser.h ; fi
 	cp parser.cpp buildparser.cpp.in
@@ -26,8 +24,8 @@ dummyparser: parser.y
 	@echo "*** specified not to use bison.                        ***"
 	@echo "*** I will use the pre-build parser.                   ***"
 	@echo "**********************************************************"
-	@echo sleeping 10 seconds so you can read this.
-	@sleep 10
+	@echo sleeping 5 seconds so you can read this.
+	@sleep 5
 	touch $@
 
 parser.cpp: buildparser.cpp dummyparser 
@@ -52,8 +50,8 @@ dummylexer: lexer.l
 	@echo "*** specified not to use flex.                        ***"
 	@echo "*** I will use the pre-build lexer.                   ***"
 	@echo "*********************************************************"
-	@echo sleeping 10 seconds so you can read this.
-	@sleep 10
+	@echo sleeping 5 seconds so you can read this.
+	@sleep 5
 	touch $@
 
 lexer.cpp: buildlexer.cpp dummylexer
@@ -65,7 +63,7 @@ MOSTLYCLEANFILES =
 CLEANFILES = $(LEXFILES) $(PARFILES) findent findent.exe test/*.try.f test/a.out test/*.mod findent.1 parser.cpp.h parser.hpp parser_report.txt
 
 
-DISTCLEANFILES = 
+DISTCLEANFILES =
 
 MAINTAINERCLEANFILES = $(BUILDPARFILES) $(BUILDLEXFILES)
 
@@ -81,4 +79,9 @@ endif
 findent.o: parser.h
 
 bin_PROGRAMS    = findent
-findent_SOURCES = findent.cpp lexer.cpp parser.cpp line_prep.cpp pre_analyzer.cpp
+findent_SOURCES = findent.cpp lexer.cpp parser.cpp \
+		  line_prep.cpp pre_analyzer.cpp debug.h \
+		  line_prep.h pre_analyzer.h version.h \
+		  findent.h simpleostream.h
+
+EXTRA_DIST  = lexer.l parser.y

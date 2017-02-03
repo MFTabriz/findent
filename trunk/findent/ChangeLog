@@ -9,6 +9,8 @@ findent-2.7.4:
 	building from tarball.
 	Update debian directory.
 	bootstrap: fix bug wich prevented 'make dist' to run
+	src/Makefile.am, Makefile.am, scripts/Makefile.am:
+	fixes to facilitate 'make distcheck'
 findent-2.7.3:
 findent-2.7.2:
 	copyright: BSD-3
