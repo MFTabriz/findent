@@ -692,9 +692,11 @@ uninstall-man: uninstall-man1
 @USEBISON_TRUE@	$(YACC) -o parser.cpp -d $<
 @USEBISON_TRUE@	if test -f parser.cpp.h ; then mv parser.cpp.h parser.h ; fi
 @USEBISON_TRUE@	if test -f parser.hpp ; then mv parser.hpp parser.h ; fi
-@USEBISON_TRUE@	cp parser.cpp buildparser.cpp.in
-@USEBISON_TRUE@	cp parser.h buildparser.h.in
-@USEBISON_TRUE@	touch dummyparser
+@USEBISON_TRUE@	if test -f buildparser.cpp.in ; \
+@USEBISON_TRUE@	   then  cp parser.cpp buildparser.cpp.in ; fi
+@USEBISON_TRUE@	if test -f buildparser.h.in ; \
+@USEBISON_TRUE@	   then cp parser.h buildparser.h.in ; fi
+@USEBISON_TRUE@	if test -f dummyparser ; then touch dummyparser ; fi
 @USEBISON_FALSE@dummyparser: parser.y
 @USEBISON_FALSE@	@echo ""
 @USEBISON_FALSE@	@echo "**********************************************************"
@@ -716,8 +718,9 @@ uninstall-man: uninstall-man1
 
 @USEFLEX_TRUE@lexer.cpp: lexer.l
 @USEFLEX_TRUE@	$(LEX) -i -o $@ $<
-@USEFLEX_TRUE@	cp lexer.cpp buildlexer.cpp.in
-@USEFLEX_TRUE@	touch dummylexer
+@USEFLEX_TRUE@	if test -f buildlexer.cpp.in ; \
+@USEFLEX_TRUE@	   then cp lexer.cpp buildlexer.cpp.in ; fi
+@USEFLEX_TRUE@	if test -f dummylexer ; then touch dummylexer ; fi
 @USEFLEX_FALSE@dummylexer: lexer.l
 @USEFLEX_FALSE@	@echo ""
 @USEFLEX_FALSE@	@echo "*********************************************************"

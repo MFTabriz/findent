@@ -11,9 +11,11 @@ parser.cpp parser.h: parser.y
 	$(YACC) -o parser.cpp -d $<
 	if test -f parser.cpp.h ; then mv parser.cpp.h parser.h ; fi
 	if test -f parser.hpp ; then mv parser.hpp parser.h ; fi
-	cp parser.cpp buildparser.cpp.in
-	cp parser.h buildparser.h.in
-	touch dummyparser
+	if test -f buildparser.cpp.in ; \
+	   then  cp parser.cpp buildparser.cpp.in ; fi
+	if test -f buildparser.h.in ; \
+	   then cp parser.h buildparser.h.in ; fi
+	if test -f dummyparser ; then touch dummyparser ; fi
 else
 dummyparser: parser.y
 	@echo ""
@@ -38,8 +40,9 @@ endif
 if USEFLEX
 lexer.cpp: lexer.l
 	$(LEX) -i -o $@ $<
-	cp lexer.cpp buildlexer.cpp.in
-	touch dummylexer
+	if test -f buildlexer.cpp.in ; \
+	   then cp lexer.cpp buildlexer.cpp.in ; fi
+	if test -f dummylexer ; then touch dummylexer ; fi
 else
 dummylexer: lexer.l
 	@echo ""
