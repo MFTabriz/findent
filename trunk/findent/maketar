@@ -3,11 +3,15 @@
 curdir=`pwd`                                       || exit 1
 version=`./getversion`                             || exit 1
 echo "version = $version"
-if [ -e debian/changelog ] ; then
-   sed -i "1s/(.*)/($version-1)/" debian/changelog   || exit 1
-fi
 ./bootstrap                                        || exit 1
 ./configure                                        || exit 1
+make distcheck                                     || exit 1
+mkdir -p ../versions                               || exit 1
+mv findent*.tar.gz ../versions                     || exit 1
+unix2dos -n README.1st ../versions/README          || exit 1
+exit 0
+
+
 make maintainer-clean                              || exit 1
 rm -rf bin share
 ./bootstrap                                        || exit 1
