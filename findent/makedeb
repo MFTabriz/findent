@@ -1,11 +1,11 @@
 #!/bin/bash
 curdir=$PWD
 version=`./getversion`
+echo "version = $version"
 tar=$PWD/../versions/findent-$version.tar.gz
 dir=findent-$version
 dsc=findent_$version-1.dsc
 debdir=$PWD/../debian/findent-$version-deb
-echo "version = $version"
 if [ -e debian/changelog ] ; then
    sed -i "1s/(.*)/($version-1)/" debian/changelog   || exit 1
 fi
@@ -19,11 +19,17 @@ cp -r $curdir/debian . || exit
 dh_make --yes --s -f $tar
 debuild -us -uc --lintian-opts --profile debian || exit
 # dpkg-buildpackage -us -uc
+if test "x$1" != xall ; then 
+   cd ..
+   rm -r $dir || exit 1
+   exit 0
+fi
 cd ..
 for dist in wheezy sid ; do
    echo building for $dist ...
    sudo bash `which pbuilder` --build --configfile $HOME/pbuilderrc.$dist $dsc || exit
 done
+rm -r $dir || exit 1
 echo '*************************************************'
 echo '** wheezy in /var/cache/pbuilder/result-wheezy **'
 echo '** sid in /var/cache/pbuilder/result-sid       **'
