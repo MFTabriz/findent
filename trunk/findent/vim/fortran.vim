@@ -241,6 +241,12 @@ if b:fortran_format == "free"
    let b:fortran_free_source = 1
    let b:fortran_fixed_source = 0
    setlocal colorcolumn=133
+   if exists("g:findent_setcolumns")
+      if(g:findent_setcolumns)
+	 setlocal numberwidth=6
+	 let &columns=132+&numberwidth
+      endif
+   endif
 else
    let g:fortran_fixed_source = 1
    let b:fortran_fixed_source = 1
