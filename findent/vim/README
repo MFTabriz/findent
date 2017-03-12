@@ -18,6 +18,11 @@ In .vimrc you can specify:
      let findent_flags = "-i4"    
      default is "-i".&shiftwidth
 
+  let findent_setcolumns = 1 " for free format, width of window will
+                             " be forced to 132 columns
+  let findent_setcolumns = 0 " no forcing of window width
+  default is 0
+
 In findent.vim, the following mappings are defined
   (asuming your LocalLeader = \):
 
