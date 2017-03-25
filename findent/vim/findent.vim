@@ -4,6 +4,7 @@
 "Author: Willem Vermin wvermin@gmail.com
 "Licence: fair
 "Date: nov 2016
+"
 
 if exists("g:use_findent")
    if !g:use_findent
@@ -100,7 +101,11 @@ augroup fortfiletype
    autocmd Filetype fortran nnoremap <buffer> == i<Esc>l
 
    " make syntax aware of above
-   autocmd Filetype fortran syntax on
+   " probably not needed.
+   " uncommented, because autocmd commands in .vimrc are not executed
+   " when a modeline for is presen, as in:
+   " !directions for vi vim: filetype=fortran
+   " autocmd Filetype fortran syntax on
 
 augroup END
 
