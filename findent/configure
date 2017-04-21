@@ -2836,6 +2836,14 @@ ac_config_files="$ac_config_files test/progfree.f"
 
 ac_config_files="$ac_config_files test/progfree.f.try.f.ref"
 
+ac_config_files="$ac_config_files test/progfree1.f"
+
+ac_config_files="$ac_config_files test/progfree1.f.try.f.ref"
+
+ac_config_files="$ac_config_files test/progfixed1.f"
+
+ac_config_files="$ac_config_files test/progfixed1.f.try.f.ref"
+
 
 ac_config_files="$ac_config_files test/test-compile.sh"
 
@@ -2850,6 +2858,10 @@ ac_config_files="$ac_config_files test/test4.sh"
 ac_config_files="$ac_config_files test/test5.sh"
 
 ac_config_files="$ac_config_files test/test6.sh"
+
+ac_config_files="$ac_config_files test/test7.sh"
+
+ac_config_files="$ac_config_files test/test8.sh"
 
 ac_config_files="$ac_config_files test/test10.sh"
 
@@ -6137,6 +6149,10 @@ do
     "test/progfree-dos.f.try.f.ref") CONFIG_FILES="$CONFIG_FILES test/progfree-dos.f.try.f.ref" ;;
     "test/progfree.f") CONFIG_FILES="$CONFIG_FILES test/progfree.f" ;;
     "test/progfree.f.try.f.ref") CONFIG_FILES="$CONFIG_FILES test/progfree.f.try.f.ref" ;;
+    "test/progfree1.f") CONFIG_FILES="$CONFIG_FILES test/progfree1.f" ;;
+    "test/progfree1.f.try.f.ref") CONFIG_FILES="$CONFIG_FILES test/progfree1.f.try.f.ref" ;;
+    "test/progfixed1.f") CONFIG_FILES="$CONFIG_FILES test/progfixed1.f" ;;
+    "test/progfixed1.f.try.f.ref") CONFIG_FILES="$CONFIG_FILES test/progfixed1.f.try.f.ref" ;;
     "test/test-compile.sh") CONFIG_FILES="$CONFIG_FILES test/test-compile.sh" ;;
     "test/test1.sh") CONFIG_FILES="$CONFIG_FILES test/test1.sh" ;;
     "test/test2.sh") CONFIG_FILES="$CONFIG_FILES test/test2.sh" ;;
@@ -6144,6 +6160,8 @@ do
     "test/test4.sh") CONFIG_FILES="$CONFIG_FILES test/test4.sh" ;;
     "test/test5.sh") CONFIG_FILES="$CONFIG_FILES test/test5.sh" ;;
     "test/test6.sh") CONFIG_FILES="$CONFIG_FILES test/test6.sh" ;;
+    "test/test7.sh") CONFIG_FILES="$CONFIG_FILES test/test7.sh" ;;
+    "test/test8.sh") CONFIG_FILES="$CONFIG_FILES test/test8.sh" ;;
     "test/test10.sh") CONFIG_FILES="$CONFIG_FILES test/test10.sh" ;;
     "test/test11.sh") CONFIG_FILES="$CONFIG_FILES test/test11.sh" ;;
     "src/buildparser.cpp") CONFIG_FILES="$CONFIG_FILES src/buildparser.cpp" ;;
@@ -6756,6 +6774,8 @@ $as_echo "$as_me: executing $ac_file commands" >&6;}
     "test/test4.sh":F) chmod +x test/test4.sh ;;
     "test/test5.sh":F) chmod +x test/test5.sh ;;
     "test/test6.sh":F) chmod +x test/test6.sh ;;
+    "test/test7.sh":F) chmod +x test/test7.sh ;;
+    "test/test8.sh":F) chmod +x test/test8.sh ;;
     "test/test10.sh":F) chmod +x test/test10.sh ;;
     "test/test11.sh":F) chmod +x test/test11.sh ;;
     "depfiles":C) test x"$AMDEP_TRUE" != x"" || {
