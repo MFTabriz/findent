@@ -27,12 +27,12 @@ fi
 cd ..
 for dist in wheezy sid ; do
    echo building for $dist ...
-   sudo bash `which pbuilder` --build --configfile $HOME/pbuilderrc.$dist $dsc || exit
+   sudo bash `which pbuilder` --build --configfile ~root/pbuilderrc.$dist $dsc || exit
 done
 rm -r $dir || exit 1
-echo '*************************************************'
-echo '** wheezy in /var/cache/pbuilder/result-wheezy **'
-echo '** sid in /var/cache/pbuilder/result-sid       **'
-echo '** do not forget to debsign .changes           **'
-echo '*************************************************'
+echo '*******************************************************'
+echo '** wheezy in /var/cache/pbuilder/result-amd64-wheezy **'
+echo '** sid in /var/cache/pbuilder/result-amd64-sid       **'
+echo '** do not forget to debsign .changes                 **'
+echo '*******************************************************'
 echo $0 done
