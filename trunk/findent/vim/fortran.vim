@@ -244,7 +244,9 @@ if b:fortran_format == "free"
    if exists("g:findent_setcolumns")
       if(g:findent_setcolumns)
 	 setlocal numberwidth=6
-	 let &columns=132+&numberwidth
+	 if &columns < 132+&numberwidth
+	    let &columns=132+&numberwidth
+	 endif
       endif
    endif
 else
