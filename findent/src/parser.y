@@ -93,6 +93,7 @@ line:
     |                interface                { properties.kind = INTERFACE;         }
     |                module                   { properties.kind = MODULE;            }
     |                moduleprocedure          { properties.kind = PROCEDURE;         }
+    |                procedure                { properties.kind = PROCEDURE;         }
     |                selectcase               { properties.kind = SELECTCASE;        }
     |                selecttype               { properties.kind = SELECTTYPE;        }
     |                simple_end               { properties.kind = END;               }
@@ -113,6 +114,7 @@ abstractinterface:   ABSTRACTINTERFACE  EOL     ;
 contains:            CONTAINS           EOL     ;
 interface:           INTERFACE          skipall ;
 moduleprocedure:     MODULEPROCEDURE    enable_identifier IDENTIFIER getname EOL ;
+procedure:           PROCEDURE          enable_identifier IDENTIFIER getname EOL ;
 
 
 subfun_stmt_bind:    subfun_stmt SKIP ;

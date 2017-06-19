@@ -13,6 +13,8 @@ findent-2.7.4:
 	fixes to facilitate 'make distcheck'
 	src/findent.cpp, add option -i- to disable indenting
 	test: add test7.sh and test8.sh to test flag -i-
+	parser.y, lexer.y:
+	   recognize PROCEDURE(not only MODULEPROCEDURE) as PROCEDURE
 findent-2.7.3:
 findent-2.7.2:
 	copyright: BSD-3

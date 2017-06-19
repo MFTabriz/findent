@@ -175,6 +175,7 @@ module            { D(O("MODULE");Y);             return MODULE;            }
 moduleprocedure   { D(O("MODULEPROCEDURE");Y);    return MODULEPROCEDURE;   }
 modulesubroutine  { D(O("MODULESUBROUTINE");Y);   return MODULESUBROUTINE;  }
 modulefunction    { D(O("MODULEFUNCTION");Y);     return MODULEFUNCTION;    }
+procedure         { D(O("PROCEDURE");Y);          return PROCEDURE;         }
 program           { D(O("PROGRAM");Y;);           return PROGRAM;           }
 pure              { D(O("PURE");Y;);              return PURE;              }
 real              { D(O("REAL");Y;);              return BASICTYPE;         }
