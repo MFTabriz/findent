@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(findent, 2.7.4~pre2, wvermin@gmail.com)
+AC_INIT(findent, 2.7.4~pre3, wvermin@gmail.com)
 AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
 AC_CONFIG_SRCDIR([src/findent.cpp])
@@ -52,6 +52,7 @@ AS_IF( [test "x$with_windows" = xyes],
         AC_MSG_NOTICE([Will create WINDOWS executable findent.exe])])
 
 AM_CONDITIONAL([MAKEMAN],[test "x$with_windows" != "xyes"])
+AM_CONDITIONAL([MAKEWIN],[test "x$with_windows" = "xyes"])
 
 # test if bison available etc...
 
