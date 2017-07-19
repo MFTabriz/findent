@@ -18,6 +18,10 @@ findent-2.7.4:
 	parser.y, lexer.y:
 	   recognize PROCEDURE(not only MODULEPROCEDURE) as PROCEDURE
 	makedeb: add i386-wheezy
+	Makefile.am, configure.ac: introduce variable MAKEWIN to 
+	  mv findent to findent.exe when compiling for windows.
+	  Somehow, now the mingw compiler does not generate foo.exe
+	  when requested to produce foo.
 findent-2.7.3:
 findent-2.7.2:
 	copyright: BSD-3
