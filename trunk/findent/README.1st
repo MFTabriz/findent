@@ -26,13 +26,14 @@ Unix-Linux users:
 		be used to regenerate the parser and lexer
 		sources. See ./configure --help
 
-    if necessary, remake the Windows executable (requires package mingw32):
+    You can create an Windows executable (requires package mingw32):
 	     $ ./configure --with-windows
              $ make clean
 	     $ make
 
-	findent.exe is available in src/
-	wfindent.bat is available in scripts/
+	If things are ok:
+	   findent.exe will be available in src/
+	   wfindent.bat is available in scripts/
 
 
 Windows users: download findent-x.y.zip
