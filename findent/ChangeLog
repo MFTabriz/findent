@@ -17,6 +17,7 @@ findent-2.7.4:
 	        from fixed to free
 	parser.y, lexer.y:
 	   recognize PROCEDURE(not only MODULEPROCEDURE) as PROCEDURE
+	makedeb: add i386-wheezy
 findent-2.7.3:
 findent-2.7.2:
 	copyright: BSD-3
