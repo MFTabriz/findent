@@ -1,5 +1,5 @@
 usage of findent in gedit
-# to be used in gedit to indent fortran source
+
 # in gedit:
 #    Edit -> preferences -> enable "External Tools"
 #    Tools -> Manage External Tools -> Add
@@ -12,3 +12,9 @@ usage of findent in gedit
 #       Output:        Replace current document
 #       Applicability: All documents   Fortran 95
 #       
+
+Alternatively, if all is well, it would be sufficient to place
+the command
+   findent -Ia -i3
+in the tool, but the script findent-gedit does some sanity checks
+to prevent "oops" experiences.
