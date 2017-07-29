@@ -1,0 +1,14 @@
+usage of findent in gedit
+# to be used in gedit to indent fortran source
+# in gedit:
+#    Edit -> preferences -> enable "External Tools"
+#    Tools -> Manage External Tools -> Add
+#       - rename "New Tool" into findent
+#       - put the file findent-gedit in the tool, or place a command
+#          in the tool that starts this script
+#       Shortcut Key:  <Alt>F1    (or something more to your liking)
+#       Save:          Nothing
+#       Input:         Current document
+#       Output:        Replace current document
+#       Applicability: All documents   Fortran 95
+#       

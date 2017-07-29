@@ -10,6 +10,7 @@ findent: indents/beautifies/converts Fortran sources
       for Unix and Windows (wfindent and wfindent.bat respectively)
  - (g)vim users: findent can act as a plug-in to format your
       edit file with the '=' command
+ - gedit users: findent can be used as indenter for the files you are editing
  - gui frontent available in a separate package: jfindent
 
 Unix-Linux users: 
@@ -63,5 +64,7 @@ Examples: $ findent < in.f90 > out.f90
      vim/README
      and the comments in the files vim/findent.vim and vim/fortran.vim
 
+gedit users:
+   Install findent, and follow the instructions in gedit/README
 
 # $Id$
