@@ -27,6 +27,8 @@ restore()
    exit
 }
 cat > $fin                    # copy input to $fin
+# gedit veresion 2 has some troubles keeping stdout and 
+#  stderr separate when stdout does not end with newline.
 # add newline if input file does not end with newline:
 lastchar="$(tail -c1 $fin | od -a -An | tr -d ' ')"
 if [ "$lastchar" != "nl" ] ; then
