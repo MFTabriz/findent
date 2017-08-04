@@ -1,5 +1,6 @@
 usage of findent in gedit
 
+to use findent as external tool:
 # in gedit:
 #    Edit -> preferences -> enable "External Tools"
 #    Tools -> Manage External Tools -> Add
@@ -13,8 +14,19 @@ usage of findent in gedit
 #       Applicability: All documents   Fortran 95
 #       
 
-Alternatively, if all is well, it would be sufficient to place
-the command
-   findent -Ia -i3
-in the tool, but the script findent-gedit does some sanity checks
-to prevent "oops" experiences.
+   Alternatively, if all is well, it would be sufficient to place
+   the command
+      findent -Ia -i3
+   in the tool, but the script findent-gedit does some sanity checks
+   to prevent "oops" experiences.
+
+To use findent as plugin:
+
+# cp findent.py findent.plugin $HOME/.local/share/gedit/plugins
+# in gedit:
+#   Edit -> preferences -> plugins -> check: findent
+  findent is available in popup menu (right-click) and
+  shortcut <Ctrl><Alt>f . You can change that in 
+  findent.py, look for the definition of 'shortcut'.
+  Advantage of plugin over external tool: gedit scrolls
+  back to point where you called findent.
