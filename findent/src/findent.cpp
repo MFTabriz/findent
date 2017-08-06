@@ -158,52 +158,52 @@ int main(int argc, char*argv[])
    while((c=getopt(argc,argv,"a:b:c:C:d:e:E:f:F:hHi:I:j:k:l:L:m:o:qQr:R:s:t:vw:x:"))!=-1)
       switch(c)
       {
-	 case 'a' :
+	 case 'a' :                            // --indent_associate=nn
 	    associate_indent  = atoi(optarg);
 	    break;
 	 case 'b' :
-	    block_indent      = atoi(optarg);
+	    block_indent      = atoi(optarg);  // --indent_block=nn
 	    break;
 	 case 'c' :
-	    case_indent       = atoi(optarg);
+	    case_indent       = atoi(optarg);  // --indent_case=nn
 	    break;
-	 case 'C' :
+	 case 'C' :                            // --indent_contains=nn/none
 	    if(optarg[0] == '-')
 	       indent_contain = 0;
 	    else
 	       contains_indent   = atoi(optarg);
 	    break;
-	 case 'd' :
+	 case 'd' :                            // --indent_do=nn
 	    do_indent         = atoi(optarg);
 	    break;
 	 case 'e' :
-	    entry_indent      = atoi(optarg);
+	    entry_indent      = atoi(optarg);  // --indent_entry=nn
 	    break;
 	 case 'E' :
-	    enum_indent       = atoi(optarg);
+	    enum_indent       = atoi(optarg);  // --indent_enum=nn
 	    break;
 	 case 'f' :
-	    if_indent         = atoi(optarg);
+	    if_indent         = atoi(optarg);  // --indent_if=nn
 	    break;
 	 case 'F' :   
-	    forall_indent     = atoi(optarg);
+	    forall_indent     = atoi(optarg);  // --indent_forall=nn
 	    break;
-	 case 'h' :
+	 case 'h' :                            // --help
 	    usage(0);
 	    return 0;
 	    break;
-	 case 'H':
+	 case 'H':                             // --manpage
 	    usage(1);
 	    return 0;
 	    break;
-	 case 'i' :
+	 case 'i' :                            // --input_format=fixed/free/auto
 	    if      (std::string(optarg) == "fixed")
 	       input_format = FIXED;
 	    else if (std::string(optarg) == "free")
 	       input_format = FREE;
 	    else if (std::string(optarg) == "auto")
 	       input_format = determine_fix_or_free(1);
-	    else if (optarg[0] == '-')
+	    else if (optarg[0] == '-')        // --indent=no/nn
 	       apply_indent = 0;
 	    else
 	    {
@@ -215,7 +215,7 @@ int main(int argc, char*argv[])
 		  if (input_format == FREE)  O("free")
 	     )
 	       break;
-	 case 'I' :
+	 case 'I' :                          // --startindent=nn/auto
 	    if (optarg[0] == 'a')
 	       auto_firstindent = 1;
 	    else
@@ -225,44 +225,52 @@ int main(int argc, char*argv[])
 	    }
 	    break;
 	 case 'j' :
-	    interface_indent  = atoi(optarg);
+	    interface_indent  = atoi(optarg);  // --indent_interface=nn
 	    break;
-	 case 'k' :
+	 case 'k' :                           // --indent_continuation=nn/no
 	    if (optarg[0] == '-')
 	       indent_cont = 0;
 	    else
 	       cont_indent = atoi(optarg);
 	    break;
 	 case 'l' :
-	    if(std::string(optarg) == "astindent")
+	    if(std::string(optarg) == "astindent")      // --lastindent
 	       last_indent_only = 1;
-	    else if(std::string(optarg) == "astusable")
+	    else if(std::string(optarg) == "astusable")  // --lastusable
 	       last_usable_only = 1;
 	    else
-	       label_left     = (atoi(optarg) != 0);
+	       label_left     = (atoi(optarg) != 0);     // --label_left=0/1
 	    break;
 	 case 'L' :
-	    input_line_length = atoi(optarg);
-	    input_format_gnu  = (optarg[strlen(optarg)-1] == 'g');
+	    input_line_length = atoi(optarg);            // --input_line_length=nn
+	    input_format_gnu  = (optarg[strlen(optarg)-1] == 'g'); // --input_gnu=0/1
 	 case 'm' :
-	    module_indent     = atoi(optarg);
+	    module_indent     = atoi(optarg);           // --indent_module=nn
 	    break;
 	 case 'o' :
-	    if(std::string(optarg) == "free")
+	    if(std::string(optarg) == "free")           // --output_format=free/same
+	    {
 	       output_format = FREE;
-	    break;
-	 case 'q' :
+	       break;
+	    }
+	    if(std::string(optarg) == "same")
+	    {
+	       output_format = 0;
+	       break;
+	    }
+
+	 case 'q' :                                    // --only_fix_free
 	    only_fix_free = 1;
 	    break;
 	 case 'Q':
 	    // return 2 if free, 4 if fixed
-	    // not dodumented, maybe useful in the future
+	    // not documented, maybe useful in the future
 	    return_format = 1;
 	    break;
-	 case 'r' :
+	 case 'r' :                                    // --indent_procedure
 	    routine_indent    = atoi(optarg);
 	    break;
-	 case 'R':
+	 case 'R':                                     // --refactor_procedure[=upcase]
 	    switch(optarg[0])
 	    {
 	       case 'R' :
@@ -272,21 +280,21 @@ int main(int argc, char*argv[])
 		  break;
 	    }
 	    break;
-	 case 's' :
+	 case 's' :                                 // --indent_select=nn
 	    select_indent     = atoi(optarg);
 	    break;
 	 case 't' :
-	    type_indent       = atoi(optarg);
+	    type_indent       = atoi(optarg);      // --indent_type=nn
 	    break;
 	 case 'v' :
-	    std::cout << "findent version "<<VERSION<<std::endl;
+	    std::cout << "findent version "<<VERSION<<std::endl;  // --version
 	    return 0;
 	    break;
 	 case 'w' :
-	    where_indent      = atoi(optarg);
+	    where_indent      = atoi(optarg);       // --indent_where=nn
 	    break;
 	 case 'x' :
-	    critical_indent   = atoi(optarg);
+	    critical_indent   = atoi(optarg);       // --indent_critical=nn
 	    break;
       }
 
@@ -1790,6 +1798,7 @@ void usage(const bool doman)
    manout("-Lnnng","same as above, but use gfortran convention",          doman);
    manout(" ","for counting the characters with tabbed lines",            doman);
    manout("-ofree","force free format output",                            doman);
+   manout("-osame","output format same is input format",                  doman);
    manout("-Rr","refactor blocks: a single 'end'",                        doman);
    manout(" "," is, if possible, replaced by",                            doman);
    manout(" "," 'end subroutine <name>' or",                              doman);
