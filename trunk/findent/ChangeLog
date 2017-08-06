@@ -22,6 +22,9 @@ findent-2.7.4:
 	  mv findent to findent.exe when compiling for windows.
 	  Somehow, now the mingw compiler does not generate foo.exe
 	  when requested to produce foo.
+	findent.cpp:
+	   add comment for names of long flags
+	   add -osame option
 findent-2.7.3:
 findent-2.7.2:
 	copyright: BSD-3
