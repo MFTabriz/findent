@@ -100,8 +100,9 @@ CONFIG_CLEAN_FILES = progfixed-dos.f progfixed-dos.f.try.f.ref \
 	progfixed.f.try.f.ref progfree-dos.f progfree-dos.f.try.f.ref \
 	progfree.f progfree.f.try.f.ref progfree1.f \
 	progfree1.f.try.f.ref progfixed1.f progfixed1.f.try.f.ref \
-	test-compile.sh test1.sh test2.sh test3.sh test4.sh test5.sh \
-	test6.sh test7.sh test8.sh test10.sh test11.sh
+	help.ref manpage.ref test-compile.sh test1.sh test2.sh \
+	test3.sh test4.sh test5.sh test6.sh test7.sh test8.sh test9.sh \
+	test10.sh test11.sh test12.sh test13.sh test14.sh test15.sh
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -327,7 +328,8 @@ TEST_LOGS = $(am__test_logs2:.test.log=.log)
 TEST_LOG_DRIVER = $(SHELL) $(top_srcdir)/test-driver
 TEST_LOG_COMPILE = $(TEST_LOG_COMPILER) $(AM_TEST_LOG_FLAGS) \
 	$(TEST_LOG_FLAGS)
-am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/progfixed-dos.f.in \
+am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/help.ref.in \
+	$(srcdir)/manpage.ref.in $(srcdir)/progfixed-dos.f.in \
 	$(srcdir)/progfixed-dos.f.try.f.ref.in \
 	$(srcdir)/progfixed.f.in $(srcdir)/progfixed.f.try.f.ref.in \
 	$(srcdir)/progfixed1.f.in $(srcdir)/progfixed1.f.try.f.ref.in \
@@ -341,10 +343,13 @@ am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/progfixed-dos.f.in \
 	$(srcdir)/progfree1.f.try.f.ref.in \
 	$(srcdir)/test-compile.sh.in $(srcdir)/test1.sh.in \
 	$(srcdir)/test10.sh.in $(srcdir)/test11.sh.in \
+	$(srcdir)/test12.sh.in $(srcdir)/test13.sh.in \
+	$(srcdir)/test14.sh.in $(srcdir)/test15.sh.in \
 	$(srcdir)/test2.sh.in $(srcdir)/test3.sh.in \
 	$(srcdir)/test4.sh.in $(srcdir)/test5.sh.in \
 	$(srcdir)/test6.sh.in $(srcdir)/test7.sh.in \
-	$(srcdir)/test8.sh.in $(top_srcdir)/test-driver
+	$(srcdir)/test8.sh.in $(srcdir)/test9.sh.in \
+	$(top_srcdir)/test-driver
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
@@ -448,7 +453,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 TESTS = test1.sh test2.sh test3.sh test4.sh test5.sh test6.sh test7.sh test8.sh \
-	test10.sh test11.sh
+	test9.sh test10.sh test11.sh test12.sh test13.sh test14.sh test15.sh
 
 CLEANFILES = prog *.mod 
 DISTCLEANFILES = *.f
@@ -517,6 +522,10 @@ progfixed1.f: $(top_builddir)/config.status $(srcdir)/progfixed1.f.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 progfixed1.f.try.f.ref: $(top_builddir)/config.status $(srcdir)/progfixed1.f.try.f.ref.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+help.ref: $(top_builddir)/config.status $(srcdir)/help.ref.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+manpage.ref: $(top_builddir)/config.status $(srcdir)/manpage.ref.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 test-compile.sh: $(top_builddir)/config.status $(srcdir)/test-compile.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 test1.sh: $(top_builddir)/config.status $(srcdir)/test1.sh.in
@@ -535,9 +544,19 @@ test7.sh: $(top_builddir)/config.status $(srcdir)/test7.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 test8.sh: $(top_builddir)/config.status $(srcdir)/test8.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+test9.sh: $(top_builddir)/config.status $(srcdir)/test9.sh.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 test10.sh: $(top_builddir)/config.status $(srcdir)/test10.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 test11.sh: $(top_builddir)/config.status $(srcdir)/test11.sh.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+test12.sh: $(top_builddir)/config.status $(srcdir)/test12.sh.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+test13.sh: $(top_builddir)/config.status $(srcdir)/test13.sh.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+test14.sh: $(top_builddir)/config.status $(srcdir)/test14.sh.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+test15.sh: $(top_builddir)/config.status $(srcdir)/test15.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 tags TAGS:
 
@@ -743,6 +762,13 @@ test8.sh.log: test8.sh
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+test9.sh.log: test9.sh
+	@p='test9.sh'; \
+	b='test9.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 test10.sh.log: test10.sh
 	@p='test10.sh'; \
 	b='test10.sh'; \
@@ -753,6 +779,34 @@ test10.sh.log: test10.sh
 test11.sh.log: test11.sh
 	@p='test11.sh'; \
 	b='test11.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+test12.sh.log: test12.sh
+	@p='test12.sh'; \
+	b='test12.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+test13.sh.log: test13.sh
+	@p='test13.sh'; \
+	b='test13.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+test14.sh.log: test14.sh
+	@p='test14.sh'; \
+	b='test14.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+test15.sh.log: test15.sh
+	@p='test15.sh'; \
+	b='test15.sh'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \

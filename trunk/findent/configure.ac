@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(findent, 2.7.4~pre3, wvermin@gmail.com)
+AC_INIT(findent, 2.7.4~pre5, wvermin@gmail.com)
 AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
 AC_CONFIG_SRCDIR([src/findent.cpp])
@@ -23,6 +23,8 @@ AC_CONFIG_FILES([test/progfree1.f])
 AC_CONFIG_FILES([test/progfree1.f.try.f.ref])
 AC_CONFIG_FILES([test/progfixed1.f])
 AC_CONFIG_FILES([test/progfixed1.f.try.f.ref])
+AC_CONFIG_FILES([test/help.ref])
+AC_CONFIG_FILES([test/manpage.ref])
 
 AC_CONFIG_FILES([test/test-compile.sh],[chmod +x test/test-compile.sh])
 AC_CONFIG_FILES([test/test1.sh],[chmod +x test/test1.sh])
@@ -33,8 +35,13 @@ AC_CONFIG_FILES([test/test5.sh],[chmod +x test/test5.sh])
 AC_CONFIG_FILES([test/test6.sh],[chmod +x test/test6.sh])
 AC_CONFIG_FILES([test/test7.sh],[chmod +x test/test7.sh])
 AC_CONFIG_FILES([test/test8.sh],[chmod +x test/test8.sh])
+AC_CONFIG_FILES([test/test9.sh],[chmod +x test/test9.sh])
 AC_CONFIG_FILES([test/test10.sh],[chmod +x test/test10.sh])
 AC_CONFIG_FILES([test/test11.sh],[chmod +x test/test11.sh])
+AC_CONFIG_FILES([test/test12.sh],[chmod +x test/test12.sh])
+AC_CONFIG_FILES([test/test13.sh],[chmod +x test/test13.sh])
+AC_CONFIG_FILES([test/test14.sh],[chmod +x test/test14.sh])
+AC_CONFIG_FILES([test/test15.sh],[chmod +x test/test15.sh])
 
 AC_SUBST([make_include], ["include"])
 
