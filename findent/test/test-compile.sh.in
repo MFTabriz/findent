@@ -1,4 +1,5 @@
 #!/bin/sh
+export FINDENT_FLAGS="$TEST_FINDENT_FLAGS"
 prog="$1"
 echo "$0: $prog"
 gfortran=gfortran
