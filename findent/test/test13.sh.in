@@ -1,0 +1,42 @@
+#!/bin/sh
+rc=0
+prog="      program fixed
+      continue
+      end
+   "
+for flag in -q --query_fix_free ; do
+   a=`echo "$prog" | ../src/findent "$flag"`
+   if [ "$a" = "fixed" ]; then
+      echo "$flag works OK"
+   else
+      echo "$flag works NOT OK:"
+      echo "expected: fixed"
+      echo "got     : $a"
+      echo "program is:"
+      echo "$prog"
+      rc=`expr $rc + 1`
+   fi
+done
+
+prog="      program free
+ continue
+      end
+   "
+for flag in -q --query_fix_free ; do
+   a=`echo "$prog" | ../src/findent -q`
+   echo "expected: free"
+   echo "got     : $a"
+   echo "program is:"
+   echo "$prog"
+   if [ "$a" = "free" ]; then
+      echo "$flag works OK"
+   else
+      echo "$flag works NOT OK:"
+      echo "expected: fixed"
+      echo "got     : $a"
+      echo "program is:"
+      echo "$prog"
+      rc=`expr $rc + 1`
+   fi
+done
+exit $rc

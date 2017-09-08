@@ -1,0 +1,172 @@
+.\" DO NOT MODIFY THIS FILE! It was created by findent -H
+.TH FINDENT "1" "2015" "findent-2.7.4~pre5" "User Commands"
+.SH NAME
+findent \- Indents and optionally converts Fortran program source
+.SH SYNOPSIS
+.B findent
+[\fIOPTION\fR]...
+.PP
+findent reads from stdin and writes to stdout.
+.SH DESCRIPTION
+Findent indents a Fortran source. Findent uses various kinds of
+indentations, see OPTIONS. Findent can convert from fixed form to
+free form, and can supplement single END statements, see 'Refactor' below.
+Errors in OPTIONS are silently ignored.
+.PP
+.SS "General options:
+Below: <n> denotes an unsigned decimal number.
+.TP
+\fB\-h, --help\fR
+print this text
+.TP
+\fB\-H, --manpage\fR
+print man page
+.TP
+\fB\-v, --version\fR
+prints findent version
+.TP
+\fB\-q, --query_fix_free\fR
+guess free or fixed, prints 'fixed' or 'free' and exits
+.TP
+\fB\-l<n>, --label_left=<n>\fR
+(0/1) 1: move statement labels to start of line (default:1)
+      (only for free format)
+.TP
+\fB\-lastindent, --last_indent\fR
+prints computed indentation of last line
+      (for usage with vim)
+.TP
+\fB\-lastusable, --last_usable\fR
+prints line number of last line usable
+      as start for indenting(for usage with vim)
+.TP
+\fB\-iauto, --input_format=auto\fR
+determine automatically input format (free or fixed)
+.TP
+\fB\-ifixed, --input_format=fixed\fR
+force input format fixed
+(default: auto)
+.TP
+\fB\-ifree, --input_format=free\fR
+force input format free
+(default: auto)
+.TP
+\fB\-i-, --indent=none\fR
+do not change indent (useful in combination with -R)
+.TP
+\fB\-L<n>, --input_line_length=<n>\fR
+use only first <n> characters of each line
+default=0: take whole lines
+.TP
+\fB\-L<n>g, --input_line_length=<n>g\fR
+same as above, but use gfortran convention
+for counting the characters with tabbed lines
+ example: --input_line_length=72g
+.TP
+\fB\-ofree, --output_format=free\fR
+force free format output
+.TP
+\fB\-osame, --output_format=same\fR
+output format same is input format
+.TP
+\fB\-Rr, --refactor_procedures\fR
+refactor procedures and modules: a single 'end'
+ is, if possible, replaced by
+ 'end subroutine <name>' or
+ 'end function <name>' or
+ 'end program <name>' or
+ 'end blockdata <name>' or
+ 'end module <name>'
+ where <name> is the name of the appropriate block
+.TP
+\fB\-RR, --refactor_procedures=upcase\fR
+same as -Rr, but 'SUBROUTINE'
+in stead of 'subroutine' etc
+.PP
+.SS "Indenting options:
+.TP
+\fB\-I<n>, --start_indent=<n>\fR
+starting  indent (default:0)
+.TP
+\fB\-Ia, --start_indent=a\fR
+determine starting indent from first line
+.TP
+\fB\-i<n>, --indent=<n>\fR
+all       indents except I,c,C,e (default: 3)
+.TP
+\fB\-a<n>, --indent_associate=<n>\fR
+ASSOCIATE    indent
+.TP
+\fB\-b<n>, --indent_block=<n>\fR
+BLOCK        indent
+.TP
+\fB\-d<n> --indent_do=<n>\fR
+DO           indent
+.TP
+\fB\-f<n>, --indent_if=<n>\fR
+IF           indent
+.TP
+\fB\-E<n>, --indent_enum=<n>\fR
+ENUM         indent
+.TP
+\fB\-F<n>, --indent_forall=<n>\fR
+FORALL       indent
+.TP
+\fB\-j<n>, --indent_interface=<n>\fR
+INTERFACE    indent
+.TP
+\fB\-m<n>, --indent_module=<n>\fR
+MODULE       indent
+.TP
+\fB\-r<n>, --indent_procedure=<n>\fR
+FUNCTION and
+ SUBROUTINE  indent
+.TP
+\fB\-s<n>, --indent_select=<n>\fR
+SELECT       indent
+.TP
+\fB\-t<n>, --indent_type=<n>\fR
+TYPE         indent
+.TP
+\fB\-w<n>, --indent_where=<n>\fR
+WHERE        indent
+.TP
+\fB\-x<n>, --indent_critical=<n>\fR
+CRITICAL     indent
+.TP
+\fB\-C-, --indent_contains=restart, \fR
+restart indent after CONTAINS
+.TP
+\fB\-k<n>, --indent_continuation=<n>\fR
+continuation indent except   
+  for lines starting with '&'
+     free to free only
+.TP
+\fB\-k-, --indent_continuation=none\fR
+continuation lines not preceded
+  by '&' are untouched
+     free to free only
+.TP
+\fB\  \fR
+next defaults are: all - all/2
+.TP
+\fB\-c<n>, --indent_case=<n>\fR
+CASE      negative indent
+.TP
+\fB\-C<n>, --indent_contains=<n>\fR
+CONTAINS  negative indent
+.TP
+\fB\-e<n>, --indent_entry=<n>\fR
+ENTRY     negative indent
+ 
+.PP
+.SS
+Examples:
+indent: findent < in.f > out.f
+        findent -i2 -r0 < in.f > out.f
+convert: findent -ofree < prog.f > prog.f90
+refactor 'end': findent -Rr < in.f90 > out.f90
+.SH COPYRIGHT
+.br
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
