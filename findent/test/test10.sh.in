@@ -1,19 +1,14 @@
 #!/bin/sh
 rc=0
-prog="  program prog
-  continue"
+cat << eof > prog
+  program prog
+  continue
+eof
+cat << eof > expect
+5
+eof
 
-for flag in -lastindent --last_indent ; do
-   a=`echo "$prog" | ../src/findent $flag -ifree -Ia -i3`
-   if [ "$a" = "5" ]; then
-      echo "$flag : works OK"
-   else
-      echo "$flag : works NOT OK"
-      echo "expected: 5"
-      echo "got     : $a"
-      echo "program is:"
-      echo "$prog"
-      rc=`expr $rc + 1`
-   fi
-done
+./doit "-lastindent --last_indent" "-ifree -Ia -i3"
+rc=`expr $rc + $?`
+
 exit $rc

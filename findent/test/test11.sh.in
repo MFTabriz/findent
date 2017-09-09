@@ -1,20 +1,15 @@
 #!/bin/sh
 rc=0
-prog="   program prog
+cat << eof > prog
+   program prog
   continue
   !comment
-"
-for flag in -lastusable --last_usable ; do
-   a=`echo "$prog" |  ../src/findent $flag -ifree -Ia`
-   if [ "$a" = "2" ]; then
-      echo "$flag : works OK"
-   else
-      echo "$flag : works NOT OK"
-      echo "expected: 2"
-      echo "got     : $a"
-      echo "program is:"
-      echo "$prog"
-      rc=`expr $rc + 1`
-   fi
-done
+eof
+cat << eof > expect
+2
+eof
+
+./doit "-lastusable --last_usable" "-ifree -Ia" "" 
+rc=`expr $rc + $?`
+
 exit $rc

@@ -27,6 +27,7 @@ AC_CONFIG_FILES([test/help.ref])
 AC_CONFIG_FILES([test/manpage.ref])
 
 AC_CONFIG_FILES([test/test-compile.sh],[chmod +x test/test-compile.sh])
+AC_CONFIG_FILES([test/doit],[chmod +x test/doit])
 AC_CONFIG_FILES([test/test1.sh],[chmod +x test/test1.sh])
 AC_CONFIG_FILES([test/test2.sh],[chmod +x test/test2.sh])
 AC_CONFIG_FILES([test/test3.sh],[chmod +x test/test3.sh])

@@ -2853,6 +2853,8 @@ ac_config_files="$ac_config_files test/manpage.ref"
 
 ac_config_files="$ac_config_files test/test-compile.sh"
 
+ac_config_files="$ac_config_files test/doit"
+
 ac_config_files="$ac_config_files test/test1.sh"
 
 ac_config_files="$ac_config_files test/test2.sh"
@@ -6184,6 +6186,7 @@ do
     "test/help.ref") CONFIG_FILES="$CONFIG_FILES test/help.ref" ;;
     "test/manpage.ref") CONFIG_FILES="$CONFIG_FILES test/manpage.ref" ;;
     "test/test-compile.sh") CONFIG_FILES="$CONFIG_FILES test/test-compile.sh" ;;
+    "test/doit") CONFIG_FILES="$CONFIG_FILES test/doit" ;;
     "test/test1.sh") CONFIG_FILES="$CONFIG_FILES test/test1.sh" ;;
     "test/test2.sh") CONFIG_FILES="$CONFIG_FILES test/test2.sh" ;;
     "test/test3.sh") CONFIG_FILES="$CONFIG_FILES test/test3.sh" ;;
@@ -6803,6 +6806,7 @@ $as_echo "$as_me: executing $ac_file commands" >&6;}
 
   case $ac_file$ac_mode in
     "test/test-compile.sh":F) chmod +x test/test-compile.sh ;;
+    "test/doit":F) chmod +x test/doit ;;
     "test/test1.sh":F) chmod +x test/test1.sh ;;
     "test/test2.sh":F) chmod +x test/test2.sh ;;
     "test/test3.sh":F) chmod +x test/test3.sh ;;
