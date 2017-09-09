@@ -1,42 +1,29 @@
 #!/bin/sh
 rc=0
-prog="      program fixed
+cat << eof > prog
+      program fixed
       continue
       end
-   "
-for flag in -q --query_fix_free ; do
-   a=`echo "$prog" | ../src/findent "$flag"`
-   if [ "$a" = "fixed" ]; then
-      echo "$flag works OK"
-   else
-      echo "$flag works NOT OK:"
-      echo "expected: fixed"
-      echo "got     : $a"
-      echo "program is:"
-      echo "$prog"
-      rc=`expr $rc + 1`
-   fi
-done
+eof
 
-prog="      program free
+cat << eof > expect
+fixed
+eof
+
+./doit "-q --query_fix_free" "" "for fixed input"
+rc=`expr $rc + $?`
+
+cat << eof > prog
+      program free
  continue
       end
-   "
-for flag in -q --query_fix_free ; do
-   a=`echo "$prog" | ../src/findent -q`
-   echo "expected: free"
-   echo "got     : $a"
-   echo "program is:"
-   echo "$prog"
-   if [ "$a" = "free" ]; then
-      echo "$flag works OK"
-   else
-      echo "$flag works NOT OK:"
-      echo "expected: fixed"
-      echo "got     : $a"
-      echo "program is:"
-      echo "$prog"
-      rc=`expr $rc + 1`
-   fi
-done
+eof
+
+cat << eof > expect
+free
+eof
+
+./doit "-q --query_fix_free" "" "for free input"
+rc=`expr $rc + $?`
+
 exit $rc
