@@ -1,6 +1,6 @@
 " to enable the findent Fortran indent program: 
 " include this file in ~/.vimrc 
-" or place it in ~/.vim/plugin/
+" or place it in ~/.vim/plugin/ as findent.vim
 "Author: Willem Vermin wvermin@gmail.com
 "Licence: fair
 "Date: nov 2016
