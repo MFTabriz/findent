@@ -44,6 +44,15 @@ AC_CONFIG_FILES([test/test13.sh],[chmod +x test/test13.sh])
 AC_CONFIG_FILES([test/test14.sh],[chmod +x test/test14.sh])
 AC_CONFIG_FILES([test/test15.sh],[chmod +x test/test15.sh])
 
+#AC_CONFIG_FILES([vim/findent.vim])
+#AC_CONFIG_FILES([vim/fortran.vim])
+#AC_CONFIG_FILES([vim/vim.txt])
+#AC_CONFIG_FILES([gedit/findent-gedit])
+#AC_CONFIG_FILES([gedit/findent.plugin])
+#AC_CONFIG_FILES([gedit/findent.py])
+#AC_CONFIG_FILES([gedit/gedit.txt])
+#AC_CONFIG_FILES([src/tocpp.sh],[chmod +x src/tocpp.sh])
+
 AC_SUBST([make_include], ["include"])
 
 AC_ARG_WITH(windows, [AS_HELP_STRING([--with-windows],[Build findent.exe @<:@default=no@:>@])],[],[with_windows=no])

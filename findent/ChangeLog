@@ -1,7 +1,7 @@
 $Id$
 findent-2.7.4:
 	src/Makefile.am, configure.ac: if flex/bison is not
-	  to beused, but lexer.l or parser.y has been changed,
+	  to be used, but lexer.l or parser.y has been changed,
 	  produce a warning message.
 	maketar: remove creating executable 
 	Readme.1st: adapted to previous line
@@ -25,6 +25,18 @@ findent-2.7.4:
 	findent.cpp:
 	   add comment for names of long flags
 	   add -osame option
+	findent.cpp tocpp.sh vim_plugin.cpp vim_plugin.h gedit_plugin.cpp
+	            gedit_plugin.h
+	   let findent output configuration files for usage with vim
+	   and gedit. Flags:
+	    --vim_help
+	    --gedit_help
+	    --vim_findent
+	    --vim_fortran
+	    --gedit_external
+	    --gedit_plugin
+	    --gedit_plugin_py
+
 findent-2.7.3:
 findent-2.7.2:
 	copyright: BSD-3
