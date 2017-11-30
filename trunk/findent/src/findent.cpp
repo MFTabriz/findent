@@ -13,6 +13,8 @@
 #include "parser.h"
 #include "simpleostream.h"
 #include "pre_analyzer.h"
+#include "vim_plugin.h"
+#include "gedit_plugin.h"
 extern "C" FILE *yyin;
 std::string mygetline();
 void get_full_statement();
@@ -195,6 +197,13 @@ int main(int argc, char*argv[])
       DO_LAST_USABLE,
       DO_LABEL_LEFT,
       DO_REFACTOR_PROCEDURE,
+      DO_VIM_FINDENT,
+      DO_VIM_HELP,
+      DO_VIM_FORTRAN,
+      DO_GEDIT_HELP,
+      DO_GEDIT_EXTERNAL,
+      DO_GEDIT_PLUGIN,
+      DO_GEDIT_PLUGIN_PY,
    };
 
    static struct option longopts[] =
@@ -229,6 +238,13 @@ int main(int argc, char*argv[])
       {"version"            , no_argument      , 0, 'v'                  },
       {"indent_where"       , required_argument, 0, 'w'                  },
       {"indent_critical"    , required_argument, 0, 'x'                  },
+      {"vim_help"           , no_argument      , 0, DO_VIM_HELP          },
+      {"gedit_help"         , no_argument      , 0, DO_GEDIT_HELP        },
+      {"vim_fortran"        , no_argument      , 0, DO_VIM_FORTRAN       },
+      {"vim_findent"        , no_argument      , 0, DO_VIM_FINDENT       },
+      {"gedit_external"     , no_argument      , 0, DO_GEDIT_EXTERNAL    },
+      {"gedit_plugin"       , no_argument      , 0, DO_GEDIT_PLUGIN      },
+      {"gedit_plugin_py"    , no_argument      , 0, DO_GEDIT_PLUGIN_PY   },
 
       {0,0,0,0}
    };
@@ -419,6 +435,27 @@ int main(int argc, char*argv[])
 		  upcase_routine_type = 1;
 	    }
 	    break;
+	 case DO_VIM_HELP:
+	    do_vim_help();
+	    return 0;
+	 case DO_VIM_FINDENT:
+	    do_vim_findent();
+	    return 0;
+	 case DO_VIM_FORTRAN:
+	    do_vim_fortran();
+	    return 0;
+	 case DO_GEDIT_HELP:
+	    do_gedit_help();
+	    return 0;
+	 case DO_GEDIT_EXTERNAL:
+	    do_gedit_external();
+	    return 0;
+	 case DO_GEDIT_PLUGIN:
+	    do_gedit_plugin();
+	    return 0;
+	 case DO_GEDIT_PLUGIN_PY:
+	    do_gedit_plugin_py();
+	    return 0;
       }
 
    free(flags);
@@ -1983,6 +2020,31 @@ void usage(const bool doman)
    manout("-C<n>, --indent_contains=<n>"    ,"CONTAINS  negative indent"                                                    ,doman);
    manout("-e<n>, --indent_entry=<n>"       ,"ENTRY     negative indent"                                                    ,doman);
    manout(" "," "                                                                                                           ,doman);
+   if(doman)
+   {
+      std::cout << ".PP" << std::endl << ".SS \"Usage with vim:" << std::endl;
+   }
+   else
+   {
+      std::cout << "  Usage with vim:" << std::endl;
+   }
+   manout("--vim_help"     ,"outputs directions to use findent in (g)vim" ,doman);
+   manout("--vim_fortran"  ,"outputs file 'fortran.vim', see --vim_help"  ,doman);
+   manout("--vim_findent"  ,"outputs file 'findent.vim', see --vim_help"  ,doman); 
+   manout(" "," "                                                         ,doman);
+   if(doman)
+   {
+      std::cout << ".PP" << std::endl << ".SS \"Usage with gedit:" << std::endl;
+   }
+   else
+   {
+      std::cout << "  Usage with gedit:" << std::endl;
+   }
+   manout("--gedit_help"      ,"outputs directions to use findent in gedit"       ,doman);
+   manout("--gedit_external"  ,"outputs script 'findent-gedit', see --gedit_help" ,doman);
+   manout("--gedit_plugin"    ,"outputs file 'findent.plugin', see --gedit_help"  ,doman);
+   manout("--gedit_plugin_py" ,"outputs file 'python.py', see --gedit_help"       ,doman);
+   manout(" "," "                                                                 ,doman);
    if(doman)
    {
       std::cout << ".PP" << std::endl << ".SS" << std::endl;

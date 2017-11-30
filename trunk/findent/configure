@@ -2886,6 +2886,15 @@ ac_config_files="$ac_config_files test/test14.sh"
 ac_config_files="$ac_config_files test/test15.sh"
 
 
+#AC_CONFIG_FILES([vim/findent.vim])
+#AC_CONFIG_FILES([vim/fortran.vim])
+#AC_CONFIG_FILES([vim/vim.txt])
+#AC_CONFIG_FILES([gedit/findent-gedit])
+#AC_CONFIG_FILES([gedit/findent.plugin])
+#AC_CONFIG_FILES([gedit/findent.py])
+#AC_CONFIG_FILES([gedit/gedit.txt])
+#AC_CONFIG_FILES([src/tocpp.sh],[chmod +x src/tocpp.sh])
+
 make_include="include"
 
 
