@@ -8,7 +8,7 @@ cat << eof > expect
 5
 eof
 
-./doit "-lastindent --last_indent" "-ifree -Ia -i3"
+$SRCDIR/test/doit "-lastindent --last_indent" "-ifree -Ia -i3"
 rc=`expr $rc + $?`
 
 exit $rc

@@ -1,5 +1,6 @@
 #!/bin/sh
 rc=0
+doit=$SRCDIR/test/doit
 cat << eof > prog
       program main
       continue
@@ -11,7 +12,7 @@ cat << eof > expect
            end
 eof
 
-./doit "-I5 --start_indent=5" -i3 "for fixed input"
+$doit "-I5 --start_indent=5" -i3 "for fixed input"
 rc=`expr $rc + $?`
 
 cat << eof > prog
@@ -24,7 +25,7 @@ cat << eof > expect
         continue
      end
 eof
-./doit "-I5 --start_indent=5" -i3 "for free input"
+$doit "-I5 --start_indent=5" -i3 "for free input"
 rc=`expr $rc + $?`
 
 cat << eof > prog
@@ -37,7 +38,7 @@ cat << eof > expect
            continue
         end
 eof
-./doit "-Ia --start_indent=a" "-I0 -i3" ""
+$doit "-Ia --start_indent=a" "-I0 -i3" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
@@ -61,7 +62,7 @@ program main
      enddo
 end
 eof
-./doit "-i5 --indent=5" "-I0" ""
+$doit "-i5 --indent=5" "-I0" ""
 rc=`expr $rc + $?`
 
 
@@ -81,7 +82,7 @@ program main
 end
 eof
 
-./doit "-a5 --indent_associate=5" "-i3 -I0" ""
+$doit "-a5 --indent_associate=5" "-i3 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
@@ -99,7 +100,7 @@ program main
 end
 eof
 
-./doit "-b5 --indent_block=5" "-i3 -I0" ""
+$doit "-b5 --indent_block=5" "-i3 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
@@ -122,7 +123,7 @@ program main
 end
 eof
 
-./doit "-d5 --indent_do=5" "-i3 -I0" ""
+$doit "-d5 --indent_do=5" "-i3 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
@@ -147,7 +148,7 @@ program main
 end
 eof
 
-./doit "-f5 --indent_if=5" "-i3 -I0" ""
+$doit "-f5 --indent_if=5" "-i3 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
@@ -168,7 +169,7 @@ program main
 end
 eof
 
-./doit "-E5 --indent_enum=5" "-i3 -I0" ""
+$doit "-E5 --indent_enum=5" "-i3 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
@@ -189,7 +190,7 @@ program main
 end
 eof
 
-./doit "-F5 --indent_forall=5" "-i3 -I0" ""
+$doit "-F5 --indent_forall=5" "-i3 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
@@ -212,7 +213,7 @@ program main
 end
 eof
 
-./doit "-j5 --indent_interface=5" "-i3 -I0" ""
+$doit "-j5 --indent_interface=5" "-i3 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
@@ -235,7 +236,7 @@ module mymodule
 end module
 eof
 
-./doit "-m5 --indent_module=5" "-i3 -I0" ""
+$doit "-m5 --indent_module=5" "-i3 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
@@ -256,7 +257,7 @@ function myfun(x)
 end function
 eof
 
-./doit "-r5 --indent_procedure=5" "-i3 -I0" ""
+$doit "-r5 --indent_procedure=5" "-i3 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
@@ -284,7 +285,7 @@ program main
    continue
 end program
 eof
-./doit "-s5 --indent_select=5" "-i3 -I0" ""
+$doit "-s5 --indent_select=5" "-i3 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
@@ -303,7 +304,7 @@ program main
    end type mytype
 end program
 eof
-./doit "-t5 --indent_type=5" "-i3 -I0" ""
+$doit "-t5 --indent_type=5" "-i3 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
@@ -322,7 +323,7 @@ program main
    end where
 end program
 eof
-./doit "-w5 --indent_where=5" "-i3 -I0" ""
+$doit "-w5 --indent_where=5" "-i3 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
@@ -343,7 +344,7 @@ program main
    end critical
 end program
 eof
-./doit "-x5 --indent_critical=5" "-i3 -I0" ""
+$doit "-x5 --indent_critical=5" "-i3 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
@@ -364,7 +365,7 @@ subroutine mysub
 end subroutine mysub
 end program
 eof
-./doit "-C- --indent_contains=restart" "-i3 -I0" ""
+$doit "-C- --indent_contains=restart" "-i3 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
@@ -385,7 +386,7 @@ program main
 5
 end program
 eof
-./doit "-k- --indent_continuation=none" "-i3 -I0" ""
+$doit "-k- --indent_continuation=none" "-i3 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
@@ -412,7 +413,7 @@ program main
       continue
 end program
 eof
-./doit "-c4 --indent_case=4" "-i6 -I0" ""
+$doit "-c4 --indent_case=4" "-i6 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
@@ -435,7 +436,7 @@ program main
       end function
 end program
 eof
-./doit "-C4 --indent_contains=4" "-i6 -I0" ""
+$doit "-C4 --indent_contains=4" "-i6 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
@@ -452,7 +453,7 @@ subroutine mysub
       continue
 end subroutine
 eof
-./doit "-e4 --indent_entry=4" "-i6 -I0" ""
+$doit "-e4 --indent_entry=4" "-i6 -I0" ""
 rc=`expr $rc + $?`
 
 exit $rc
