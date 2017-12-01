@@ -2814,38 +2814,22 @@ fi
 ac_config_headers="$ac_config_headers config.h"
 
 
-ac_config_files="$ac_config_files test/progfixed-dos.f"
-
-ac_config_files="$ac_config_files test/progfixed-dos.f.try.f.ref"
-
-ac_config_files="$ac_config_files test/progfixed.f"
-
-ac_config_files="$ac_config_files test/progfixedfree-dos.f"
-
-ac_config_files="$ac_config_files test/progfixedfree-dos.f.try.f.ref"
-
-ac_config_files="$ac_config_files test/progfixedfree.f"
-
-ac_config_files="$ac_config_files test/progfixedfree.f.try.f.ref"
-
-ac_config_files="$ac_config_files test/progfixed.f.try.f.ref"
-
-ac_config_files="$ac_config_files test/progfree-dos.f"
-
-ac_config_files="$ac_config_files test/progfree-dos.f.try.f.ref"
-
-ac_config_files="$ac_config_files test/progfree.f"
-
-ac_config_files="$ac_config_files test/progfree.f.try.f.ref"
-
-ac_config_files="$ac_config_files test/progfree1.f"
-
-ac_config_files="$ac_config_files test/progfree1.f.try.f.ref"
-
-ac_config_files="$ac_config_files test/progfixed1.f"
-
-ac_config_files="$ac_config_files test/progfixed1.f.try.f.ref"
-
+#AC_CONFIG_FILES([test/progfixed-dos.f])
+#AC_CONFIG_FILES([test/progfixed-dos.f.try.f.ref])
+#AC_CONFIG_FILES([test/progfixed.f])
+#AC_CONFIG_FILES([test/progfixedfree-dos.f])
+#AC_CONFIG_FILES([test/progfixedfree-dos.f.try.f.ref])
+#AC_CONFIG_FILES([test/progfixedfree.f])
+#AC_CONFIG_FILES([test/progfixedfree.f.try.f.ref])
+#AC_CONFIG_FILES([test/progfixed.f.try.f.ref])
+#AC_CONFIG_FILES([test/progfree-dos.f])
+#AC_CONFIG_FILES([test/progfree-dos.f.try.f.ref])
+#AC_CONFIG_FILES([test/progfree.f])
+#AC_CONFIG_FILES([test/progfree.f.try.f.ref])
+#AC_CONFIG_FILES([test/progfree1.f])
+#AC_CONFIG_FILES([test/progfree1.f.try.f.ref])
+#AC_CONFIG_FILES([test/progfixed1.f])
+#AC_CONFIG_FILES([test/progfixed1.f.try.f.ref])
 ac_config_files="$ac_config_files test/help.ref"
 
 ac_config_files="$ac_config_files test/manpage.ref"
@@ -2865,59 +2849,33 @@ ac_config_files="$ac_config_files test/gedit_plugin.ref"
 ac_config_files="$ac_config_files test/gedit_plugin_py.ref"
 
 
-ac_config_files="$ac_config_files test/test-compile.sh"
+#AC_CONFIG_FILES([test/test-compile.sh],[chmod +x test/test-compile.sh])
+#AC_CONFIG_FILES([test/doit],[chmod +x test/doit])
+#AC_CONFIG_FILES([test/test1.sh],[chmod +x test/test1.sh])
+#AC_CONFIG_FILES([test/test2.sh],[chmod +x test/test2.sh])
+#AC_CONFIG_FILES([test/test3.sh],[chmod +x test/test3.sh])
+#AC_CONFIG_FILES([test/test4.sh],[chmod +x test/test4.sh])
+#AC_CONFIG_FILES([test/test5.sh],[chmod +x test/test5.sh])
+#AC_CONFIG_FILES([test/test6.sh],[chmod +x test/test6.sh])
+#AC_CONFIG_FILES([test/test7.sh],[chmod +x test/test7.sh])
+#AC_CONFIG_FILES([test/test8.sh],[chmod +x test/test8.sh])
+#AC_CONFIG_FILES([test/test9.sh],[chmod +x test/test9.sh])
+#AC_CONFIG_FILES([test/test10.sh],[chmod +x test/test10.sh])
+#AC_CONFIG_FILES([test/test11.sh],[chmod +x test/test11.sh])
+#AC_CONFIG_FILES([test/test12.sh],[chmod +x test/test12.sh])
+#AC_CONFIG_FILES([test/test13.sh],[chmod +x test/test13.sh])
+#AC_CONFIG_FILES([test/test14.sh],[chmod +x test/test14.sh])
+#AC_CONFIG_FILES([test/test15.sh],[chmod +x test/test15.sh])
+#AC_CONFIG_FILES([test/test16.sh],[chmod +x test/test16.sh])
 
-ac_config_files="$ac_config_files test/doit"
-
-ac_config_files="$ac_config_files test/test1.sh"
-
-ac_config_files="$ac_config_files test/test2.sh"
-
-ac_config_files="$ac_config_files test/test3.sh"
-
-ac_config_files="$ac_config_files test/test4.sh"
-
-ac_config_files="$ac_config_files test/test5.sh"
-
-ac_config_files="$ac_config_files test/test6.sh"
-
-ac_config_files="$ac_config_files test/test7.sh"
-
-ac_config_files="$ac_config_files test/test8.sh"
-
-ac_config_files="$ac_config_files test/test9.sh"
-
-ac_config_files="$ac_config_files test/test10.sh"
-
-ac_config_files="$ac_config_files test/test11.sh"
-
-ac_config_files="$ac_config_files test/test12.sh"
-
-ac_config_files="$ac_config_files test/test13.sh"
-
-ac_config_files="$ac_config_files test/test14.sh"
-
-ac_config_files="$ac_config_files test/test15.sh"
-
-ac_config_files="$ac_config_files test/test16.sh"
-
-
-ac_config_files="$ac_config_files vim/findent.vim"
-
-ac_config_files="$ac_config_files vim/fortran.vim"
-
-ac_config_files="$ac_config_files vim/README"
-
-ac_config_files="$ac_config_files gedit/findent-gedit"
-
-ac_config_files="$ac_config_files gedit/findent.plugin"
-
-ac_config_files="$ac_config_files gedit/findent.py"
-
-ac_config_files="$ac_config_files gedit/README"
-
-ac_config_files="$ac_config_files src/tocpp.sh"
-
+#AC_CONFIG_FILES([vim/findent.vim])
+#AC_CONFIG_FILES([vim/fortran.vim])
+#AC_CONFIG_FILES([vim/README])
+#AC_CONFIG_FILES([gedit/findent-gedit])
+#AC_CONFIG_FILES([gedit/findent.plugin])
+#AC_CONFIG_FILES([gedit/findent.py])
+#AC_CONFIG_FILES([gedit/README])
+#AC_CONFIG_FILES([src/tocpp.sh],[chmod +x src/tocpp.sh])
 
 make_include="include"
 
@@ -5448,7 +5406,7 @@ fi
 done
 
 
-ac_config_files="$ac_config_files Makefile src/Makefile scripts/Makefile test/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile scripts/Makefile test/Makefile vim/Makefile gedit/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -6200,22 +6158,6 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
-    "test/progfixed-dos.f") CONFIG_FILES="$CONFIG_FILES test/progfixed-dos.f" ;;
-    "test/progfixed-dos.f.try.f.ref") CONFIG_FILES="$CONFIG_FILES test/progfixed-dos.f.try.f.ref" ;;
-    "test/progfixed.f") CONFIG_FILES="$CONFIG_FILES test/progfixed.f" ;;
-    "test/progfixedfree-dos.f") CONFIG_FILES="$CONFIG_FILES test/progfixedfree-dos.f" ;;
-    "test/progfixedfree-dos.f.try.f.ref") CONFIG_FILES="$CONFIG_FILES test/progfixedfree-dos.f.try.f.ref" ;;
-    "test/progfixedfree.f") CONFIG_FILES="$CONFIG_FILES test/progfixedfree.f" ;;
-    "test/progfixedfree.f.try.f.ref") CONFIG_FILES="$CONFIG_FILES test/progfixedfree.f.try.f.ref" ;;
-    "test/progfixed.f.try.f.ref") CONFIG_FILES="$CONFIG_FILES test/progfixed.f.try.f.ref" ;;
-    "test/progfree-dos.f") CONFIG_FILES="$CONFIG_FILES test/progfree-dos.f" ;;
-    "test/progfree-dos.f.try.f.ref") CONFIG_FILES="$CONFIG_FILES test/progfree-dos.f.try.f.ref" ;;
-    "test/progfree.f") CONFIG_FILES="$CONFIG_FILES test/progfree.f" ;;
-    "test/progfree.f.try.f.ref") CONFIG_FILES="$CONFIG_FILES test/progfree.f.try.f.ref" ;;
-    "test/progfree1.f") CONFIG_FILES="$CONFIG_FILES test/progfree1.f" ;;
-    "test/progfree1.f.try.f.ref") CONFIG_FILES="$CONFIG_FILES test/progfree1.f.try.f.ref" ;;
-    "test/progfixed1.f") CONFIG_FILES="$CONFIG_FILES test/progfixed1.f" ;;
-    "test/progfixed1.f.try.f.ref") CONFIG_FILES="$CONFIG_FILES test/progfixed1.f.try.f.ref" ;;
     "test/help.ref") CONFIG_FILES="$CONFIG_FILES test/help.ref" ;;
     "test/manpage.ref") CONFIG_FILES="$CONFIG_FILES test/manpage.ref" ;;
     "test/vim_help.ref") CONFIG_FILES="$CONFIG_FILES test/vim_help.ref" ;;
@@ -6225,32 +6167,6 @@ do
     "test/gedit_external.ref") CONFIG_FILES="$CONFIG_FILES test/gedit_external.ref" ;;
     "test/gedit_plugin.ref") CONFIG_FILES="$CONFIG_FILES test/gedit_plugin.ref" ;;
     "test/gedit_plugin_py.ref") CONFIG_FILES="$CONFIG_FILES test/gedit_plugin_py.ref" ;;
-    "test/test-compile.sh") CONFIG_FILES="$CONFIG_FILES test/test-compile.sh" ;;
-    "test/doit") CONFIG_FILES="$CONFIG_FILES test/doit" ;;
-    "test/test1.sh") CONFIG_FILES="$CONFIG_FILES test/test1.sh" ;;
-    "test/test2.sh") CONFIG_FILES="$CONFIG_FILES test/test2.sh" ;;
-    "test/test3.sh") CONFIG_FILES="$CONFIG_FILES test/test3.sh" ;;
-    "test/test4.sh") CONFIG_FILES="$CONFIG_FILES test/test4.sh" ;;
-    "test/test5.sh") CONFIG_FILES="$CONFIG_FILES test/test5.sh" ;;
-    "test/test6.sh") CONFIG_FILES="$CONFIG_FILES test/test6.sh" ;;
-    "test/test7.sh") CONFIG_FILES="$CONFIG_FILES test/test7.sh" ;;
-    "test/test8.sh") CONFIG_FILES="$CONFIG_FILES test/test8.sh" ;;
-    "test/test9.sh") CONFIG_FILES="$CONFIG_FILES test/test9.sh" ;;
-    "test/test10.sh") CONFIG_FILES="$CONFIG_FILES test/test10.sh" ;;
-    "test/test11.sh") CONFIG_FILES="$CONFIG_FILES test/test11.sh" ;;
-    "test/test12.sh") CONFIG_FILES="$CONFIG_FILES test/test12.sh" ;;
-    "test/test13.sh") CONFIG_FILES="$CONFIG_FILES test/test13.sh" ;;
-    "test/test14.sh") CONFIG_FILES="$CONFIG_FILES test/test14.sh" ;;
-    "test/test15.sh") CONFIG_FILES="$CONFIG_FILES test/test15.sh" ;;
-    "test/test16.sh") CONFIG_FILES="$CONFIG_FILES test/test16.sh" ;;
-    "vim/findent.vim") CONFIG_FILES="$CONFIG_FILES vim/findent.vim" ;;
-    "vim/fortran.vim") CONFIG_FILES="$CONFIG_FILES vim/fortran.vim" ;;
-    "vim/README") CONFIG_FILES="$CONFIG_FILES vim/README" ;;
-    "gedit/findent-gedit") CONFIG_FILES="$CONFIG_FILES gedit/findent-gedit" ;;
-    "gedit/findent.plugin") CONFIG_FILES="$CONFIG_FILES gedit/findent.plugin" ;;
-    "gedit/findent.py") CONFIG_FILES="$CONFIG_FILES gedit/findent.py" ;;
-    "gedit/README") CONFIG_FILES="$CONFIG_FILES gedit/README" ;;
-    "src/tocpp.sh") CONFIG_FILES="$CONFIG_FILES src/tocpp.sh" ;;
     "src/buildparser.cpp") CONFIG_FILES="$CONFIG_FILES src/buildparser.cpp" ;;
     "src/buildparser.h") CONFIG_FILES="$CONFIG_FILES src/buildparser.h" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
@@ -6259,6 +6175,8 @@ do
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "scripts/Makefile") CONFIG_FILES="$CONFIG_FILES scripts/Makefile" ;;
     "test/Makefile") CONFIG_FILES="$CONFIG_FILES test/Makefile" ;;
+    "vim/Makefile") CONFIG_FILES="$CONFIG_FILES vim/Makefile" ;;
+    "gedit/Makefile") CONFIG_FILES="$CONFIG_FILES gedit/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac
@@ -6854,25 +6772,6 @@ $as_echo "$as_me: executing $ac_file commands" >&6;}
 
 
   case $ac_file$ac_mode in
-    "test/test-compile.sh":F) chmod +x test/test-compile.sh ;;
-    "test/doit":F) chmod +x test/doit ;;
-    "test/test1.sh":F) chmod +x test/test1.sh ;;
-    "test/test2.sh":F) chmod +x test/test2.sh ;;
-    "test/test3.sh":F) chmod +x test/test3.sh ;;
-    "test/test4.sh":F) chmod +x test/test4.sh ;;
-    "test/test5.sh":F) chmod +x test/test5.sh ;;
-    "test/test6.sh":F) chmod +x test/test6.sh ;;
-    "test/test7.sh":F) chmod +x test/test7.sh ;;
-    "test/test8.sh":F) chmod +x test/test8.sh ;;
-    "test/test9.sh":F) chmod +x test/test9.sh ;;
-    "test/test10.sh":F) chmod +x test/test10.sh ;;
-    "test/test11.sh":F) chmod +x test/test11.sh ;;
-    "test/test12.sh":F) chmod +x test/test12.sh ;;
-    "test/test13.sh":F) chmod +x test/test13.sh ;;
-    "test/test14.sh":F) chmod +x test/test14.sh ;;
-    "test/test15.sh":F) chmod +x test/test15.sh ;;
-    "test/test16.sh":F) chmod +x test/test16.sh ;;
-    "src/tocpp.sh":F) chmod +x src/tocpp.sh ;;
     "depfiles":C) test x"$AMDEP_TRUE" != x"" || {
   # Older Autoconf quotes --file arguments for eval, but not when files
   # are listed without --file.  Let's play safe and only enable the eval

@@ -9,7 +9,7 @@ cat << eof > expect
 2
 eof
 
-./doit "-lastusable --last_usable" "-ifree -Ia" "" 
+$SRCDIR/test/doit "-lastusable --last_usable" "-ifree -Ia" "" 
 rc=`expr $rc + $?`
 
 exit $rc
