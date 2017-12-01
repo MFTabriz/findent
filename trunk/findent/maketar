@@ -9,6 +9,7 @@ make distcheck                                     || exit 1
 mkdir -p ../versions                               || exit 1
 mv findent*.tar.gz ../versions                     || exit 1
 unix2dos -n README.1st ../versions/README          || exit 1
+
 exit 0
 
 
