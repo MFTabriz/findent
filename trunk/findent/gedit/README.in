@@ -7,6 +7,7 @@ Usage of findent in gedit
 #################################################
 mkdir -p $HOME/bin
 findent --gedit_external > $HOME/bin/findent-gedit
+chmod +x $HOME/bin/findent-gedit
 #################################################
 
    Make sure the $HOME/bin is in the PATH environment variable.
