@@ -53,7 +53,7 @@ endif
 
 MOSTLYCLEANFILES =
 
-CLEANFILES = $(LEXFILES) $(PARFILES) findent findent.exe test/*.try.f test/a.out test/*.mod findent.1 parser.cpp.h parser.hpp parser_report.txt
+CLEANFILES = $(LEXFILES) $(PARFILES) findent findent.exe findent.1 parser.cpp.h parser.hpp parser_report.txt *.inc
 
 
 DISTCLEANFILES = dummylexer dummyparser
@@ -76,29 +76,29 @@ vim_plugin.o: vim_fortran.inc vim_findent.inc vim_help.inc
 gedit_plugin.o: gedit_external.inc gedit_plugin.inc gedit_plugin_py.inc \
    gedit_help.inc
 
-TOCPP    = $(top_srcdir)/src/tocpp.sh
-VIMDIR   = $(top_srcdir)/vim
-GEDITDIR = $(top_srcdir)/gedit
+TOCPP    = ./tocpp.sh
+VIMDIR   = ../vim
+GEDITDIR = ../gedit
 
-vim_fortran.inc: $(VIMDIR)/fortran.vim $(TOCPP)
+vim_fortran.inc: $(VIMDIR)/fortran.vim
 	$(TOCPP) < $(VIMDIR)/fortran.vim > $@
 
-vim_findent.inc: $(VIMDIR)/findent.vim $(TOCPP)
+vim_findent.inc: $(VIMDIR)/findent.vim
 	$(TOCPP) < $(VIMDIR)/findent.vim > $@
 
-vim_help.inc: $(VIMDIR)/README $(TOCPP)
+vim_help.inc: $(VIMDIR)/README
 	$(TOCPP) < $(VIMDIR)/README > $@
 
-gedit_external.inc: $(GEDITDIR)/findent-gedit $(TOCPP)
+gedit_external.inc: $(GEDITDIR)/findent-gedit
 	$(TOCPP) < $(GEDITDIR)/findent-gedit > $@
 
 gedit_plugin.inc: $(GEDITDIR)/findent.plugin $(TOCPP)
 	$(TOCPP) < $(GEDITDIR)/findent.plugin > $@
 
-gedit_plugin_py.inc: $(GEDITDIR)/findent.py $(TOCPP)
+gedit_plugin_py.inc: $(GEDITDIR)/findent.py
 	$(TOCPP) < $(GEDITDIR)/findent.py > $@
 
-gedit_help.inc: $(GEDITDIR)/README $(TOCPP)
+gedit_help.inc: $(GEDITDIR)/README
 	$(TOCPP) < $(GEDITDIR)/README > $@
 
 bin_PROGRAMS    = findent

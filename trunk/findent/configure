@@ -2902,14 +2902,22 @@ ac_config_files="$ac_config_files test/test15.sh"
 ac_config_files="$ac_config_files test/test16.sh"
 
 
-#AC_CONFIG_FILES([vim/findent.vim])
-#AC_CONFIG_FILES([vim/fortran.vim])
-#AC_CONFIG_FILES([vim/vim.txt])
-#AC_CONFIG_FILES([gedit/findent-gedit])
-#AC_CONFIG_FILES([gedit/findent.plugin])
-#AC_CONFIG_FILES([gedit/findent.py])
-#AC_CONFIG_FILES([gedit/gedit.txt])
-#AC_CONFIG_FILES([src/tocpp.sh],[chmod +x src/tocpp.sh])
+ac_config_files="$ac_config_files vim/findent.vim"
+
+ac_config_files="$ac_config_files vim/fortran.vim"
+
+ac_config_files="$ac_config_files vim/README"
+
+ac_config_files="$ac_config_files gedit/findent-gedit"
+
+ac_config_files="$ac_config_files gedit/findent.plugin"
+
+ac_config_files="$ac_config_files gedit/findent.py"
+
+ac_config_files="$ac_config_files gedit/README"
+
+ac_config_files="$ac_config_files src/tocpp.sh"
+
 
 make_include="include"
 
@@ -6235,6 +6243,14 @@ do
     "test/test14.sh") CONFIG_FILES="$CONFIG_FILES test/test14.sh" ;;
     "test/test15.sh") CONFIG_FILES="$CONFIG_FILES test/test15.sh" ;;
     "test/test16.sh") CONFIG_FILES="$CONFIG_FILES test/test16.sh" ;;
+    "vim/findent.vim") CONFIG_FILES="$CONFIG_FILES vim/findent.vim" ;;
+    "vim/fortran.vim") CONFIG_FILES="$CONFIG_FILES vim/fortran.vim" ;;
+    "vim/README") CONFIG_FILES="$CONFIG_FILES vim/README" ;;
+    "gedit/findent-gedit") CONFIG_FILES="$CONFIG_FILES gedit/findent-gedit" ;;
+    "gedit/findent.plugin") CONFIG_FILES="$CONFIG_FILES gedit/findent.plugin" ;;
+    "gedit/findent.py") CONFIG_FILES="$CONFIG_FILES gedit/findent.py" ;;
+    "gedit/README") CONFIG_FILES="$CONFIG_FILES gedit/README" ;;
+    "src/tocpp.sh") CONFIG_FILES="$CONFIG_FILES src/tocpp.sh" ;;
     "src/buildparser.cpp") CONFIG_FILES="$CONFIG_FILES src/buildparser.cpp" ;;
     "src/buildparser.h") CONFIG_FILES="$CONFIG_FILES src/buildparser.h" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
@@ -6856,6 +6872,7 @@ $as_echo "$as_me: executing $ac_file commands" >&6;}
     "test/test14.sh":F) chmod +x test/test14.sh ;;
     "test/test15.sh":F) chmod +x test/test15.sh ;;
     "test/test16.sh":F) chmod +x test/test16.sh ;;
+    "src/tocpp.sh":F) chmod +x src/tocpp.sh ;;
     "depfiles":C) test x"$AMDEP_TRUE" != x"" || {
   # Older Autoconf quotes --file arguments for eval, but not when files
   # are listed without --file.  Let's play safe and only enable the eval
