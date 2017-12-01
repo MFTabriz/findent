@@ -1,9 +1,27 @@
+To enable findent for vim:
+  find out in which directory the configuration files for vim are situated, 
+  here we assume it is in $HOME/.vim . Enter the following commands:
 
-To enable findent for vim, place
-  findent.vim in ~/.vim/plugin/
-  fortran.vim in ~/.vim/after/indent/
+##############################################
+vimroot=$HOME/.vim
+mkdir -p $vimroot/plugin
+findent --vim_findent > $vimroot/plugin/findent.vim
+mkdir -p $vimroot/after/indent
+findent --vim_fortran > $vimroot/after/indent/fortran.vim
+##############################################
 
-In .vimrc you can specify:
+In ~/.vimrc include the following lines:
+
+""""""""""""""""""""""""""""""
+filetype plugin indent on
+syntax on
+""""""""""""""""""""""""""""""
+
+If you do not want syntax highlighting, you can switch it
+off again with:
+syntax off
+
+In ~/.vimrc you can specify:
 
   let use_findent = 1   " use findent (default)
   let use_findent = 0   " do not use findent

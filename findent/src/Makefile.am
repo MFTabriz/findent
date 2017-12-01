@@ -86,8 +86,8 @@ vim_fortran.inc: $(VIMDIR)/fortran.vim $(TOCPP)
 vim_findent.inc: $(VIMDIR)/findent.vim $(TOCPP)
 	$(TOCPP) < $(VIMDIR)/findent.vim > $@
 
-vim_help.inc: $(VIMDIR)/vim.txt $(TOCPP)
-	$(TOCPP) < $(VIMDIR)/vim.txt > $@
+vim_help.inc: $(VIMDIR)/README $(TOCPP)
+	$(TOCPP) < $(VIMDIR)/README > $@
 
 gedit_external.inc: $(GEDITDIR)/findent-gedit $(TOCPP)
 	$(TOCPP) < $(GEDITDIR)/findent-gedit > $@
@@ -98,8 +98,8 @@ gedit_plugin.inc: $(GEDITDIR)/findent.plugin $(TOCPP)
 gedit_plugin_py.inc: $(GEDITDIR)/findent.py $(TOCPP)
 	$(TOCPP) < $(GEDITDIR)/findent.py > $@
 
-gedit_help.inc: $(GEDITDIR)/gedit.txt $(TOCPP)
-	$(TOCPP) < $(GEDITDIR)/gedit.txt > $@
+gedit_help.inc: $(GEDITDIR)/README $(TOCPP)
+	$(TOCPP) < $(GEDITDIR)/README > $@
 
 bin_PROGRAMS    = findent
 findent_SOURCES = findent.cpp lexer.cpp parser.cpp \
