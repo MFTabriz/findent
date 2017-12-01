@@ -4,21 +4,23 @@ Usage of findent in gedit
 
    Enter the following comamnds:
 
-     mkdir -p $HOME/bin
-     findent --gedit_external > $HOME/bin/findent-gedit
+#################################################
+mkdir -p $HOME/bin
+findent --gedit_external > $HOME/bin/findent-gedit
+#################################################
 
    Make sure the $HOME/bin is in the PATH environment variable.
 
-    in gedit:
+    Open gedit:
     ----------------------- 
        (Edit ->) Preferences -> plugins : enable "External Tools"
-             in the tool that starts this script
+       Close gedit and start it again.
        Tools -> Manage External Tools -> Add
           - rename "New Tool" into findent
           - put 
                findent-gedit
             in the tool
-          Shortcut Key:  <Alt>F1    (or something more to your liking)
+          Shortcut Key:  <Alt>F11   (or something more to your liking)
           Save:          Nothing
           Input:         Current document
           Output:        Replace current document
@@ -37,11 +39,13 @@ Usage of findent in gedit
   Find the location of the directory where gedit expects the configuration
   files, we assume here $HOME/.local/share/gedit/plugins
   Enter the following commands:
----------------------------------
+
+##################################################
 geditroot=$HOME/.local/share/gedit/plugins
+mkdir -p $geditroot
 findent --gedit_plugin > $geditroot/findent.plugin
 findent --gedit_plugin_py > $geditroot/findent.py
----------------------------------
+##################################################
 
  in gedit:
    (Edit ->) Preferences -> plugins -> check: findent
