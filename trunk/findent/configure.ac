@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(findent, 2.7.4~pre5, wvermin@gmail.com)
+AC_INIT(findent, 2.7.4~pre6, wvermin@gmail.com)
 AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
 AC_CONFIG_SRCDIR([src/findent.cpp])
@@ -25,6 +25,13 @@ AC_CONFIG_FILES([test/progfixed1.f])
 AC_CONFIG_FILES([test/progfixed1.f.try.f.ref])
 AC_CONFIG_FILES([test/help.ref])
 AC_CONFIG_FILES([test/manpage.ref])
+AC_CONFIG_FILES([test/vim_help.ref])
+AC_CONFIG_FILES([test/vim_fortran.ref])
+AC_CONFIG_FILES([test/vim_findent.ref])
+AC_CONFIG_FILES([test/gedit_help.ref])
+AC_CONFIG_FILES([test/gedit_external.ref])
+AC_CONFIG_FILES([test/gedit_plugin.ref])
+AC_CONFIG_FILES([test/gedit_plugin_py.ref])
 
 AC_CONFIG_FILES([test/test-compile.sh],[chmod +x test/test-compile.sh])
 AC_CONFIG_FILES([test/doit],[chmod +x test/doit])
@@ -43,6 +50,7 @@ AC_CONFIG_FILES([test/test12.sh],[chmod +x test/test12.sh])
 AC_CONFIG_FILES([test/test13.sh],[chmod +x test/test13.sh])
 AC_CONFIG_FILES([test/test14.sh],[chmod +x test/test14.sh])
 AC_CONFIG_FILES([test/test15.sh],[chmod +x test/test15.sh])
+AC_CONFIG_FILES([test/test16.sh],[chmod +x test/test16.sh])
 
 #AC_CONFIG_FILES([vim/findent.vim])
 #AC_CONFIG_FILES([vim/fortran.vim])

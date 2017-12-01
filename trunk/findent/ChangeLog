@@ -36,6 +36,9 @@ findent-2.7.4:
 	    --gedit_external
 	    --gedit_plugin
 	    --gedit_plugin_py
+	test:
+	   use only one or two lines for testing flags -h, -H
+	   add tests (test16.sh) for vim and gedit related flags
 
 findent-2.7.3:
 findent-2.7.2:

@@ -1,7 +1,7 @@
 #!/bin/sh
 rc=0
 for flag in -h --help ; do
-   ../src/findent "$flag" > help.try
+   ../src/findent "$flag" | head -n 1 > help.try
    cmp -s help.ref help.try
    r=$?
    if [ $r -eq 0 ] ; then
@@ -13,7 +13,7 @@ for flag in -h --help ; do
 done
 
 for flag in -H --manpage ; do
-   ../src/findent "$flag" > manpage.try
+   ../src/findent "$flag" | head -n 1 > manpage.try
    cmp -s manpage.ref manpage.try
    r=$?
    if [ $r -eq 0 ] ; then
