@@ -94,9 +94,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 DIST_COMMON = $(srcdir)/Makefile.am $(am__DIST_COMMON)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
-CONFIG_CLEAN_FILES = help.ref manpage.ref vim_help.ref vim_fortran.ref \
-	vim_findent.ref gedit_help.ref gedit_external.ref \
-	gedit_plugin.ref gedit_plugin_py.ref
+CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -322,12 +320,7 @@ TEST_LOGS = $(am__test_logs2:.test.log=.log)
 TEST_LOG_DRIVER = $(SHELL) $(top_srcdir)/test-driver
 TEST_LOG_COMPILE = $(TEST_LOG_COMPILER) $(AM_TEST_LOG_FLAGS) \
 	$(TEST_LOG_FLAGS)
-am__DIST_COMMON = $(srcdir)/Makefile.in \
-	$(srcdir)/gedit_external.ref.in $(srcdir)/gedit_help.ref.in \
-	$(srcdir)/gedit_plugin.ref.in $(srcdir)/gedit_plugin_py.ref.in \
-	$(srcdir)/help.ref.in $(srcdir)/manpage.ref.in \
-	$(srcdir)/vim_findent.ref.in $(srcdir)/vim_fortran.ref.in \
-	$(srcdir)/vim_help.ref.in $(top_srcdir)/test-driver
+am__DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/test-driver
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
@@ -447,6 +440,9 @@ EXTRA_DIST = test1.sh test2.sh test3.sh test4.sh test5.sh test6.sh \
 	progfixedfree-dos.f.try.f.ref progfixedfree.f.try.f.ref \
 	progfree-dos.f.try.f.ref progfree.f.try.f.ref \
 	progfree1.f.try.f.ref progfixed1.f.try.f.ref \
+	help.ref manpage.ref \
+        vim_help.ref gedit_help.ref vim_fortran.ref vim_findent.ref \
+	gedit_external.ref gedit_plugin.ref gedit_plugin_py.ref \
 	doit
 
 CLEANFILES = prog expect result  *.mod *.try
@@ -484,24 +480,6 @@ $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
-help.ref: $(top_builddir)/config.status $(srcdir)/help.ref.in
-	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
-manpage.ref: $(top_builddir)/config.status $(srcdir)/manpage.ref.in
-	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
-vim_help.ref: $(top_builddir)/config.status $(srcdir)/vim_help.ref.in
-	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
-vim_fortran.ref: $(top_builddir)/config.status $(srcdir)/vim_fortran.ref.in
-	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
-vim_findent.ref: $(top_builddir)/config.status $(srcdir)/vim_findent.ref.in
-	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
-gedit_help.ref: $(top_builddir)/config.status $(srcdir)/gedit_help.ref.in
-	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
-gedit_external.ref: $(top_builddir)/config.status $(srcdir)/gedit_external.ref.in
-	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
-gedit_plugin.ref: $(top_builddir)/config.status $(srcdir)/gedit_plugin.ref.in
-	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
-gedit_plugin_py.ref: $(top_builddir)/config.status $(srcdir)/gedit_plugin_py.ref.in
-	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 tags TAGS:
 
 ctags CTAGS:

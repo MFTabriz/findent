@@ -1,8 +1,14 @@
 #!/bin/sh
 rc=0
+SRCDIR=${SRCDIR:-.}
 for flag in -h --help ; do
    ../src/findent "$flag" | head -n 1 > help.try
-   cmp -s help.ref help.try
+   echo help.try:
+   cat help.try
+   echo help.ref:
+   ls $SRCDIR/test
+   cat $SRCDIR/test/help.ref
+   cmp -s $SRCDIR/test/help.ref help.try
    r=$?
    if [ $r -eq 0 ] ; then
       echo "$flag : works OK"
@@ -14,7 +20,7 @@ done
 
 for flag in -H --manpage ; do
    ../src/findent "$flag" | head -n 1 > manpage.try
-   cmp -s manpage.ref manpage.try
+   cmp -s $SRCDIR/test/manpage.ref manpage.try
    r=$?
    if [ $r -eq 0 ] ; then
       echo "$flag : OK"

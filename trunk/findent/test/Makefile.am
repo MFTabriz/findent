@@ -15,6 +15,9 @@ EXTRA_DIST = test1.sh test2.sh test3.sh test4.sh test5.sh test6.sh \
 	progfixedfree-dos.f.try.f.ref progfixedfree.f.try.f.ref \
 	progfree-dos.f.try.f.ref progfree.f.try.f.ref \
 	progfree1.f.try.f.ref progfixed1.f.try.f.ref \
+	help.ref manpage.ref \
+        vim_help.ref gedit_help.ref vim_fortran.ref vim_findent.ref \
+	gedit_external.ref gedit_plugin.ref gedit_plugin_py.ref \
 	doit
 
 export SRCDIR = $(top_srcdir)
