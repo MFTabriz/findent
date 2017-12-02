@@ -2830,24 +2830,15 @@ ac_config_headers="$ac_config_headers config.h"
 #AC_CONFIG_FILES([test/progfree1.f.try.f.ref])
 #AC_CONFIG_FILES([test/progfixed1.f])
 #AC_CONFIG_FILES([test/progfixed1.f.try.f.ref])
-ac_config_files="$ac_config_files test/help.ref"
-
-ac_config_files="$ac_config_files test/manpage.ref"
-
-ac_config_files="$ac_config_files test/vim_help.ref"
-
-ac_config_files="$ac_config_files test/vim_fortran.ref"
-
-ac_config_files="$ac_config_files test/vim_findent.ref"
-
-ac_config_files="$ac_config_files test/gedit_help.ref"
-
-ac_config_files="$ac_config_files test/gedit_external.ref"
-
-ac_config_files="$ac_config_files test/gedit_plugin.ref"
-
-ac_config_files="$ac_config_files test/gedit_plugin_py.ref"
-
+#AC_CONFIG_FILES([test/help.ref])
+#AC_CONFIG_FILES([test/manpage.ref])
+#AC_CONFIG_FILES([test/vim_help.ref])
+#AC_CONFIG_FILES([test/vim_fortran.ref])
+#AC_CONFIG_FILES([test/vim_findent.ref])
+#AC_CONFIG_FILES([test/gedit_help.ref])
+#AC_CONFIG_FILES([test/gedit_external.ref])
+#AC_CONFIG_FILES([test/gedit_plugin.ref])
+#AC_CONFIG_FILES([test/gedit_plugin_py.ref])
 
 #AC_CONFIG_FILES([test/test-compile.sh],[chmod +x test/test-compile.sh])
 #AC_CONFIG_FILES([test/doit],[chmod +x test/doit])
@@ -6158,15 +6149,6 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
-    "test/help.ref") CONFIG_FILES="$CONFIG_FILES test/help.ref" ;;
-    "test/manpage.ref") CONFIG_FILES="$CONFIG_FILES test/manpage.ref" ;;
-    "test/vim_help.ref") CONFIG_FILES="$CONFIG_FILES test/vim_help.ref" ;;
-    "test/vim_fortran.ref") CONFIG_FILES="$CONFIG_FILES test/vim_fortran.ref" ;;
-    "test/vim_findent.ref") CONFIG_FILES="$CONFIG_FILES test/vim_findent.ref" ;;
-    "test/gedit_help.ref") CONFIG_FILES="$CONFIG_FILES test/gedit_help.ref" ;;
-    "test/gedit_external.ref") CONFIG_FILES="$CONFIG_FILES test/gedit_external.ref" ;;
-    "test/gedit_plugin.ref") CONFIG_FILES="$CONFIG_FILES test/gedit_plugin.ref" ;;
-    "test/gedit_plugin_py.ref") CONFIG_FILES="$CONFIG_FILES test/gedit_plugin_py.ref" ;;
     "src/buildparser.cpp") CONFIG_FILES="$CONFIG_FILES src/buildparser.cpp" ;;
     "src/buildparser.h") CONFIG_FILES="$CONFIG_FILES src/buildparser.h" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
