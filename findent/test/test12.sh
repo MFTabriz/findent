@@ -2,12 +2,7 @@
 rc=0
 SRCDIR=${SRCDIR:-.}
 for flag in -h --help ; do
-   ../src/findent "$flag" | head -n 1 > help.try
-   echo help.try:
-   cat help.try
-   echo help.ref:
-   ls $SRCDIR/test
-   cat $SRCDIR/test/help.ref
+   ../src/findent "$flag" | head -n 1 | tr -d '\r' > help.try
    cmp -s $SRCDIR/test/help.ref help.try
    r=$?
    if [ $r -eq 0 ] ; then
@@ -19,7 +14,7 @@ for flag in -h --help ; do
 done
 
 for flag in -H --manpage ; do
-   ../src/findent "$flag" | head -n 1 > manpage.try
+   ../src/findent "$flag" | head -n 1 | tr -d '\r' > manpage.try
    cmp -s $SRCDIR/test/manpage.ref manpage.try
    r=$?
    if [ $r -eq 0 ] ; then

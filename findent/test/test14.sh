@@ -40,9 +40,9 @@ $doit "-iauto --input_format=auto -ifree --input_format=free" "-I0 -i3" "for fre
 rc=`expr $rc + $?`
 
 cat << eof > prog
-prog="      program main
+      program main
          continue
-      end"
+      end
 eof
 cp prog expect
 

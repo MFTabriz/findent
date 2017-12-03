@@ -208,6 +208,7 @@ int main(int argc, char*argv[])
 
    static struct option longopts[] =
    {
+      {"indent"             , required_argument, 0, DO_INDENT            },
       {"indent_associate"   , required_argument, 0, 'a'                  },
       {"indent_block"       , required_argument, 0, 'b'                  },
       {"indent_case"        , required_argument, 0, 'c'                  },
@@ -220,7 +221,6 @@ int main(int argc, char*argv[])
       {"help"               , no_argument      , 0, 'h'                  },
       {"manpage"            , no_argument      , 0, 'H'                  },
       {"input_format"       , required_argument, 0, DO_INPUT_FORMAT      },
-      {"indent"             , required_argument, 0, DO_INDENT            },
       {"start_indent"       , required_argument, 0, 'I'                  },
       {"indent_interface"   , required_argument, 0, 'j'                  },
       {"indent_continuation", required_argument, 0, 'k'                  },
