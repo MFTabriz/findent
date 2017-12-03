@@ -6,6 +6,8 @@ BUILDPARFILES = buildparser.cpp buildparser.h
 LEXFILES      =      lexer.cpp
 BUILDLEXFILES = buildlexer.cpp
 
+AM_CXXFLAGS = -fPIC
+
 if USEBISON
 parser.cpp parser.h: parser.y
 	$(YACC) -o parser.cpp -d $<

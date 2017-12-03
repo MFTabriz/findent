@@ -312,6 +312,7 @@ PARFILES = parser.cpp      parser.h
 BUILDPARFILES = buildparser.cpp buildparser.h
 LEXFILES = lexer.cpp
 BUILDLEXFILES = buildlexer.cpp
+AM_CXXFLAGS = -fPIC
 MOSTLYCLEANFILES = 
 CLEANFILES = $(LEXFILES) $(PARFILES) findent findent.exe findent.1 parser.cpp.h parser.hpp parser_report.txt *.inc
 DISTCLEANFILES = dummylexer dummyparser
