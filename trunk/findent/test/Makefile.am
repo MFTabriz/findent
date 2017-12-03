@@ -22,4 +22,4 @@ EXTRA_DIST = test1.sh test2.sh test3.sh test4.sh test5.sh test6.sh \
 
 export SRCDIR = $(top_srcdir)
 CLEANFILES = prog expect result  *.mod *.try
-DISTCLEANFILES = *.f
+DISTCLEANFILES = *.f.try.f
