@@ -28,14 +28,14 @@ fi
 parms=`head -n1 < $prog | tr '!' ' '|tr '\r' ' '`
 $exe $parms < $prog > $bprog.try.f 2>/dev/null
 if [ -f $prog.try.f.ref ]; then
-   case "$exe" in
-      *.exe)
+   case "`file $exe`" in
+      *"MS Windows"*)
 	 case $prog in
 	    *dos*)
 	       :
 	       ;;
 	    *)
-	       dos2unix -q $bprog.try.f
+	       sed -i 's/\r//' $bprog.try.f
 	       ;;
 	 esac
    esac

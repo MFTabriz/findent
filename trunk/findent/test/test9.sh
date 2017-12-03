@@ -9,7 +9,7 @@ expect="program main
 end"
 
 for flag in -l0 --label_left=0 ; do
-   a=`echo "$prog" | ../src/findent "$flag" -I0 -i6`
+   a=`echo "$prog" | ../src/findent "$flag" -I0 -i6 | tr -d '\r'`
    if [ "$a" = "$expect" ]; then
       echo "$flag works OK"
    else
@@ -28,7 +28,7 @@ expect="program main
 10    continue
 end"
 for flag in -l1 --label_left=1 ; do
-   a=`echo "$prog" | ../src/findent "$flag" -I0 -i6`
+   a=`echo "$prog" | ../src/findent "$flag" -I0 -i6 | tr -d '\r'`
    if [ "$a" = "$expect" ]; then
       echo "$flag works OK"
    else
