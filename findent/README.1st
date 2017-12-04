@@ -41,7 +41,6 @@ Windows users: download findent-x.y.zip
                $ unzip findent-x.y.zip
                $ copy findent.exe C:\WINDOWS
 	       $ copy wfindent.bat C:\WINDOWS
-	       $ copy findent.jar C:\WINDOWS
 
 
 All systems:
