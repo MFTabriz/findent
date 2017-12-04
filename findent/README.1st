@@ -52,10 +52,10 @@ Examples: $ findent < in.f90 > out.f90
           $ wfindent -i4 -Rr *.f
 
 (g)vim users:
-   Install findent, and put the following files in place:
+   Install findent, the following command shows instructions
+   how to use findent in (g)vim:
 
-   vim/findent.vim -> ~/.vim/plugin/findent.vim
-   vim/fortran.vim -> ~/.vim/after/indent/fortran.vim
+    findent --vim_help
 
    Documentation:
      in (g)vim:
@@ -65,6 +65,11 @@ Examples: $ findent < in.f90 > out.f90
      and the comments in the files vim/findent.vim and vim/fortran.vim
 
 gedit users:
-   Install findent, and follow the instructions in gedit/README
+   Install findent, the following command shows instructions
+   how to use findent in gedit:
+
+    findent --gedit_help
+
+
 
 # $Id$
