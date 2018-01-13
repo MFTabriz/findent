@@ -78,9 +78,12 @@ vim_plugin.o: vim_fortran.inc vim_findent.inc vim_help.inc
 gedit_plugin.o: gedit_external.inc gedit_plugin.inc gedit_plugin_py.inc \
    gedit_help.inc
 
+emacs_plugin.o: emacs_findent.inc emacs_help.inc
+
 TOCPP    = $(top_srcdir)/src/tocpp.sh
 VIMDIR   = $(top_srcdir)/vim
 GEDITDIR = $(top_srcdir)/gedit
+EMACSDIR = $(top_srcdir)/emacs
 
 vim_fortran.inc: $(VIMDIR)/fortran.vim $(TOCPP)
 	$(TOCPP) < $(VIMDIR)/fortran.vim > $@
@@ -103,6 +106,12 @@ gedit_plugin_py.inc: $(GEDITDIR)/findent.py $(TOCPP)
 gedit_help.inc: $(GEDITDIR)/README $(TOCPP)
 	$(TOCPP) < $(GEDITDIR)/README > $@
 
+emacs_findent.inc: $(EMACSDIR)/findent.el $(TOCPP)
+	$(TOCPP) < $(EMACSDIR)/findent.el > $@
+
+emacs_help.inc: $(EMACSDIR)/README $(TOCPP)
+	$(TOCPP) < $(EMACSDIR)/README > $@
+
 bin_PROGRAMS    = findent
 
 findent_SOURCES = findent.cpp lexer.cpp parser.cpp \
@@ -110,6 +119,7 @@ findent_SOURCES = findent.cpp lexer.cpp parser.cpp \
 		  line_prep.h pre_analyzer.h version.h \
 		  findent.h simpleostream.h \
 		  vim_plugin.cpp vim_plugin.h \
-		  gedit_plugin.cpp gedit_plugin.h 
+		  gedit_plugin.cpp gedit_plugin.h \
+		  emacs_plugin.cpp emacs_plugin.h
 
 EXTRA_DIST  = lexer.l parser.y tocpp.sh

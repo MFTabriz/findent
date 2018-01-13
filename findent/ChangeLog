@@ -45,6 +45,11 @@ findent-2.7.4:
 	   of a do-loop, but as an assignement by adding:
 	      lvalue:  lvalue '%' lvalue
 
+	test, findent.cpp, emacs
+	   add ability to generate emacs config file.
+	   add aliases for flags containing '_': 
+	     '-' can be used instead
+
 findent-2.7.3:
 findent-2.7.2:
 	copyright: BSD-3
