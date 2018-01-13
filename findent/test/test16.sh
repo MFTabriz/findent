@@ -3,7 +3,7 @@ rc=0
 SRCDIR=${SRCDIR:-.}
 for f in vim_help gedit_help vim_fortran vim_findent \
    gedit_external gedit_plugin gedit_plugin_py \
-   emacs_help emacs_findent ; do
+   emacs_help emacs_findent readme ; do
    flag="--$f"
    ../src/findent $flag | head -n 2 | tr -d '\r' > $f.try
    cmp -s $SRCDIR/test/$f.ref $f.try
