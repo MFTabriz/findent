@@ -82,4 +82,4 @@ AC_LANG([C++])
 AC_HEADER_STDC
 AC_CHECK_HEADERS([iostream string stack vector cstdio queue algorithm sstream],[],AC_MSG_ERROR([Exiting])) 
 
-AC_OUTPUT(Makefile src/Makefile scripts/Makefile test/Makefile vim/Makefile gedit/Makefile emacs/Makefile)
+AC_OUTPUT(Makefile src/Makefile scripts/Makefile test/Makefile vim/Makefile gedit/Makefile emacs/Makefile doc/Makefile)

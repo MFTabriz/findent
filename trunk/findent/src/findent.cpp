@@ -16,6 +16,7 @@
 #include "vim_plugin.h"
 #include "gedit_plugin.h"
 #include "emacs_plugin.h"
+#include "readme_plugin.h"
 extern "C" FILE *yyin;
 std::string mygetline();
 void get_full_statement();
@@ -207,6 +208,7 @@ int main(int argc, char*argv[])
       DO_GEDIT_PLUGIN_PY,
       DO_EMACS_FINDENT,
       DO_EMACS_HELP,
+      DO_README,
    };
 
    static struct option longopts[] =
@@ -323,6 +325,8 @@ int main(int argc, char*argv[])
 
       {"emacs_findent"      , no_argument      , 0, DO_EMACS_FINDENT     },
       {"emacs-findent"      , no_argument      , 0, DO_EMACS_FINDENT     },
+
+      {"readme"             , no_argument      , 0, DO_README            },
 
       {0,0,0,0}
    };
@@ -539,6 +543,9 @@ int main(int argc, char*argv[])
 	    return 0;
 	 case DO_EMACS_FINDENT:
 	    do_emacs_findent();
+	    return 0;
+	 case DO_README:
+	    do_readme();
 	    return 0;
       }
 
@@ -2035,6 +2042,7 @@ void usage(const bool doman)
    manout(" ","In the options, you can replace '_' with '-'."                                              ,doman);
    manout("-h, --help"                       ,"print this text"                                            ,doman);
    manout("-H, --manpage"                    ,"print man page"                                             ,doman);
+   manout("--readme"                         ,"print some background information"                          ,doman);
    manout("-v, --version"                    ,"prints findent version"                                     ,doman);
    manout("-q, --query_fix_free"             ,"guess free or fixed, prints 'fixed' or 'free' and exits"    ,doman);
    //manout("-Q","returncode=2 for free, 4 for fixed",                      doman);

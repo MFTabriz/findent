@@ -19,6 +19,7 @@ EXTRA_DIST = test1.sh test2.sh test3.sh test4.sh test5.sh test6.sh \
         vim_help.ref gedit_help.ref vim_fortran.ref vim_findent.ref \
 	gedit_external.ref gedit_plugin.ref gedit_plugin_py.ref \
 	emacs_help.ref emacs_findent.ref \
+	readme.ref \
 	doit
 
 export SRCDIR = $(top_srcdir)

@@ -5343,7 +5343,7 @@ fi
 done
 
 
-ac_config_files="$ac_config_files Makefile src/Makefile scripts/Makefile test/Makefile vim/Makefile gedit/Makefile emacs/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile scripts/Makefile test/Makefile vim/Makefile gedit/Makefile emacs/Makefile doc/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -6106,6 +6106,7 @@ do
     "vim/Makefile") CONFIG_FILES="$CONFIG_FILES vim/Makefile" ;;
     "gedit/Makefile") CONFIG_FILES="$CONFIG_FILES gedit/Makefile" ;;
     "emacs/Makefile") CONFIG_FILES="$CONFIG_FILES emacs/Makefile" ;;
+    "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac
