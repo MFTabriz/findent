@@ -1,5 +1,5 @@
 AUTOMAKE_OPTIONS = gnu
-SUBDIRS = src scripts test vim gedit
+SUBDIRS = src scripts test vim gedit emacs
 MAINTAINERCLEANFILES = config.h.in~
 maintainer-clean-local:
 	rm -rf bin share autom4te.cache

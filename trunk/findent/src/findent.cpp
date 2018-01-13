@@ -15,6 +15,7 @@
 #include "pre_analyzer.h"
 #include "vim_plugin.h"
 #include "gedit_plugin.h"
+#include "emacs_plugin.h"
 extern "C" FILE *yyin;
 std::string mygetline();
 void get_full_statement();
@@ -204,47 +205,124 @@ int main(int argc, char*argv[])
       DO_GEDIT_EXTERNAL,
       DO_GEDIT_PLUGIN,
       DO_GEDIT_PLUGIN_PY,
+      DO_EMACS_FINDENT,
+      DO_EMACS_HELP,
    };
 
    static struct option longopts[] =
    {
       {"indent"             , required_argument, 0, DO_INDENT            },
+
       {"indent_associate"   , required_argument, 0, 'a'                  },
+      {"indent-associate"   , required_argument, 0, 'a'                  },
+
       {"indent_block"       , required_argument, 0, 'b'                  },
+      {"indent-block"       , required_argument, 0, 'b'                  },
+
       {"indent_case"        , required_argument, 0, 'c'                  },
+      {"indent-case"        , required_argument, 0, 'c'                  },
+
       {"indent_contains"    , required_argument, 0, DO_INDENT_CONTAINS   },
+      {"indent-contains"    , required_argument, 0, DO_INDENT_CONTAINS   },
+
       {"indent_do"          , required_argument, 0, 'd'                  },
+      {"indent-do"          , required_argument, 0, 'd'                  },
+
       {"indent_entry"       , required_argument, 0, 'e'                  },
+      {"indent-entry"       , required_argument, 0, 'e'                  },
+
       {"indent_enum"        , required_argument, 0, 'E'                  },
+      {"indent-enum"        , required_argument, 0, 'E'                  },
+
       {"indent_if"          , required_argument, 0, 'f'                  },
+      {"indent-if"          , required_argument, 0, 'f'                  },
+
       {"indent_forall"      , required_argument, 0, 'F'                  },
+      {"indent-forall"      , required_argument, 0, 'F'                  },
+
       {"help"               , no_argument      , 0, 'h'                  },
+
       {"manpage"            , no_argument      , 0, 'H'                  },
+
       {"input_format"       , required_argument, 0, DO_INPUT_FORMAT      },
+      {"input-format"       , required_argument, 0, DO_INPUT_FORMAT      },
+
       {"start_indent"       , required_argument, 0, 'I'                  },
+      {"start-indent"       , required_argument, 0, 'I'                  },
+
       {"indent_interface"   , required_argument, 0, 'j'                  },
+      {"indent-interface"   , required_argument, 0, 'j'                  },
+
       {"indent_continuation", required_argument, 0, 'k'                  },
+      {"indent-continuation", required_argument, 0, 'k'                  },
+
       {"last_indent"        , no_argument      , 0, DO_LAST_INDENT       },
+      {"last-indent"        , no_argument      , 0, DO_LAST_INDENT       },
+
       {"last_usable"        , no_argument      , 0, DO_LAST_USABLE       },
+      {"last-usable"        , no_argument      , 0, DO_LAST_USABLE       },
+
       {"label_left"         , required_argument, 0, DO_LABEL_LEFT        },
+      {"label-left"         , required_argument, 0, DO_LABEL_LEFT        },
+
       {"input_line_length"  , required_argument, 0, 'L'                  },
+      {"input-line-length"  , required_argument, 0, 'L'                  },
+
       {"indent_module"      , required_argument, 0, 'm'                  },
+      {"indent-module"      , required_argument, 0, 'm'                  },
+
       {"output_format"      , required_argument, 0, 'o'                  },
+      {"output-format"      , required_argument, 0, 'o'                  },
+
       {"query_fix_free"     , no_argument      , 0, 'q'                  },
+      {"query-fix-free"     , no_argument      , 0, 'q'                  },
+
       {"indent_procedure"   , required_argument, 0, 'r'                  },
+      {"indent-procedure"   , required_argument, 0, 'r'                  },
+
       {"refactor_procedures", optional_argument, 0, DO_REFACTOR_PROCEDURE},
+      {"refactor-procedures", optional_argument, 0, DO_REFACTOR_PROCEDURE},
+
       {"indent_select"      , required_argument, 0, 's'                  },
+      {"indent-select"      , required_argument, 0, 's'                  },
+
       {"indent_type"        , required_argument, 0, 't'                  },
+      {"indent-type"        , required_argument, 0, 't'                  },
+
       {"version"            , no_argument      , 0, 'v'                  },
+
       {"indent_where"       , required_argument, 0, 'w'                  },
+      {"indent-where"       , required_argument, 0, 'w'                  },
+
       {"indent_critical"    , required_argument, 0, 'x'                  },
+      {"indent-critical"    , required_argument, 0, 'x'                  },
+
       {"vim_help"           , no_argument      , 0, DO_VIM_HELP          },
+      {"vim-help"           , no_argument      , 0, DO_VIM_HELP          },
+
       {"gedit_help"         , no_argument      , 0, DO_GEDIT_HELP        },
+      {"gedit-help"         , no_argument      , 0, DO_GEDIT_HELP        },
+
       {"vim_fortran"        , no_argument      , 0, DO_VIM_FORTRAN       },
+      {"vim-fortran"        , no_argument      , 0, DO_VIM_FORTRAN       },
+
       {"vim_findent"        , no_argument      , 0, DO_VIM_FINDENT       },
+      {"vim-findent"        , no_argument      , 0, DO_VIM_FINDENT       },
+
       {"gedit_external"     , no_argument      , 0, DO_GEDIT_EXTERNAL    },
+      {"gedit-external"     , no_argument      , 0, DO_GEDIT_EXTERNAL    },
+
       {"gedit_plugin"       , no_argument      , 0, DO_GEDIT_PLUGIN      },
+      {"gedit-plugin"       , no_argument      , 0, DO_GEDIT_PLUGIN      },
+
       {"gedit_plugin_py"    , no_argument      , 0, DO_GEDIT_PLUGIN_PY   },
+      {"gedit-plugin-py"    , no_argument      , 0, DO_GEDIT_PLUGIN_PY   },
+
+      {"emacs_help"         , no_argument      , 0, DO_EMACS_HELP        },
+      {"emacs-help"         , no_argument      , 0, DO_EMACS_HELP        },
+
+      {"emacs_findent"      , no_argument      , 0, DO_EMACS_FINDENT     },
+      {"emacs-findent"      , no_argument      , 0, DO_EMACS_FINDENT     },
 
       {0,0,0,0}
    };
@@ -455,6 +533,12 @@ int main(int argc, char*argv[])
 	    return 0;
 	 case DO_GEDIT_PLUGIN_PY:
 	    do_gedit_plugin_py();
+	    return 0;
+	 case DO_EMACS_HELP:
+	    do_emacs_help();
+	    return 0;
+	 case DO_EMACS_FINDENT:
+	    do_emacs_findent();
 	    return 0;
       }
 
@@ -1948,6 +2032,7 @@ void usage(const bool doman)
    }
 
    manout(" ","Below: <n> denotes an unsigned decimal number."                                             ,doman);
+   manout(" ","In the options, you can replace '_' with '-'."                                              ,doman);
    manout("-h, --help"                       ,"print this text"                                            ,doman);
    manout("-H, --manpage"                    ,"print man page"                                             ,doman);
    manout("-v, --version"                    ,"prints findent version"                                     ,doman);
@@ -2044,6 +2129,17 @@ void usage(const bool doman)
    manout("--gedit_external"  ,"outputs script 'findent-gedit', see --gedit_help" ,doman);
    manout("--gedit_plugin"    ,"outputs file 'findent.plugin', see --gedit_help"  ,doman);
    manout("--gedit_plugin_py" ,"outputs file 'python.py', see --gedit_help"       ,doman);
+   manout(" "," "                                                                 ,doman);
+   if(doman)
+   {
+      std::cout << ".PP" << std::endl << ".SS \"Usage with emacs:" << std::endl;
+   }
+   else
+   {
+      std::cout << "  Usage with emacs:" << std::endl;
+   }
+   manout("--emacs_help"      ,"outputs directions to use findent in emacs"       ,doman);
+   manout("--emacs_findent"   ,"outputs script 'findent.el', see --emacs_help"    ,doman);
    manout(" "," "                                                                 ,doman);
    if(doman)
    {

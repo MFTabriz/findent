@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(findent, 2.7.4~pre7, wvermin@gmail.com)
+AC_INIT(findent, 2.7.4~pre8, wvermin@gmail.com)
 AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
 AC_CONFIG_SRCDIR([src/findent.cpp])
@@ -82,4 +82,4 @@ AC_LANG([C++])
 AC_HEADER_STDC
 AC_CHECK_HEADERS([iostream string stack vector cstdio queue algorithm sstream],[],AC_MSG_ERROR([Exiting])) 
 
-AC_OUTPUT(Makefile src/Makefile scripts/Makefile test/Makefile vim/Makefile gedit/Makefile)
+AC_OUTPUT(Makefile src/Makefile scripts/Makefile test/Makefile vim/Makefile gedit/Makefile emacs/Makefile)
