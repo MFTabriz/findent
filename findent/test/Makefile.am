@@ -23,5 +23,10 @@ EXTRA_DIST = test1.sh test2.sh test3.sh test4.sh test5.sh test6.sh \
 	doit
 
 export SRCDIR = $(top_srcdir)
+if MAKEWIN
+   export WINDOWS = yes
+else
+   export WINDOWS = no
+endif
 CLEANFILES = prog expect result  *.mod *.try
 DISTCLEANFILES = *.f.try.f

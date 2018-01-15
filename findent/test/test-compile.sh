@@ -28,17 +28,16 @@ fi
 parms=`head -n1 < $prog | tr '!' ' '|tr '\r' ' '`
 $exe $parms < $prog > $bprog.try.f 2>/dev/null
 if [ -f $prog.try.f.ref ]; then
-   case "`file $exe`" in
-      *"MS Windows"*)
-	 case $prog in
-	    *dos*)
-	       :
-	       ;;
-	    *)
-	       sed -i 's/\r//' $bprog.try.f
-	       ;;
-	 esac
-   esac
+   if [ "$WINDOWS" = yes ] ; then
+      case $prog in
+	 *dos*)
+	    :
+	    ;;
+	 *)
+	    sed -i 's/\r//' $bprog.try.f
+	    ;;
+      esac
+   fi
    cmp -s $bprog.try.f $prog.try.f.ref >/dev/null 2>&1
    if [ "$?" -eq 0 ]; then
       echo -n "OK"
