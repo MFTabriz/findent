@@ -75,9 +75,13 @@ int lines_read        = 0;
 int input_line_length = 0;
 bool input_format_gnu = 0;
 int determine_fix_or_free(const bool store);
-bool isfixedcmt(const std::string s);
+bool isfixedcmtp(const std::string s);
 char fixedmissingquote(const std::string s);
 int what_to_return(void);
+
+std::string afterwordincomment(const std::string s, const std::string w);
+
+const std::string findentfix="findentfix:";
 
 bool nbseen;                                 // true if non-blank-line is seen
 
@@ -1238,6 +1242,7 @@ void get_full_statement()
       else
       {
 	 handle_fixed(s, fortran_more);
+	 D(O("more:");O(fortran_more));
 	 if (fortran_more)
 	    continue;
 	 else
@@ -1279,6 +1284,17 @@ void handle_free(std::string s, bool &more)
       D(O("end of file"););
       more = 0;
       return;
+   }
+
+   // handle findentfix: the free case is simpler than the
+   // fixed case. 
+   if (lines.empty())
+   {
+      std::string fix = afterwordincomment(s,findentfix);
+      if (fix != "")
+      {
+	 full_statement = fix;
+      }
    }
 
    if (input_line_length !=0)
@@ -1339,6 +1355,33 @@ void handle_fixed(std::string s, bool &more)
 
    D(O("fixed s");O(s););
 
+   // if this is a findentfix line:
+   //    Assume that no continuation lines can follow.
+   //    So, if there are already one or more lines read,
+   //    push this line on linestack and do not expect
+   //    continuation lines.
+   //    If, however this is the first line, handle this 
+   //    as a normal comment line: in that case no continuation
+   //    lines are requested either.
+
+   std::string fix = afterwordincomment(s,findentfix);
+   if (fix != "")
+   {
+      if (lines.empty())
+      {
+	 full_statement = fix;
+	 D(O("findentfix:");O(full_statement));
+      }
+      else 
+      {
+	 D(O("pushing back because of findentfix");O(s0));
+	 linestack.push(s0);
+	 num_lines--;
+	 more = 0;
+	 return;
+      }
+   }
+
    if (input_line_length != 0)
    {
       // with tabbed input there is a difference between
@@ -1352,7 +1395,7 @@ void handle_fixed(std::string s, bool &more)
       s = s.substr(0,input_line_length);
    }
 
-   if (isfixedcmt(s))
+   if (isfixedcmtp(s))
    {  // this is a blank or comment or preprocessor line
       lines.push_back(trim(s));
       olines.push_back(s);
@@ -1678,7 +1721,7 @@ void output_line()
 	    handle_pre(s);
 	    continue;
 	 }
-	 if(isfixedcmt(s))
+	 if(isfixedcmtp(s))
 	 {  // this is an empty line or comment line
 	    if (output_format == FIXED)
 	    {
@@ -1848,9 +1891,9 @@ void output_line()
 		  }
 		  prevlchar = lastchar(*it);
 		  inpreproc = (firstchar(*it) == '#');
-		  if (!isfixedcmt(*it++))
+		  if (!isfixedcmtp(*it++))
 		  {
-		     D(O("!isfixedcmt"););
+		     D(O("!isfixedcmtp"););
 		     needamp =  '&';
 		     // we have to put an '&' at the end of the line,
 		     // but what if the line ends in a ! comment, as in
@@ -2020,26 +2063,41 @@ void usage(const bool doman)
       std::cout << ".SH SYNOPSIS"                                                               << std::endl;
       std::cout << ".B findent"                                                                 << std::endl;
       std::cout << "[\\fIOPTION\\fR]..."                                                        << std::endl;
-      std::cout << ".PP"<<std::endl<< "findent reads from stdin and writes to stdout."          << std::endl;
+      std::cout << ".PP"<<std::endl<< "Findent reads from STDIN and writes to STDOUT."          << std::endl;
       std::cout << ".SH DESCRIPTION"                                                            << std::endl;
       std::cout << "Findent indents a Fortran source. Findent uses various kinds of"            << std::endl;
       std::cout << "indentations, see OPTIONS. Findent can convert from fixed form to"          << std::endl;
       std::cout << "free form, and can supplement single END statements, see 'Refactor' below." << std::endl;
-      std::cout << "Errors in OPTIONS are silently ignored."                                    << std::endl;
+      std::cout << "Comment lines with '!' in column one are not indented."                     << std::endl;
+      std::cout << " You can correct findent related indenting errors by inserting comment"     << std::endl;
+      std::cout << "lines: "                                                                    << std::endl;
+      std::cout << " !  findentfix: <fortran statement>"                                        << std::endl;
+      std::cout << " where <fortran statement> is for example DO, END, WHERE() etcetera."       << std::endl;
+      std::cout << "Findent will adjust the indentation according to <fortran statement>."      << std::endl;
+      std::cout << " Errors in OPTIONS are silently ignored."                                   << std::endl;
       std::cout << ".PP" << std::endl << ".SS \"General options:"                               << std::endl;
    }
    else
    {
-      std::cout << "findent [options]"                                        << std::endl;
-      std::cout << "   format fortran program"                                << std::endl;
-      std::cout << "   reads from STDIN, writes to STDOUT"                    << std::endl;
-      std::cout << "   comment lines with '!' in column one are not indented" << std::endl;
-      std::cout << "options: (errors are silently ignored)"                   << std::endl;
-      std::cout << "  general:"                                               << std::endl;
+      std::cout << "findent [options]"                                                        << std::endl;
+      std::cout << "   Format fortran source."                                                << std::endl;
+      std::cout << "   Reads from STDIN, writes to STDOUT."                                   << std::endl;
+      std::cout << "   Comment lines with '!' in column one are not indented."                << std::endl;
+      std::cout << "   You can correct findent related indenting errors by"                   << std::endl;
+      std::cout << "   inserting comment lines: "                                             << std::endl;
+      std::cout << "    !  findentfix: <fortran statement>"                                   << std::endl;
+      std::cout << "   where <fortran statement> is for example DO, END, WHERE() etcetera."   << std::endl;
+      std::cout << "   Findent will adjust the indentation according to <fortran statement>." << std::endl;
+      std::cout << "Options (errors are silently ignored):"                                   << std::endl;
+      std::cout                                                                               << std::endl;
+      std::cout << "  General options:"                                                       << std::endl;
+      std::cout                                                                               << std::endl;
    }
 
    manout(" ","Below: <n> denotes an unsigned decimal number."                                             ,doman);
-   manout(" ","In the options, you can replace '_' with '-'."                                              ,doman);
+   manout(" ","In the long options, you can replace '_' with '-'."                                         ,doman);
+   if (!doman)
+      std::cout << std::endl;
    manout("-h, --help"                       ,"print this text"                                            ,doman);
    manout("-H, --manpage"                    ,"print man page"                                             ,doman);
    manout("--readme"                         ,"print some background information"                          ,doman);
@@ -2082,7 +2140,9 @@ void usage(const bool doman)
    }
    else
    {
-      std::cout << "  indents:"                                     << std::endl;
+      std::cout << std::endl;
+      std::cout << "  Indenting options:"                           << std::endl;
+      std::cout << std::endl;
    }
    manout("-I<n>, --start_indent=<n>"       ,"starting  indent (default:0)"                                                 ,doman);
    manout("-Ia, --start_indent=a"           ,"determine starting indent from first line"                                    ,doman);
@@ -2191,7 +2251,10 @@ void manout(const std::string flag, const std::string txt, const bool doman)
    }
    else
    {
-      std::cout << flag << "\t" << ": " << txt << std::endl;
+      if (flag == " ")
+	 std::cout << flag << "\t" << "  " << txt << std::endl;
+      else
+	 std::cout << flag << "\t" << ": " << txt << std::endl;
    }
 }
 
@@ -2275,7 +2338,7 @@ std::string handle_dos(const std::string s)
    return sl;
 }
 
-bool isfixedcmt(const std::string s)
+bool isfixedcmtp(const std::string s)
 {
    // returns 1 if this is a fixed empty line or fixed comment line or preprocessor line
    //                                         or debug line ('d' or 'D' in column 1)
@@ -2284,6 +2347,51 @@ bool isfixedcmt(const std::string s)
    char c = firstchar(s);
    char cts = firstchar(trim(s));
    return (cts == 0 || c == 'C' || c == 'c' || cts == '!' || c == '*' || cts == '#' || c == 'd' || c == 'D'); 
+}
+
+std::string afterwordincomment(const std::string s, const std::string w)
+{
+   // if s is a comment line, if comment starts with w, return 
+   //   string after w
+   // else return ""
+   //   ignore case in w
+   // example:
+   // s = "!   HOppa  tralala hop"
+   // w = "hoppa"
+   // return "  tralala hop"
+
+   std::string sl = trim(s);
+   if (sl.length() == 0)
+      return "";
+   if (input_format == FREE)
+   {
+      if (sl[0] !=  '!')
+	 return "";
+   }
+   else
+   {
+      bool com = 0;
+      char c = s[0];
+      switch (c)
+      {
+	 case 'c':
+	 case 'C':
+	 case '*':
+	    com = 1;
+      }
+      if (sl[0] == '!')
+      {
+	 com = 1;
+      }
+      if (!com)
+	 return "";
+   }
+   sl = ltrim(sl.substr(1));
+   size_t l = w.length();
+   if (stolower(sl.substr(0,l)) == stolower(w)) 
+      return sl.substr(l);
+   else
+      return "";
 }
 
 char fixedmissingquote(const std::string s)

@@ -383,3 +383,23 @@ defined(q)
        dom(1) % temperature(:, 1) = 1.
 
   end subroutine nok
+
+
+  ! testing with indentfix:
+  subroutine testfix
+       implicit none
+       integer i,j,k
+       do i=1,10
+!             comment
+          continue
+          do j=1,6
+             continue
+             !  findentfix: do
+                do k=1,7
+                   continue
+                enddo
+! FINDENTFIX: enddo
+          enddo
+          continue
+       enddo
+  end subroutine testfix
