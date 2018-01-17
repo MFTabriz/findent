@@ -1,4 +1,7 @@
 $Id$
+findent-2.8.0:
+	implement ! findentfix:
+	clean up code, enhance documentation
 findent-2.7.4:
 	src/Makefile.am, configure.ac: if flex/bison is not
 	  to be used, but lexer.l or parser.y has been changed,

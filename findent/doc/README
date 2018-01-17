@@ -296,7 +296,7 @@ findent, usage?
    NOTE 4.1:
         Here a script to check for line length:
 
->>>> snip ----------file: checklength----------------------------------------------------
+>>>> snip ---------- checklength ---------------------------------------
 
 #!/bin/bash
 # checks file line lengths
@@ -334,7 +334,7 @@ while [ "$1" ] ; do
    shift
 done
 
->>>> snip --------------------------------------------------------------
+<<<< snip ---------- checklength --------------------------------------
 
    Example of usage:
        checklength 72 *.f
@@ -361,7 +361,7 @@ done
         can create the program 'addspace' or, on Windows, 'addspace.exe'
         by compiling this program:
 
->>>> snip --------------------------------------------------------------
+>>>> snip -------- addspace.f ------------------------------------------
 program addspace
    implicit none
    character(1000) :: line
@@ -372,12 +372,12 @@ program addspace
       write(*,'(1x,a)') trim(line)
    enddo
 end program addspace
-<<<< snip --------------------------------------------------------------
+<<<< snip -------- addspace.f ------------------------------------------
 
         Or, if you have a vintage Fortran-4 compiler, by compiling
         this program:
 
->>>> snip --------------------------------------------------------------
+>>>> snip -------- ADDSPACE.F ------------------------------------------
       DIMENSION L(1000)
       DATA LB/1H /
    10 DO 15 I=1,1000
@@ -394,11 +394,76 @@ end program addspace
   100 FORMAT(1000A1)
   110 FORMAT(1H ,1000A1)
       END
-<<<< snip --------------------------------------------------------------
+<<<< snip -------- ADDSPACE.F ------------------------------------------
 
         Use the generated program 'addspace' in stead of 'sed':
 
         findent -ofree < prog.f | addspace | findent > prog.f90
+
+findent, failure, findentfix:
+=============================
+
+   One thing is certain: findent contains errors. I appreciate it 
+   if you bring errors to my attention. If possible I will fix them.
+
+   On the other hand, it is possible to fool findent, for example
+   by using #ifdef, #else, #endif in a way that confuses findent.
+
+   Both cases can be solved using ! findentfix: , read on:
+
+   The next program will not be indented correctly:
+
+>>>> snip -------- fixdemo.f90 -----------------------------------------
+! compile with: gfortran -cpp fixdemo.f90
+! or
+!               gfortran -cpp -DLOOPJ fixdemo.f90
+   program fixdemo
+      implicit none
+      integer i,j
+      j=4
+      do i=1,3
+#ifdef LOOPJ
+      do j=1,2
+#endif
+      print *,i*j
+      enddo
+#ifdef LOOPJ
+      enddo
+      print *,'with j-loop'
+#else
+      print *,'without j-loop'
+#endif
+      continue
+   end program fixdemo
+<<<< snip -------- fixdemo.f90 -----------------------------------------
+
+   That is because findent takes the indentation from:
+#ifdef LOOPJ
+      do j=1,2
+#endif
+   and
+#else
+      print *,'without j-loop'
+#endif
+   So, findent is missing an enddo for the j-loop.
+
+   In this case, the solution would be to insert #else just before the
+   first #endif. 
+   If, however, in a real-world example this is not possible, or 
+   when findent really makes an error, you can use findentfix.
+   In the example above, insert directly after the last #endif:
+     ! findentfix: enddo
+   and findent will indent correctly. In general, the text after
+     ! findentfix:
+   will be used by findent as a normal source line, so the following
+   could also be useful:
+     ! FINDENTfix: subroutine dummy
+     ! findentFIX: do;do;do
+     ! FINDENTFIX: end;end
+     ! findentfix: where ()
+   But the following would do nothing:
+     ! findentfix: continue
+
 
 findent, installation:
 ======================

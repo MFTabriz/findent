@@ -305,6 +305,9 @@ top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = gnu
 SUBDIRS = src scripts test vim gedit emacs doc
 MAINTAINERCLEANFILES = config.h.in~
+EXTRA_DIST = bootstrap getversion LICENCE README.1st README.windows  \
+	     makedeb maketar makezip README.2nd
+
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
