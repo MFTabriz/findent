@@ -3,8 +3,9 @@ rc=0
 flags=$1
 eflags=$2
 comment=$3
+exe=$FINDENT
 for flag in $flags ; do
-   cat prog | ../src/findent $eflags $flag | tr -d '\r' > result
+   cat prog | $exe $eflags $flag | tr -d '\r' > result
    if cmp -s expect result ; then
       echo "$flag : OK $comment"
    else

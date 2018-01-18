@@ -11,10 +11,10 @@ version=`./getversion`                                            || exit 1
 echo "version = $version"
 cd ..                                                             || exit 1
 mkdir -p versions                                                 || exit 1
-cp findent/README.windows versions/README.txt                     || exit 1
-cp findent/src/findent.exe versions                               || exit 1
-cp findent/scripts/wfindent.bat versions                          || exit 1
-cp findent/COPYING versions/COPYING.txt
+cp $dir/README.windows versions/README.txt                        || exit 1
+cp $dir/src/findent.exe versions                                  || exit 1
+cp $dir/scripts/wfindent.bat versions                             || exit 1
+cp $dir/COPYING versions/COPYING.txt
 cd versions                                                       || exit 1
 unix2dos README.txt COPYING.txt                                   || exit 1
 rm -f "findent-$version.zip"

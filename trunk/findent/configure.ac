@@ -74,6 +74,38 @@ AS_IF( [test "x$useflex" = "xno"],
 
 AM_CONDITIONAL([USEFLEX],[test "x$useflex" = "xyes"])
 
+AC_CONFIG_FILES([test/prelude])
+AC_CONFIG_FILES([test/test-compile.sh],[chmod +x test/test-compile.sh])
+AC_CONFIG_FILES([test/doit],[chmod +x test/doit])
+AC_CONFIG_FILES([test/progfixed-dos.f])
+AC_CONFIG_FILES([test/progfixed-dos.f.try.f.ref])
+AC_CONFIG_FILES([test/progfixed.f])
+AC_CONFIG_FILES([test/progfixed.f.try.f.ref])
+AC_CONFIG_FILES([test/progfixedfree-dos.f])
+AC_CONFIG_FILES([test/progfixedfree-dos.f.try.f.ref])
+AC_CONFIG_FILES([test/progfixedfree.f])
+AC_CONFIG_FILES([test/progfixedfree.f.try.f.ref])
+AC_CONFIG_FILES([test/progfree-dos.f])
+AC_CONFIG_FILES([test/progfree-dos.f.try.f.ref])
+AC_CONFIG_FILES([test/progfree.f])
+AC_CONFIG_FILES([test/progfree.f.try.f.ref])
+AC_CONFIG_FILES([test/progfree1.f])
+AC_CONFIG_FILES([test/progfree1.f.try.f.ref])
+AC_CONFIG_FILES([test/progfixed1.f])
+AC_CONFIG_FILES([test/progfixed1.f.try.f.ref])
+AC_CONFIG_FILES([test/manpage.ref])
+AC_CONFIG_FILES([test/help.ref])
+AC_CONFIG_FILES([test/vim_fortran.ref])
+AC_CONFIG_FILES([test/vim_findent.ref])
+AC_CONFIG_FILES([test/gedit_help.ref])
+AC_CONFIG_FILES([test/vim_help.ref])
+AC_CONFIG_FILES([test/gedit_external.ref])
+AC_CONFIG_FILES([test/gedit_plugin.ref])
+AC_CONFIG_FILES([test/gedit_plugin_py.ref])
+AC_CONFIG_FILES([test/emacs_help.ref])
+AC_CONFIG_FILES([test/emacs_findent.ref])
+AC_CONFIG_FILES([test/readme.ref])
+
 AC_PROG_CXX
 AC_PROG_AWK
 AC_PROG_SED

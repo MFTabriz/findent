@@ -4560,6 +4560,69 @@ else
 fi
 
 
+ac_config_files="$ac_config_files test/prelude"
+
+ac_config_files="$ac_config_files test/test-compile.sh"
+
+ac_config_files="$ac_config_files test/doit"
+
+ac_config_files="$ac_config_files test/progfixed-dos.f"
+
+ac_config_files="$ac_config_files test/progfixed-dos.f.try.f.ref"
+
+ac_config_files="$ac_config_files test/progfixed.f"
+
+ac_config_files="$ac_config_files test/progfixed.f.try.f.ref"
+
+ac_config_files="$ac_config_files test/progfixedfree-dos.f"
+
+ac_config_files="$ac_config_files test/progfixedfree-dos.f.try.f.ref"
+
+ac_config_files="$ac_config_files test/progfixedfree.f"
+
+ac_config_files="$ac_config_files test/progfixedfree.f.try.f.ref"
+
+ac_config_files="$ac_config_files test/progfree-dos.f"
+
+ac_config_files="$ac_config_files test/progfree-dos.f.try.f.ref"
+
+ac_config_files="$ac_config_files test/progfree.f"
+
+ac_config_files="$ac_config_files test/progfree.f.try.f.ref"
+
+ac_config_files="$ac_config_files test/progfree1.f"
+
+ac_config_files="$ac_config_files test/progfree1.f.try.f.ref"
+
+ac_config_files="$ac_config_files test/progfixed1.f"
+
+ac_config_files="$ac_config_files test/progfixed1.f.try.f.ref"
+
+ac_config_files="$ac_config_files test/manpage.ref"
+
+ac_config_files="$ac_config_files test/help.ref"
+
+ac_config_files="$ac_config_files test/vim_fortran.ref"
+
+ac_config_files="$ac_config_files test/vim_findent.ref"
+
+ac_config_files="$ac_config_files test/gedit_help.ref"
+
+ac_config_files="$ac_config_files test/vim_help.ref"
+
+ac_config_files="$ac_config_files test/gedit_external.ref"
+
+ac_config_files="$ac_config_files test/gedit_plugin.ref"
+
+ac_config_files="$ac_config_files test/gedit_plugin_py.ref"
+
+ac_config_files="$ac_config_files test/emacs_help.ref"
+
+ac_config_files="$ac_config_files test/emacs_findent.ref"
+
+ac_config_files="$ac_config_files test/readme.ref"
+
+
 ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -6099,6 +6162,37 @@ do
     "src/buildparser.h") CONFIG_FILES="$CONFIG_FILES src/buildparser.h" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "src/buildlexer.cpp") CONFIG_FILES="$CONFIG_FILES src/buildlexer.cpp" ;;
+    "test/prelude") CONFIG_FILES="$CONFIG_FILES test/prelude" ;;
+    "test/test-compile.sh") CONFIG_FILES="$CONFIG_FILES test/test-compile.sh" ;;
+    "test/doit") CONFIG_FILES="$CONFIG_FILES test/doit" ;;
+    "test/progfixed-dos.f") CONFIG_FILES="$CONFIG_FILES test/progfixed-dos.f" ;;
+    "test/progfixed-dos.f.try.f.ref") CONFIG_FILES="$CONFIG_FILES test/progfixed-dos.f.try.f.ref" ;;
+    "test/progfixed.f") CONFIG_FILES="$CONFIG_FILES test/progfixed.f" ;;
+    "test/progfixed.f.try.f.ref") CONFIG_FILES="$CONFIG_FILES test/progfixed.f.try.f.ref" ;;
+    "test/progfixedfree-dos.f") CONFIG_FILES="$CONFIG_FILES test/progfixedfree-dos.f" ;;
+    "test/progfixedfree-dos.f.try.f.ref") CONFIG_FILES="$CONFIG_FILES test/progfixedfree-dos.f.try.f.ref" ;;
+    "test/progfixedfree.f") CONFIG_FILES="$CONFIG_FILES test/progfixedfree.f" ;;
+    "test/progfixedfree.f.try.f.ref") CONFIG_FILES="$CONFIG_FILES test/progfixedfree.f.try.f.ref" ;;
+    "test/progfree-dos.f") CONFIG_FILES="$CONFIG_FILES test/progfree-dos.f" ;;
+    "test/progfree-dos.f.try.f.ref") CONFIG_FILES="$CONFIG_FILES test/progfree-dos.f.try.f.ref" ;;
+    "test/progfree.f") CONFIG_FILES="$CONFIG_FILES test/progfree.f" ;;
+    "test/progfree.f.try.f.ref") CONFIG_FILES="$CONFIG_FILES test/progfree.f.try.f.ref" ;;
+    "test/progfree1.f") CONFIG_FILES="$CONFIG_FILES test/progfree1.f" ;;
+    "test/progfree1.f.try.f.ref") CONFIG_FILES="$CONFIG_FILES test/progfree1.f.try.f.ref" ;;
+    "test/progfixed1.f") CONFIG_FILES="$CONFIG_FILES test/progfixed1.f" ;;
+    "test/progfixed1.f.try.f.ref") CONFIG_FILES="$CONFIG_FILES test/progfixed1.f.try.f.ref" ;;
+    "test/manpage.ref") CONFIG_FILES="$CONFIG_FILES test/manpage.ref" ;;
+    "test/help.ref") CONFIG_FILES="$CONFIG_FILES test/help.ref" ;;
+    "test/vim_fortran.ref") CONFIG_FILES="$CONFIG_FILES test/vim_fortran.ref" ;;
+    "test/vim_findent.ref") CONFIG_FILES="$CONFIG_FILES test/vim_findent.ref" ;;
+    "test/gedit_help.ref") CONFIG_FILES="$CONFIG_FILES test/gedit_help.ref" ;;
+    "test/vim_help.ref") CONFIG_FILES="$CONFIG_FILES test/vim_help.ref" ;;
+    "test/gedit_external.ref") CONFIG_FILES="$CONFIG_FILES test/gedit_external.ref" ;;
+    "test/gedit_plugin.ref") CONFIG_FILES="$CONFIG_FILES test/gedit_plugin.ref" ;;
+    "test/gedit_plugin_py.ref") CONFIG_FILES="$CONFIG_FILES test/gedit_plugin_py.ref" ;;
+    "test/emacs_help.ref") CONFIG_FILES="$CONFIG_FILES test/emacs_help.ref" ;;
+    "test/emacs_findent.ref") CONFIG_FILES="$CONFIG_FILES test/emacs_findent.ref" ;;
+    "test/readme.ref") CONFIG_FILES="$CONFIG_FILES test/readme.ref" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "scripts/Makefile") CONFIG_FILES="$CONFIG_FILES scripts/Makefile" ;;
@@ -6795,6 +6889,8 @@ $as_echo X"$file" |
   done
 }
  ;;
+    "test/test-compile.sh":F) chmod +x test/test-compile.sh ;;
+    "test/doit":F) chmod +x test/doit ;;
 
   esac
 done # for ac_tag

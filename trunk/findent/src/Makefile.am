@@ -9,7 +9,7 @@ BUILDLEXFILES = buildlexer.cpp
 AM_CXXFLAGS = -fPIC
 
 if USEBISON
-parser.cpp parser.h: parser.y
+parsermade: parser.y
 	$(YACC) -o parser.cpp -d $<
 	if test -f parser.cpp.h ; then mv parser.cpp.h parser.h ; fi
 	if test -f parser.hpp ; then mv parser.hpp parser.h ; fi
@@ -17,6 +17,9 @@ parser.cpp parser.h: parser.y
 	   then  cp parser.cpp buildparser.cpp.in ; fi
 	if test -f buildparser.h.in ; \
 	   then cp parser.h buildparser.h.in ; fi
+	@touch $@
+
+parser.cpp parser.h: parsermade
 else
 dummyparser: parser.y
 	@echo ""
@@ -53,9 +56,11 @@ lexer.cpp: buildlexer.cpp dummylexer
 	cp $< $@
 endif
 
+lexer.o: parser.h
+
 MOSTLYCLEANFILES =
 
-CLEANFILES = $(LEXFILES) $(PARFILES) findent findent.exe findent.1 parser.cpp.h parser.hpp parser_report.txt *.inc
+CLEANFILES = $(LEXFILES) $(PARFILES) findent findent.exe findent.1 parser.cpp.h parser.hpp parser_report.txt *.inc parsermade
 
 
 DISTCLEANFILES = dummylexer dummyparser
