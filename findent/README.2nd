@@ -11,5 +11,3 @@ Extra scripts:
   - makezip:
       creates zipfile for usage in wondows in ../versions
 
-  - makedeb:
-      creates .deb directory with .deb file in ../debian

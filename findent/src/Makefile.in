@@ -315,7 +315,7 @@ LEXFILES = lexer.cpp
 BUILDLEXFILES = buildlexer.cpp
 AM_CXXFLAGS = -fPIC
 MOSTLYCLEANFILES = 
-CLEANFILES = $(LEXFILES) $(PARFILES) findent findent.exe findent.1 parser.cpp.h parser.hpp parser_report.txt *.inc
+CLEANFILES = $(LEXFILES) $(PARFILES) findent findent.exe findent.1 parser.cpp.h parser.hpp parser_report.txt *.inc parsermade
 DISTCLEANFILES = dummylexer dummyparser
 MAINTAINERCLEANFILES = $(BUILDPARFILES) $(BUILDLEXFILES)
 @MAKEMAN_TRUE@man1_MANS = findent.1
@@ -704,7 +704,7 @@ uninstall-man: uninstall-man1
 .PRECIOUS: Makefile
 
 
-@USEBISON_TRUE@parser.cpp parser.h: parser.y
+@USEBISON_TRUE@parsermade: parser.y
 @USEBISON_TRUE@	$(YACC) -o parser.cpp -d $<
 @USEBISON_TRUE@	if test -f parser.cpp.h ; then mv parser.cpp.h parser.h ; fi
 @USEBISON_TRUE@	if test -f parser.hpp ; then mv parser.hpp parser.h ; fi
@@ -712,6 +712,9 @@ uninstall-man: uninstall-man1
 @USEBISON_TRUE@	   then  cp parser.cpp buildparser.cpp.in ; fi
 @USEBISON_TRUE@	if test -f buildparser.h.in ; \
 @USEBISON_TRUE@	   then cp parser.h buildparser.h.in ; fi
+@USEBISON_TRUE@	@touch $@
+
+@USEBISON_TRUE@parser.cpp parser.h: parsermade
 @USEBISON_FALSE@dummyparser: parser.y
 @USEBISON_FALSE@	@echo ""
 @USEBISON_FALSE@	@echo "********************************************************"
@@ -742,6 +745,8 @@ uninstall-man: uninstall-man1
 
 @USEFLEX_FALSE@lexer.cpp: buildlexer.cpp dummylexer
 @USEFLEX_FALSE@	cp $< $@
+
+lexer.o: parser.h
 
 @MAKEMAN_TRUE@findent.1: findent
 @MAKEMAN_TRUE@	./findent -H > $@
