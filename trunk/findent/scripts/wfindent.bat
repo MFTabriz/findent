@@ -15,9 +15,30 @@ set fargs=
 if -%1-==-- goto :EOF
 set aa=%1
 
-if "%aa%" == "-v" goto :SPECIALRUN
-if "%aa%" == "-h" goto :SPECIALRUN
-if "%aa%" == "-H" goto :SPECIALRUN
+if "%aa%" == "-v"                goto :SPECIALRUN
+if "%aa%" == "--version"         goto :SPECIALRUN
+if "%aa%" == "-h"                goto :SPECIALRUN
+if "%aa%" == "--help"            goto :SPECIALRUN
+if "%aa%" == "-H"                goto :SPECIALRUN
+if "%aa%" == "--manpage"         goto :SPECIALRUN
+if "%aa%" == "--vim_help"        goto :SPECIALRUN
+if "%aa%" == "--vim-help"        goto :SPECIALRUN
+if "%aa%" == "--vim_fortran"     goto :SPECIALRUN
+if "%aa%" == "--vim-fortran"     goto :SPECIALRUN
+if "%aa%" == "--vim_findent"     goto :SPECIALRUN
+if "%aa%" == "--vim-findent"     goto :SPECIALRUN
+if "%aa%" == "--gedit_help"      goto :SPECIALRUN
+if "%aa%" == "--gedit-help"      goto :SPECIALRUN
+if "%aa%" == "--gedit_external"  goto :SPECIALRUN
+if "%aa%" == "--gedit-external"  goto :SPECIALRUN
+if "%aa%" == "--gedit_plugin"    goto :SPECIALRUN
+if "%aa%" == "--gedit-plugin"    goto :SPECIALRUN
+if "%aa%" == "--gedit_plugin_py" goto :SPECIALRUN
+if "%aa%" == "--gedit-plugin-py" goto :SPECIALRUN
+if "%aa%" == "--emacs_help"      goto :SPECIALRUN
+if "%aa%" == "--emacs-help"      goto :SPECIALRUN
+if "%aa%" == "--emacs_findent"   goto :SPECIALRUN
+if "%aa%" == "--emacs-findent"   goto :SPECIALRUN
 if "%aa%" == "-q" (
    echo wfindent: flag -q ignored
    echo           use "findent -q < filename"
