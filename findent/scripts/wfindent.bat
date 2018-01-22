@@ -8,6 +8,9 @@ if -%1-==-- (
   echo wfindent -ifree -i4 *.f90
   echo for a complete list of findent-args, type
   echo   wfindent -h
+  echo NOTE: flags that influence the indenting: use
+  echo       only the short varieties preceded with
+  echo       a single '-', like -i5 -Rr
   goto :EOF
 )
 set fargs=
@@ -46,13 +49,17 @@ if "%aa%" == "-q" (
    shift
    goto :astart
 )
+if %aa:~0,2%==-- (
+   echo Error: found flag: %aa%
+   echo Use only short indenting flags like -i5 -Rr ...
+   exit /b
+)
 
 if %aa:~0,1%==- (
    set fargs=%fargs% %aa%
    shift
    goto astart
 )
-
 :bstart
 if -%1-==-- goto :EOF
 if exist %1 goto one
