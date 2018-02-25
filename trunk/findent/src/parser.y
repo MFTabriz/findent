@@ -42,6 +42,8 @@ struct propstruct properties;
 %token ERROR
 %token LAST_TOKEN
 
+%left '%'
+
 %%
 
 lline:               labels line
