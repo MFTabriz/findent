@@ -1,6 +1,7 @@
 $Id$
 findent-2.8.1:
 	adapt wfindent and wfindent.bat to long options
+	parser.y: get rid of shift-reduce conflict
 findent-2.8.0:
 	implement ! findentfix:
 	clean up code, enhance documentation
