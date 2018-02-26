@@ -1,4 +1,4 @@
-findent (2.8.1~pre1-1) unstable; urgency=low
+findent (2.8.1-1) unstable; urgency=low
 
   * Initial release (Closes: #842166)
 
