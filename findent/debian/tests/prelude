@@ -1,4 +1,5 @@
 export FINDENT=findent
+export WFINDENT=wfindent
 dir=`basename $0`.tmpdir
 rm -rf $dir
 mkdir $dir
