@@ -1,5 +1,4 @@
 #!/bin/bash
-# obsolete, use makesid <all>
 # parameter all: produce debs for i386-wheezy, amd64=wheezy, amd64-sid
 curdir=$PWD
 version=`./getversion`

@@ -22,5 +22,7 @@ for dist in $dists; do
    echo building for $dist ...
    pdebuild  --debbuildopts "-us -uc"  -- --configfile ~root/pbuilderrc.$dist \
       --hookdir ~/pbuilderhooks || exit 1
+   sudo pbuilder --build --configfile /root/pbuilderrc.sid --buildresult $debdir $debdir/*dsc
+   sudo chown -h $USER.$USER $debdir/*
 done
 echo $0 done
