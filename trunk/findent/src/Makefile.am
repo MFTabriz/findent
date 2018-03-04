@@ -8,6 +8,8 @@ parser.cpp: parser.y
 	if test -f parser.cpp.h ; then mv parser.cpp.h parser.h ; fi
 	if test -f parser.hpp ; then mv parser.hpp parser.h ; fi
 	
+parser.h: parser.cpp
+
 builtparser: parser.cpp
 	mv parser.cpp builtparser.cpp
 	mv parser.h builtparser.h

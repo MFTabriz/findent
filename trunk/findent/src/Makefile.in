@@ -705,6 +705,8 @@ uninstall-man: uninstall-man1
 @USEBISON_TRUE@	if test -f parser.cpp.h ; then mv parser.cpp.h parser.h ; fi
 @USEBISON_TRUE@	if test -f parser.hpp ; then mv parser.hpp parser.h ; fi
 
+@USEBISON_TRUE@parser.h: parser.cpp
+
 @USEBISON_TRUE@builtparser: parser.cpp
 @USEBISON_TRUE@	mv parser.cpp builtparser.cpp
 @USEBISON_TRUE@	mv parser.h builtparser.h
