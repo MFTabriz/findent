@@ -26,6 +26,8 @@ if test "x$1" != xall ; then
    exit 0
 fi
 cd ..
+pwd
+exit
 for dist in i386-wheezy wheezy sid ; do
    echo building for $dist ...
    sudo bash `which pbuilder` --build --configfile ~root/pbuilderrc.$dist $dsc || exit
