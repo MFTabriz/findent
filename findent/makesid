@@ -1,0 +1,19 @@
+#!/bin/bash
+curdir=$PWD
+version=`./getversion`
+echo "version = $version"
+tar=$curdir/../versions/findent-$version.tar.gz
+dir=findent-$version
+debdir=$PWD/../debian/findent-$version-deb.sid
+./maketar  || exit 1
+rm -rf $debdir
+mkdir -p $debdir || exit 1
+cd $debdir || exit 1
+cp $tar . || exit 1
+tar xf $tar || exit 1
+cp $tar findent_$version.orig.tar.gz
+cd $dir || exit 1
+echo building for sid ...
+pdebuild  --debbuildopts "-us -uc"  -- --configfile ~root/pbuilderrc.sid \
+          --hookdir ~/pbuilderhooks || exit 1
+echo $0 done

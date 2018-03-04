@@ -1,4 +1,13 @@
-findent (2.8.1-1) unstable; urgency=low
+findent (2.8.2-1) unstable; urgency=low
+
+  * Bug fixes
+  * Add support for vim, gedit, emacs
+  * Add long options
+  * Improve documentation
+
+ -- Willem Vermin <wvermin@gmail.com>  Sun, 04 Mar 2018 12:17:22 +0100
+
+findent (2.7.3-1) unstable; urgency=low
 
   * Initial release (Closes: #842166)
 
