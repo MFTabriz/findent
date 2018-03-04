@@ -13,7 +13,7 @@
 #
 
 # the location of findent, replace with correct location:
-FINDENT=findent-location
+FINDENT=${FINDENT:-findent-location}
 if ! "$FINDENT" -v >/dev/null 2>&1 ; then
    FINDENT="findent"   # try if findent is in PATH
    if ! "$FINDENT" -v >/dev/null 2>&1 ; then

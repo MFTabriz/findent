@@ -1,5 +1,7 @@
 #!/bin/sh
+cd debian/tests
 . ./prelude
+unset FINDENT
 cat <<eof > prog1.f || exit 1
 program prog1
 continue
@@ -39,5 +41,5 @@ for i in 1 2 ; do
    fi
 done
 
+. ../postlude
 exit 0
-
