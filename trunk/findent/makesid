@@ -1,4 +1,12 @@
 #!/bin/bash
+# This script assumes that root has created a pbuilder environment
+# for sid (and for wheezy and i386-wheezy).
+# The configfiles are resp. ~/root/pbuilderrc.sid , 
+#  ~/root/pbuilderrc.wheezy and ~/root/pbuilderrc.i386-wheezy.
+# This script does not run update.
+#
+# debian distributions are created in ../debian/
+#
 curdir=$PWD
 version=`./getversion`
 echo "version = $version"
