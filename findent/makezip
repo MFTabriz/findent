@@ -23,5 +23,5 @@ zip   "findent-$version.zip" findent.exe README.txt \
                              COPYING.txt wfindent.bat             || exit 1
 rm -f findent.exe README.txt wfindent.bat COPYING.txt
 cd "$dir"                                                         || exit 1
-make maintainer-clean                                             || exit 1
+make distclean
 echo "$0 done"
