@@ -5,7 +5,7 @@ findent (2.8.2-1) unstable; urgency=low
   * Add long options
   * Improve documentation
 
- -- Willem Vermin <wvermin@gmail.com>  Tue, 20 Mar 2018 08:49:45 +0100
+ -- Willem Vermin <wvermin@gmail.com>  Tue, 27 Mar 2018 15:12:50 +0200
 
 findent (2.7.3-1) unstable; urgency=low
 
