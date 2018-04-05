@@ -1153,6 +1153,7 @@ void get_full_statement()
    //   correct indenting)
    //
    // and lines will contain:
+   //    subroutine compute(x x,y)
    //
    // #ifdef one
    //      x &
@@ -1252,6 +1253,7 @@ void get_full_statement()
    }
    D(O("full_statement:");O(num_lines);O(full_statement););
    D(O("lines:"); for (unsigned int i=0; i<lines.size(); i++) { O(i);O(lines[i]); })
+   D(O("olines:"); for (unsigned int i=0; i<olines.size(); i++) { O(i);O(olines[i]); })
 }
 
 void handle_prc(std::string s, bool &more)
@@ -1267,6 +1269,13 @@ void handle_prc(std::string s, bool &more)
    }
    std::string sl = rtrim(s);
    lines.push_back(sl);
+   //    subroutine compute( &
+   // #ifdef one
+   //      x &
+   // #else
+   //      x,y &
+   // #endif
+   //     )
    olines.push_back(s);
    if(lastchar(sl) == '\\')
       more = 1;
