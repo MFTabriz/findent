@@ -1269,13 +1269,6 @@ void handle_prc(std::string s, bool &more)
    }
    std::string sl = rtrim(s);
    lines.push_back(sl);
-   //    subroutine compute( &
-   // #ifdef one
-   //      x &
-   // #else
-   //      x,y &
-   // #endif
-   //     )
    olines.push_back(s);
    if(lastchar(sl) == '\\')
       more = 1;
