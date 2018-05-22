@@ -7,6 +7,7 @@ tar=$PWD/../versions/findent-$version.tar.gz
 dir=findent-$version
 dsc=findent_$version-1.dsc
 debdir=$PWD/../debian/findent-$version-deb
+./maketar
 if [ -e debian/changelog ] ; then
    sed -i "1s/(.*)/($version-1)/" debian/changelog   || exit 1
 fi
@@ -27,7 +28,7 @@ if test "x$1" != xall ; then
 fi
 cd ..
 pwd
-exit
+#for dist in sid ; do
 for dist in i386-wheezy wheezy sid ; do
    echo building for $dist ...
    sudo bash `which pbuilder` --build --configfile ~root/pbuilderrc.$dist $dsc || exit
