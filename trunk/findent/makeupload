@@ -1,0 +1,21 @@
+#!/bin/bash
+# creates directory for upload
+# ./maketar
+# version numbers for upstream releases:
+newversion=`./getversion`
+oldversion=2.7.3
+curdir=`pwd`
+dist=sid
+tar=$curdir/../versions/findent-$newversion.tar.gz
+uploaddir=$curdir/../upload/upload-$newversion
+echo removing $uploaddir ...
+mkdir -p $uploaddir
+sudo chown -R willem.willem $uploaddir
+rm -rf $uploaddir
+mkdir -p $uploaddir
+cd $uploaddir || exit 1
+cp -v $tar . || exit 1
+sudo bash `which pbuilder` --execute --bindmounts $PWD \
+   --configfile ~root/pbuilderrc.$dist  \
+   -- $curdir/pbuilderscript $PWD $oldversion $newversion|| exit 1
+sudo chown -R willem.willem $uploaddir
