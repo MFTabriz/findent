@@ -31,7 +31,7 @@ pwd
 #for dist in sid ; do
 for dist in i386-wheezy wheezy sid ; do
    echo building for $dist ...
-   sudo bash `which pbuilder` --build --configfile ~root/pbuilderrc.$dist $dsc || exit
+   sudo bash `which pbuilder` --build --configfile ~root/pbuilderrc.$dist $dsc || exit 1
 done
 rm -r $dir || exit 1
 echo '***********************************************************'
