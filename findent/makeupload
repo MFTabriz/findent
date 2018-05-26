@@ -19,3 +19,9 @@ sudo bash `which pbuilder` --execute --bindmounts $PWD \
    --configfile ~root/pbuilderrc.$dist  \
    -- $curdir/pbuilderscript $PWD $oldversion $newversion|| exit 1
 sudo chown -R willem.willem $uploaddir
+rm -r findent-$oldversion
+rm    findent_$oldversion-1.debian.tar.xz
+rm    findent_$oldversion-1.dsc
+rm    findent_$oldversion.orig.tar.gz
+rm -r findent-$newversion
+rm -r findent-$newversion.orig

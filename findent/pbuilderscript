@@ -23,15 +23,17 @@ if [ -d debian.upstream ] ; then
    rm -r debian
    mv debian.upstream debian || exit 1
 fi
-echo dpkg-source ...
+#echo dpkg-source ...
 #dpkg-source --commit
 echo quilt ...
 while quilt push; do quilt refresh; done
 #dch
 echo | mk-build-deps -i -r debian/control || exit 1
 #dpkg-source --commit
-while quilt push; do quilt refresh; done
+#while quilt push; do quilt refresh; done
 dpkg-buildpackage -us -uc
 cd ..
+echo "running lintian ..."
 lintian -i -I --show-overrides findent_$newversion-1_amd64.changes
+echo "end lintian"
 echo $0 done
