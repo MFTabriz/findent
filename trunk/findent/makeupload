@@ -8,6 +8,7 @@ curdir=`pwd`
 dist=sid
 tar=$curdir/../versions/findent-$newversion.tar.gz
 uploaddir=$curdir/../upload/upload-$newversion
+./maketar
 echo removing $uploaddir ...
 mkdir -p $uploaddir
 sudo chown -R willem.willem $uploaddir
@@ -25,3 +26,7 @@ rm    findent_$oldversion-1.dsc
 rm    findent_$oldversion.orig.tar.gz
 rm -r findent-$newversion
 rm -r findent-$newversion.orig
+debsign *.changes
+echo to check: dput -s ftp-eu $uploaddir/*.changes
+echo to upload: dput ftp-eu $uploaddir/*.changes
+echo "$0 done"
