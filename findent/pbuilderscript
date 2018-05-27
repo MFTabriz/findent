@@ -14,7 +14,7 @@ export DEBFULLNAME="Willem Vermin"
 sed -i 's/^#//' /etc/apt/sources.list   # oncomment 2de regel
 apt update
 apt -y install apt-utils || exit 1
-apt -y install quilt devscripts debhelper autotools-dev equivs vim || exit 1
+apt -y install quilt devscripts debhelper autotools-dev equivs || exit 1
 apt source findent || exit 1
 cd findent-$oldversion || exit 1
 uupdate -v $newversion ../findent-$newversion.tar.gz || exit 1
@@ -23,6 +23,7 @@ if [ -d debian.upstream ] ; then
    rm -r debian
    mv debian.upstream debian || exit 1
 fi
+#apt -y install vim
 #echo dpkg-source ...
 #dpkg-source --commit
 echo quilt ...
