@@ -7,7 +7,7 @@ findent (2.8.2-1) unstable; urgency=low
   * Add 'tests' directory in debian/
   * Add 'findentfix': correct wrong indentation
 
- -- Willem Vermin <wvermin@gmail.com>  Sun, 27 May 2018 06:35:31 +0200
+ -- Willem Vermin <wvermin@gmail.com>  Tue, 29 May 2018 08:09:48 +0200
 
 findent (2.7.3-1) unstable; urgency=low
 
