@@ -1,6 +1,6 @@
 #!/bin/bash
 # creates directory for upload
-# ./maketar
+# BTW: it seems that ./makedeb produces exactly the same ...
 # version numbers for upstream releases:
 newversion=`./getversion`
 oldversion=2.7.3
