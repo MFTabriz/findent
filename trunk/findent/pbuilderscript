@@ -7,7 +7,7 @@ if [ -z "$3" ] ; then
    echo usage: pbuilderscript workdir oldversion newversion
    exit 1
 fi
-cd "$1" || exit 1
+cd "$workdir" || exit 1
 echo "working in `pwd`"
 export DEBEMAIL=wvermin@gmail.com
 export DEBFULLNAME="Willem Vermin"
