@@ -27,6 +27,6 @@ rm    findent_$oldversion.orig.tar.gz
 rm -r findent-$newversion
 rm -r findent-$newversion.orig
 debsign *.changes
-echo to check: dput -s ftp-eu $uploaddir/*.changes
+echo to check: dput -s mentors $uploaddir/*.changes
 echo to upload: dput ftp-eu $uploaddir/*.changes
 echo "$0 done"
