@@ -2,9 +2,9 @@ findent (2.8.2-1) unstable; urgency=low
 
   * New upstream release
   * Changed Standards-Version: 4.1.4
-  * Changed Build-Depends: debhelper (>=11)
+  * switched to the debhelper compat level 11, bumped the build dep accordingly
 
- -- Willem Vermin <wvermin@gmail.com>  Sun, 10 Jun 2018 14:28:04 +0200
+ -- Willem Vermin <wvermin@gmail.com>  Sun, 10 Jun 2018 14:35:46 +0200
 
 findent (2.7.3-1) unstable; urgency=low
 
