@@ -2,13 +2,11 @@ findent (2.8.3~pre1-1) unstable; urgency=low
 
   * New upstream release
 
- -- Willem Vermin <wvermin@gmail.com>  Sun, 17 Jun 2018 14:05:22 +0200
+ -- Willem Vermin <wvermin@gmail.com>  Sat, 16 Jun 2018 17:03:39 +0200
 
 findent (2.8.2-1) unstable; urgency=low
 
   * New upstream release
-  * Changed Standards-Version: 4.1.4
-  * Changed Build-Depends: debhelper (>=11)
 
  -- Willem Vermin <wvermin@gmail.com>  Wed, 13 Jun 2018 05:09:12 +0200
 

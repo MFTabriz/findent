@@ -2569,3 +2569,8 @@ bool cleanfive(const std::string s)
    return 1;
 }
 
+int ppp(const std::string s)     // for ad-hoc debugging purposes
+{
+   std::cout << s << std::endl;
+   return 0;
+}

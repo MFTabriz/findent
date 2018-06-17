@@ -11,7 +11,7 @@ struct propstruct properties;
 %token END ENDSUBROUTINE ENDFUNCTION ENDPROGRAM ENDMODULE ENDSUBMODULE
 %token IF THEN ELSE ELSEIF ENDIF
 %token WHERE ENDWHERE FORALL ENDFORALL ELSEWHERE
-%token DO DOWHILE DOCONCURRENT ENDDO
+%token DO DOCOMMA DOWHILE DOCONCURRENT ENDDO
 %token SELECTCASE SELECTTYPE ENDSELECT CASE CASEDEFAULT TYPEIS CLASSIS CLASSDEFAULT
 %token INTERFACE ABSTRACTINTERFACE ENDINTERFACE
 %token CONTAINS
@@ -95,11 +95,13 @@ line:
     |                interface                { properties.kind = INTERFACE;         }
     |                module                   { properties.kind = MODULE;            }
     |                moduleprocedure          { properties.kind = PROCEDURE;         }
+    |                program_stmt             { properties.kind = PROGRAM;           }
     |                procedure                { properties.kind = PROCEDURE;         }
     |                selectcase               { properties.kind = SELECTCASE;        }
     |                selecttype               { properties.kind = SELECTTYPE;        }
     |                simple_end               { properties.kind = END;               }
-    |                subfun_stmt_bind         {                                      }
+    |                subroutine_stmt          { properties.kind = SUBROUTINE;        }
+    |                function_stmt            { properties.kind = FUNCTION;          }
     |                submodule                { properties.kind = SUBMODULE;         }
     |                type                     { properties.kind = TYPE;              }
     |                typeis                   { properties.kind = TYPEIS;            }
@@ -119,31 +121,54 @@ moduleprocedure:     MODULEPROCEDURE    enable_identifier IDENTIFIER getname EOL
 procedure:           PROCEDURE          enable_identifier IDENTIFIER getname EOL ;
 
 
-subfun_stmt_bind:    subfun_stmt SKIP ;
-subfun_stmt:         subfunprefix subfun subfunname ;
-subfun:              subfun_spec enable_identifier  ;
-subfun_spec:         SUBROUTINE       { properties.kind = SUBROUTINE;}
-           |         MODULESUBROUTINE { properties.kind = SUBROUTINE;}
-	   |         FUNCTION         { properties.kind = FUNCTION;  }
-	   |         MODULEFUNCTION   { properties.kind = FUNCTION;  }
-	   |         PROGRAM          { properties.kind = PROGRAM;   }
-	   ;
-subfunname:          IDENTIFIER enable_skip getname ;
-subfunprefix:        empty
-            |        subfunprefix subfunprefix_spec ;
-subfunprefix_spec:   ELEMENTAL   
-		 |   IMPURE      
-		 |   PURE        
-		 |   RECURSIVE   
-		 |   intrinsic_type_spec
-		 |   TYPEC LR
-		 |   CLASS LR ;
+	/* standard dictates that only                                         */
+	/*    PROGRAM program_name                                             */
+	/* is allowed, but there is (or was) at least one dialect that allows: */
+	/*    PROGRAM                                                          */
+	/* and another dialect that allows                                     */
+	/*    PROGRAM program_name(p1,...,p8), comment                         */
+	/* and                                                                 */
+	/*    PROGRAM program_name,p1,...,p8, comment                          */
+	/* so we will be a bit sloppy here                                     */
+
+program_stmt:            PROGRAM enable_identifier IDENTIFIER getname enable_skip SKIP
+	            |    PROGRAM enable_identifier EOL
+		    ;
+
+subroutine_stmt:         subroutineprefix subroutine subroutinename enable_skip SKIP;
+subroutine:              subroutine_spec ;
+subroutine_spec:         SUBROUTINE
+                    |    MODULESUBROUTINE
+	            ;
+subroutinename:          enable_identifier IDENTIFIER getname ;
+subroutineprefix:        empty
+                    |    subroutineprefix subroutineprefix_spec 
+		    ;
+subroutineprefix_spec:  ELEMENTAL   
+		    |   IMPURE      
+		    |   PURE        
+		    |   RECURSIVE   
+		    |   intrinsic_type_spec
+		    |   TYPEC LR
+		    |   CLASS LR 
+		    ;
+
+function_stmt:          subroutineprefix function functionname LR enable_skip SKIP ;
+function:               function_spec ;
+function_spec:          FUNCTION
+	            |   MODULEFUNCTION
+	            ;
+functionname:           enable_identifier IDENTIFIER getname ;
+
 submodule:           SUBMODULE LR enable_identifier IDENTIFIER getname EOL ;
+
 intrinsic_type_spec: BASICTYPE
-		   | BASICTYPE kind_selector ;
+		   | BASICTYPE kind_selector 
+		   ;
 kind_selector:       '*' I_NUMBER      /* extension */
 	     |       '*' LR            /* extension */
-	     |       LR ;
+	     |       LR 
+	     ;
 
 entry:               ENTRY enable_identifier IDENTIFIER skipall ;
 
@@ -166,25 +191,36 @@ endsubroutine:       ENDSUBROUTINE construct_name EOL ;
 endtype:             ENDTYPE       construct_name EOL ;
 endwhere:            ENDWHERE      construct_name EOL ;
 simple_end:          END                          EOL ;
+gidentifier:         IDENTIFIER
+	   |         TIDENTIFIER 
+	   ;
 
 assignment:          lvalue '=' skipnoop
-	  |          ASSIGN I_NUMBER TO enable_identifier IDENTIFIER EOL
-	  |          ASSIGN I_NUMBER TO enable_identifier TIDENTIFIER EOL ;
+	  |          ASSIGN I_NUMBER TO enable_identifier gidentifier EOL 
+	  ;
 
 else:                ELSE           construct_name EOL ;
 elseif:              ELSEIF LR THEN construct_name EOL ;
 elsewhere:           ELSEWHERE LR   construct_name EOL
-	 |           ELSEWHERE      construct_name EOL ;
+	 |           ELSEWHERE      construct_name EOL 
+	 ;
 
 if_construct:        IF     LR THEN EOL ;
 where_construct:     WHERE  LR EOL ;
 forall_construct:    FORALL LR EOL ;
-do_construct:        do I_NUMBER     getdolabel skipall 
-            |        do IDENTIFIER              skipall
-            |        do TIDENTIFIER             skipall
-	    |        do ','                     skipall
-	    |        do                         EOL ;
-do:                  DO enable_identifier ;
+
+do_construct:        do       I_NUMBER     getdolabel skipall      /* do 100 i=1,10          */
+            |        do       gidentifier             skipall      /* do i=1,10              */
+            |        docomma  gidentifier             skipall      /* do, i=1,10             */
+	    |        do                                       EOL  /* do                     */ 
+	    |        DOWHILE      LR                          EOL  /* do while (i<10)        */
+	                                                           /* do, while (i<10)       */
+	    |        DOCONCURRENT LR                          EOL  /* do concurrent (i=1:20) */
+	                                                           /* do, concurrent (i=1:20)*/
+	    ;
+
+do:                  DO      enable_identifier ;
+docomma:             DOCOMMA enable_identifier ;
 
 selectcase:          SELECTCASE LR EOL     ;
 selecttype:          SELECTTYPE LR skipall ;
@@ -204,13 +240,12 @@ enum:                ENUM ','             skipall ;
 
 type:                type1 ','  skipall
     |                type1 ':'  skipall
-    |                type1 IDENTIFIER  skipall ;
+    |                type1 IDENTIFIER  skipall 
+    ;
 type1:               TYPE enable_identifier ;
 
-lvalue:              IDENTIFIER
-      |              IDENTIFIER LR
-      |              TIDENTIFIER
-      |              TIDENTIFIER LR
+lvalue:              gidentifier
+      |              gidentifier LR
       |              lvalue '%' lvalue
       ;
 construct_name:      enable_identifier empty
@@ -234,7 +269,7 @@ getstlabel:          {properties.label=lexer_getstlabel();}
           ;
 getdolabel:          {properties.dolabel=lexer_geti_number();}
           ;
-empty:               
+empty:               /* empty */
      ;
 %%
 
