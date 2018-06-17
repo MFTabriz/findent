@@ -40,6 +40,11 @@
             j = 3
        END SUBROUTINE
 
+       module function fun1(arg1)
+            integer :: arg1
+            fun1 = 10
+       end function fun1
+
        MODULE PROCEDURE sub2
             arg2 = 1
        END procedure sub2
@@ -184,14 +189,20 @@
        loop: do i=1,20
           continue
        enddo loop
-       loop1 : do i=1,20
+       loop1 : do , i=1,20
           continue
        enddo loop1
        end = 10
        do while(i.eq.0)
           continue
        enddo
+       do , while(i.eq.0)
+          continue
+       enddo
        do concurrent(i=1:10)
+          x(i) = 0
+       enddo
+       do , concurrent(i=1:10)
           x(i) = 0
        enddo
 

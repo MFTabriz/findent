@@ -1,4 +1,24 @@
 $Id$
+findent-2.8.3:
+	parser.y, lexer.l: changed detection of do-constructs
+	     DO , 
+	     DO , 100
+	  are now NOT classified as a do-construct
+	  explicit detection of DOWHILE and DOCONCURRENT
+
+	  Made detection of PROGRAM and FUNCTION more
+	  precise:
+	  for PROGRAM only allowed:
+	    PROGRAM IDENTIFIER <followed by whatever you want>
+	                       some old dialects permit this
+	    PROGRAM
+	           i.e: program without a name
+	  for FUNCTION:
+	    parameter list is now required
+
+	makedeb: some enhancements. 
+	debian.wheezy, debian.xenial: directories with deviations from sid
+
 findent-2.8.2: 
 	debianizing ...
 findent-2.8.1:

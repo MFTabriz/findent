@@ -137,6 +137,11 @@ complex           { D(O("COMPLEX");Y;);           return BASICTYPE;         }
 contains          { D(O("CONTAINS");Y);           return CONTAINS;          }
 critical          { D(O("CRITICAL");Y;);          return CRITICAL;          }
 do                { D(O("DO");Y;);                return DO;                }
+do,               { D(O("DO,");Y;);               return DOCOMMA;           }
+doconcurrent      { D(O("DOCONCURRENT");Y;);      return DOCONCURRENT;      }
+do,concurrent     { D(O("DO,CONCURRENT");Y;);     return DOCONCURRENT;      }
+dowhile           { D(O("DOWHILE");Y;);           return DOWHILE;           }
+do,while          { D(O("DO,WHILE");Y;);          return DOWHILE;           }
 doublecomplex     { D(O("DOUBLECOMPLEX");Y;);     return BASICTYPE;         }
 doubleprecision   { D(O("DOUBLEPRECISION");Y;);   return BASICTYPE;         }
 elemental         { D(O("ELEMENTAL");Y;);         return ELEMENTAL;         }
