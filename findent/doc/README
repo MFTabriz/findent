@@ -62,10 +62,13 @@ findent, why?
    - floppy, only for fixed format: http://www.netlib.org/floppy/
    - convert.f90: converts from fixed to free format, and indents:
         ftp://ftp.numerical.rl.ac.uk/pub/MandR/convert.f90
-   - f2f90: based of convert.f90: http://www.fortran.com/f2f90.tar.gz
+   - f2f90: based on convert.f90: http://www.fortran.com/f2f90.tar.gz
    - f90ppr: an impressive piece of software that beautifies
         Fortran code and contains a macro processor.
-        http://www.ifremer.fr/ditigo/molagnon/fortran90/
+        http://fortranwiki.org/fortran/show/f90ppr
+   - fprettify: an indenter and beautifier, written in Python.
+	IMHO not mature at the time of this writing (june 2018).
+        https://github.com/pseewald/fprettify
 
    For me, the problem with these tools is, that 
 
