@@ -1,0 +1,66 @@
+#!/bin/bash
+# parameter all: produce debs for i386-wheezy, amd64=wheezy, amd64-sid
+curdir=$PWD
+version=`./getversion`
+echo "version = $version"
+tar=$PWD/../versions/findent-$version.tar.gz
+dir=findent-$version
+dsc=findent_$version-1.dsc
+debdir=$PWD/../debian/findent-$version-deb
+./maketar
+if [ -e debian/changelog ] ; then
+   sed -i "1s/(.*)/($version-1)/" debian/changelog   || exit 1
+fi
+rm -rf $debdir
+mkdir -p $debdir || exit
+cd $debdir || exit
+cp $tar . || exit
+tar xf $tar || exit
+cd $dir || exit
+#cp -r $curdir/debian . || exit
+echo compat before xenial: `cat debian/compat` `grep Standards-Version debian/control`
+cp debian.xenial/* debian || exit
+echo compat after xenial: `cat debian/compat` `grep Standards-Version debian/control`
+#dh_make --yes -s -f $tar
+dh_make --yes -s --createorig
+cd ..
+dpkg-source -b $dir || exit 1
+cd -
+#debuild -us -uc --lintian-opts --profile debian || exit
+dpkg-buildpackage -us -uc --check-command=lintian --check-option='--profile' --check-option=debian
+if test "x$1" != xall ; then 
+   cd ..
+   rm -r $dir || exit 1
+   exit 0
+fi
+cd ..
+#for dist in sid ; do
+#for dist in amd64-wheezy ; do
+for dist in i386-wheezy amd64-wheezy amd64-sid ; do
+   workdir=`mktemp -d --tmpdir findent-pbuilder-$dist.XXXXXXX`
+   echo building for $dist in $workdir ...
+   cd $workdir || exit 1
+   mkdir w || exit 1
+   cd w || exit 1
+   tar xf $tar || exit 1
+   cd $dir || exit 1
+   echo compat before $dist: `cat debian/compat` `grep Standards-Version debian/control`
+   case $dist in
+      *wheezy*)
+	 cp debian.wheezy/* debian || exit
+	 ;;
+   esac
+   echo compat after $dist: `cat debian/compat` `grep Standards-Version debian/control`
+   dh_make --yes -s --createorig
+   cd ..
+   dpkg-source -b $dir || exit 1
+   sudo bash `which pbuilder` --build --configfile ~root/pbuilderrc.$dist $dsc || exit 1
+   debsign /var/cache/pbuilder/result-$dist/findent_$version-1_*.changes || exit 1
+done
+rm -r $dir || exit 1
+echo '***********************************************************'
+echo '** i386-wheezy in /var/cache/pbuilder/result-i386-wheezy **'
+echo '** wheezy in /var/cache/pbuilder/result-amd64-wheezy     **'
+echo '** sid in /var/cache/pbuilder/result-amd64-sid           **'
+echo '***********************************************************'
+echo $0 done
