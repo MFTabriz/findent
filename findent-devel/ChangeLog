@@ -1,0 +1,441 @@
+$Id$
+findent-2.8.3:
+	parser.y, lexer.l: changed detection of do-constructs
+	     DO , 
+	     DO , 100
+	  are now NOT classified as a do-construct
+	  explicit detection of DOWHILE and DOCONCURRENT
+
+	  Made detection of PROGRAM and FUNCTION more
+	  precise:
+	  for PROGRAM only allowed:
+	    PROGRAM IDENTIFIER <followed by whatever you want>
+	                       some old dialects permit this
+	    PROGRAM
+	           i.e: program without a name
+	  for FUNCTION:
+	    parameter list is now required
+
+	makedeb: some enhancements. 
+	debian.wheezy, debian.xenial: directories with deviations from sid
+
+findent-2.8.2: 
+	debianizing ...
+findent-2.8.1:
+	adapt wfindent and wfindent.bat to long options
+	parser.y: get rid of shift-reduce conflict
+	src/Makefile.am: some minors to ensure proper regeneration
+	   of lexer.cpp if necessary
+findent-2.8.0:
+	implement ! findentfix:
+	clean up code, enhance documentation
+	parallel make, also for make check, seems to work now
+findent-2.7.4:
+	src/Makefile.am, configure.ac: if flex/bison is not
+	  to be used, but lexer.l or parser.y has been changed,
+	  produce a warning message.
+	maketar: remove creating executable 
+	Readme.1st: adapted to previous line
+	Change build process: no bison or flex needed when
+	building from tarball.
+	Update debian directory.
+	bootstrap: fix bug wich prevented 'make dist' to run
+	src/Makefile.am, Makefile.am, scripts/Makefile.am:
+	fixes to facilitate 'make distcheck'
+	src/findent.cpp, add option -i- to disable indenting
+	test: add test7.sh and test8.sh to test flag -i-
+	README: add method to get indented comments when converting
+	        from fixed to free
+	parser.y, lexer.y:
+	   recognize PROCEDURE(not only MODULEPROCEDURE) as PROCEDURE
+	makedeb: add i386-wheezy
+	Makefile.am, configure.ac: introduce variable MAKEWIN to 
+	  mv findent to findent.exe when compiling for windows.
+	  Somehow, now the mingw compiler does not generate foo.exe
+	  when requested to produce foo.
+	findent.cpp:
+	   add comment for names of long flags
+	   add -osame option
+	findent.cpp tocpp.sh vim_plugin.cpp vim_plugin.h gedit_plugin.cpp
+	            gedit_plugin.h
+	   let findent output configuration files for usage with vim
+	   and gedit. Flags:
+	    --vim_help
+	    --gedit_help
+	    --vim_findent
+	    --vim_fortran
+	    --gedit_external
+	    --gedit_plugin
+	    --gedit_plugin_py
+	test:
+	   use only one or two lines for testing flags -h, -H
+	   add tests (test16.sh) for vim and gedit related flags.
+	   make use of MAKEWIN (see configure.ac) to determine
+	   if we made an windows executable.
+	parser.y:  bugfix
+	   take care that "dom(1)%t" is recognized as an lvalue
+	   so that "dom(1)%t = 0" is not classified as the start
+	   of a do-loop, but as an assignement by adding:
+	      lvalue:  lvalue '%' lvalue
+
+	test, findent.cpp, emacs
+	   add ability to generate emacs config file.
+	   add aliases for flags containing '_': 
+	     '-' can be used instead
+
+findent-2.7.3:
+findent-2.7.2:
+	copyright: BSD-3
+	debial/rules: add 
+	  export DEB_BUILD_MAINT_OPTIONS=hardening=+all
+	debian/, makedeb, maketar:
+	   some slight modifications for debian packaging
+	findent.cpp:
+	   changed output of pure comment lines while converting
+	     from fixed to free:
+	     - comment starts with [cC*!] in column one:
+		  the first character is replaced by '!' and the comment
+		  is ouput un-indented
+	     - comment starting with '!', not in column 1, is indented
+	     - comment with [dD] in column one:
+		  is output as-is, prepended with '!', starting in column one
+	   fixed format: if garbage is detected in label field,
+	      output that line as-is
+findent-2.7.1:
+	maketar: adapt version in debian/changelog
+	vim somewhat better findent.vim and fortran.vim
+	pre_analyzer.cpp: bugfix
+findent-2.7.0:
+	findent.cpp:
+	   - add option -lastindent to output only the indentation level
+	     of the last line
+	   - recognise '#  if' etc
+	   - fixed minor bug: code starting with preprocessor directive
+	     in combination with -Ia did not function properly
+	   - add flag -Q. returncode =2 for free, 4 for fixed
+	     for usage in vim
+	   - removed documentation for -Q, it is not needed now
+	   - add stack for dolabels to obtain correct indenting in cases
+		like this:
+		   do 1 i=1,2
+		   #if x
+		   1 continue
+		   #else
+		   1 continue
+		   #endif
+	   - make fixed ! comment output as in free
+	   - better initialization of indents if startindent>0
+	   - -Innn now sets auto_firstindent = 0
+	   - better #if ... handling
+	wfindent:
+	   - add code to look for findent in default PATH if
+	     the given location (FINDENT=) does not work
+	   - exit if no findent is found
+	all:
+	   - omit 'using namespace std'
+	   - update documentation README, README.1st
+	   - move test folder out of src folder
+	   - separate tests, new tests for -lastindent and -lastonly
+	vim:
+	   - add a folder vim and two files: findent.vim and fortran.vim
+findent-2.6.0:
+	findent.cpp:
+	   - -Ia now also works correct if source starts with 'end',
+	     'endif' etc.
+	   - bootstrap now fills in findent version in configure.ac
+	     on the 'AC_INIT(' line
+	   - configure.ac add AC_CONFIG_FILES statements to copy
+	     test cases to build directory
+findent-2.5.1:
+	findent.cpp:
+	   - corrected help output for the -rR flag by replacing leading '\'
+	     by space
+	   - some improvements in help output
+findent-2.5.0:
+	findent.cpp:
+	   - lines starting originally with '!' are not indented
+	   - pure comment lines, not starting with '!' get an indent
+	     of at least 1
+	   - added -C- flag: resets indent with 'contains'
+	   - continuation lines not starting with '&' are extra intented
+	     flag: -kn
+	   - flag -k-: continuation lines are untouched
+	   - findent.cpp: somewhat better layout of man page
+	README:
+	   - add remark about not wanting irreversible changes to sources
+	wfindent:
+	   - use installation path of findent in stead of 'findent'
+	   - recognize -v, -h and -H flags: run findent using only this flag
+	   - ignore -q flag
+	wfindent.bat:
+	   - recognize -v, -h and -H flags: run findent using only this flag
+	   - ignore -q flag
+	test:
+	   - adapted progfree.f.try.f.ref and progfree-dos.f.try.f.ref
+findent-2.4.1:
+	fixed typo in help text.
+findent-2.4:
+	release 2.4
+findent-2.3.1:
+	findent.cpp: correct explanation of -l flag in usage()
+	maketar: fix a few nearly-bugs
+	src/parser.y, src/Makefile.am: take care that older versions
+	   of bison work
+
+findent-2.3:
+	jfindent: is now in a separate folder: ../jfindent
+	   with it's on autoconf setup
+	Makefile.am: added $(DESTDIR) for the man page
+	   adapted to new jfindent location
+	findent.cpp: fix bug in coverting fixed to free when dealing
+	   with a preprocessor continuation
+	configure.ac: explicitly include macros in m4, do not
+	   use AC_CONFIG_MACRO_DIR, this seems not to work
+	   in Debian wheezy
+	repaired make check. Send log file to stdout.
+	maketar, makezip: removed making jfindent.jar
+	configure.ac: use standard AC_PROG_YACC
+
+jfindent 1.1:
+	jfindent now writes config file after reading (succesfull
+	or not) and after clicking 'Quit'
+	added 'recent folders' menu item under 'File'
+	some trivial changes
+	added menuitem 'File->Save configuration'
+version 2.2:
+	convert to autoconf
+findent-2.2:
+	Makefile: add support for creating 32 bit executable
+	findent.cpp: -H options produces man page
+	findent.cpp: better support for preprocessor lines with
+	             continuation line
+	src/Makefile.am configure.ac:
+		take care that no manpage is made when compiling for
+		windows
+
+findent-2.1:
+   wfindent.bat:
+      added
+   wfindent:
+      change from bash syntax to sh syntax
+   Jfindent.java:
+      added
+      added Oracle copyright text
+      finished ...
+      added file menu
+      added about menu
+      somewhat better menubar and better
+        texts for buttons and mor intuitive behaviour with
+	'show all options'
+      removed 'show all options' button, extend help
+        with this information
+      some trivia
+      when previewing a file, the scroll position
+        remains the same when trying different options
+      Make menu textArea's non-editable
+   CHANGELOG
+      added subversion Id to all files
+   Makefile:
+      add support for jfindent
+      fix minor bug: make -j works now
+   README:
+      add text for jfindent
+      revised the text
+   README.1st:
+      add text for jfindent
+      revised the text
+   INSTALL:
+      revised the text
+   lexer.l:
+      allow $ as non-first character in identifier
+
+findent-2.0:
+   Complete new code
+   Better parser
+   Space insensitive
+   Fortran 2008 compliant
+
+findent-1.6.5:
+   Makefile:
+      removed -g flag
+      created 'zip' and 'tar' targets
+   findent.y:
+      added code and help text for the -L flag
+   wfindent:
+      added -L flag
+   README:
+      replaced NOTE 1, it covers now tab input.
+   Added scripts 'makezip' and 'maketar'
+   Added README.1st
+
+findent-1.6.4:
+   findent.y:
+      determine if input comes from terminal, warn user
+      and accept a single dot ('.') as end-of file
+      Extended usage() with examples
+
+findent-1.6.3:
+   findent.l, findent.y, findent.h:
+      implement refactor routines
+   findent.y:
+      bug fixes for fixed form continuation lines
+         
+findent-1.6.2:
+      regcognise tabbed source: 
+          <tab>[1-9] 
+          is recognised as a continuation line
+      fixed bug when tab follows label: ltab2sp now takes in acccount 
+          a statement label
+
+findent-1.6.1:
+   findent.l: 
+      get rid of flex message: "warning, dangerous trailing context"
+                by slight redefinition of statement-label
+              simplified else, elseif, elsewhere recognition
+   findent.y: 
+      recognize debug lines in fixed format ('d' or 'D' in colimn 1),
+         treating them as comment lines.
+	 Special treatment with -ofree: debug line as:
+	    'd        print *,"debug",i'
+	 will be output after conversion to free format as:
+	    '!d        print *,"debug",i'
+
+findent-1.6.0:
+   Makefile:
+      slight change in rule to make .o from .cpp
+   wfindent:
+      added
+   findent.l:
+      fixed recognition of elseif by better definition of {nc}
+   README:
+      describe wfindent
+   INSTALL:
+      install wfindent
+
+findent-1.5.9:
+   findent.l:
+      recognize 'label :' ('label:' was already recognized)
+      recognize false type as in 'typecode = 10'
+      better discrimination between fixed and free
+   findent.y:
+      recognize '123 enddo', do not double-de-indent
+
+findent-1.5.8:
+   findent.y:
+      fill indent-stack from 0 to start_indent with the default indent
+   findent.l: 
+      support for construct name in 'do' 'if' 'select' 'block' 
+      recognize some forms of false end
+      recognize 'abstract type' and 'abstract interface'
+
+findent-1.5.7
+   findent.l:
+      recognize strings in 'rest' state
+      more precise definition of function
+      recognize 'endprogram'
+      do not confuse 'do (i) =' witha do statement
+   findent.y:
+      fixed form: put an ' ' as possible separator between label and code
+
+
+findent-1.5.6
+   Makefile:
+      added support for cross compiling to windows:
+         make clean
+	 make MINGW=1
+      creates a windows 32 bit findent.exe
+   findent.l:
+      ticket 1: 
+         more precise recognition of function statement
+
+findent-1.5.5
+   findent.y:
+      added support for conditional preprocessor statements. Example:
+      #ifdef USEMPI
+      subroutine mysub(a,b)
+      real a,b
+      #else
+      subroutine mysub(a)
+      real a
+      #endif
+      end subroutine mysub
+
+      indents correctly now.
+
+findent-1.5.4
+   findent.y: 
+      recognize ' x = 3 & ! comment' as a line needing a continuation
+      preprocessor statements are handled on ad-hoc basis
+   findent.l:
+      preprocessor statements are not recognized any more
+
+findent-1.5.3
+   findent.y:
+      add fixed-to-free: add check if this is a preprocessor line
+      fixed-to-free: fixed fortran can have a trailing comment,
+         starting with !, and have a continuation line.
+         This is fixed.
+      fixed-to-free: fixed bad handling of otherwise empty continuation lines
+   findent.l: 
+      better recognition of fixed and free
+      recognize 'integer(kind=8) function func1(a,b)' as a function
+              Thanks to Dusan Jovic
+      removed 'select' from definition of explicitly not-handled keywords
+
+
+findent-1.5.2
+   findent.l:
+      let lexer recognise 'type, public :: mytype' Thanks to Dusan Jovic
+findent-1.5.1
+   findent.l:
+      added some patterns to distinguish between fixed and fixed format
+   findent.y:
+      fix for files that do not end with \n
+      fix for correct indenting continuation line while converting 
+findent-1.5
+   README:
+      add recipe to use equalprg in vim
+   findent.y:
+      add ';' in to rules to quiet bison-2.5
+      fix placement of preprocessor lines if they are in a 
+         continuation suite
+      enlarge number of lines to be considered when determining
+         fixed or free from 10 to 1000
+   findent.l:
+      fix definition of {neol}
+
+findent-1.4
+   findent.y:
+      make sure that string(n,' ') is always called with n >= 0
+findent-1.3
+   version.h:
+      set version to 1.3
+   findent.h:
+      add definition for lexer_set()
+   findent.l:
+      add lexer_set()
+      in lexer_init(): change lexer_push() to lexer_set()
+   findent.y:
+      replace lexer_pop()...lexer_push() sequences by lexer_set()
+   minor code cleaning.
+   Makefile: 
+     'test' dependent of 'all'
+     'clean' also cleans test directory
+   test/progfixed_dos.f:
+      add -ifixed in first line
+   test/progfree_dos.f:
+      add -ifree in first line
+   README:
+      minor adaptations
+   CHANGELOG added
+
+findent-1.2
+   findent.l:
+      fix error in lexer_push
+
+findent-1.1
+   findent.l:
+      fix error in lexer_pop
+
+findent-1.0
+   initial release

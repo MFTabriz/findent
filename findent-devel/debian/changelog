@@ -1,0 +1,19 @@
+findent (2.8.3~pre2-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Willem Vermin <wvermin@gmail.com>  Tue, 26 Jun 2018 11:47:05 +0200
+
+findent (2.8.2-1) unstable; urgency=low
+
+  * New upstream release
+  * Changed Standards-Version: 4.1.4
+  * Changed Build-Depends: debhelper (>=11)
+
+ -- Willem Vermin <wvermin@gmail.com>  Wed, 13 Jun 2018 05:09:12 +0200
+
+findent (2.7.3-1) unstable; urgency=low
+
+  * Initial release (Closes: #842166)
+
+ -- Willem Vermin <wvermin@gmail.com>  Tue, 20 Dec 2016 12:22:24 +0100
