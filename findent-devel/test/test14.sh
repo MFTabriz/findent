@@ -138,8 +138,8 @@ program main
 contains
    subroutine mysub
       continue
-   end SUBROUTINE mysub
-end PROGRAM main
+   END SUBROUTINE mysub
+END PROGRAM main
 eof
 
 $doit "-RR --refactor_procedures=upcase" "-I0 -i3" "for free input"
@@ -174,8 +174,8 @@ cat << eof > expect
       contains
          subroutine mysub
             continue
-         end SUBROUTINE mysub
-      end PROGRAM main
+         END SUBROUTINE mysub
+      END PROGRAM main
 eof
 
 $doit "-RR --refactor_procedures=upcase" "-I0 -i3" "for fixed input"

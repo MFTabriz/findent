@@ -19,6 +19,13 @@ findent-2.8.3:
 	makedeb: some enhancements. 
 	debian.wheezy, debian.xenial: directories with deviations from sid
 
+	findent.cpp, some tests:
+	   more generic refactoring of end statements. Now
+	   for example: 'end subroutine' will be refactored to
+	   'end subroutine mysub'. 
+	   Moreover: 'end subroutine mysub' will be changed into
+	   'end function myfun' if appropriate.
+
 findent-2.8.2: 
 	debianizing ...
 findent-2.8.1:
