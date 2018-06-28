@@ -17,7 +17,6 @@
 #include "gedit_plugin.h"
 #include "emacs_plugin.h"
 #include "readme_plugin.h"
-extern "C" FILE *yyin;
 std::string mygetline();
 void get_full_statement();
 void handle_free(std::string s,bool &more);
@@ -35,7 +34,7 @@ void push_all(void);
 void top_all(void);
 void pop_all(void);
 
-std::string whatprop(struct propstruct p);
+std::string whatrprop(struct propstruct p);
 std::string stoupper(const std::string s);
 std::string stolower(const std::string s);
 char firstchar(const std::string s);
@@ -76,6 +75,7 @@ int input_line_length = 0;
 bool input_format_gnu = 0;
 int determine_fix_or_free(const bool store);
 bool isfixedcmtp(const std::string s);
+bool isalnumplus(const char c);
 char fixedmissingquote(const std::string s);
 int what_to_return(void);
 
@@ -142,7 +142,7 @@ const bool label_left_default = 1;
 bool refactor_routines   = 0; // 1: refactor routine-end statements
 bool upcase_routine_type = 0; // 1: use 'SUBROUTINE' etc in stead of 'subroutine'
 
-bool simple_end_found    = 0;
+bool refactor_end_found    = 0;
 bool return_format       = 0; // 1: return 2 if format==free, 4 if format==fixed
 bool only_fix_free       = 0; // 1: determine only if fixed or free (-q)
 bool apply_indent        = 1; // 1: output indented line, else output original lines
@@ -768,7 +768,7 @@ void indent_and_output()
       }
       cur_indent = top_indent();
       D(O("cur_indent:");O(cur_indent));
-      simple_end_found = 0;
+      refactor_end_found = 0;
       //
       // for every entity that has a correponding end-entity
       // e.g. subroutine
@@ -781,7 +781,7 @@ void indent_and_output()
 	 case FUNCTION:
 	 case PROGRAM:
 	 case BLOCKDATA:
-	    D(O("SUBFUN");O(whatprop(props));O(props.name);O("cur_indent:");O(cur_indent));
+	    D(O("SUBFUN");O(whatrprop(props));O(props.name);O("cur_indent:");O(cur_indent));
 	    cur_indent = top_indent();
 	    D(O("cur_indent:");O(cur_indent););
 	    push_indent(cur_indent + routine_indent);
@@ -790,7 +790,7 @@ void indent_and_output()
 	    break;
 	 case MODULE:
 	 case SUBMODULE:
-	    D(O("MODULESTART");O(whatprop(props));O(props.name););
+	    D(O("MODULESTART");O(whatrprop(props));O(props.name););
 	    cur_indent = top_indent();
 	    D(O("cur_indent:");O(cur_indent););
 	    push_indent(cur_indent + module_indent);
@@ -801,20 +801,17 @@ void indent_and_output()
 	    D(O("BLOCK"););
 	    cur_indent = top_indent();
 	    push_indent(cur_indent + block_indent);
-	    push_rprops(props);
 	    break;
 	 case CRITICAL:
 	    D(O("CRITICAL"););
 	    cur_indent = top_indent();
 	    push_indent(cur_indent + critical_indent);
-	    push_rprops(props);
 	    break;
 	 case ENUM:
 	    D(O("ENUM"););
 	    cur_indent = top_indent();
 	    push_indent(cur_indent + enum_indent);
 	    empty_dolabels();
-	    push_rprops(props);
 	    break;
 	 case ABSTRACTINTERFACE:
 	 case INTERFACE:
@@ -822,7 +819,6 @@ void indent_and_output()
 	    cur_indent = top_indent();
 	    push_indent(cur_indent + interface_indent);
 	    empty_dolabels();
-	    push_rprops(props);
 	    break;
 	 case DO:
 	    D(O("DOSTART"););
@@ -833,14 +829,12 @@ void indent_and_output()
 	       D(O("DOSTART LABEL");O(props.dolabel);O(string2number<int>(props.dolabel)););
 	       push_dolabel(string2number<int>(props.dolabel));
 	    }
-	    push_rprops(props);
 	    break;
 	 case SELECTCASE:
 	 case SELECTTYPE:
 	    D(O("SELECTCASE"););
 	    cur_indent = top_indent();
 	    push_indent(cur_indent + select_indent);
-	    push_rprops(props);
 	    break;
 	 case CASE:
 	 case CASEDEFAULT:
@@ -851,12 +845,18 @@ void indent_and_output()
 	    cur_indent -= case_indent;
 	    break;
 	 case END:
-	    D(O("GENERIC_END"););
+	 case ENDBLOCKDATA:
+	 case ENDFUNCTION:
+	 case ENDMODULE:
+	 case ENDPROCEDURE:
+	 case ENDPROGRAM:
+	 case ENDSUBROUTINE:
+	    D(O("ROUTINE_END"););
+	    refactor_end_found = 1;
 	    if (!indent_handled)
 	       cur_indent = pop_indent();
 	    cur_rprop = top_rprops();
-	    simple_end_found = 1;
-	    D(O(whatprop(cur_rprop));O(cur_rprop.name););
+	    D(O(whatrprop(cur_rprop));O(cur_rprop.name););
 	    pop_rprops();
 	    break;
 	 case ENDASSOCIATE:
@@ -867,7 +867,6 @@ void indent_and_output()
 	 case ENDFORALL:
 	 case ENDIF:
 	 case ENDINTERFACE:
-	 case ENDMODULE:
 	 case ENDSELECT:
 	 case ENDSUBMODULE:
 	 case ENDTYPE:
@@ -875,21 +874,9 @@ void indent_and_output()
 	    D(O("SPECIFIC_END"););
 	    if (!indent_handled)
 	       cur_indent = pop_indent();
-	    pop_rprops();
-	    break;
-	 case ENDBLOCKDATA:
-	 case ENDFUNCTION:
-	 case ENDPROCEDURE:
-	 case ENDPROGRAM:
-	 case ENDSUBROUTINE:
-	    D(O("ROUTINE_END"););
-	    if (!indent_handled)
-	       cur_indent = pop_indent();
-	    D(O(whatprop(cur_rprop));O(cur_rprop.name););
-	    pop_rprops();
 	    break;
 	 case PROCEDURE:  // in fact: moduleprocedure
-	    D(O("PROCEDURE");O(whatprop(props));O(props.name););
+	    D(O("PROCEDURE");O(whatrprop(props));O(props.name););
 	    // depending on what follows this will be 
 	    // recognized as a module procedure with content
 	    // or only a moduleprocedure specification
@@ -909,7 +896,6 @@ void indent_and_output()
 	    D(O("IFCONSTRUCT"););
 	    cur_indent = top_indent();
 	    push_indent(cur_indent + if_indent);
-	    push_rprops(props);
 	    break;
 	 case ELSE:
 	    D(O("ELSECONSTRUCT"););
@@ -931,25 +917,21 @@ void indent_and_output()
 	    D(O("WHERECONSTRUCT"););
 	    cur_indent = top_indent();
 	    push_indent(cur_indent + where_indent);
-	    push_rprops(props);
 	    break;
 	 case ASSOCIATE:
 	    D(O("ASSOCIATECONSTRUCT"););
 	    cur_indent = top_indent();
 	    push_indent(cur_indent + associate_indent);
-	    push_rprops(props);
 	    break;
 	 case TYPE:
 	    D(O("TYPECONSTRUCT"););
 	    cur_indent = top_indent();
 	    push_indent(cur_indent + type_indent);
-	    push_rprops(props);
 	    break;
 	 case FORALL:
 	    D(O("FORALLCONSTRUCT"););
 	    cur_indent = top_indent();
 	    push_indent(cur_indent + forall_indent);
-	    push_rprops(props);
 	    break;
 	 default:
 	    cur_indent = top_indent();
@@ -1270,7 +1252,7 @@ void get_full_statement()
    }
    D(O("full_statement:");O(num_lines);O(full_statement););
    D(O("lines:"); for (unsigned int i=0; i<lines.size(); i++) { O(i);O(lines[i]); })
-   D(O("olines:"); for (unsigned int i=0; i<olines.size(); i++) { O(i);O(olines[i]); })
+      D(O("olines:"); for (unsigned int i=0; i<olines.size(); i++) { O(i);O(olines[i]); })
 }
 
 void handle_prc(std::string s, bool &more)
@@ -1583,27 +1565,75 @@ void output_line()
    mycout.setoutput(!last_indent_only);
    mycout.reset();
 
-   D(O("refactor");O(refactor_routines);O(simple_end_found);O(lines.size());O(cur_rprop.kind););
-   if (refactor_routines && simple_end_found)
+   D(O("refactor");O(refactor_routines);O(refactor_end_found);O(lines.size());O(cur_rprop.kind););
+   if (refactor_routines && refactor_end_found)
    {
-      if (cur_rprop.kind != 0)
+      if (cur_rprop.kind != 0) // check if corresponding start is ok
       {
 	 // modify first line to match the corrsponding module, subroutine ... line  
-	 // find the location of 'end'
-	 std::string s = stoupper(lines[0]);
-	 size_t p = s.find("END");
-	 D(O("p");O(p););
-	 if ( p != std::string::npos)
+	 //std::cout << labelleng << " ";ppp("*"+lines[0]);
+	 //
+	 // starting at position labelleng + spaces, scan lines[0] until isalnumplus
+	 // returns false. The scanned characters will be replaced by something
+	 // like: 'end subroutine mysub'
+	 //
+	 std::string s   = lines[0];
+	 size_t startpos = s.find_first_not_of(' ',labelleng);
+	 size_t endpos   = s.length();
+	 for (size_t i=startpos; i<s.length(); i++)
 	 {
-	    std::string routinetype = whatprop(cur_rprop);
-	    if (upcase_routine_type)
-	       routinetype = stoupper(routinetype);
-	    lines[0] = lines[0].substr(0,p+3)+
-	       " "+routinetype+" "+cur_rprop.name + lines[0].substr(p+3);
-	    if (! apply_indent)
-	       olines[0] = lines[0];
-	    D(O(s);O(lines[0]););
+	    if (!isalnumplus(s[i]))
+	    {
+	       endpos = i;
+	       break;
+	    }
 	 }
+	 //
+	 // correct endpos for trailing spaces:
+	 //
+	 for (size_t i=endpos-1; ;i--)
+	 {
+	    bool r;
+	    switch(s[i])
+	    {
+	       case ' ':
+	       case '\t':
+		  r = 0;
+		  break;
+	       default:
+		  endpos = i+1;
+		  r = 1;
+		  break;
+	    }
+	    if (r)
+	       break;
+	 }
+	 std::string replacement = "end " + whatrprop(cur_rprop);
+	 if (upcase_routine_type)
+	    replacement = stoupper(replacement);
+	 if (cur_rprop.name != "")
+	    replacement += " " + cur_rprop.name;
+	 lines[0] = s.substr(0,startpos) + replacement + s.substr(endpos);
+	 if (! apply_indent)
+	    olines[0] = lines[0];
+	 D(O(s);O(lines[0]););
+
+	 /*
+	    std::string s = stoupper(lines[0]);
+	    size_t p = s.find("END");
+	    D(O("p");O(p););
+	    if ( p != std::string::npos)
+	    {
+	    std::string routinetype = whatrprop(cur_rprop);
+	    if (upcase_routine_type)
+	    routinetype = stoupper(routinetype);
+	    lines[0] = lines[0].substr(0,p+3)+
+	    " "+routinetype+" "+cur_rprop.name + lines[0].substr(p+3);
+	    if (! apply_indent)
+	    olines[0] = lines[0];
+	    D(O(s);O(lines[0]););
+	    }
+	    */
       }
    }
 
@@ -2006,21 +2036,20 @@ struct propstruct top_rprops()
    return rprops.top();
 }
 
-std::string whatprop(struct propstruct p)
+std::string whatrprop(struct propstruct p)
 {
    switch(p.kind)
    { 
       case SUBROUTINE:
       case MODULESUBROUTINE: return("subroutine");
       case PROGRAM:          return("program");
-      case BLOCKDATA:        return("blockdata");
+      case BLOCKDATA:        return("block data");
       case FUNCTION:
       case MODULEFUNCTION:   return("function");
       case MODULE:           return("module");
       case SUBMODULE:        return("submodule");
       case PROCEDURE:        return("procedure");
-      case INTERFACE:        return("interface");
-      default:               return("UNKNOWN");
+      default:               return("");
    }
 }
 
@@ -2253,15 +2282,15 @@ void usage(const bool doman)
 }
 void replaceAll( std::string &s, const std::string &search, const std::string &replace ) 
 {
-// https://stackoverflow.com/questions/4643512/replace-substring-with-another-substring-c
-    for( size_t pos = 0; ; pos += replace.length() ) {
-        // Locate the substring to replace
-        pos = s.find( search, pos );
-        if( pos == std::string::npos ) break;
-        // Replace by erasing and inserting
-        s.erase( pos, search.length() );
-        s.insert( pos, replace );
-    }
+   // https://stackoverflow.com/questions/4643512/replace-substring-with-another-substring-c
+   for( size_t pos = 0; ; pos += replace.length() ) {
+      // Locate the substring to replace
+      pos = s.find( search, pos );
+      if( pos == std::string::npos ) break;
+      // Replace by erasing and inserting
+      s.erase( pos, search.length() );
+      s.insert( pos, replace );
+   }
 }
 
 // doman == 1: output in man page format
@@ -2592,3 +2621,20 @@ int ppp(const std::string s)     // for ad-hoc debugging purposes
    std::cout << s << std::endl;
    return 0;
 }
+
+bool isalnumplus(const char c)
+   // returns true if c is alfanum or in " \t_"
+{
+   if (std::isalnum(c))
+      return 1;
+   else 
+      switch (c)
+      {
+	 case ' ':
+	 case '\t':
+	 case '_':
+	    return 1;
+      }
+   return 0;
+}
+
