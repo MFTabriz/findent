@@ -2255,16 +2255,21 @@ void usage(const bool doman)
    manout(" "," example: --input_line_length=72g"                                                          ,doman);
    manout("-ofree, --output_format=free"     ,"force free format output"                                   ,doman);
    manout("-osame, --output_format=same"     ,"output format same is input format"                         ,doman);
-   manout("-Rr, --refactor_procedures"       ,"refactor procedures and modules: a single 'end'"            ,doman);
-   manout(" "," is, if possible, replaced by"                                                              ,doman);
+   manout("-Rr, --refactor_procedures"       ,"refactor procedures and modules: the END line"              ,doman);
+   manout(" "," of a subroutine, program etc. is, if possible, replaced by"                                ,doman);
    manout(" "," 'end subroutine <name>' or"                                                                ,doman);
    manout(" "," 'end function <name>' or"                                                                  ,doman);
+   manout(" "," 'end procedure <name>' or"                                                                 ,doman);
    manout(" "," 'end program <name>' or"                                                                   ,doman);
-   manout(" "," 'end blockdata <name>' or"                                                                 ,doman);
-   manout(" "," 'end module <name>'"                                                                       ,doman);
-   manout(" "," where <name> is the name of the appropriate block"                                         ,doman);
-   manout("-RR, --refactor_procedures=upcase","same as -Rr, but 'SUBROUTINE'"                              ,doman);
-   manout(" ","in stead of 'subroutine' etc"                                                               ,doman);
+   manout(" "," 'end block data <name>' or"                                                                ,doman);
+   manout(" "," 'end module <name>' or"                                                                    ,doman);
+   manout(" "," 'end submodule <name>'"                                                                    ,doman);
+   manout(" "," where <name> is the name of the appropriate procedure, subroutine etc."                    ,doman);
+   manout(" "," NOTE1: if the END line contains a continuation the results are undefined"                  ,doman);
+   manout(" "," NOTE2: a line like 'end function fun' will be replaced by"                                 ,doman);
+   manout(" ","        'end subroutine sub' if the END line ends 'subroutine sub'"                         ,doman);
+   manout("-RR, --refactor_procedures=upcase","same as -Rr, but 'END SUBROUTINE <name>'"                   ,doman);
+   manout(" ","in stead of 'end subroutine <name>' etc."                                                   ,doman);
    if(doman)
    {
       std::cout << ".PP" << std::endl << ".SS \"Indenting options:" << std::endl;
