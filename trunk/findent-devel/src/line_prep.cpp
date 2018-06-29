@@ -27,6 +27,7 @@ line_prep::line_prep(const std::string s)
 
    set_place_holder(' ');
 
+   //
    // parsing stops at end of string s or at ';' or at '\n'
    // sl will contain s, space removed, except in strings and holleriths and label
    // sv will contain s, space removed, strings and hollertihs replaced
@@ -93,7 +94,9 @@ line_prep::line_prep(const std::string s)
       c = line[index];
       if (c == '\n') 
 	 break;
+      //
       // also end, when encountering a ';' which is not part of a string:
+      //
       if (c == ';' && state != in_qstring && state != in_hollerith)
 	 break;
 
@@ -128,8 +131,10 @@ line_prep::line_prep(const std::string s)
 	    }
 	    if (isblank(c))
 	    {
+	       //
 	       // a sneak preview, to see if the first non-blank
 	       // is a digit. In this case the label is not ended here
+	       //
 	       bool digitfound = 0;
 	       for (unsigned int j=index+1; j<line.size(); j++)
 	       {
@@ -148,9 +153,11 @@ line_prep::line_prep(const std::string s)
 	       break;
 	    }
 
+	    //
 	    // here we found a label, directly follwed by a non-blank
 	    // which tells us, that this is not a label
 	    // correction:
+	    //
 	    sv += v;
 	    for (unsigned int i=0; i<v.size(); i++)
 	       wv.push_back(nonestruct);
@@ -178,9 +185,11 @@ line_prep::line_prep(const std::string s)
 
 		  D(O(sl);O(c);O(prevc););
 		  sl   += c;
+		  //
 		  // this could be an hollerith, if the previous character
 		  // is not part of an identifier or the immediately preceding
 		  // item was an hollerith
+		  //
 		  if ((prevc != '_' && !isalnum(prevc)) || 
 			(prevtype == is_string && prevstringtype == 'h'))
 		  {
@@ -198,9 +207,11 @@ line_prep::line_prep(const std::string s)
 
 		  state = in_qstring;
 
-		  /* if there is a string immediately before this one, and the    */
-		  /* quotation character was the same, (like: 'foo''bar') we      */
-		  /*	 take appropriate action:")                                */
+		  //
+		  // if there is a string immediately before this one, and the
+		  // quotation character was the same, (like: 'foo''bar') we
+		  //	 take appropriate action:
+		  //
 		  {
 		     unsigned int nwv = wv.size();
 		     if (nwv != 0 && wv[nwv-1].type == is_string && wv[nwv-1].stringtype == c)
@@ -248,7 +259,9 @@ line_prep::line_prep(const std::string s)
 		     }
 		     else
 		     {
+			//
 			// after all, this was an hollerith with length 0, adapt sv and wv
+			//
 			sv += v + c;
 			D(O(v);O(sv););
 			for (unsigned int i=0; i<v.size()+1;i++)
@@ -257,7 +270,9 @@ line_prep::line_prep(const std::string s)
 		     }
 		     break;
 		  default:
+		     //
 		     // and here it was no hollerith at all, adapt sv and wv
+		     //
 		     nhol = 0;
 		     for (unsigned int i=0; i<v.size()+1; i++)
 			wv.push_back(nonestruct);
@@ -306,8 +321,10 @@ line_prep::line_prep(const std::string s)
 	    {
 	       break;
 	    }
+	    //
 	    // a dot operator can be [a-zA-z][a-zA-Z0-9_]*
 	    // check if first char is [a-zA-Z]
+	    //
 	    if (v.size() == 0)
 	    {
 	       if(isalpha(c))
@@ -319,7 +336,9 @@ line_prep::line_prep(const std::string s)
 	       }
 	       else
 	       {
+		  //
 		  // this was no dotop
+		  //
 		  getnextc = 0;         // re-examine this c
 		  sv += '.';
 		  wv.push_back(nonestruct);
@@ -344,8 +363,10 @@ line_prep::line_prep(const std::string s)
 	       sl += c;
 	       break;
 	    }
+	    //
 	    // this is no dotop, but we already collected some
 	    // characters for it. Correct this:
+	    //
 	    sv      += '.' + v;
 	    for (unsigned int i = 0; i < v.size()+1; i++)
 	       wv.push_back(nonestruct);
@@ -355,7 +376,9 @@ line_prep::line_prep(const std::string s)
       }
    }
 
+   //
    // depending on the state we are in at the end, we take appropriate action:
+   //
 
    switch(state)
    {
