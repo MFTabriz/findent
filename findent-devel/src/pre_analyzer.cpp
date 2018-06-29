@@ -1,5 +1,6 @@
 #include <string>
 #include "pre_analyzer.h"
+//
 // if start of s ==
 // #\s*if
 // or
