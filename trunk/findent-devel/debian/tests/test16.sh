@@ -1,5 +1,4 @@
 #!/bin/sh
-cd debian/tests
 . ./prelude
 exe=$FINDENT
 rc=0

@@ -180,4 +180,5 @@ eof
 
 $doit "-RR --refactor_procedures=upcase" "-I0 -i3" "for fixed input"
 rc=`expr $rc + $?`
+. ../postlude
 exit $rc

@@ -457,4 +457,5 @@ eof
 $doit "-e4 --indent_entry=4" "-i6 -I0" ""
 rc=`expr $rc + $?`
 
+. ../postlude
 exit $rc

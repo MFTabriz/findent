@@ -1,5 +1,4 @@
 #!/bin/sh
-cd debian/tests
 . ./prelude
 rc=0
 cat << eof > prog
@@ -14,4 +13,5 @@ eof
 rc=`expr $rc + $?`
 
 . ../postlude
+
 exit $rc
