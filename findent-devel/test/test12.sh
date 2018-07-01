@@ -39,4 +39,5 @@ for flag in -v --version ; do
    fi
 done
 
+. ../postlude
 exit $rc

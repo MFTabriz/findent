@@ -28,4 +28,5 @@ eof
 $doit "-q --query_fix_free" "" "for free input"
 rc=`expr $rc + $?`
 
+. ../postlude
 exit $rc

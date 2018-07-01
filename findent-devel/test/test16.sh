@@ -16,4 +16,5 @@ for f in vim_help gedit_help vim_fortran vim_findent \
    fi
    rc=`expr $rc + $r` 
 done
+. ../postlude
 exit $rc

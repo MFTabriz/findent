@@ -2,12 +2,16 @@
 version=`./getversion`
 date=`date -R`
 echo "version = $version"
-sed -i "/^AC_INIT(findent/s/^.*/AC_INIT(findent, $version, wvermin@gmail.com)/" configure.ac
-if [ -e debian/changelog ] ; then
-   sed -i "1s/(.*)/($version-1)/" debian/changelog       || exit 1
-   sed -i "0,/^ --.*>/{/^ --.*>/s/>  .*/>  $date/}" debian/changelog || exit 1
-fi
-autoreconf -fvi
-./configure
-make builtparser builtlexer
-make distclean
+sed -i "/^AC_INIT(findent/s/^.*/AC_INIT(findent, $version, wvermin@gmail.com)/" configure.ac    || exit 1
+for d in debian debian.wheezy debian.xenial ; do
+   if [ -e $d/changelog ] ; then
+      sed -i "1s/(.*)/($version-1)/" debian/changelog       || exit 1
+      sed -i "0,/^ --.*>/{/^ --.*>/s/>  .*/>  $date/}" $d/changelog || exit 1
+   fi
+done
+autoreconf -fvi                                     || exit 1
+./configure                                         || exit 1
+cp test/*.f test/*.ref test/*.sh doit debian/tests  || exit 1
+make builtparser builtlexer                         || exit 1
+make distclean                                      || exit 1
+echo "bootstrap done"

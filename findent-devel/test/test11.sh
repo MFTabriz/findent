@@ -13,4 +13,5 @@ eof
 ../doit "-lastusable --last_usable" "-ifree -Ia" "" 
 rc=`expr $rc + $?`
 
+. ../postlude
 exit $rc
