@@ -2,10 +2,8 @@
 # parameter all: produce debs for i386-wheezy, amd64=wheezy, amd64-sid
 curdir=$PWD
 version=`./getversion`
-pversion=2.8.3~pre1
 echo "version = $version"
 tar=$PWD/../versions/findent-$version.tar.gz
-tarorig=$PWD/../debian/findent-$pversion-deb/findent_2.8.3~pre1.orig.tar.xz
 dir=findent-$version
 dsc=findent_$version-1.dsc
 debdir=$PWD/../debian/findent-$version-deb
@@ -14,15 +12,13 @@ for d in debian debian.xenial debian.wheezy ; do
       sed -i "1s/(.*)/($version-1)/" $d/changelog   || exit 1
    fi
 done
-./maketar
+./maketar || exit 1
 rm -rf $debdir
-mkdir -p $debdir || exit
-cd $debdir || exit
-cp $tar . || exit
-#cp $tarorig . || exit
+mkdir -p $debdir || exit 1
+cd $debdir || exit 1
+cp $tar . || exit 1
 tar xf $tar || exit
 cd $dir || exit
-#cp -r $curdir/debian . || exit
 echo compat before xenial: `cat debian/compat` `grep Standards-Version debian/control`
 cp debian.xenial/* debian || exit
 echo compat after xenial: `cat debian/compat` `grep Standards-Version debian/control`

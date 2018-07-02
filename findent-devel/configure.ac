@@ -68,6 +68,7 @@ AS_IF( [test "x$with_flex" = "xuse-flex-if-available"],
 AM_CONDITIONAL([USEFLEX],[test "x$useflex" = "xyes"])
 
 AC_CONFIG_FILES([test/prelude])
+AC_CONFIG_FILES([test/postlude])
 AC_CONFIG_FILES([test/test-compile.sh],[chmod +x test/test-compile.sh])
 AC_CONFIG_FILES([test/doit],[chmod +x test/doit])
 AC_CONFIG_FILES([test/progfixed-dos.f])
