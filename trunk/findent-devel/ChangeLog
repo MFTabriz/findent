@@ -26,6 +26,14 @@ findent-2.8.3:
 	   Moreover: 'end subroutine mysub' will be changed into
 	   'end function myfun' if appropriate.
 
+	test/Makefile: clean up
+
+	bootstrap: copies most files from test to debian/tests
+
+	test:
+	   adapted test scripts to run in test and in sadt
+
+
 findent-2.8.2: 
 	debianizing ...
 findent-2.8.1:

@@ -4550,6 +4550,8 @@ fi
 
 ac_config_files="$ac_config_files test/prelude"
 
+ac_config_files="$ac_config_files test/postlude"
+
 ac_config_files="$ac_config_files test/test-compile.sh"
 
 ac_config_files="$ac_config_files test/doit"
@@ -6148,6 +6150,7 @@ do
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
     "test/prelude") CONFIG_FILES="$CONFIG_FILES test/prelude" ;;
+    "test/postlude") CONFIG_FILES="$CONFIG_FILES test/postlude" ;;
     "test/test-compile.sh") CONFIG_FILES="$CONFIG_FILES test/test-compile.sh" ;;
     "test/doit") CONFIG_FILES="$CONFIG_FILES test/doit" ;;
     "test/progfixed-dos.f") CONFIG_FILES="$CONFIG_FILES test/progfixed-dos.f" ;;

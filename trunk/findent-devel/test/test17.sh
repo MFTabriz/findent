@@ -1,6 +1,10 @@
 #!/bin/sh
-. ./prelude
-#unset FINDENT
+if test -e prelude ; then
+   . ./prelude
+else
+   unset FINDENT
+   . ./debian/tests/prelude
+fi
 cat <<eof > prog1.f || exit 1
 program prog1
 continue
