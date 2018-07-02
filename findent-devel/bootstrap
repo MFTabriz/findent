@@ -11,7 +11,8 @@ for d in debian debian.wheezy debian.xenial ; do
 done
 autoreconf -fvi                                     || exit 1
 ./configure                                         || exit 1
-cp test/*.f test/*.ref test/*.sh doit debian/tests  || exit 1
+cp test/*.f test/*.ref test/*.sh \
+   test/doit debian/tests                           || exit 1
 make builtparser builtlexer                         || exit 1
 make distclean                                      || exit 1
 echo "bootstrap done"

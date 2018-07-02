@@ -258,7 +258,7 @@ defined(q)
       end subroutine nok
 
 
-         ! testing with indentfix:
+      ! testing with findentfix:
          subroutine testfix
             implicit none
             integer i,j,k

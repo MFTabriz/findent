@@ -173,14 +173,14 @@ c a comment
                 print *,0
            endselect
 
-      end program
+      end program progfixed
 
       subroutine one(a)
            continue
         entry myentry
            continue
            return
-      end subroutine
+      end subroutine one
       subroutine two(a)
            continue
 d              print *,'debug i=',i
@@ -199,7 +199,7 @@ c next line starts with <sp><sp><sp><sp><tab>
 c next line starts with <sp><sp><sp><sp><sp><tab>
      6     5
            return
-      endsubroutine
+      end subroutine two
       subroutine three(a)
            continue
            return
@@ -207,7 +207,7 @@ c next line starts with <sp><sp><sp><sp><sp><tab>
       subroutine four(a)
            continue
            return
-      endsubroutine four
+      end subroutine four
       subrou
      xtine five
            continue
@@ -258,7 +258,7 @@ defined(q)
       end subroutine nok
 
 
-      ! testing with indentfix:
+      ! testing with findentfix:
       subroutine testfix
            implicit none
            integer i,j,k
