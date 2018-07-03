@@ -1323,11 +1323,29 @@ void handle_free(std::string s, bool &more)
    //
    if (lines.empty())
    {
+#if 1
       std::string fix = afterwordincomment(s,findentfix);
       if (fix != "")
       {
 	 full_statement = fix;
       }
+#else
+      std::string sl = ltrim(s);
+
+      lexer_push(ltrim(s),FINDENTFIX);
+      //ppp("s:"+s);
+      int rc = yylex();
+      //std::cout << rc << " "<<FINDENTFIX<<" "; ppp("FINDENTFIX"); ppp("line:"+ltrim(s));
+      //ppp(lexer_getrest());
+      //std::cout << "rc:" << rc << std::endl;
+      if ( rc == FINDENTFIX )
+      {
+	 full_statement = lexer_getrest();
+	 //ppp("full:"+full_statement);
+      }
+      lexer_pop();
+#endif
+
    }
 
    if (input_line_length !=0)
@@ -1934,7 +1952,7 @@ void output_line()
 		     if (label_left && labellength > 0)
 		     {
 			//
-		        // put label at start of line
+			// put label at start of line
 			//
 			s = trim(s);
 			std::string label = s.substr(0,labellength);
@@ -2430,7 +2448,7 @@ int guess_fixedfree(const std::string s)
       if(firstchar(s) < 32)
 	 return UNSURE;
 
-   lexer_set(ltab2sp(s));
+   lexer_set(ltab2sp(s),FINDFORMAT);
    int rc = yylex();
    return rc;
 }
