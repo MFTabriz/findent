@@ -66,9 +66,10 @@ fi
 
 echo "END TESTING FINDENT rc=$rc"
 if [ $rc -ne 0 ] ; then
-   echo "if you are sure $prog.try.f is correct:"
-   echo "cp $prog.try.f  $prog.try.f.ref"
-   echo "cp $prog.try.f.ref $prog.try.f.ref.in"
+   echo "If you are sure $PWD/$bprog.try.f is correct:"
+   echo "copy $PWD/$bprog.try.f"
+   echo "to the corresponding .in file in the test directory"
+   echo " and configure again."
 fi
 rm -f prog
 exit $rc

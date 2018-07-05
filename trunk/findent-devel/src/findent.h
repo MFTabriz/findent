@@ -7,16 +7,13 @@
 int yyparse();
 void yyerror(const char *c);
 extern "C" int yylex();
-void lexer_set(class line_prep p);
+void lexer_set(class line_prep p, const int state);
 void lexer_set(std::string s, const int state);
-void lexer_set(std::string s);
 
 std::string lexer_getname(void);
 std::string lexer_getstlabel(void);
 std::string lexer_geti_number(void);
 std::string lexer_getrest(void);
-void        lexer_push(std::string s, const int state);
-void        lexer_pop(void);
 
 struct propstruct
 {

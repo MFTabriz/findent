@@ -82,7 +82,6 @@ int input_line_length = 0;
 bool input_format_gnu = 0;
 
 bool nbseen;                                 // true if non-blank-line is seen
-const std::string findentfix="findentfix:";
 
 std::stack<int> indent;                      // to store indents
 std::stack<std::stack <int> > indent_stack;  // to store indent stack
@@ -1323,29 +1322,12 @@ void handle_free(std::string s, bool &more)
    //
    if (lines.empty())
    {
-#if 1
-      std::string fix = afterwordincomment(s,findentfix);
-      if (fix != "")
-      {
-	 full_statement = fix;
-      }
-#else
-      std::string sl = ltrim(s);
-
-      lexer_push(ltrim(s),FINDENTFIX);
-      //ppp("s:"+s);
+      lexer_set(s,FINDENTFIX);
       int rc = yylex();
-      //std::cout << rc << " "<<FINDENTFIX<<" "; ppp("FINDENTFIX"); ppp("line:"+ltrim(s));
-      //ppp(lexer_getrest());
-      //std::cout << "rc:" << rc << std::endl;
       if ( rc == FINDENTFIX )
       {
 	 full_statement = lexer_getrest();
-	 //ppp("full:"+full_statement);
       }
-      lexer_pop();
-#endif
-
    }
 
    if (input_line_length !=0)
@@ -1421,12 +1403,13 @@ void handle_fixed(std::string s, bool &more)
    //    lines are requested either.
    //
 
-   std::string fix = afterwordincomment(s,findentfix);
-   if (fix != "")
+   lexer_set(s,FINDENTFIX);
+   int rc = yylex();
+   if (rc == FINDENTFIX || rc == FIXFINDENTFIX)
    {
       if (lines.empty())
       {
-	 full_statement = fix;
+	 full_statement = lexer_getrest();
 	 D(O("findentfix:");O(full_statement));
       }
       else 
@@ -2532,53 +2515,6 @@ bool isfixedcmtp(const std::string s)
    char c = firstchar(s);
    char cts = firstchar(trim(s));
    return (cts == 0 || c == 'C' || c == 'c' || cts == '!' || c == '*' || cts == '#' || c == 'd' || c == 'D'); 
-}
-
-std::string afterwordincomment(const std::string s, const std::string w)
-{
-   //
-   // if s is a comment line, if comment starts with w, return 
-   //   string after w
-   // else return ""
-   //   ignore case in w
-   // example:
-   // s = "!   HOppa  tralala hop"
-   // w = "hoppa"
-   // return "  tralala hop"
-   //
-
-   std::string sl = trim(s);
-   if (sl.length() == 0)
-      return "";
-   if (input_format == FREE)
-   {
-      if (sl[0] !=  '!')
-	 return "";
-   }
-   else
-   {
-      bool com = 0;
-      char c = s[0];
-      switch (c)
-      {
-	 case 'c':
-	 case 'C':
-	 case '*':
-	    com = 1;
-      }
-      if (sl[0] == '!')
-      {
-	 com = 1;
-      }
-      if (!com)
-	 return "";
-   }
-   sl       = ltrim(sl.substr(1));
-   size_t l = w.length();
-   if (stolower(sl.substr(0,l)) == stolower(w)) 
-      return sl.substr(l);
-   else
-      return "";
 }
 
 char fixedmissingquote(const std::string s)
