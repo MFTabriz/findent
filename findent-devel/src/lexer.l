@@ -8,10 +8,9 @@
 #include "findent.h"
 #include "debug.h"
 #define YY_DECL extern "C" int yylex()
-std::stack<int>         start_stack;
-std::stack<std::string> input_string_stack;
-std::string             lexer_name, lexer_stlabel, lexeri_number, lexer_rest;
-std::string             input_string;
+std::stack<int> start_stack;
+std::string     lexer_name, lexer_stlabel, lexeri_number, lexer_rest;
+std::string     input_string;
 int             lrlevel;
 bool            lrreturn;
 class line_prep pline;
@@ -215,10 +214,19 @@ where             { D(O("WHERE");Y;);             return WHERE;             }
 }
 
 <state_findentfix>{
-[\!c]{b}*findentfix:          { D(O("FINDENTFIX");Y;); 
+{b}*\!{b}*findentfix:         { D(O("FINDENTFIX");Y;); 
                                 size_t l = input_string.length()-yyleng-1;
                                 lexer_rest = input_string.substr(yyleng,l);
-				return FINDENTFIX; }
+				return FINDENTFIX;
+		              }
+^[c\*]{b}*findentfix:         { D(O("FIXFINDENTFIX");Y;);
+                                size_t l = input_string.length()-yyleng-1;
+                                lexer_rest = input_string.substr(yyleng,l);
+				return FIXFINDENTFIX;
+		              }
+
+\n                       {  D(O("EOL"););   return EOL;        }
+.                        {  D(O("BLA");Y;); return yytext[0];  }
 }
 
 " "[0-9]*" "    {
@@ -278,7 +286,7 @@ where             { D(O("WHERE");Y;);             return WHERE;             }
 
 %%
 
-void lexer_set(class line_prep p)
+void lexer_set(class line_prep p, const int state)
 {
    input_string  = p.get_line_encoded()+'\n';
    pline         = p;
@@ -286,21 +294,17 @@ void lexer_set(class line_prep p)
    BEGIN(INITIAL);
    yy_scan_string(input_string.c_str());
    D(O("lexer_set");O(input_string);O(p.get_type_as_string(0)););
+   lexer_enable(state);
 }
 
 void lexer_set(std::string s, const int state)
-{
-   lexer_set(s);
-   lexer_enable(state);
-}
-void lexer_set(std::string s)
 {
    input_string  = s+'\n';
    D(O("lexer_set");O(input_string););
    yy_delete_buffer(YY_CURRENT_BUFFER);
    yy_scan_string(input_string.c_str());
+   lexer_enable(state);
 }
-
 
 void lexer_enable(const int k)
 {
@@ -337,6 +341,11 @@ std::string lexer_getrest()
 {
    return lexer_rest;
 }
+
+#if 0
+// maybe we need this in the future:
+// not sure if this works OK
+std::stack<std::string> input_string_stack;
 void lexer_push(std::string s, const int state)
 {
    // https://sourceforge.net/p/flex/mailman/message/30542280/
@@ -353,6 +362,7 @@ void lexer_pop()
    input_string=input_string_stack.top();
    input_string_stack.pop();
 }
+#endif
 
 void quiet_compiler()                   // to prevent warning about unused unput
 {

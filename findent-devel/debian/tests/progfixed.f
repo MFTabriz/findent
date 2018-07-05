@@ -273,6 +273,9 @@ c             comment
             enddo
 C FINDENTFIX: enddo
          enddo
+* findentFIX: do;do
+      continue
+* findentfix:    enddo;enddo
          continue
          enddo
          end subroutine testfix

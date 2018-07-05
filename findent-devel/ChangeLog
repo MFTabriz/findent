@@ -33,6 +33,15 @@ findent-2.8.3:
 	test:
 	   adapted test scripts to run in test and in sadt
 
+	findent.cpp, lexer.l:
+	   let the lexer find the string findentfix: in stead
+	   of a function in findent.cpp
+
+	findent.cpp, lexer.l, parser.y:
+	   minor change in defintion of lexer_set()
+
+	test/test-compile.sh.in:
+	   improved output when test fails
 
 findent-2.8.2: 
 	debianizing ...
