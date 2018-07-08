@@ -11,6 +11,7 @@
 #include "findent.h"
 #include "version.h"
 #include "parser.h"
+#include "functions.h"
 #include "simpleostream.h"
 #include "pre_analyzer.h"
 #include "vim_plugin.h"
@@ -22,7 +23,7 @@ void get_full_statement();
 void handle_free(std::string s,bool &more);
 void remove_trailing_comment(std::string &s);
 void handle_fixed(std::string s, bool &more);
-void handle_prc(std::string s, bool &more);
+void handle_prc(std::string s, bool iscoco, bool &more);
 void output_line();
 
 int pop_indent();
@@ -35,10 +36,6 @@ void top_all(void);
 void pop_all(void);
 
 std::string whatrprop(struct propstruct p);
-std::string stoupper(const std::string s);
-std::string stolower(const std::string s);
-char firstchar(const std::string s);
-char lastchar(const std::string s);
 
 void push_rprops(struct propstruct p);
 struct propstruct pop_rprops();
@@ -58,9 +55,6 @@ void set_default_indents();
 void usage(const bool doman);
 void replaceAll( std::string &s, const std::string &search, const std::string &replace );
 void manout(const std::string flag, const std::string txt, const bool doman);
-std::string trim(const std::string& str);
-std::string rtrim(const std::string& str);
-std::string ltrim(const std::string& str);
 std::string ltab2sp(const std::string& s);
 std::string handle_dos(const std::string s);
 
@@ -1012,39 +1006,6 @@ void init_indent()
    push_indent(start_indent);
 }
 
-std::string trim(const std::string& str)
-{
-   const std::string whitespace = " \t";
-   const size_t strBegin = str.find_first_not_of(whitespace);
-   if (strBegin == std::string::npos)
-      return ""; // no content
-
-   const size_t strEnd = str.find_last_not_of(whitespace);
-   const size_t strRange = strEnd - strBegin + 1;
-
-   return str.substr(strBegin, strRange);
-}
-
-std::string rtrim(const std::string& str)
-{
-   const std::string whitespace = " \t";
-
-   const size_t strEnd = str.find_last_not_of(whitespace);
-   if (strEnd == std::string::npos)
-      return ""; // no content
-   return str.substr(0,strEnd+1);
-}
-
-std::string ltrim(const std::string& str)
-{
-   const std::string whitespace = " \t";
-   const size_t strBegin = str.find_first_not_of(whitespace);
-   if (strBegin == std::string::npos)
-      return ""; // no content
-
-   return str.substr(strBegin);
-}
-
 std::string ltab2sp(const std::string& s)
 {
    //
@@ -1224,13 +1185,13 @@ void get_full_statement()
       {
 	 char fcts = firstchar(trim(s));
 	 if (input_format == FREE)
-	    nbseen = (fcts != 0 && fcts != '!' && fcts != '#');
+	    nbseen = (fcts != 0 && fcts != '!' && fcts != '#' && firstchars(trim(s),2) != "??");
 	 else
 	 {
 	    std::string s1 = ltab2sp(s);
 	    if (s1.length() > 6)
 	       nbseen = (s[0] != 'c' && s[0] != 'C' && s[0] != 'd' && s[0] != 'D' 
-		     && fcts != '!' && s[0] != '*' && fcts != '#');
+		     && fcts != '!' && s[0] != '*' && fcts != '#' && firstchars(trim(s),2) != "??");
 	 }
 	 D(O("get_full_statement fcts");O(fcts);O("s");O(s);O("nbseen");O(nbseen));
 	 if (auto_firstindent && nbseen)
@@ -1246,10 +1207,12 @@ void get_full_statement()
       D(O("get_full_statement s leng:");O(s);O(s.length());O("endline:");O(endline.length()););
       D(O("get_full_statement auto_fi");O(auto_firstindent);O("curindent:");O(cur_indent);O("nbseen");O(nbseen));
 
-      if(preproc_more || (firstchar(s) == '#'))
+      bool iscoco = (firstchars(s,2) == "?");
+
+      if(preproc_more || iscoco || (firstchar(s) == '#'))
       {
 	 D(O("preproc");O(s);O(preproc_more););
-	 handle_prc(s, preproc_more);
+	 handle_prc(s, iscoco, preproc_more);
 	 if (preproc_more || fortran_more)
 	    continue;
 	 else
@@ -1279,7 +1242,7 @@ void get_full_statement()
       D(O("olines:"); for (unsigned int i=0; i<olines.size(); i++) { O(i);O(olines[i]); })
 }
 
-void handle_prc(std::string s, bool &more)
+void handle_prc(std::string s, const bool iscoco, bool &more)
    //
    // adds preprocessor continuation line s to full statement
    // more = 1: more preprocessor lines are to expected
@@ -1295,7 +1258,8 @@ void handle_prc(std::string s, bool &more)
    std::string sl = rtrim(s);
    lines.push_back(sl);
    olines.push_back(s);
-   if(lastchar(sl) == '\\')
+   char lc=lastchar(sl);
+   if((!iscoco && lc == '\\') || (iscoco && lc == '&'))
       more = 1;
    else
       more = 0;
@@ -1593,23 +1557,6 @@ int guess_indent(const std::string s)
    return si;
 }
 
-std::string stoupper(const std::string s)
-{
-   std::string sl = s;
-   int l     = sl.size();
-   for (int i=0; i<l; i++)
-      sl[i] = toupper(sl[i]);
-   return sl;
-}
-
-std::string stolower(const std::string s)
-{
-   std::string sl = s;
-   int l     = sl.size();
-   for (int i=0; i<l; i++)
-      sl[i] = tolower(sl[i]);
-   return sl;
-}
 
 void output_line()
 {
@@ -1698,7 +1645,7 @@ void output_line()
       D(O("firstline");O(firstline););
       lines.pop_front();
       olines.pop_front();
-      if(firstchar(firstline) == '#')
+      if(firstchar(firstline) == '#' || firstchars(firstline,2)=="??")
       {
 	 handle_pre(firstline);
       }
@@ -1757,7 +1704,7 @@ void output_line()
 	 char ofc  = firstchar(os);
 	 lines.pop_front();
 	 olines.pop_front();
-	 if(fc == '#')
+	 if(fc == '#' || firstchars(s,2) == "??")
 	 {
 	    handle_pre(s);
 	 }
@@ -1820,7 +1767,7 @@ void output_line()
 	 char ftc       = firstchar(trim(s));
 	 lines.pop_front();
 	 olines.pop_front();
-	 if (ftc == '#')
+	 if (ftc == '#' || firstchars(trim(s),2) == "??")
 	 {
 	    handle_pre(s);
 	    continue;
@@ -2016,7 +1963,7 @@ void output_line()
 		     continue;
 		  }
 		  prevlchar = lastchar(*it);
-		  inpreproc = (firstchar(*it) == '#');
+		  inpreproc = (firstchar(*it) == '#' || firstchars(*it,2) == "??");
 		  if (!isfixedcmtp(*it++))
 		  {
 		     D(O("!isfixedcmtp"););
@@ -2514,7 +2461,7 @@ bool isfixedcmtp(const std::string s)
       return 1;
    char c = firstchar(s);
    char cts = firstchar(trim(s));
-   return (cts == 0 || c == 'C' || c == 'c' || cts == '!' || c == '*' || cts == '#' || c == 'd' || c == 'D'); 
+   return (cts == 0 || c == 'C' || c == 'c' || cts == '!' || c == '*' || cts == '#' || c == 'd' || c == 'D' || firstchars(trim(s),2) == "??"); 
 }
 
 char fixedmissingquote(const std::string s)
@@ -2601,8 +2548,10 @@ void handle_pre(const std::string s)
 {
    D(O("pre before");O(cur_indent);O(top_indent());O(s););
 
-   if (s == "" || firstchar(s) != '#')
+   if (s == "" || (firstchar(s) != '#' && firstchars(s,2) != "??"))
+   {
       return;
+   }
 
    int ifelse = prea.analyze(s);
 
@@ -2644,22 +2593,6 @@ void handle_pre(const std::string s)
    }
 }
 
-char firstchar(const std::string s)
-{
-   size_t l = s.length();
-   if (l == 0)
-      return 0;
-   return s[0];
-}
-
-char lastchar(const std::string s)
-{
-   size_t l = s.length();
-   if (l == 0)
-      return 0;
-   return s[l-1];
-}
-
 bool cleanfive(const std::string s)
    //
    // returns 1, if columns 1-5 contain only [0-9 \t]
@@ -2677,12 +2610,6 @@ bool cleanfive(const std::string s)
       return 0;
    }
    return 1;
-}
-
-int ppp(const std::string s)     // for ad-hoc debugging purposes
-{
-   std::cout << s << std::endl;
-   return 0;
 }
 
 bool isalnumplus(const char c)

@@ -30,7 +30,6 @@ propstruct parseline(class line_prep p);
 
 void lexer_enable(const int k);
 
-int ppp(const std::string s);
 
 #include "debug.h"
 #endif

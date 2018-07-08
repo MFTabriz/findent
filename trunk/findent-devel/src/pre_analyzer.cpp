@@ -1,5 +1,6 @@
 #include <string>
 #include "pre_analyzer.h"
+#include "functions.h"
 //
 // if start of s ==
 // #\s*if
@@ -17,26 +18,53 @@
 // ENDIF_pre:  an #endif is found, without preceding #else
 // ENDIFE_pre:  an #endif is found, with preceding #else
 //
+// if start of s ==
+// ??\s*if
+// or
+// ??\s*else if
+// or
+// ??\s*else
+// or
+// ??\s*endif
+//
+// (all case and space independent)
+//
+// then the function returns
+// IF_pre:     '??if'  found
+// ELIF_pre:   '??else if'  found
+// ELSE_pre:   '??else'  found
+// ENDIF_pre:  '??endif'  found, without preceding '#else' or '??else'
+// ENDIFE_pre: '??endif'  found, with preceding '#else' or '??else'
+//
 // The funcion returns NONE_pre if none of above is found.
 //
 int pre_analyzer::analyze(const std::string s)
 {
-   if (s.size() <3 || s[0] != '#')
+   bool iscoco = (firstchars(s,2) == "??");
+   if (s.size() <3 || (s[0] != '#' && !iscoco))
       return this->NONE_pre;
 
-   const size_t strBegin = 1 + s.substr(1).find_first_not_of(" \t");
+   const size_t strBegin = 1 + s.substr(1+iscoco).find_first_not_of(" \t");
 
    if (strBegin == std::string::npos)
       return this->NONE_pre;
 
    std::string sl = s.substr(strBegin);
+   if (iscoco)
+   {
+      sl = stolower(remove_blanks(sl));
+   }
 
    if (sl.find("if") == 0)
    {
       this->ifelse_stack.push(0);
       return pre_analyzer::IF_pre;
    }
-   else if (sl.find("elif") == 0)
+   else if (!iscoco && sl.find("elif") == 0)
+   {
+      return pre_analyzer::ELIF_pre;
+   }
+   else if (iscoco && sl.find("elseif") == 0)
    {
       return pre_analyzer::ELIF_pre;
    }

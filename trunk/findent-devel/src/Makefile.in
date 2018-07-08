@@ -102,8 +102,9 @@ am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_findent_OBJECTS = findent.$(OBJEXT) mylexer.$(OBJEXT) \
 	myparser.$(OBJEXT) line_prep.$(OBJEXT) pre_analyzer.$(OBJEXT) \
-	vim_plugin.$(OBJEXT) gedit_plugin.$(OBJEXT) \
-	emacs_plugin.$(OBJEXT) readme_plugin.$(OBJEXT)
+	functions.$(OBJEXT) vim_plugin.$(OBJEXT) \
+	gedit_plugin.$(OBJEXT) emacs_plugin.$(OBJEXT) \
+	readme_plugin.$(OBJEXT)
 findent_OBJECTS = $(am_findent_OBJECTS)
 findent_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -323,6 +324,7 @@ EMACSDIR = $(top_srcdir)/emacs
 READMEDIR = $(top_srcdir)/doc
 findent_SOURCES = findent.cpp mylexer.cpp myparser.cpp parser.h \
 		  line_prep.cpp pre_analyzer.cpp debug.h \
+		  functions.cpp functions.h \
 		  line_prep.h pre_analyzer.h version.h \
 		  findent.h simpleostream.h \
 		  vim_plugin.cpp vim_plugin.h \
@@ -423,6 +425,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/emacs_plugin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/findent.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/functions.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gedit_plugin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/line_prep.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mylexer.Po@am__quote@

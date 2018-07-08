@@ -198,6 +198,7 @@ where             { D(O("WHERE");Y;);             return WHERE;             }
 }
 
 <state_findformat>{
+^\?\?.*\n                     { D(O("UNSURE");Y;);   return UNSURE;   }
 ^[^dDcC#!* 0-9].*\n           { D(O("FREE");Y;);     return FREE;     }
 ^[ 0-9]{1,4}[[:alpha:]_%].*\n { D(O("FREE");Y;);     return FREE;     }
 ^[^!]*!.*\n                   { D(O("UNSURE");Y;);   return UNSURE;   }
