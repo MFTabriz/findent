@@ -43,6 +43,12 @@ findent-2.8.3:
 	test/test-compile.sh.in:
 	   improved output when test fails
 
+	findent.cpp, lexer.l:
+	   add support for coco preprocessor
+
+	functions.cpp, functions.h:
+	   moved some general usable stringfunctions to functions.cpp
+
 findent-2.8.2: 
 	debianizing ...
 findent-2.8.1:
