@@ -49,6 +49,9 @@ findent-2.8.3:
 	functions.cpp, functions.h:
 	   moved some general usable stringfunctions to functions.cpp
 
+	test:
+	   added test18.sh for testing coco and cpp
+
 findent-2.8.2: 
 	debianizing ...
 findent-2.8.1:
