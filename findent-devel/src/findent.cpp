@@ -1286,7 +1286,7 @@ void handle_free(std::string s, bool &more)
    //
    if (lines.empty())
    {
-      lexer_set(s,FINDENTFIX);
+      lexer_set(s,FIRSTLINE);
       int rc = yylex();
       if ( rc == FINDENTFIX )
       {
@@ -1367,7 +1367,7 @@ void handle_fixed(std::string s, bool &more)
    //    lines are requested either.
    //
 
-   lexer_set(s,FINDENTFIX);
+   lexer_set(s,FIRSTLINE);
    int rc = yylex();
    if (rc == FINDENTFIX || rc == FIXFINDENTFIX)
    {

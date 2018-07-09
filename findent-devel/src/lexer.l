@@ -20,7 +20,7 @@ class line_prep pline;
 %s state_identifier state_keyword
 
 %x state_lr state_lrb state_skip state_skipall state_skipnoop state_error
-%x state_findformat state_findentfix
+%x state_findformat state_findentfix state_firstline
 
 b [ \t]
 
@@ -230,6 +230,48 @@ where             { D(O("WHERE");Y;);             return WHERE;             }
 .                        {  D(O("BLA");Y;); return yytext[0];  }
 }
 
+<state_firstline>{
+{b}*\!{b}*findentfix:         { D(O("FINDENTFIX");Y;); 
+                                size_t l = input_string.length()-yyleng-1;
+                                lexer_rest = input_string.substr(yyleng,l);
+				return FINDENTFIX;
+		              }
+^[c\*]{b}*findentfix:         { D(O("FIXFINDENTFIX");Y;);
+                                size_t l = input_string.length()-yyleng-1;
+                                lexer_rest = input_string.substr(yyleng,l);
+				return FIXFINDENTFIX;
+		              }
+
+^{b}*#if                      { D(O("CPP_IF");Y;);
+                                return CPP_IF;
+			      }
+^{b}*#endif                   { D(O("CPP_ENDIF");Y;);
+                                return CPP_ENDIF;
+			      }
+^{b}*#else                    { D(O("CPP_ELSE");Y;);
+                                return CPP_ELSE;
+			      }
+^{b}*#elif                    { D(O("CPP_ELIF");Y;);
+                                return CPP_ELIF;
+			      }
+
+^{b}*\?\?{b}*i{b}*f           { D(O("COCO_IF");Y;);
+                                return COCO_IF;
+			      }
+^{b}*\?\?{b}*e{b}*n{b}*d{b}*i{b}*f { D(O("COCO_ENDIF");Y;);
+                                return COCO_ENDIF;
+			      }
+^{b}*\?\?{b}*e{b}*l{b}*s{b}*e { D(O("COCO_ELSE");Y;);
+                                return COCO_ELSE;
+			      }
+^{b}*\?\?{b}*e{b}*l{b}*s{b}*e{b}*i{b}*f { D(O("COCO_ELIF");Y;);
+                                return COCO_ELIF;
+			      }
+
+\n                       {  D(O("EOL"););   return EOL;        }
+.                        {  D(O("BLA");Y;); return yytext[0];  }
+}
+
 " "[0-9]*" "    {
 		   int type = pline.get_type(std::string(yytext));
                    D(O("found_special");O(type);O(pline.get_type_as_string(std::string(yytext)));Y;);
@@ -318,6 +360,7 @@ void lexer_enable(const int k)
       case KEYWORD:     BEGIN(state_keyword);      break;
       case FINDFORMAT:  BEGIN(state_findformat);   break;
       case FINDENTFIX:  BEGIN(state_findentfix);   break;
+      case FIRSTLINE:   BEGIN(state_firstline);    break;
       default:
 	 D(O("invalid parameter in lexer_enable");O(k););
 	 BEGIN(state_error);
