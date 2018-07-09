@@ -44,7 +44,12 @@ int pre_analyzer::analyze(const std::string s)
    if (s.size() <3 || (s[0] != '#' && !iscoco))
       return this->NONE_pre;
 
-   const size_t strBegin = 1 + s.substr(1+iscoco).find_first_not_of(" \t");
+   int k;
+   if (iscoco)
+      k=2;
+   else
+      k=1;
+   const size_t strBegin = k + s.substr(k).find_first_not_of(" \t");
 
    if (strBegin == std::string::npos)
       return this->NONE_pre;
