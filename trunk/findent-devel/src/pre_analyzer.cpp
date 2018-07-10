@@ -1,6 +1,7 @@
 #include <string>
 #include "pre_analyzer.h"
 #include "functions.h"
+#include "parser.h"
 //
 // if start of s ==
 // #\s*if
@@ -38,61 +39,40 @@
 //
 // The funcion returns NONE_pre if none of above is found.
 //
-int pre_analyzer::analyze(const std::string s)
+int pre_analyzer::analyze(const std::string s, const int pretype)
 {
-   bool iscoco = (firstchars(s,2) == "??");
-   if (s.size() <3 || (s[0] != '#' && !iscoco))
-      return this->NONE_pre;
-
-   int k;
-   if (iscoco)
-      k=2;
-   else
-      k=1;
-   const size_t strBegin = k + s.substr(k).find_first_not_of(" \t");
-
-   if (strBegin == std::string::npos)
-      return this->NONE_pre;
-
-   std::string sl = s.substr(strBegin);
-   if (iscoco)
+   switch(pretype)
    {
-      sl = stolower(remove_blanks(sl));
+      case CPP_IF:  case CPP_ENDIF:  case CPP_ELSE:  case CPP_ELIF:
+      case COCO_IF: case COCO_ENDIF: case COCO_ELSE: case COCO_ELIF: break;
+      default: return this->NONE_pre;
    }
 
-   if (sl.find("if") == 0)
+   int r;
+   switch(pretype)
    {
-      this->ifelse_stack.push(0);
-      return pre_analyzer::IF_pre;
-   }
-   else if (!iscoco && sl.find("elif") == 0)
-   {
-      return pre_analyzer::ELIF_pre;
-   }
-   else if (iscoco && sl.find("elseif") == 0)
-   {
-      return pre_analyzer::ELIF_pre;
-   }
-   else if (sl.find("else") == 0)
-   {
-      if (!this->ifelse_stack.empty())
-      {
-	 ifelse_stack.pop();
-	 ifelse_stack.push(1);
-      }
-      return pre_analyzer::ELSE_pre;
-   }
-   else if (sl.find("endif") == 0)
-   {
-      int r = pre_analyzer::ENDIF_pre; 
-      if (!ifelse_stack.empty())
-      {
-	 if (ifelse_stack.top())
-	    r = pre_analyzer::ENDIFE_pre;
-	 ifelse_stack.pop();
-      }
-      return r;
-   }
-   else
+      case CPP_IF: case COCO_IF:
+	 this->ifelse_stack.push(0);
+	 return pre_analyzer::IF_pre;
+      case CPP_ELIF: case COCO_ELIF:
+	 return pre_analyzer::ELIF_pre;
+      case CPP_ELSE: case COCO_ELSE:
+	 if (!this->ifelse_stack.empty())
+	 {
+	    ifelse_stack.pop();
+	    ifelse_stack.push(1);
+	 }
+	 return pre_analyzer::ELSE_pre;
+      case CPP_ENDIF: case COCO_ENDIF:
+	 r = pre_analyzer::ENDIF_pre; 
+	 if (!ifelse_stack.empty())
+	 {
+	    if (ifelse_stack.top())
+	       r = pre_analyzer::ENDIFE_pre;
+	    ifelse_stack.pop();
+	 }
+	 return r;
+    default:
       return pre_analyzer::NONE_pre;
+   }
 }

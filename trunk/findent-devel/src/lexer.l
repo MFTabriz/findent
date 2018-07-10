@@ -20,7 +20,7 @@ class line_prep pline;
 %s state_identifier state_keyword
 
 %x state_lr state_lrb state_skip state_skipall state_skipnoop state_error
-%x state_findformat state_findentfix state_firstline
+%x state_findformat state_scanfixpre
 
 b [ \t]
 
@@ -214,7 +214,7 @@ where             { D(O("WHERE");Y;);             return WHERE;             }
 .*\n                          { D(O("UNSURE");Y;);   return UNSURE;   }
 }
 
-<state_findentfix>{
+<state_scanfixpre>{
 {b}*\!{b}*findentfix:         { D(O("FINDENTFIX");Y;); 
                                 size_t l = input_string.length()-yyleng-1;
                                 lexer_rest = input_string.substr(yyleng,l);
@@ -225,23 +225,9 @@ where             { D(O("WHERE");Y;);             return WHERE;             }
                                 lexer_rest = input_string.substr(yyleng,l);
 				return FIXFINDENTFIX;
 		              }
-
-\n                       {  D(O("EOL"););   return EOL;        }
-.                        {  D(O("BLA");Y;); return yytext[0];  }
-}
-
-<state_firstline>{
-{b}*\!{b}*findentfix:         { D(O("FINDENTFIX");Y;); 
-                                size_t l = input_string.length()-yyleng-1;
-                                lexer_rest = input_string.substr(yyleng,l);
-				return FINDENTFIX;
-		              }
-^[c\*]{b}*findentfix:         { D(O("FIXFINDENTFIX");Y;);
-                                size_t l = input_string.length()-yyleng-1;
-                                lexer_rest = input_string.substr(yyleng,l);
-				return FIXFINDENTFIX;
-		              }
-
+^{b}*#                        { D(O("CPP");Y;);
+                                return CPP;
+                              }
 ^{b}*#if                      { D(O("CPP_IF");Y;);
                                 return CPP_IF;
 			      }
@@ -255,6 +241,9 @@ where             { D(O("WHERE");Y;);             return WHERE;             }
                                 return CPP_ELIF;
 			      }
 
+^{b}*\?\?                     { D(O("COCO");Y;);
+                                return COCO;
+                              }
 ^{b}*\?\?{b}*i{b}*f           { D(O("COCO_IF");Y;);
                                 return COCO_IF;
 			      }
@@ -359,8 +348,7 @@ void lexer_enable(const int k)
       case SKIPNOOP:    BEGIN(state_skipnoop);     break;
       case KEYWORD:     BEGIN(state_keyword);      break;
       case FINDFORMAT:  BEGIN(state_findformat);   break;
-      case FINDENTFIX:  BEGIN(state_findentfix);   break;
-      case FIRSTLINE:   BEGIN(state_firstline);    break;
+      case SCANFIXPRE:  BEGIN(state_scanfixpre);   break;
       default:
 	 D(O("invalid parameter in lexer_enable");O(k););
 	 BEGIN(state_error);

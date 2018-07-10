@@ -41,7 +41,7 @@ void push_rprops(struct propstruct p);
 struct propstruct pop_rprops();
 struct propstruct top_rprops();
 
-void handle_pre(const std::string s);
+bool handle_pre(const std::string s, const int pretype);
 
 void handle_reading_from_tty();
 
@@ -666,7 +666,9 @@ void handle_last_usable_only()
 	 usable_line = prev+1;
       while (!lines.empty())
       {
-	 int ifelse = preb.analyze(trim(lines.front()));
+	 lexer_set(lines.front(),SCANFIXPRE);
+	 int pretype = yylex();
+	 int ifelse  = preb.analyze(trim(lines.front()),pretype);
 	 switch(ifelse)
 	 {
 	    case pre_analyzer::IF_pre:
@@ -1286,7 +1288,7 @@ void handle_free(std::string s, bool &more)
    //
    if (lines.empty())
    {
-      lexer_set(s,FIRSTLINE);
+      lexer_set(s,SCANFIXPRE);
       int rc = yylex();
       if ( rc == FINDENTFIX )
       {
@@ -1367,7 +1369,7 @@ void handle_fixed(std::string s, bool &more)
    //    lines are requested either.
    //
 
-   lexer_set(s,FIRSTLINE);
+   lexer_set(s,SCANFIXPRE);
    int rc = yylex();
    if (rc == FINDENTFIX || rc == FIXFINDENTFIX)
    {
@@ -1639,17 +1641,15 @@ void output_line()
 
    if (input_format == FREE)
    {
-      std::string firstline = lines.front();
+      std::string firstline  = lines.front();
       std::string ofirstline = olines.front();
-      char ofc = firstchar(ofirstline);
+      char ofc               = firstchar(ofirstline);
       D(O("firstline");O(firstline););
       lines.pop_front();
       olines.pop_front();
-      if(firstchar(firstline) == '#' || firstchars(firstline,2)=="??")
-      {
-	 handle_pre(firstline);
-      }
-      else
+      lexer_set(firstline,SCANFIXPRE);
+      int pretype = yylex();
+      if(!handle_pre(firstline, pretype))
       {
 	 int l;
 	 if (firstline != "" || lines.size() > 1)
@@ -1704,11 +1704,9 @@ void output_line()
 	 char ofc  = firstchar(os);
 	 lines.pop_front();
 	 olines.pop_front();
-	 if(fc == '#' || firstchars(s,2) == "??")
-	 {
-	    handle_pre(s);
-	 }
-	 else
+	 lexer_set(s,SCANFIXPRE);
+	 int pretype = yylex();
+	 if(!handle_pre(s,pretype))
 	 {
 	    if (indent_cont || fc == '&')
 	    {
@@ -1767,11 +1765,10 @@ void output_line()
 	 char ftc       = firstchar(trim(s));
 	 lines.pop_front();
 	 olines.pop_front();
-	 if (ftc == '#' || firstchars(trim(s),2) == "??")
-	 {
-	    handle_pre(s);
+	 lexer_set(s,SCANFIXPRE);
+	 int pretype = yylex();
+	 if (handle_pre(s,pretype))
 	    continue;
-	 }
 	 if(isfixedcmtp(s))
 	 {
 	    //
@@ -2544,17 +2541,20 @@ void pop_all()
 //     or, if there is no #else, from the code before the #if{,def,ndef}
 //
 
-void handle_pre(const std::string s)
+bool handle_pre(const std::string s, const int pretype)
 {
+
    D(O("pre before");O(cur_indent);O(top_indent());O(s););
 
-   if (s == "" || (firstchar(s) != '#' && firstchars(s,2) != "??"))
+   switch(pretype)
    {
-      return;
+      case CPP:
+      case COCO:
+	 mycout << s << endline;
+	 return 1;
    }
 
-   int ifelse = prea.analyze(s);
-
+   int ifelse = prea.analyze(s, pretype);
    switch(ifelse)
    {
       case pre_analyzer::IF_pre:
@@ -2575,6 +2575,7 @@ void handle_pre(const std::string s)
 	 break;
 
       default:
+	 return 0;
 	 break;
    }
 
@@ -2591,6 +2592,7 @@ void handle_pre(const std::string s)
       lines.pop_front();
       olines.pop_front();
    }
+   return 1;
 }
 
 bool cleanfive(const std::string s)
