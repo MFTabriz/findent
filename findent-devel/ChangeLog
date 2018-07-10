@@ -52,6 +52,12 @@ findent-2.8.3:
 	test:
 	   added test18.sh for testing coco and cpp
 
+	lexer.l, parser.y, findent.cpp:
+	   use lexer to scan preprocessor lines
+
+	TODO: correct handling of continuation lines of preprocessor
+	   lines
+
 findent-2.8.2: 
 	debianizing ...
 findent-2.8.1:

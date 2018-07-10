@@ -8,6 +8,7 @@ rc=0
 doit=../doit
 cat << eof > prog
       program main
+      #define foo
       contains
       #ifdef foo
       subroutine sub()
@@ -22,6 +23,7 @@ cat << eof > prog
 eof
 cat << eof > expect
       program main
+#define foo
       contains
 #ifdef foo
          subroutine sub()
@@ -40,6 +42,7 @@ rc=`expr $rc + $?`
 
 cat << eof > expect
 program main
+#define foo
 contains
 #ifdef foo
    subroutine sub()
@@ -58,10 +61,11 @@ rc=`expr $rc + $?`
 
 cat << eof > prog
       program main
+      ??logical::foo = .true.
       contains
-      ??if(foo)
+      ??if(foo) then
       subroutine sub()
-      ??else  if(bar)
+      ??else  if(bar) then
       subroutine sub(a)
       ??else
       subroutine sub(a,b)
@@ -72,10 +76,11 @@ cat << eof > prog
 eof
 cat << eof > expect
       program main
+??logical::foo = .true.
       contains
-??if(foo)
+??if(foo) then
          subroutine sub()
-??else  if(bar)
+??else  if(bar) then
          subroutine sub(a)
 ??else
          subroutine sub(a,b)
@@ -90,10 +95,11 @@ rc=`expr $rc + $?`
 
 cat << eof > expect
 program main
+??logical::foo = .true.
 contains
-??if(foo)
+??if(foo) then
    subroutine sub()
-??else  if(bar)
+??else  if(bar) then
    subroutine sub(a)
 ??else
    subroutine sub(a,b)
