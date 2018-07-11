@@ -23,7 +23,7 @@ void get_full_statement();
 void handle_free(std::string s,bool &more);
 void remove_trailing_comment(std::string &s);
 void handle_fixed(std::string s, bool &more);
-void handle_prc(std::string s, bool iscoco, bool &more);
+void handle_prc(std::string s, const int pregentype, bool &more);
 void output_line();
 
 int pop_indent();
@@ -1156,6 +1156,7 @@ void get_full_statement()
    indent_handled       = 0;
    bool preproc_more    = 0;
    bool fortran_more    = 0;
+   int pregentype       = 0;
 
    while(1)
    {
@@ -1209,12 +1210,45 @@ void get_full_statement()
       D(O("get_full_statement s leng:");O(s);O(s.length());O("endline:");O(endline.length()););
       D(O("get_full_statement auto_fi");O(auto_firstindent);O("curindent:");O(cur_indent);O("nbseen");O(nbseen));
 
-      bool iscoco = (firstchars(s,2) == "?");
-
-      if(preproc_more || iscoco || (firstchar(s) == '#'))
+      lexer_set(s,SCANFIXPRE);
+      bool ispre = 0;
+      int pretype = yylex();
+      if (!preproc_more)
       {
+	 pregentype = 0;
+	 switch(pretype)
+	 {
+	    case CPP_IF: case CPP_ENDIF: case CPP_ELSE: case CPP_ELIF: case CPP: 
+	       pregentype = CPP;
+	       ispre      = 1;
+	       break;
+	    case COCO_IF: case COCO_ENDIF: case COCO_ELSE: case COCO_ELIF: case COCO: 
+	       pregentype = COCO;
+	       ispre      = 1;
+	       break;
+	 }
+      }
+      else if(pregentype == COCO)  // coco continuation lines must start with ??
+      {
+	 lexer_set(s,SCANFIXPRE);
+	 pretype = yylex();
+	 switch(pretype)
+	 {
+	    case COCO_IF: case COCO_ENDIF: case COCO_ELSE: case COCO_ELIF: case COCO: 
+	       pregentype = COCO;
+	       break;
+	    default:
+	       pregentype = 0;
+	       ispre      = 0;
+	       preproc_more = 0;
+	       break;
+	 }
+      }
+
+      if(preproc_more || ispre)
+      { 
 	 D(O("preproc");O(s);O(preproc_more););
-	 handle_prc(s, iscoco, preproc_more);
+	 handle_prc(s, pregentype, preproc_more);
 	 if (preproc_more || fortran_more)
 	    continue;
 	 else
@@ -1244,7 +1278,7 @@ void get_full_statement()
       D(O("olines:"); for (unsigned int i=0; i<olines.size(); i++) { O(i);O(olines[i]); })
 }
 
-void handle_prc(std::string s, const bool iscoco, bool &more)
+void handle_prc(std::string s, const int pregentype, bool &more)
    //
    // adds preprocessor continuation line s to full statement
    // more = 1: more preprocessor lines are to expected
@@ -1257,11 +1291,17 @@ void handle_prc(std::string s, const bool iscoco, bool &more)
       more = 0;
       return;
    }
-   std::string sl = rtrim(s);
+   std::string sl;
+   std::string sl1 = trim(s);
+   if (firstchar(sl1) == '#' || firstchars(sl1,2) == "??")  // TODO
+      sl = sl1;
+   else
+      sl = rtrim(s);
+
    lines.push_back(sl);
    olines.push_back(s);
    char lc=lastchar(sl);
-   if((!iscoco && lc == '\\') || (iscoco && lc == '&'))
+   if((pregentype == CPP && lc == '\\') || (pregentype == COCO && lc == '&'))
       more = 1;
    else
       more = 0;
@@ -2546,36 +2586,49 @@ bool handle_pre(const std::string s, const int pretype)
 
    D(O("pre before");O(cur_indent);O(top_indent());O(s););
 
+   int ifelse;
    switch(pretype)
    {
       case CPP:
       case COCO:
-	 mycout << s << endline;
-	 return 1;
+	 break;
+      default:
+	 ifelse = prea.analyze(s, pretype);
+	 switch(ifelse)
+	 {
+	    case pre_analyzer::IF_pre:
+	       push_all();
+	       break;
+
+	    case pre_analyzer::ELIF_pre:
+	       top_all();
+	       break;
+
+	    case pre_analyzer::ELSE_pre:
+	       top_all();
+	    case pre_analyzer::ENDIF_pre:
+	       pop_all();
+	       break;
+
+	    case pre_analyzer::ENDIFE_pre:
+	       break;
+
+	    default:
+	       return 0;
+	       break;
+	 }
+	 break;
    }
 
-   int ifelse = prea.analyze(s, pretype);
-   switch(ifelse)
+   int pregentype = 0;
+
+   switch(pretype)
    {
-      case pre_analyzer::IF_pre:
-	 push_all();
+      case CPP_IF: case CPP_ENDIF: case CPP_ELSE: case CPP_ELIF: case CPP: 
+	 pregentype = CPP;
 	 break;
-
-      case pre_analyzer::ELIF_pre:
-	 top_all();
-	 break;
-
-      case pre_analyzer::ELSE_pre:
-	 top_all();
-      case pre_analyzer::ENDIF_pre:
-	 pop_all();
-	 break;
-
-      case pre_analyzer::ENDIFE_pre:
-	 break;
-
-      default:
-	 return 0;
+      case COCO_IF: case COCO_ENDIF: case COCO_ELSE: case COCO_ELIF: case COCO: 
+	 pregentype = COCO;
 	 break;
    }
 
@@ -2584,8 +2637,25 @@ bool handle_pre(const std::string s, const int pretype)
    char lchar = lastchar(s);
    while (!lines.empty())
    {
-      if (lchar != '\\')
-	 break;
+      if (pregentype == CPP && lchar != '\\')
+	 return 1;
+      // coco continuation lines must start with ??
+      if (pregentype == COCO)
+      {
+	 lexer_set(lines.front(),SCANFIXPRE);
+	 int rc = yylex();
+	 switch(rc)
+	 {
+	    case COCO_IF: case COCO_ENDIF: case COCO_ELSE: case COCO_ELIF: case COCO: 
+	       break;
+	    default:
+	       return 1;
+	       break;
+	 }
+      }
+
+      if (pregentype == COCO && lchar != '&')
+	 return 1;
 
       mycout <<lines.front() << endline;
       lchar = lastchar(lines.front());

@@ -8,9 +8,13 @@ rc=0
 doit=../doit
 cat << eof > prog
       program main
-      #define foo
+      #define foo \\
+bar \\
+  a
       contains
-      #ifdef foo
+      #ifdef foo \\
+  bar \\
+ a
       subroutine sub()
       #elif bar==1
       subroutine sub(a)
@@ -23,9 +27,13 @@ cat << eof > prog
 eof
 cat << eof > expect
       program main
-#define foo
+#define foo \\
+bar \\
+  a
       contains
-#ifdef foo
+#ifdef foo \\
+  bar \\
+ a
          subroutine sub()
 #elif bar==1
          subroutine sub(a)
@@ -37,14 +45,18 @@ cat << eof > expect
       end program
 eof
 
-$doit "-iauto --input_format=auto -ifixed --input_format=fixed" "-I0 -i3" "for fixed input"
+$doit "-ifixed --input_format=fixed" "-I0 -i3" "for fixed input"
 rc=`expr $rc + $?`
 
 cat << eof > expect
 program main
-#define foo
+#define foo \\
+bar \\
+  a
 contains
-#ifdef foo
+#ifdef foo \\
+  bar \\
+ a
    subroutine sub()
 #elif bar==1
    subroutine sub(a)
@@ -56,14 +68,17 @@ contains
 end program
 eof
 
-$doit "-ifree --input_format=free" "-I0 -i3" "for fixed input"
+$doit "-ifree --input_format=free" "-I0 -i3" "for free input"
 rc=`expr $rc + $?`
 
 cat << eof > prog
       program main
-      ??logical::foo = .true.
+      ??logical::foo = .true. &
+      ?? .or. &
+      ?? .or. .false.
       contains
-      ??if(foo) then
+      ??if(foo) &
+      ?? then
       subroutine sub()
       ??else  if(bar) then
       subroutine sub(a)
@@ -72,13 +87,18 @@ cat << eof > prog
       ??endif
       continue
       end subroutine
+      ?? logical a= &
+      ? .true.
       end program
 eof
 cat << eof > expect
       program main
-??logical::foo = .true.
+??logical::foo = .true. &
+?? .or. &
+?? .or. .false.
       contains
-??if(foo) then
+??if(foo) &
+?? then
          subroutine sub()
 ??else  if(bar) then
          subroutine sub(a)
@@ -87,17 +107,22 @@ cat << eof > expect
 ??endif
             continue
          end subroutine
+?? logical a= &
+         ? .true.
       end program
 eof
 
-$doit "-iauto --input_format=auto -ifixed --input_format=fixed" "-I0 -i3" "for fixed input"
+$doit "-ifixed --input_format=fixed" "-I0 -i3" "for fixed input"
 rc=`expr $rc + $?`
 
 cat << eof > expect
 program main
-??logical::foo = .true.
+??logical::foo = .true. &
+?? .or. &
+?? .or. .false.
 contains
-??if(foo) then
+??if(foo) &
+?? then
    subroutine sub()
 ??else  if(bar) then
    subroutine sub(a)
@@ -106,10 +131,12 @@ contains
 ??endif
       continue
    end subroutine
+?? logical a= &
+   ? .true.
 end program
 eof
 
-$doit "-ifree --input_format=free" "-I0 -i3" "for fixed input"
+$doit "-ifree --input_format=free" "-I0 -i3" "for free input"
 rc=`expr $rc + $?`
 . ../postlude
 exit $rc
