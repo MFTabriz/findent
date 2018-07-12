@@ -1,5 +1,9 @@
 #!/bin/sh
-. ./prelude
+if test -e prelude ; then
+   . ./prelude
+else
+   . ./debian/tests/prelude
+fi
 rc=0
 doit=../doit
 cat << eof > prog
@@ -28,4 +32,5 @@ eof
 $doit "-q --query_fix_free" "" "for free input"
 rc=`expr $rc + $?`
 
+. ../postlude
 exit $rc

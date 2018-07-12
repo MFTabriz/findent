@@ -19,6 +19,47 @@ findent-2.8.3:
 	makedeb: some enhancements. 
 	debian.wheezy, debian.xenial: directories with deviations from sid
 
+	findent.cpp, some tests:
+	   more generic refactoring of end statements. Now
+	   for example: 'end subroutine' will be refactored to
+	   'end subroutine mysub'. 
+	   Moreover: 'end subroutine mysub' will be changed into
+	   'end function myfun' if appropriate.
+
+	test/Makefile: clean up
+
+	bootstrap: copies most files from test to debian/tests
+
+	test:
+	   adapted test scripts to run in test and in sadt
+
+	findent.cpp, lexer.l:
+	   let the lexer find the string findentfix: in stead
+	   of a function in findent.cpp
+
+	findent.cpp, lexer.l, parser.y:
+	   minor change in defintion of lexer_set()
+
+	test/test-compile.sh.in:
+	   improved output when test fails
+
+	findent.cpp, lexer.l:
+	   add support for coco preprocessor
+
+	functions.cpp, functions.h:
+	   moved some general usable stringfunctions to functions.cpp
+
+	test:
+	   added test18.sh for testing coco and cpp
+
+	lexer.l, parser.y, findent.cpp:
+	   use lexer to scan preprocessor lines
+
+	TODO: correct handling of continuation lines of preprocessor
+	   lines, especially coco continuations
+	   : clean up code, findent.cpp is too messy
+
+
 findent-2.8.2: 
 	debianizing ...
 findent-2.8.1:

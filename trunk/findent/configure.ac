@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(findent, 2.8.3~pre1, wvermin@gmail.com)
+AC_INIT(findent, 2.8.3~pre2, wvermin@gmail.com)
 AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
 AC_CONFIG_SRCDIR([src/findent.cpp])
@@ -68,6 +68,7 @@ AS_IF( [test "x$with_flex" = "xuse-flex-if-available"],
 AM_CONDITIONAL([USEFLEX],[test "x$useflex" = "xyes"])
 
 AC_CONFIG_FILES([test/prelude])
+AC_CONFIG_FILES([test/postlude])
 AC_CONFIG_FILES([test/test-compile.sh],[chmod +x test/test-compile.sh])
 AC_CONFIG_FILES([test/doit],[chmod +x test/doit])
 AC_CONFIG_FILES([test/progfixed-dos.f])

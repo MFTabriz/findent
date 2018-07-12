@@ -139,6 +139,8 @@ findent, how?
     - line_prep.cpp:    converts a line Fortran code to something that
                         can easily be digested by flex
     - pre_analyzer.cpp: code to handle pre-processor statements
+    - functions.cpp:    some simple string functions
+    - functions.h:      include file for functions.cpp
     - line_prep.h:      header file for line_prep.cpp
     - simpleostream.h   wrapper for std::cout
     - pre_analyzer.h    header file for pre_analyzer.cpp

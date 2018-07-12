@@ -1,7 +1,10 @@
 #!/bin/sh
-cd debian/tests
-. ./prelude
-unset FINDENT
+if test -e prelude ; then
+   . ./prelude
+else
+   unset FINDENT
+   . ./debian/tests/prelude
+fi
 cat <<eof > prog1.f || exit 1
 program prog1
 continue
@@ -31,8 +34,9 @@ program prog2
 end program prog2
 eof
 
-$WFINDENT --indent=5 prog1.f prog2.f
-
+$WFINDENT -i5 prog1.f prog2.f
+sed -i 's/\r//' prog1.f
+sed -i 's/\r//' prog2.f
 for i in 1 2 ; do
    cmp -s prog$i.f prog$i.f.ref
    if [ $? -ne 0 ] ; then

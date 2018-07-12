@@ -1,5 +1,9 @@
 #!/bin/sh
-. ./prelude
+if test -e prelude ; then
+   . ./prelude
+else
+   . ./debian/tests/prelude
+fi
 rc=0
 prog="  program main
 10      continue
@@ -44,4 +48,5 @@ for flag in -l1 --label_left=1 ; do
    fi
 done
 
+. ../postlude
 exit $rc

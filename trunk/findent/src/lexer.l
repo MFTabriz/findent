@@ -8,9 +8,9 @@
 #include "findent.h"
 #include "debug.h"
 #define YY_DECL extern "C" int yylex()
-std::stack<int>      start_stack;
-std::string          lexer_name, lexer_stlabel, lexeri_number;
-std::string          input_string;
+std::stack<int> start_stack;
+std::string     lexer_name, lexer_stlabel, lexeri_number, lexer_rest;
+std::string     input_string;
 int             lrlevel;
 bool            lrreturn;
 class line_prep pline;
@@ -20,7 +20,7 @@ class line_prep pline;
 %s state_identifier state_keyword
 
 %x state_lr state_lrb state_skip state_skipall state_skipnoop state_error
-%x state_findformat
+%x state_findformat state_scanfixpre
 
 b [ \t]
 
@@ -198,6 +198,7 @@ where             { D(O("WHERE");Y;);             return WHERE;             }
 }
 
 <state_findformat>{
+^\?\?.*\n                     { D(O("UNSURE");Y;);   return UNSURE;   }
 ^[^dDcC#!* 0-9].*\n           { D(O("FREE");Y;);     return FREE;     }
 ^[ 0-9]{1,4}[[:alpha:]_%].*\n { D(O("FREE");Y;);     return FREE;     }
 ^[^!]*!.*\n                   { D(O("UNSURE");Y;);   return UNSURE;   }
@@ -211,6 +212,53 @@ where             { D(O("WHERE");Y;);             return WHERE;             }
 ^c{b}+[[:alnum:]].*\n         { D(O("FIXED");Y;);    return FIXED;    }
 ^[ 0123456789]{6}.*\n         { D(O("UNSURE");Y;);   return UNSURE;   }
 .*\n                          { D(O("UNSURE");Y;);   return UNSURE;   }
+}
+
+<state_scanfixpre>{
+{b}*\!{b}*findentfix:         { D(O("FINDENTFIX");Y;); 
+                                size_t l = input_string.length()-yyleng-1;
+                                lexer_rest = input_string.substr(yyleng,l);
+				return FINDENTFIX;
+		              }
+^[c\*]{b}*findentfix:         { D(O("FIXFINDENTFIX");Y;);
+                                size_t l = input_string.length()-yyleng-1;
+                                lexer_rest = input_string.substr(yyleng,l);
+				return FIXFINDENTFIX;
+		              }
+^{b}*#                        { D(O("CPP");Y;);
+                                return CPP;
+                              }
+^{b}*#if                      { D(O("CPP_IF");Y;);
+                                return CPP_IF;
+			      }
+^{b}*#endif                   { D(O("CPP_ENDIF");Y;);
+                                return CPP_ENDIF;
+			      }
+^{b}*#else                    { D(O("CPP_ELSE");Y;);
+                                return CPP_ELSE;
+			      }
+^{b}*#elif                    { D(O("CPP_ELIF");Y;);
+                                return CPP_ELIF;
+			      }
+
+^{b}*\?\?                     { D(O("COCO");Y;);
+                                return COCO;
+                              }
+^{b}*\?\?{b}*i{b}*f           { D(O("COCO_IF");Y;);
+                                return COCO_IF;
+			      }
+^{b}*\?\?{b}*e{b}*n{b}*d{b}*i{b}*f { D(O("COCO_ENDIF");Y;);
+                                return COCO_ENDIF;
+			      }
+^{b}*\?\?{b}*e{b}*l{b}*s{b}*e { D(O("COCO_ELSE");Y;);
+                                return COCO_ELSE;
+			      }
+^{b}*\?\?{b}*e{b}*l{b}*s{b}*e{b}*i{b}*f { D(O("COCO_ELIF");Y;);
+                                return COCO_ELIF;
+			      }
+
+\n                       {  D(O("EOL"););   return EOL;        }
+.                        {  D(O("BLA");Y;); return yytext[0];  }
 }
 
 " "[0-9]*" "    {
@@ -270,7 +318,7 @@ where             { D(O("WHERE");Y;);             return WHERE;             }
 
 %%
 
-void lexer_set(class line_prep p)
+void lexer_set(class line_prep p, const int state)
 {
    input_string  = p.get_line_encoded()+'\n';
    pline         = p;
@@ -278,18 +326,19 @@ void lexer_set(class line_prep p)
    BEGIN(INITIAL);
    yy_scan_string(input_string.c_str());
    D(O("lexer_set");O(input_string);O(p.get_type_as_string(0)););
+   lexer_enable(state);
 }
 
-void lexer_set(std::string s)
+void lexer_set(std::string s, const int state)
 {
    input_string  = s+'\n';
    D(O("lexer_set");O(input_string););
    yy_delete_buffer(YY_CURRENT_BUFFER);
    yy_scan_string(input_string.c_str());
-   BEGIN(state_findformat);
+   lexer_enable(state);
 }
 
-void lexer_enable(int k)
+void lexer_enable(const int k)
 {
    switch(k)
    {
@@ -299,6 +348,7 @@ void lexer_enable(int k)
       case SKIPNOOP:    BEGIN(state_skipnoop);     break;
       case KEYWORD:     BEGIN(state_keyword);      break;
       case FINDFORMAT:  BEGIN(state_findformat);   break;
+      case SCANFIXPRE:  BEGIN(state_scanfixpre);   break;
       default:
 	 D(O("invalid parameter in lexer_enable");O(k););
 	 BEGIN(state_error);
@@ -311,7 +361,6 @@ std::string lexer_getname()
 {
    return lexer_name;
 }
-
 std::string lexer_getstlabel()
 {
    return lexer_stlabel;
@@ -320,6 +369,32 @@ std::string lexer_geti_number()
 {
    return lexeri_number;
 }
+std::string lexer_getrest()
+{
+   return lexer_rest;
+}
+
+#if 0
+// maybe we need this in the future:
+// not sure if this works OK
+std::stack<std::string> input_string_stack;
+void lexer_push(std::string s, const int state)
+{
+   // https://sourceforge.net/p/flex/mailman/message/30542280/
+
+   input_string_stack.push(s);
+   input_string = s+'\n';
+   yypush_buffer_state(YY_CURRENT_BUFFER);
+   yy_scan_string(input_string.c_str());
+   lexer_enable(state);
+}
+void lexer_pop()
+{
+   yypop_buffer_state();
+   input_string=input_string_stack.top();
+   input_string_stack.pop();
+}
+#endif
 
 void quiet_compiler()                   // to prevent warning about unused unput
 {

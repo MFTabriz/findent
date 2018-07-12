@@ -1,5 +1,9 @@
 #!/bin/sh
-. ./prelude
+if test -e prelude ; then
+   . ./prelude
+else
+   . ./debian/tests/prelude
+fi
 rc=0
 doit=../doit
 cat << eof > prog
@@ -457,4 +461,5 @@ eof
 $doit "-e4 --indent_entry=4" "-i6 -I0" ""
 rc=`expr $rc + $?`
 
+. ../postlude
 exit $rc

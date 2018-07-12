@@ -1,6 +1,9 @@
 #!/bin/sh
-cd debian/tests
-. ./prelude
+if test -e prelude ; then
+   . ./prelude
+else
+   . ./debian/tests/prelude
+fi
 rc=0
 prog="  program main
 10      continue
