@@ -54,7 +54,7 @@ std::string remove_blanks(const std::string s)
 
 int ppp(const std::string s)     // for ad-hoc debugging purposes
 {
-   std::cout << s << std::endl;
+   std::cout << "ppp:["+s+"]" << std::endl;
    return 0;
 }
 
