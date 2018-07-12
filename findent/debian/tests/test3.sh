@@ -1,6 +1,9 @@
 #!/bin/sh
-cd debian/tests
-. ./prelude
+if test -e prelude ; then
+   . ./prelude
+else
+   . ./debian/tests/prelude
+fi
 ../test-compile.sh ../progfixedfree-dos.f
 rc=$?
 . ../postlude

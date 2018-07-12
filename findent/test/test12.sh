@@ -1,5 +1,9 @@
 #!/bin/sh
-. ./prelude
+if test -e prelude ; then
+   . ./prelude
+else
+   . ./debian/tests/prelude
+fi
 rc=0
 exe=$FINDENT
 for flag in -h --help ; do
@@ -39,4 +43,5 @@ for flag in -v --version ; do
    fi
 done
 
+. ../postlude
 exit $rc

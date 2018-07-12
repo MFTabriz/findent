@@ -25,7 +25,10 @@ struct propstruct properties;
 %token MODULEPROCEDURE PROCEDURE ENDPROCEDURE
 %token TIDENTIFIER
 %token BLANK
-%token FINDFORMAT FREE FIXED UNSURE PROBFREE
+%token FINDFORMAT FREE FIXED UNSURE PROBFREE FINDENTFIX FIXFINDENTFIX
+%token SCANFIXPRE
+%token CPP_IF CPP_ENDIF CPP_ELSE CPP_ELIF CPP
+%token COCO_IF COCO_ENDIF COCO_ELSE COCO_ELIF COCO
 
 %token IDENTIFIER SKIP SKIPALL SKIPNOOP KEYWORD
 
@@ -284,14 +287,12 @@ void resetprop()
 propstruct parseline(class line_prep p)
 {
    D(O("entering parseline"););
-   lexer_set(p);
+   lexer_set(p,IDENTIFIER);
    resetprop();
-   lexer_enable(IDENTIFIER);
    yyparse();
    if (properties.kind != UNCLASSIFIED)
       return properties;
-   lexer_set(p);
-   lexer_enable(KEYWORD);
+   lexer_set(p,KEYWORD);
    yyparse();
    return properties;
 }

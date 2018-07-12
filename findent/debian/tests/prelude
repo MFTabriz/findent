@@ -1,3 +1,4 @@
+cd debian/tests
 export FINDENT=findent
 export WFINDENT=wfindent
 dir=`basename $0`.tmpdir

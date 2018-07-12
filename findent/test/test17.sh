@@ -1,5 +1,10 @@
 #!/bin/sh
-. ./prelude
+if test -e prelude ; then
+   . ./prelude
+else
+   unset FINDENT
+   . ./debian/tests/prelude
+fi
 cat <<eof > prog1.f || exit 1
 program prog1
 continue
@@ -29,9 +34,6 @@ program prog2
 end program prog2
 eof
 
-echo "testing wfindent"
-echo "WFINDENT: $WFINDENT"
-echo "FINDENT: $FINDENT"
 $WFINDENT -i5 prog1.f prog2.f
 sed -i 's/\r//' prog1.f
 sed -i 's/\r//' prog2.f
@@ -43,5 +45,5 @@ for i in 1 2 ; do
    fi
 done
 
+. ../postlude
 exit 0
-

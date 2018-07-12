@@ -1,5 +1,9 @@
 #!/bin/sh
-. ./prelude
+if test -e prelude ; then
+   . ./prelude
+else
+   . ./debian/tests/prelude
+fi
 exe=$FINDENT
 rc=0
 for f in vim_help gedit_help vim_fortran vim_findent \
@@ -16,4 +20,5 @@ for f in vim_help gedit_help vim_fortran vim_findent \
    fi
    rc=`expr $rc + $r` 
 done
+. ../postlude
 exit $rc

@@ -1,5 +1,9 @@
 #!/bin/sh
-. ./prelude
+if test -e prelude ; then
+   . ./prelude
+else
+   . ./debian/tests/prelude
+fi
 rc=0
 cat << eof > prog
    program prog
@@ -13,4 +17,5 @@ eof
 ../doit "-lastusable --last_usable" "-ifree -Ia" "" 
 rc=`expr $rc + $?`
 
+. ../postlude
 exit $rc

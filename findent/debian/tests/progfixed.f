@@ -258,7 +258,7 @@ defined(q)
       end subroutine nok
 
 
-         ! testing with indentfix:
+      ! testing with findentfix:
          subroutine testfix
             implicit none
             integer i,j,k
@@ -273,6 +273,9 @@ c             comment
             enddo
 C FINDENTFIX: enddo
          enddo
+* findentFIX: do;do
+      continue
+* findentfix:    enddo;enddo
          continue
          enddo
          end subroutine testfix

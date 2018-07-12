@@ -7,17 +7,18 @@ tar=$PWD/../versions/findent-$version.tar.gz
 dir=findent-$version
 dsc=findent_$version-1.dsc
 debdir=$PWD/../debian/findent-$version-deb
-./maketar
-if [ -e debian/changelog ] ; then
-   sed -i "1s/(.*)/($version-1)/" debian/changelog   || exit 1
-fi
+for d in debian debian.xenial debian.wheezy ; do
+   if [ -e $d/changelog ] ; then
+      sed -i "1s/(.*)/($version-1)/" $d/changelog   || exit 1
+   fi
+done
+./maketar || exit 1
 rm -rf $debdir
-mkdir -p $debdir || exit
-cd $debdir || exit
-cp $tar . || exit
+mkdir -p $debdir || exit 1
+cd $debdir || exit 1
+cp $tar . || exit 1
 tar xf $tar || exit
 cd $dir || exit
-#cp -r $curdir/debian . || exit
 echo compat before xenial: `cat debian/compat` `grep Standards-Version debian/control`
 cp debian.xenial/* debian || exit
 echo compat after xenial: `cat debian/compat` `grep Standards-Version debian/control`
