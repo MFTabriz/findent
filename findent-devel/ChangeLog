@@ -56,7 +56,9 @@ findent-2.8.3:
 	   use lexer to scan preprocessor lines
 
 	TODO: correct handling of continuation lines of preprocessor
-	   lines
+	   lines, especially coco continuations
+	   : clean up code, findent.cpp is too messy
+
 
 findent-2.8.2: 
 	debianizing ...

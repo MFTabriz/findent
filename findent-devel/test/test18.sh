@@ -88,7 +88,7 @@ cat << eof > prog
       continue
       end subroutine
       ?? logical a= &
-      ? .true.
+      ?? .true.
       end program
 eof
 cat << eof > expect
@@ -108,7 +108,7 @@ cat << eof > expect
             continue
          end subroutine
 ?? logical a= &
-         ? .true.
+?? .true.
       end program
 eof
 
@@ -132,7 +132,7 @@ contains
       continue
    end subroutine
 ?? logical a= &
-   ? .true.
+?? .true.
 end program
 eof
 

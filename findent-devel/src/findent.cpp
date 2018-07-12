@@ -1302,9 +1302,13 @@ void handle_prc(std::string s, const int pregentype, bool &more)
    olines.push_back(s);
    char lc=lastchar(sl);
    if((pregentype == CPP && lc == '\\') || (pregentype == COCO && lc == '&'))
+   {
       more = 1;
+   }
    else
+   {
       more = 0;
+   }
 }
 
 void handle_free(std::string s, bool &more)
@@ -2639,20 +2643,7 @@ bool handle_pre(const std::string s, const int pretype)
    {
       if (pregentype == CPP && lchar != '\\')
 	 return 1;
-      // coco continuation lines must start with ??
-      if (pregentype == COCO)
-      {
-	 lexer_set(lines.front(),SCANFIXPRE);
-	 int rc = yylex();
-	 switch(rc)
-	 {
-	    case COCO_IF: case COCO_ENDIF: case COCO_ELSE: case COCO_ELIF: case COCO: 
-	       break;
-	    default:
-	       return 1;
-	       break;
-	 }
-      }
+      // coco continuation lines must start with ??, but we ignore that
 
       if (pregentype == COCO && lchar != '&')
 	 return 1;
