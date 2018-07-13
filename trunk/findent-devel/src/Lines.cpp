@@ -27,4 +27,6 @@ void Lines::readline()
 
    this->linebuffer.push(this->curline);
    this->reset_curline();
+   if(!this->end_of_file)
+      this->lines_read ++;
 }
