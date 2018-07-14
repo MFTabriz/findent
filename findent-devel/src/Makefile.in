@@ -104,7 +104,7 @@ am_findent_OBJECTS = findent.$(OBJEXT) mylexer.$(OBJEXT) \
 	myparser.$(OBJEXT) line_prep.$(OBJEXT) pre_analyzer.$(OBJEXT) \
 	functions.$(OBJEXT) vim_plugin.$(OBJEXT) \
 	gedit_plugin.$(OBJEXT) emacs_plugin.$(OBJEXT) \
-	readme_plugin.$(OBJEXT)
+	readme_plugin.$(OBJEXT) flags.$(OBJEXT) usage.$(OBJEXT)
 findent_OBJECTS = $(am_findent_OBJECTS)
 findent_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -330,7 +330,8 @@ findent_SOURCES = findent.cpp mylexer.cpp myparser.cpp parser.h \
 		  vim_plugin.cpp vim_plugin.h \
 		  gedit_plugin.cpp gedit_plugin.h \
 		  emacs_plugin.cpp emacs_plugin.h \
-		  readme_plugin.cpp readme_plugin.h prop.h
+		  readme_plugin.cpp readme_plugin.h prop.h \
+		  flags.cpp flags.h usage.cpp usage.h
 
 BUILT_SOURCES = parser.cpp parser.h lexer.cpp
 EXTRA_DIST = lexer.l parser.y tocpp.sh builtparser.cpp \
@@ -425,6 +426,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/emacs_plugin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/findent.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/flags.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/functions.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gedit_plugin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/line_prep.Po@am__quote@
@@ -432,6 +434,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/myparser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pre_analyzer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readme_plugin.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/usage.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vim_plugin.Po@am__quote@
 
 .cpp.o:

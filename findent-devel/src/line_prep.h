@@ -6,22 +6,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
-
-template <typename T>
-  std::string number2string ( T number )
-  {
-    std::ostringstream ss;
-    ss << number;
-    return ss.str();
-  }
-
-template <typename T>
-  T string2number ( const std::string &text )
-  {
-    std::istringstream ss(text);
-    T result;
-    return ss >> result ? result : 0;
-  }
+#include "functions.h"
 
 class line_prep
 {
