@@ -1,8 +1,12 @@
 %{
 // $Id$
 #include <iostream>
-#include "findent.h"
+
+#include "debug.h"
+#include "lexer.h"
 #include "line_prep.h"
+#include "prop.h"
+
 struct propstruct properties;
 %}
 

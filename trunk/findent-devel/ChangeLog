@@ -59,6 +59,9 @@ findent-2.8.3:
 	   lines, especially coco continuations
 	   : clean up code, findent.cpp is too messy
 
+	~pre3
+	   streamlined .h files, added prop.h
+
 
 findent-2.8.2: 
 	debianizing ...

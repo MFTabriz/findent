@@ -1,23 +1,29 @@
 // $Id$
-#include <cstdio>
-#include <iostream>
-#include <stack>
-#include <queue>
-#include <iomanip>
-#include <unistd.h>
-#include <getopt.h>
 #include <algorithm>
+#include <cstdio>
+#include <getopt.h>
+#include <iomanip>
+#include <iostream>
+#include <queue>
+#include <stack>
 #include <string.h>
-#include "findent.h"
-#include "version.h"
-#include "parser.h"
-#include "functions.h"
-#include "simpleostream.h"
-#include "pre_analyzer.h"
-#include "vim_plugin.h"
-#include "gedit_plugin.h"
+#include <unistd.h>
+
+#include "debug.h"
 #include "emacs_plugin.h"
+#include "findent.h"
+#include "functions.h"
+#include "gedit_plugin.h"
+#include "lexer.h"
+#include "line_prep.h"
+#include "parser.h"
+#include "pre_analyzer.h"
+#include "prop.h"
 #include "readme_plugin.h"
+#include "simpleostream.h"
+#include "version.h"
+#include "vim_plugin.h"
+
 std::string mygetline();
 void get_full_statement();
 void handle_free(std::string s,bool &more);
@@ -36,6 +42,7 @@ void top_all(void);
 void pop_all(void);
 
 std::string whatrprop(struct propstruct p);
+const struct propstruct empty_rprop={0,"","",""};
 
 void push_rprops(struct propstruct p);
 struct propstruct pop_rprops();
