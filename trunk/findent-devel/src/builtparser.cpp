@@ -64,12 +64,12 @@
 /* Copy the first part of user declarations.  */
 #line 1 "parser.y" /* yacc.c:339  */
 
-// $Id: parser.y 291 2018-07-10 13:21:04Z willem_vermin $
+// $Id: parser.y 298 2018-07-14 07:54:33Z willem_vermin $
 #include <iostream>
-//#include "findent.h"
+
+#include "debug.h"
 #include "lexer.h"
 #include "line_prep.h"
-#include "debug.h"
 #include "prop.h"
 
 struct propstruct properties;

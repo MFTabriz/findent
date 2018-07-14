@@ -60,7 +60,9 @@ findent-2.8.3:
 	   : clean up code, findent.cpp is too messy
 
 	~pre3
-	   streamlined .h files, added prop.h
+	   streamlined .h files, added prop.h usage.cpp usage.h
+	   added flags.cpp flags.h lexer.h
+
 
 
 findent-2.8.2: 
