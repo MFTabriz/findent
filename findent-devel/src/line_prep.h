@@ -1,6 +1,7 @@
 // $Id$
 #ifndef LINE_PREP_H
 #define LINE_PREP_H
+
 #include <iostream>
 #include <sstream>
 #include <string>

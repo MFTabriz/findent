@@ -1,12 +1,15 @@
 %{
 // $Id$
 #include <iostream>
-#include <string>
 #include <stack>
+#include <string>
 #include <vector>
-#include "parser.h"
-#include "findent.h"
+
 #include "debug.h"
+#include "lexer.h"
+#include "line_prep.h"
+#include "parser.h"
+
 #define YY_DECL extern "C" int yylex()
 std::stack<int> start_stack;
 std::string     lexer_name, lexer_stlabel, lexeri_number, lexer_rest;
