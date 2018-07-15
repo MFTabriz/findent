@@ -10,7 +10,7 @@ class Flags
    int get_flags(int argc, char *argv[]);
 
    enum {
-      DO_DUMMY = 1000,
+      DO_NOTHING = 1000,
       DO_EMACS_FINDENT,
       DO_EMACS_HELP,
       DO_GEDIT_EXTERNAL,

@@ -1,4 +1,5 @@
 // $Id$
+#include <iostream>
 #ifndef DEBUG_H
 #define DEBUG_H
 #define O(x) {std::cerr << " [" << x << "] ";}

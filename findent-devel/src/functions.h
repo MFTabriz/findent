@@ -26,8 +26,14 @@ std::string firstchars(const std::string s, const int n);
 std::string remove_blanks(const std::string s);
 int ppp(const std::string s);
 char firstchar(const std::string s);
+bool isalnumplus(const char c);
 char lastchar(const std::string s);
 std::string trim(const std::string& str);
 std::string rtrim(const std::string& str);
 std::string ltrim(const std::string& str);
+
+bool cleanfive(const std::string s);
+int num_leading_spaces(const std::string &s);
+bool isfixedcmtp(const std::string s);
+char fixedmissingquote(const std::string s);
 #endif
