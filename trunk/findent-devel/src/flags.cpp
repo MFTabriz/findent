@@ -58,7 +58,7 @@ void Flags::set_default_indents()
 int Flags::get_flags(int argc, char *argv[])
 {
    char *envopts = getenv("FINDENT_FLAGS");
-   char **flags;
+   char **allflags;
    char *envflags = strdup("");
    int nflags = 1;
    if (envopts != 0)
@@ -70,19 +70,19 @@ int Flags::get_flags(int argc, char *argv[])
       //
       // malloc enough space for all flags:
       //
-      flags    = (char**) malloc(sizeof(char*)*(strlen(envflags)+argc));
-      flags[0] = argv[0];
+      allflags    = (char**) malloc(sizeof(char*)*(strlen(envflags)+argc));
+      allflags[0] = argv[0];
       char *a  = strtok(envflags," \t:");
       while (a != 0)
       {
-	 flags[nflags++] = a;
+	 allflags[nflags++] = a;
 	 a = strtok(0," \t:");
       }
    }
    else
    {
-      flags    = (char**) malloc(sizeof(char*)*argc);
-      flags[0] = argv[0];
+      allflags    = (char**) malloc(sizeof(char*)*argc);
+      allflags[0] = argv[0];
    }
 
    for (int i = 1; i<argc; i++)
@@ -90,7 +90,7 @@ int Flags::get_flags(int argc, char *argv[])
       //
       // collect flags from command line:
       //
-      flags[nflags++] = argv[i];
+      allflags[nflags++] = argv[i];
    }
 
 
@@ -217,8 +217,10 @@ int Flags::get_flags(int argc, char *argv[])
    opterr = 0;
    int option_index = 0;
    std::string option_name;
-   while((c=getopt_long(nflags,flags,"a:b:c:C:d:e:E:f:F:hHi:I:j:k:l:L:m:o:qQr:R:s:t:vw:x:",
+   int retval = DO_NOTHING;
+   while((c=getopt_long(nflags,allflags,"a:b:c:C:d:e:E:f:F:hHi:I:j:k:l:L:m:o:qQr:R:s:t:vw:x:",
 	       longopts, &option_index))!=-1)
+   {
       switch(c)
       {
 	 case 'a' :                            // --indent_associate=nn
@@ -253,11 +255,11 @@ int Flags::get_flags(int argc, char *argv[])
 	    break;
 	 case 'h' :                            // --help
 	    //usage(0);
-	    return DO_USAGE;
+	    retval = DO_USAGE;
 	    break;
 	 case 'H':                             // --manpage
 	    //usage(1);
-	    return DO_MANPAGE;
+	    retval = DO_MANPAGE;
 	    break;
 	 case 'i' :                            // --input_format=fixed/free/auto
 	    if      (std::string(optarg) == "fixed")
@@ -352,8 +354,8 @@ int Flags::get_flags(int argc, char *argv[])
 	    type_indent       = atoi(optarg);       // --indent_type=nn
 	    break;
 	 case 'v' :
-	    //std::cout << "findent version "<<VERSION<<std::endl;  // --version
-	    return DO_VERSION;
+	    retval = DO_VERSION;
+	    break;
 	 case 'w' :
 	    where_indent      = atoi(optarg);       // --indent_where=nn
 	    break;
@@ -402,28 +404,23 @@ int Flags::get_flags(int argc, char *argv[])
 	    }
 	    break;
 	 case DO_VIM_HELP:
-	    //do_vim_help();
 	 case DO_VIM_FINDENT:
-	    //do_vim_findent();
 	 case DO_VIM_FORTRAN:
-	    //do_vim_fortran();
 	 case DO_GEDIT_HELP:
-	    //do_gedit_help();
 	 case DO_GEDIT_EXTERNAL:
-	    //do_gedit_external();
 	 case DO_GEDIT_PLUGIN:
-	    //do_gedit_plugin();
 	 case DO_GEDIT_PLUGIN_PY:
-	    //do_gedit_plugin_py();
 	 case DO_EMACS_HELP:
-	    //do_emacs_help();
 	 case DO_EMACS_FINDENT:
-	    //do_emacs_findent();
 	 case DO_README:
-	    //do_readme();
-	    return c;
+	    retval = c;
+	    break;
       }
+      if (retval != DO_NOTHING)
+	 break;
+   }
 
-   free(flags);
+   free(allflags);
    free(envflags);
+   return retval;
 }
