@@ -24,89 +24,71 @@
 #include "version.h"
 #include "vim_plugin.h"
 
-Flags flags;
-std::string mygetline();
-void get_full_statement();
-void handle_free(std::string s,bool &more);
-void remove_trailing_comment(std::string &s);
-void handle_fixed(std::string s, bool &more);
-void handle_prc(std::string s, const int pregentype, bool &more);
-void output_line();
-
-int pop_indent();
-int top_indent();
-void push_indent(int p);
-void init_indent();
-void handle_last_usable_only();
-void push_all(void);
-void top_all(void);
-void pop_all(void);
-
-std::string whatrprop(struct propstruct p);
-const struct propstruct empty_rprop={0,"","",""};
-
-void push_rprops(struct propstruct p);
-struct propstruct pop_rprops();
-struct propstruct top_rprops();
-
-bool handle_pre(const std::string s, const int pretype);
-
-void handle_reading_from_tty();
-
-int input_format;
-int output_format;
-int start_indent;
-int pop_dolabel();
-int top_dolabel();
-void push_dolabel(int l);
-void empty_dolabels();
-void indent_and_output();
-
-void set_default_indents();
-std::string ltab2sp(const std::string& s);
-std::string handle_dos(const std::string s);
-
-int guess_indent(const std::string str);
-int determine_fix_or_free(const bool store);
-int what_to_return(void);
-
-bool refactor_end_found;
-bool reading_from_tty = 0;
-int lines_read        = 0;
-
-bool nbseen;                                 // true if non-blank-line is seen
-
-std::stack<int> indent;                      // to store indents
-std::stack<std::stack <int> > indent_stack;  // to store indent stack
-std::stack<bool> nbseen_stack;               // to store nbseen
-
-pre_analyzer prea;
-
+int               cur_indent;
+struct propstruct cur_rprop           = empty_rprop;
+bool              end_of_file;
+std::string       endline             = "\n";
+bool              endline_set         = 0;
+Flags             flags;
+std::string       full_statement;             // current statement, including continuation lines, &'s removed
+bool              indent_handled;
+int               input_format;
+int               labellength;
+int               lines_read          = 0;
+simpleostream     mycout;
+bool              nbseen;                    // true if non-blank-line is seen 
+int               num_lines;                 // number of lines read sofar
+int               output_format;
+pre_analyzer      prea;
 struct propstruct prev_props;
-std::stack<struct propstruct> rprops;     // to store routines (module, subroutine ...)
+bool              reading_from_tty    = 0;
+bool              refactor_end_found;
+int               start_indent;
+int               stlabel;
+
+std::stack<int>                             dolabels;        // to store labels, necessary for labelled do
+std::stack<std::stack <int> >               dolabels_stack;  // to store dolabels stack
+std::stack<int>                             indent;          // to store indents
+std::stack<std::stack <int> >               indent_stack;    // to store indent stack
+std::queue <std::string>                    linebuffer;      // used when determining fixed or free
+std::deque <std::string>                    lines;           // current line, one continuation line per item
+std::stack <std::string>                    linestack;       // used for fixed format
+std::stack<bool>                            nbseen_stack;    // to store nbseen
+std::deque <std::string>                    olines;          // the original line
+std::stack<struct propstruct>               rprops;          // to store routines (module, subroutine ...)
 std::stack<std::stack <struct propstruct> > rprops_stack;
-struct propstruct cur_rprop = empty_rprop;
 
-int cur_indent;
-int num_lines;                          // number of lines read sofar
-bool indent_handled;
-
-std::stack<int> dolabels;               // to store labels, necessary for labelled do
-std::stack<std::stack <int> > dolabels_stack;  // to store dolabels stack
-int stlabel;
-int labellength;
-
-std::string full_statement;             // current statement, including continuation lines, &'s removed
-std::deque <std::string> lines;         // current line, one continuation line per item
-std::deque <std::string> olines;        // the original line
-std::queue <std::string> linebuffer;    // used when determining fixed or free
-std::stack <std::string> linestack;     // used for fixed format
-bool end_of_file;
-
-std::string endline      = "\n";
-bool endline_set         = 0;
-
-simpleostream mycout;
+int               determine_fix_or_free(const bool store);
+void              empty_dolabels();
+void              get_full_statement();
+int               guess_indent(const std::string str);
+std::string       handle_dos(const std::string s);
+void              handle_fixed(std::string s, bool &more);
+void              handle_free(std::string s,bool &more);
+void              handle_last_usable_only();
+void              handle_prc(std::string s, const int pregentype, bool &more);
+bool              handle_pre(const std::string s, const int pretype);
+void              handle_reading_from_tty();
+void              indent_and_output();
+void              init_indent();
+std::string       mygetline();
+void              output_line();
+void              pop_all(void);
+int               pop_dolabel();
+int               pop_indent();
+struct propstruct pop_rprops();
+void              push_all(void);
+void              push_indent(int p);
+void              push_dolabel(int l);
+void              push_rprops(struct propstruct p);
+void              remove_trailing_comment(std::string &s);
+void              set_default_indents();
+void              top_all(void);
+int               top_dolabel();
+int               top_indent();
+struct            propstruct top_rprops();
+int               what_to_return(void);
+std::string       whatrprop(struct propstruct p);
 
 int main(int argc, char*argv[])
 {
@@ -228,7 +210,7 @@ int what_to_return()
 	    break;
       }
    return 0;
-}
+}              // end of what_to_return
 
 //
 // search for the last line that is usable to start indenting
@@ -272,12 +254,12 @@ void handle_last_usable_only()
 	 int ifelse  = preb.analyze(trim(lines.front()),pretype);
 	 switch(ifelse)
 	 {
-	    case pre_analyzer::IF_pre:
+	    case pre_analyzer::IF:
 	       usables.push(usable_line);
 	       prevs.push(prev);
 	       break;
 
-	    case pre_analyzer::ELIF_pre:
+	    case pre_analyzer::ELIF:
 	       if(!usables.empty())
 	       {
 		  usable_line = usables.top();
@@ -285,8 +267,8 @@ void handle_last_usable_only()
 	       }
 	       break;
 
-	    case pre_analyzer::ELSE_pre:
-	    case pre_analyzer::ENDIF_pre:
+	    case pre_analyzer::ELSE:
+	    case pre_analyzer::ENDIF:
 	       if (!usables.empty())
 	       {
 		  usable_line = usables.top();
@@ -296,10 +278,10 @@ void handle_last_usable_only()
 	       }
 	       break;
 
-	    case pre_analyzer::ENDIFE_pre:
+	    case pre_analyzer::ENDIFE:
 	       break;
 
-	    case pre_analyzer::NONE_pre:
+	    case pre_analyzer::NONE:
 	       break;
 	 }
 	 lines.pop_front();
@@ -311,7 +293,7 @@ void handle_last_usable_only()
 	 return;
       }
    }
-}
+}             // end of last_usable_only
 
 
 void indent_and_output()
@@ -565,7 +547,7 @@ void indent_and_output()
       if (rest == "")
 	 break;
    }
-}
+}               // end of indent_and_output
 
 void handle_reading_from_tty()
 {
@@ -581,7 +563,7 @@ void handle_reading_from_tty()
       std::cerr << "!   indent:  findent < in.f > out.f"             << std::endl;
       std::cerr << "!   convert: findent -ofree < prog.f > prog.f90" << std::endl;
    }
-}
+}                // end of handle_reading_from_tty
 
 void init_indent()
    //
@@ -607,75 +589,7 @@ void init_indent()
    }
    D(O("init_indent calling push");O(indent.size()););
    push_indent(start_indent);
-}
-
-std::string ltab2sp(const std::string& s)
-{
-   //
-   // converts leading white space and white space after a statement label
-   //   to spaces and removes trailing white space
-   // if line starts with 0-5 spaces or digits followed by a tab, followed
-   //   by 1-9, this is counted as 5 spaces, it appears that many compilers
-   //   assume that 
-   //   <tab>1  <some code>
-   //   is a continuation statement, if the continuation character is 1-9
-   //   If the character is not within 1-9, it is assumed that 
-   //   this character is the first of a statement, so in this case
-   //   this is counted as 6 spaces
-   //
-
-   int si              = 0;
-   bool ready          = 0;
-   const int tabl      = 6;
-   bool firsttab       = 1;
-   std::string leader  = "";
-   int removed         = 0;
-
-   for (unsigned int j=0; j<s.length(); j++)
-   {
-      switch (s[j])
-      {
-	 case ' ' :
-	    si ++;
-	    removed++;
-	    leader = leader + " ";
-	    break;
-	 case '\t' :
-	    if (firsttab)
-	    {
-	       firsttab = 0;
-	       if (si < 6)
-		  //
-		  // investigate next char: if 1-9, count this tab as 5 spaces
-		  //
-		  if (s.length() > j+1)
-		     if (s[j+1] >= '1' && s[j+1] <= '9')
-		     {
-			si = 5;
-			removed++;
-			leader = std::string(5,' ');
-			break;
-		     }
-	    }
-	    si = (si/tabl)*tabl + tabl;
-	    leader = leader + std::string(si - leader.length(),' ');
-	    break;
-	 case '0': case '1': case '2': case '3': case '4':
-	 case '5': case '6': case '7': case '8': case '9':
-	    si++;
-	    removed++;
-	    leader += s[j];
-	    firsttab = 0;
-	    break;
-	 default:
-	    ready = 1;
-	    break;
-      }
-      if(ready)
-	 break;
-   }
-   return leader + trim(s.substr(removed));
-}
+}             // end of init_indent
 
 std::string mygetline()
 {
@@ -704,9 +618,10 @@ std::string mygetline()
 
    return handle_dos(s);
 
-}
+}              // end of mygetline
 
 void get_full_statement()
+{
    //
    // this function collects 'full_statement': a complete
    // fortran line, concatenated from possible continuation lines,
@@ -751,7 +666,6 @@ void get_full_statement()
    // #endif
    //     )
    //
-{
    std::string s;
    full_statement       = "";
    indent_handled       = 0;
@@ -877,15 +791,15 @@ void get_full_statement()
    D(O("full_statement:");O(num_lines);O(full_statement););
    D(O("lines:"); for (unsigned int i=0; i<lines.size(); i++) { O(i);O(lines[i]); })
       D(O("olines:"); for (unsigned int i=0; i<olines.size(); i++) { O(i);O(olines[i]); })
-}
+}           // end of get_full_statement
 
 void handle_prc(std::string s, const int pregentype, bool &more)
+{
    //
    // adds preprocessor continuation line s to full statement
    // more = 1: more preprocessor lines are to expected
    //        0: this line is complete
    //
-{
    if(end_of_file)
    {
       D(O("end of file"););
@@ -910,16 +824,16 @@ void handle_prc(std::string s, const int pregentype, bool &more)
    {
       more = 0;
    }
-}
+}         // end of handle_prc
 
 void handle_free(std::string s, bool &more)
+{
    //
    // adds input line s to full_statement
    // more 1: more lines are to expected
    //      0: this line is complete
    //
 
-{
    if(end_of_file)
    {
       D(O("end of file"););
@@ -989,7 +903,7 @@ void handle_free(std::string s, bool &more)
    lines.push_back(trim(s));
    olines.push_back(s);
    D(O("full_statement");O(full_statement);O("more:");O(more);O("cur_indent");O(cur_indent));
-}
+}           // end of handle_free
 
 void handle_fixed(std::string s, bool &more)
 {
@@ -1120,7 +1034,7 @@ void handle_fixed(std::string s, bool &more)
    D(O(full_statement);O(rtrim(sl));O(sl););
    more = 1;   // look for more continuation lines
    return;
-}
+}           // end of handle_fixed
 
 void remove_trailing_comment(std::string &s)
 {
@@ -1152,7 +1066,7 @@ void remove_trailing_comment(std::string &s)
       }
    }
    return;
-}
+}              // end of remove_trailing_comment
 
 int guess_indent(const std::string s)
 {
@@ -1194,7 +1108,7 @@ int guess_indent(const std::string s)
 	 break;
    }
    return si;
-}
+}                // end of guess_indent
 
 
 void output_line()
@@ -1656,7 +1570,7 @@ void output_line()
 	 }
       }
    }
-}
+}           // end of output_line
 
 int pop_indent()
 {
@@ -1664,25 +1578,25 @@ int pop_indent()
       return 0;
    indent.pop();
    return top_indent();
-}
+}         // end of pop_indent
 
 int top_indent()
 {
    if (indent.empty())
       return 0;
    return indent.top();
-}
+}         // end of top_indent
 
 void push_indent(int p)
 {
    indent.push(p);
    D(O("push_indent size:");O(indent.size());O("top:");O(indent.top());O("p:");O(p));
-}
+}        // end of push_indent
 
 void push_rprops(struct propstruct p)
 {
    rprops.push(p);
-}
+}        // end of push_rprops
 
 struct propstruct pop_rprops()
 {
@@ -1690,14 +1604,14 @@ struct propstruct pop_rprops()
       return empty_rprop;
    rprops.pop();
    return top_rprops();
-}
+}       // end of pop_rprops
 
 struct propstruct top_rprops()
 {
    if (rprops.empty())
       return empty_rprop;
    return rprops.top();
-}
+}       // end of top_rprops
 
 std::string whatrprop(struct propstruct p)
 {
@@ -1714,7 +1628,7 @@ std::string whatrprop(struct propstruct p)
       case PROCEDURE:        return("procedure");
       default:               return("");
    }
-}
+}         // end of whatrprop
 
 int pop_dolabel()
 {
@@ -1722,25 +1636,25 @@ int pop_dolabel()
       return -1;
    dolabels.pop();
    return top_dolabel();
-}
+}        // end of pop_dolabel
 
 int top_dolabel()
 {
    if (dolabels.empty())
       return -1;
    return dolabels.top();
-}
+}        // end of top_dolabel
 
 void push_dolabel(int p)
 {
    dolabels.push(p);
-}
+}       // end of push_dolabel
 
 void empty_dolabels()
 {
    while(!dolabels.empty())
       dolabels.pop();
-}
+}       // end of empty_dolabels
 
 int guess_fixedfree(const std::string s)
 {
@@ -1758,7 +1672,7 @@ int guess_fixedfree(const std::string s)
    lexer_set(ltab2sp(s),FINDFORMAT);
    int rc = yylex();
    return rc;
-}
+}           // end of guess_fixedfree
 
 int determine_fix_or_free(const bool store)
 {
@@ -1803,14 +1717,14 @@ int determine_fix_or_free(const bool store)
       }
    }
    return FIXED;
-}
+}          // end of determine_fix_or_free
 
 std::string handle_dos(const std::string s)
+{
    //
    // determine if the input is dos format:
    // side effect: sets endline if not already been set
    //
-{
    std::string sl;
    sl = s;
    if (!endline_set)
@@ -1826,7 +1740,7 @@ std::string handle_dos(const std::string s)
    if (sl != "" && lastchar(sl) =='\r')
       sl.erase(sl.length()-1);
    return sl;
-}
+}         // end of handle_dos
 
 void push_all()
 {
@@ -1834,7 +1748,7 @@ void push_all()
    nbseen_stack.push(nbseen);
    rprops_stack.push(rprops);
    dolabels_stack.push(dolabels);
-}
+}         // end of push_all
 
 void top_all()
 {
@@ -1846,7 +1760,7 @@ void top_all()
       rprops = rprops_stack.top();
    if (!dolabels_stack.empty())
       dolabels = dolabels_stack.top();
-}
+}         // end of top_all
 
 void pop_all()
 {
@@ -1858,7 +1772,7 @@ void pop_all()
       rprops_stack.pop();
    if (!dolabels_stack.empty())
       dolabels_stack.pop();
-}
+}        // end of pop_all
 //
 // #if, #ifdef, #ifndef, #else, #elif and #endif
 
@@ -1891,21 +1805,21 @@ bool handle_pre(const std::string s, const int pretype)
 	 ifelse = prea.analyze(s, pretype);
 	 switch(ifelse)
 	 {
-	    case pre_analyzer::IF_pre:
+	    case pre_analyzer::IF:
 	       push_all();
 	       break;
 
-	    case pre_analyzer::ELIF_pre:
+	    case pre_analyzer::ELIF:
 	       top_all();
 	       break;
 
-	    case pre_analyzer::ELSE_pre:
+	    case pre_analyzer::ELSE:
 	       top_all();
-	    case pre_analyzer::ENDIF_pre:
+	    case pre_analyzer::ENDIF:
 	       pop_all();
 	       break;
 
-	    case pre_analyzer::ENDIFE_pre:
+	    case pre_analyzer::ENDIFE:
 	       break;
 
 	    default:
@@ -1945,4 +1859,5 @@ bool handle_pre(const std::string s, const int pretype)
       olines.pop_front();
    }
    return 1;
-}
+}       // end of handle_pre
+

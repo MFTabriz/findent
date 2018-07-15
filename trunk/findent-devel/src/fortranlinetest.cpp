@@ -28,4 +28,5 @@ int main()
       linebuffer.front().print();
       linebuffer.pop();
    }
+   return 0;
 }

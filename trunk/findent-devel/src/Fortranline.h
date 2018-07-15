@@ -2,8 +2,7 @@
 #include <string>
 #include "functions.h"
 #include "parser.h"
-#include "findent.h"
-std::string Ltab2sp(const std::string& s);
+#include "lexer.h"
 class Fortranline
 {
 
@@ -116,7 +115,7 @@ class Fortranline
    {
       if (!has_ltab2sp)
       {
-	 ltab2sp_line = Ltab2sp(orig_line);
+	 ltab2sp_line = ::ltab2sp(orig_line);
 	 has_ltab2sp = 1;
       }
       return ltab2sp_line;
