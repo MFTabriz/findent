@@ -5,7 +5,7 @@ class pre_analyzer
 
    public:
    int analyze(const std::string s, const int pretype);
-   enum {NONE_pre,IF_pre,ELIF_pre,ELSE_pre,ENDIF_pre,ENDIFE_pre};
+   enum {NONE=1,IF,ELIF,ELSE,ENDIF,ENDIFE};
 
 
 };
