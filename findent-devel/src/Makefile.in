@@ -746,7 +746,7 @@ uninstall-man: uninstall-man1
 @USEFLEX_FALSE@	cp $< $@
 
 @MAKEMAN_TRUE@findent.1: findent
-@MAKEMAN_TRUE@	./findent -H > $@
+@MAKEMAN_TRUE@	: | ./findent -H > $@
 
 findent.o: parser.h
 
