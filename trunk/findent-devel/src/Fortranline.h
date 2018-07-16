@@ -3,6 +3,7 @@
 #include "functions.h"
 #include "parser.h"
 #include "lexer.h"
+
 class Fortranline
 {
 
@@ -13,6 +14,11 @@ class Fortranline
    bool has_trim, has_ltrim, has_rtrim, has_first, has_first2, has_last;
    bool has_ltab2sp, has_scanfixpre;
 
+   public:
+
+   enum {UNKNOWN=1,FIXED,FREE};
+
+   static int format;
 
    void init()
    {
@@ -23,9 +29,9 @@ class Fortranline
       has_last    = 0;
       has_first2  = 0;
       has_ltab2sp = 0;
-   }
 
-   public:
+      format      = UNKNOWN;
+   }
 
    void print();
 
@@ -130,5 +136,30 @@ class Fortranline
 	 has_scanfixpre = 1;
       }
       return Scanfixpre;
+   }
+
+   static std::string format2txt()
+   {
+      switch(getformat())
+      {
+	 case UNKNOWN:
+	    return "unknown";
+	 case FIXED:
+	    return "fixed";
+	 case FREE:
+	    return "free";
+	 default:
+	    return "";
+      }
+   }
+
+   static void setformat(const int what)
+   {
+      format = what;
+   }
+
+   static int getformat()
+   {
+      return format;
    }
 };

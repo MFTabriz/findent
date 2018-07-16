@@ -28,5 +28,14 @@ int main()
       linebuffer.front().print();
       linebuffer.pop();
    }
+   Fortranline l1;
+   Fortranline l2;
+
+   std::cout << l1.format2txt() << " " << l2.format2txt() << std::endl;
+   Fortranline::format = Fortranline::FIXED;
+   std::cout << l1.format2txt() << " " << l2.format2txt() << std::endl;
+   l1.format = Fortranline::FREE;
+   std::cout << l1.format2txt() << " " << l2.format2txt() << std::endl;
+
    return 0;
 }

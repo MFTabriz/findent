@@ -1,6 +1,8 @@
 #include "Fortranline.h"
+int Fortranline::format;
 void Fortranline::print()
 {
+   std::cout << "format:" << format2txt() << std::endl;
    std::cout << "orig_line: [" << orig_line << "]" << std::endl;
    if(has_trim)
       std::cout << "trim_line: [" << trim_line << "]" << std::endl;
