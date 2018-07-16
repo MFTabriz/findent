@@ -4,7 +4,7 @@
 #include "parser.h"
 #include "lexer.h"
 
-class Fortranline
+class fortranline
 {
 
    std::string trim_line, ltrim_line, rtrim_line, orig_line;
@@ -35,11 +35,11 @@ class Fortranline
 
    void print();
 
-   Fortranline()
+   fortranline()
    {
       init();
    }
-   Fortranline(const std::string& s)
+   fortranline(const std::string& s)
    {
       init();
       orig_line = s;

@@ -128,7 +128,8 @@ findent_SOURCES = findent.cpp mylexer.cpp myparser.cpp lexer.h parser.h \
 		  gedit_plugin.cpp gedit_plugin.h \
 		  emacs_plugin.cpp emacs_plugin.h \
 		  readme_plugin.cpp readme_plugin.h prop.h \
-		  flags.cpp flags.h usage.cpp usage.h
+		  flags.cpp flags.h usage.cpp usage.h \
+		  fortranline.cpp fortranline.h
 
 BUILT_SOURCES = parser.cpp parser.h lexer.cpp
 

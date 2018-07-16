@@ -1,10 +1,10 @@
 #include <iostream>
 #include <queue>
-#include "Fortranline.h"
-std::queue<Fortranline> linebuffer;
+#include "fortranline.h"
+std::queue<fortranline> linebuffer;
 int main()
 {
-   Fortranline s;
+   fortranline s;
    s.set_line("   1  ");
    s.trim();
    linebuffer.push(s);
@@ -28,13 +28,13 @@ int main()
       linebuffer.front().print();
       linebuffer.pop();
    }
-   Fortranline l1;
-   Fortranline l2;
+   fortranline l1;
+   fortranline l2;
 
    std::cout << l1.format2txt() << " " << l2.format2txt() << std::endl;
-   Fortranline::format = Fortranline::FIXED;
+   fortranline::format = fortranline::FIXED;
    std::cout << l1.format2txt() << " " << l2.format2txt() << std::endl;
-   l1.format = Fortranline::FREE;
+   l1.format = fortranline::FREE;
    std::cout << l1.format2txt() << " " << l2.format2txt() << std::endl;
 
    return 0;

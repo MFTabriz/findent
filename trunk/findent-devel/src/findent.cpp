@@ -12,6 +12,7 @@
 #include "findent.h"
 #include "flags.h"
 #include "functions.h"
+#include "fortranline.h"
 #include "gedit_plugin.h"
 #include "lexer.h"
 #include "line_prep.h"
@@ -43,6 +44,7 @@ pre_analyzer      prea;
 struct propstruct prev_props;
 bool              reading_from_tty    = 0;
 bool              refactor_end_found;
+fortranline       curline;
 int               start_indent;
 int               stlabel;
 
@@ -50,7 +52,8 @@ std::stack<int>                             dolabels;        // to store labels,
 std::stack<std::stack <int> >               dolabels_stack;  // to store dolabels stack
 std::stack<int>                             indent;          // to store indents
 std::stack<std::stack <int> >               indent_stack;    // to store indent stack
-std::deque <std::string>                    linebuffer;      // used when determining fixed or free
+std::deque <std::string>                    linebuffer;      // deque for source lines
+std::deque <fortranline>                    curlinebuffer;   // deque for source lines
 std::deque <std::string>                    lines;           // current line, one continuation line per item
 std::stack<bool>                            nbseen_stack;    // to store nbseen
 std::deque <std::string>                    olines;          // the original line
@@ -62,7 +65,7 @@ void              empty_dolabels();
 void              get_full_statement();
 int               guess_indent(const std::string str);
 std::string       handle_dos(const std::string s);
-void              handle_fixed(std::string s, bool &more);
+void              handle_fixed(bool &more);
 void              handle_free(std::string s,bool &more);
 void              handle_last_usable_only();
 void              handle_prc(std::string s, const int pregentype, bool &more);
@@ -70,7 +73,7 @@ bool              handle_pre(const std::string s, const int pretype);
 void              handle_reading_from_tty();
 void              indent_and_output();
 void              init_indent();
-std::string       mygetline();
+void              mygetline();
 void              output_line();
 void              pop_all(void);
 int               pop_dolabel();
@@ -590,7 +593,7 @@ void init_indent()
    push_indent(start_indent);
 }             // end of init_indent
 
-std::string mygetline()
+void mygetline()
 {
    //
    // reads next line from cin.
@@ -615,8 +618,8 @@ std::string mygetline()
    if (!end_of_file && reading_from_tty)
       end_of_file = (s == ".");
 
-   return handle_dos(s);
-
+   s = handle_dos(s);
+   curline.set_line(s);
 }              // end of mygetline
 
 void get_full_statement()
@@ -674,15 +677,20 @@ void get_full_statement()
 
    while(1)
    {
-      if (linebuffer.empty())
+      //if (linebuffer.empty())
+      if (curlinebuffer.empty())
       {
-	 s = mygetline();
+	 mygetline();
+	 s = curline.orig();
 	 D(O("get_full_statement mygetline");O(s));
       }
       else
       {
-	 s = linebuffer.front();
-	 linebuffer.pop_front();
+	 //s = linebuffer.front();
+	 //linebuffer.pop_front();
+	 curline = curlinebuffer.front();
+	 curlinebuffer.pop_front();
+	 s = curline.orig();
 	 if (reading_from_tty && s == ".")
 	    end_of_file = 1;
 	 D(O("get_full_statement linebuffer");O(s));
@@ -773,7 +781,7 @@ void get_full_statement()
       }
       else
       {
-	 handle_fixed(s, fortran_more);
+	 handle_fixed(fortran_more);
 	 D(O("more:");O(fortran_more));
 	 if (fortran_more)
 	    continue;
@@ -898,15 +906,15 @@ void handle_free(std::string s, bool &more)
    D(O("full_statement");O(full_statement);O("more:");O(more);O("cur_indent");O(cur_indent));
 }           // end of handle_free
 
-void handle_fixed(std::string s, bool &more)
+//void handle_fixed(std::string s, bool &more)
+void handle_fixed(bool &more)
 {
+   std::string s = curline.orig();
    if(end_of_file)
    {
       more = 0;
       return;
    }
-
-   std::string s0 = s;
 
    D(O("fixed s");O(s););
 
@@ -914,7 +922,7 @@ void handle_fixed(std::string s, bool &more)
    // if this is a findentfix line:
    //    Assume that no continuation lines can follow.
    //    So, if there are already one or more lines read,
-   //    push this line on linebuffer and do not expect
+   //    push this line on curlinebuffer and do not expect
    //    continuation lines.
    //    If, however this is the first line, handle this 
    //    as a normal comment line: in that case no continuation
@@ -932,8 +940,9 @@ void handle_fixed(std::string s, bool &more)
       }
       else 
       {
-	 D(O("pushing back because of findentfix");O(s0));
-	 linebuffer.push_front(s0);
+	 D(O("pushing back because of findentfix");O(s));
+	// linebuffer.push_front(s);
+	 curlinebuffer.push_front(curline);
 	 num_lines--;
 	 more = 0;
 	 return;
@@ -1011,7 +1020,8 @@ void handle_fixed(std::string s, bool &more)
       // we push back the line in it's original state
       // to prevent double line truncation
       //
-      linebuffer.push_front(s0);
+      //linebuffer.push_front(s);
+      curlinebuffer.push_front(curline);
       num_lines--;
       more = 0;          // do not look for further continuation lines
       return;
@@ -1677,7 +1687,8 @@ int determine_fix_or_free(const bool store)
    while ( n < nmax)
    {
       n++;
-      s = mygetline();
+      mygetline();
+      s = curline.orig();
       if (end_of_file)
       {
 	 //
@@ -1686,12 +1697,18 @@ int determine_fix_or_free(const bool store)
 	 //
 
 	 if(store && reading_from_tty)
-	    linebuffer.push_back(s);       // s == "."
+	 {
+	    //linebuffer.push_back(s);       // s == "."
+	    curlinebuffer.push_back(curline);
+	 }
 	 break;
       }
 
       if (store)
-	 linebuffer.push_back(s);
+      {
+	 //linebuffer.push_back(s);
+	 curlinebuffer.push_back(curline);
+      }
 
       rc = guess_fixedfree(s);
       switch(rc)

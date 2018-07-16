@@ -1,6 +1,6 @@
-#include "Fortranline.h"
-int Fortranline::format;
-void Fortranline::print()
+#include "fortranline.h"
+int fortranline::format;
+void fortranline::print()
 {
    std::cout << "format:" << format2txt() << std::endl;
    std::cout << "orig_line: [" << orig_line << "]" << std::endl;
