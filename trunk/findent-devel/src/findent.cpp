@@ -52,7 +52,7 @@ std::stack<int>                             dolabels;        // to store labels,
 std::stack<std::stack <int> >               dolabels_stack;  // to store dolabels stack
 std::stack<int>                             indent;          // to store indents
 std::stack<std::stack <int> >               indent_stack;    // to store indent stack
-std::deque <std::string>                    linebuffer;      // deque for source lines
+//std::deque <std::string>                    linebuffer;      // deque for source lines
 std::deque <fortranline>                    curlinebuffer;   // deque for source lines
 std::deque <std::string>                    lines;           // current line, one continuation line per item
 std::stack<bool>                            nbseen_stack;    // to store nbseen
@@ -702,15 +702,19 @@ void get_full_statement()
 
       if (!nbseen)
       {
-	 char fcts = firstchar(trim(s));
+	 //char fcts = firstchar(trim(s));
+	 std::string fcts = curline.firstchar();
 	 if (input_format == FREE)
-	    nbseen = (fcts != 0 && fcts != '!' && fcts != '#' && firstchars(trim(s),2) != "??");
+	    // nbseen = (fcts != 0 && fcts != '!' && fcts != '#' && firstchars(trim(s),2) != "??");
+	    nbseen = (fcts != "" && fcts != "!" && fcts != "#" && curline.first2chars() != "??");
 	 else
 	 {
 	    std::string s1 = ltab2sp(s);
 	    if (s1.length() > 6)
+//	       nbseen = (s[0] != 'c' && s[0] != 'C' && s[0] != 'd' && s[0] != 'D' 
+//		     && fcts != '!' && s[0] != '*' && fcts != '#' && firstchars(trim(s),2) != "??");
 	       nbseen = (s[0] != 'c' && s[0] != 'C' && s[0] != 'd' && s[0] != 'D' 
-		     && fcts != '!' && s[0] != '*' && fcts != '#' && firstchars(trim(s),2) != "??");
+		     && fcts != "!" && s[0] != '*' && fcts != "#" && curline.first2chars() != "??");
 	 }
 	 D(O("get_full_statement fcts");O(fcts);O("s");O(s);O("nbseen");O(nbseen));
 	 if (flags.auto_firstindent && nbseen)
@@ -726,9 +730,10 @@ void get_full_statement()
       D(O("get_full_statement s leng:");O(s);O(s.length());O("endline:");O(endline.length()););
       D(O("get_full_statement auto_fi");O(flags.auto_firstindent);O("curindent:");O(cur_indent);O("nbseen");O(nbseen));
 
-      lexer_set(s,SCANFIXPRE);
+      //lexer_set(s,SCANFIXPRE);
+      //int pretype = yylex();
+      int pretype = curline.scanfixpre();
       bool ispre = 0;
-      int pretype = yylex();
       if (!preproc_more)
       {
 	 pregentype = 0;
@@ -746,8 +751,9 @@ void get_full_statement()
       }
       else if(pregentype == COCO)  // coco continuation lines must start with ??
       {
-	 lexer_set(s,SCANFIXPRE);
-	 pretype = yylex();
+	 //lexer_set(s,SCANFIXPRE);
+	 //pretype = yylex();
+	 pretype = curline.scanfixpre();
 	 switch(pretype)
 	 {
 	    case COCO_IF: case COCO_ENDIF: case COCO_ELSE: case COCO_ELIF: case COCO: 

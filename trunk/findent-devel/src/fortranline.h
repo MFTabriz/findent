@@ -22,13 +22,14 @@ class fortranline
 
    void init()
    {
-      has_trim    = 0;
-      has_ltrim   = 0;
-      has_rtrim   = 0;
-      has_first   = 0;
-      has_last    = 0;
-      has_first2  = 0;
-      has_ltab2sp = 0;
+      has_trim       = 0;
+      has_ltrim      = 0;
+      has_rtrim      = 0;
+      has_first      = 0;
+      has_last       = 0;
+      has_first2     = 0;
+      has_ltab2sp    = 0;
+      has_scanfixpre = 0;
 
       format      = UNKNOWN;
    }
