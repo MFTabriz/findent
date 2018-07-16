@@ -119,7 +119,7 @@ readme.inc: $(READMEDIR)/README $(TOCPP)
 
 bin_PROGRAMS    = findent
 
-findent_SOURCES = findent.cpp mylexer.cpp myparser.cpp parser.h \
+findent_SOURCES = findent.cpp mylexer.cpp myparser.cpp lexer.h parser.h \
 		  line_prep.cpp pre_analyzer.cpp debug.h \
 		  functions.cpp functions.h \
 		  line_prep.h pre_analyzer.h version.h \
