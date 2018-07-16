@@ -66,7 +66,7 @@ if MAKEMAN
 man1_MANS = findent.1
 
 findent.1: findent
-	./findent -H > $@
+	: | ./findent -H > $@
 
 endif
 

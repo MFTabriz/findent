@@ -50,9 +50,8 @@ std::stack<int>                             dolabels;        // to store labels,
 std::stack<std::stack <int> >               dolabels_stack;  // to store dolabels stack
 std::stack<int>                             indent;          // to store indents
 std::stack<std::stack <int> >               indent_stack;    // to store indent stack
-std::queue <std::string>                    linebuffer;      // used when determining fixed or free
+std::deque <std::string>                    linebuffer;      // used when determining fixed or free
 std::deque <std::string>                    lines;           // current line, one continuation line per item
-std::stack <std::string>                    linestack;       // used for fixed format
 std::stack<bool>                            nbseen_stack;    // to store nbseen
 std::deque <std::string>                    olines;          // the original line
 std::stack<struct propstruct>               rprops;          // to store routines (module, subroutine ...)
@@ -675,13 +674,7 @@ void get_full_statement()
 
    while(1)
    {
-      if (!linestack.empty())
-      {
-	 s = linestack.top();
-	 linestack.pop();
-	 D(O("get_full_statement linestack");O(s));
-      }
-      else if (linebuffer.empty())
+      if (linebuffer.empty())
       {
 	 s = mygetline();
 	 D(O("get_full_statement mygetline");O(s));
@@ -689,7 +682,7 @@ void get_full_statement()
       else
       {
 	 s = linebuffer.front();
-	 linebuffer.pop();
+	 linebuffer.pop_front();
 	 if (reading_from_tty && s == ".")
 	    end_of_file = 1;
 	 D(O("get_full_statement linebuffer");O(s));
@@ -921,7 +914,7 @@ void handle_fixed(std::string s, bool &more)
    // if this is a findentfix line:
    //    Assume that no continuation lines can follow.
    //    So, if there are already one or more lines read,
-   //    push this line on linestack and do not expect
+   //    push this line on linebuffer and do not expect
    //    continuation lines.
    //    If, however this is the first line, handle this 
    //    as a normal comment line: in that case no continuation
@@ -940,7 +933,7 @@ void handle_fixed(std::string s, bool &more)
       else 
       {
 	 D(O("pushing back because of findentfix");O(s0));
-	 linestack.push(s0);
+	 linebuffer.push_front(s0);
 	 num_lines--;
 	 more = 0;
 	 return;
@@ -1018,7 +1011,7 @@ void handle_fixed(std::string s, bool &more)
       // we push back the line in it's original state
       // to prevent double line truncation
       //
-      linestack.push(s0);
+      linebuffer.push_front(s0);
       num_lines--;
       more = 0;          // do not look for further continuation lines
       return;
@@ -1676,6 +1669,7 @@ int guess_fixedfree(const std::string s)
 
 int determine_fix_or_free(const bool store)
 {
+   // apperantly: store is always 1 ...
    int rc;
    std::string s;
    int n = 0;
@@ -1692,12 +1686,12 @@ int determine_fix_or_free(const bool store)
 	 //
 
 	 if(store && reading_from_tty)
-	    linebuffer.push(s);       // s == "."
+	    linebuffer.push_back(s);       // s == "."
 	 break;
       }
 
       if (store)
-	 linebuffer.push(s);
+	 linebuffer.push_back(s);
 
       rc = guess_fixedfree(s);
       switch(rc)
