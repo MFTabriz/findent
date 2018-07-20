@@ -7,31 +7,30 @@
 class fortranline
 {
 
-   std::string trim_line, ltrim_line, rtrim_line, orig_line;
+   std::string trim_line, ltrim_line, rtrim_line, orig_line,chopped_line;
    std::string first, last, first2;
-   std::string ltab2sp_line;
+   std::string ltab2sp_line, Rest, Trimmed_line;
    int Scanfixpre;
-   bool has_trim, has_ltrim, has_rtrim, has_first, has_first2, has_last;
-   bool has_ltab2sp, has_scanfixpre;
+   bool have_trim, have_ltrim, have_rtrim, have_first, have_first2, have_last;
+   bool have_ltab2sp, have_scanfixpre, have_chopped_line, have_trimmed_line;
+
+   static int format, line_length;
+   static bool gnu_format;
 
    public:
 
-   enum {UNKNOWN=1,FIXED,FREE};
-
-   static int format;
-
    void init()
    {
-      has_trim       = 0;
-      has_ltrim      = 0;
-      has_rtrim      = 0;
-      has_first      = 0;
-      has_last       = 0;
-      has_first2     = 0;
-      has_ltab2sp    = 0;
-      has_scanfixpre = 0;
-
-      format      = UNKNOWN;
+      have_chopped_line = 0;
+      have_first        = 0;
+      have_first2       = 0;
+      have_last         = 0;
+      have_ltab2sp      = 0;
+      have_ltrim        = 0;
+      have_rtrim        = 0;
+      have_scanfixpre   = 0;
+      have_trim         = 0;
+      have_trimmed_line = 0;
    }
 
    void print();
@@ -55,90 +54,150 @@ class fortranline
    {
       return orig_line;
    }
+
+   std::string line()
+   {
+      if(have_chopped_line)
+	 return chopped_line;
+
+      switch(format)
+      {
+	 case FIXED:
+	    if (line_length == 0)
+	       chopped_line = ltab2sp();
+	    else
+	       //
+	       // With tabbed input there is a difference between
+	       // gfortran and other compilers with respect to the line length.
+	       // Other compilers simply count the number of characters.
+	       // gfortran always assumes that the
+	       // continuation character is in column 6,
+	       // so this needs extra attention:
+	       //
+	       if(getgnu_format())
+		  chopped_line = ltab2sp().substr(0,line_length);
+	       else
+		  chopped_line = orig().substr(0,line_length);
+	    break;
+	 case FREE:
+	    if (line_length == 0)
+	       chopped_line = orig();
+	    else
+	       chopped_line = orig().substr(0,line_length);
+	    break;
+	 default:
+	    return orig().substr(0,line_length);
+	    break;
+      }
+      have_chopped_line = 1;
+      return chopped_line;
+   }
+
+   std::string trimmed_line()
+   {
+      if (!have_trimmed_line)
+      {
+	 Trimmed_line = ::trim(line());
+	 have_trimmed_line = 1;
+      }
+      return Trimmed_line;
+   }
+
    std::string rtrim()
    {
-      if (!has_rtrim)
+      if (!have_rtrim)
       {
 	 rtrim_line = ::rtrim(orig_line);
-	 has_rtrim  = 1;
+	 have_rtrim  = 1;
       }
       return rtrim_line;
    }
    std::string ltrim()
    {
-      if (!has_ltrim)
+      if (!have_ltrim)
       {
 	 ltrim_line = ::ltrim(orig_line);
-	 has_ltrim  = 1;
+	 have_ltrim  = 1;
       }
       return ltrim_line;
    }
    std::string trim()
    {
-      if (!has_trim)
+      if (!have_trim)
       {
 	 trim_line = ::ltrim(rtrim());
-	 has_trim  = 1;
+	 have_trim  = 1;
       }
       return trim_line;
    }
    std::string firstchar()
    {
-      if (!has_first)
+      if (!have_first)
       {
 	 if (ltrim().length() > 0)
 	    first  = ltrim_line[0];
 	 else
 	    first = "";
-	 has_first  = 1;
+	 have_first  = 1;
       }
       return first;
    }
    std::string lastchar()
    {
-      if (!has_last)
+      if (!have_last)
       {
 	 if (rtrim().length() > 0)
 	    last  = rtrim_line[rtrim_line.length()-1];
 	 else
 	    last = "";
-	 has_last  = 1;
+	 have_last  = 1;
       }
       return last;
    }
    std::string first2chars()
    {
-      if (!has_first2)
+      if (!have_first2)
       {
 	 if (ltrim().length() > 1)
 	    first2  = ltrim_line.substr(0,2);
 	 else
 	    first2 = "";
-	 has_first2  = 1;
+	 have_first2  = 1;
       }
       return first2;
    }
    std::string ltab2sp()
    {
-      if (!has_ltab2sp)
+      if (!have_ltab2sp)
       {
 	 ltab2sp_line = ::ltab2sp(orig_line);
-	 has_ltab2sp = 1;
+	 have_ltab2sp = 1;
       }
       return ltab2sp_line;
    }
 
    int scanfixpre()
    {
-      if(!has_scanfixpre)
+      if(!have_scanfixpre)
       {
 	 lexer_set(trim(),SCANFIXPRE);
-	 Scanfixpre = yylex();
-	 has_scanfixpre = 1;
+	 Scanfixpre      = yylex();
+	 Rest            = lexer_getrest();
+	 have_scanfixpre = 1;
       }
+      if (format == FIXED)
+	 if(Scanfixpre == FIXFINDENTFIX)
+	    Scanfixpre = FINDENTFIX;
       return Scanfixpre;
    }
 
+   std::string rest()
+   {
+      if(scanfixpre()==FINDENTFIX)
+	 return Rest;
+      else
+	 return "";
+   }
    static std::string format2txt()
    {
       switch(getformat())
@@ -158,9 +217,24 @@ class fortranline
    {
       format = what;
    }
-
    static int getformat()
    {
       return format;
+   }
+   static void setline_length(const int what)
+   {
+      line_length = what;
+   }
+   static int getline_length()
+   {
+      return line_length;
+   }
+   static void setgnu_format(bool what)
+   {
+      gnu_format = what;
+   }
+   static bool getgnu_format()
+   {
+      return gnu_format;
    }
 };

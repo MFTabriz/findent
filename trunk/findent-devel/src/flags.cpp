@@ -15,7 +15,7 @@ void Flags::set_defaults(void)
 
    apply_indent        = 1;
    auto_firstindent    = 0;
-   input_format        = 0;
+   input_format        = UNKNOWN;
    input_format_gnu    = 0;
    input_line_length   = 0;
    label_left          = label_left_default;
@@ -267,7 +267,7 @@ int Flags::get_flags(int argc, char *argv[])
 	    else if (std::string(optarg) == "free")
 	       input_format = FREE;
 	    else if (std::string(optarg) == "auto")
-	       input_format = 0;
+	       input_format = UNKNOWN;
 	    else if (optarg[0] == '-')        // --indent=no/nn
 	       apply_indent = 0;
 	    else
@@ -374,7 +374,7 @@ int Flags::get_flags(int argc, char *argv[])
 	    else if (!strcmp(optarg,"free"))
 	       input_format = FREE;
 	    else if (!strcmp(optarg,"auto"))
-	       input_format = 0;
+	       input_format = UNKNOWN;
 	    break;
 	 case DO_INDENT:
 	    if (!strcmp(optarg,"none"))

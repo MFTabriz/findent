@@ -66,7 +66,7 @@ void              get_full_statement();
 int               guess_indent(const std::string str);
 std::string       handle_dos(const std::string s);
 void              handle_fixed(bool &more);
-void              handle_free(std::string s,bool &more);
+void              handle_free(bool &more);
 void              handle_last_usable_only();
 void              handle_prc(std::string s, const int pregentype, bool &more);
 bool              handle_pre(const std::string s, const int pretype);
@@ -94,6 +94,7 @@ std::string       whatrprop(struct propstruct p);
 
 int main(int argc, char*argv[])
 {
+   fortranline::setformat(UNKNOWN);
    int todo = flags.get_flags(argc,argv);
    switch(todo)
    {
@@ -138,12 +139,16 @@ int main(int argc, char*argv[])
 	 return 0;
    }
 
+   fortranline::setline_length(flags.input_line_length);
+   fortranline::setgnu_format(flags.input_format_gnu);
    start_indent = flags.start_indent;
    handle_reading_from_tty();
 
    input_format = flags.input_format;
-   if (input_format == 0)
+   if (input_format == UNKNOWN)
       input_format = determine_fix_or_free(1);
+
+   fortranline::setformat(input_format);
 
    if (flags.only_fix_free)
    {
@@ -779,7 +784,7 @@ void get_full_statement()
 
       if (input_format == FREE)
       {
-	 handle_free(s,fortran_more);
+	 handle_free(fortran_more);
 	 if (fortran_more) 
 	    continue;
 	 else
@@ -833,17 +838,16 @@ void handle_prc(std::string s, const int pregentype, bool &more)
    }
 }         // end of handle_prc
 
-void handle_free(std::string s, bool &more)
+void handle_free(bool &more)
 {
    //
-   // adds input line s to full_statement
+   // adds curline to full_statement
    // more 1: more lines are to expected
    //      0: this line is complete
    //
 
    if(end_of_file)
    {
-      D(O("end of file"););
       more = 0;
       return;
    }
@@ -854,23 +858,23 @@ void handle_free(std::string s, bool &more)
    //
    if (lines.empty())
    {
-      lexer_set(s,SCANFIXPRE);
-      int rc = yylex();
-      if ( rc == FINDENTFIX )
+      int rc = curline.scanfixpre();
+      if (rc == FINDENTFIX)
       {
-	 full_statement = lexer_getrest();
+	 full_statement = curline.rest();
       }
    }
 
-   if (flags.input_line_length !=0)
-      s = s.substr(0,flags.input_line_length);
+   //
+   // sl becomes the first input_line_length characters of curline
+   // and then trimmed left and right:
+   //
+   std::string sl = curline.trimmed_line();
 
-   std::string sl = trim(s);
-
-   if (firstchar(sl) == '&')
+   if(curline.firstchar() == "&")
    {
       sl.erase(0,1);
-      sl = trim(sl);
+      sl = ltrim(sl);
    }
 
    //
@@ -880,39 +884,32 @@ void handle_free(std::string s, bool &more)
 
    if (sl == "" || firstchar(sl) == '!' )
    {
-      lines.push_back(trim(s));
-      olines.push_back(s);
+      lines.push_back(curline.trimmed_line());
+      olines.push_back(curline.orig());
       return;
    }
 
+   full_statement = full_statement + sl;
+
    //
-   // Investigate if this line wants a continuation.
-   // We append the line to full_statement, and look for
-   // an unterminated string. 
-   // If there is an unterminated
-   // string, and the line ends with '&', a continuation
-   // line is expected.
-   // If there is no unterminated string, we strip of
-   // a possible trailing comment, and trim.
+   // remove trailing comment and trailing white space
+   //
+   
+   remove_trailing_comment(full_statement);
+   full_statement = rtrim(full_statement);
+
+   // 
    // If the last character = '&', a continuation is expected.
    //
-
-   std::string cs = full_statement + sl;
-
-   remove_trailing_comment(cs);
-   cs = rtrim(cs);
-
-   more = ( lastchar(cs) == '&');
+   more = ( lastchar(full_statement) == '&');
    if (more)            // chop off '&' :
-      cs.erase(cs.length()-1);
+      full_statement.erase(full_statement.length()-1);
 
-   full_statement = cs;
-   lines.push_back(trim(s));
-   olines.push_back(s);
-   D(O("full_statement");O(full_statement);O("more:");O(more);O("cur_indent");O(cur_indent));
+   lines.push_back(curline.trimmed_line());
+   olines.push_back(curline.orig());
 }           // end of handle_free
 
-//void handle_fixed(std::string s, bool &more)
+
 void handle_fixed(bool &more)
 {
    std::string s = curline.orig();
@@ -921,8 +918,6 @@ void handle_fixed(bool &more)
       more = 0;
       return;
    }
-
-   D(O("fixed s");O(s););
 
    //
    // if this is a findentfix line:
@@ -935,19 +930,20 @@ void handle_fixed(bool &more)
    //    lines are requested either.
    //
 
-   lexer_set(s,SCANFIXPRE);
-   int rc = yylex();
-   if (rc == FINDENTFIX || rc == FIXFINDENTFIX)
+   //lexer_set(s,SCANFIXPRE);
+   //int rc = yylex();
+
+   int rc = curline.scanfixpre();
+
+   //if (rc == FINDENTFIX == FIXFINDENTFIX)
+   if (rc == FINDENTFIX)
    {
       if (lines.empty())
       {
-	 full_statement = lexer_getrest();
-	 D(O("findentfix:");O(full_statement));
+	 full_statement = curline.rest();
       }
       else 
       {
-	 D(O("pushing back because of findentfix");O(s));
-	// linebuffer.push_front(s);
 	 curlinebuffer.push_front(curline);
 	 num_lines--;
 	 more = 0;
@@ -955,20 +951,22 @@ void handle_fixed(bool &more)
       }
    }
 
+#if 0
    if (flags.input_line_length != 0)
    {
       //
-      // with tabbed input there is a difference between
-      // gfortran and other compilers
-      // other compilers simply count the number of characters.
+      // With tabbed input there is a difference between
+      // gfortran and other compilers with respect to the line length.
+      // Other compilers simply count the number of characters.
       // gfortran always assumes that the
-      // continuation character is in column 6
+      // continuation character is in column 6,
       // so this needs extra attention:
       //
       if (flags.input_format_gnu) // convert leading tabs to spaces
 	 s = ltab2sp(s);
       s = s.substr(0,flags.input_line_length);
    }
+#endif
 
    if (isfixedcmtp(s))
       //
@@ -1047,8 +1045,17 @@ void handle_fixed(bool &more)
 
 void remove_trailing_comment(std::string &s)
 {
-   // `
-   // removes trailing comment
+   //
+   // removes trailing comment, but only if not part of an
+   // unterminated string.
+   // e.g:
+   // 'print *, " Hi! and goodbye'
+   // becomes:
+   // 'print *, " Hi! and goodbye'
+   // but
+   // 'print *, " Hi! and goodbye" ! say goodbye'
+   // becomes
+   // 'print *, " Hi! and goodbye" '
    //
 
    bool instring = 0;

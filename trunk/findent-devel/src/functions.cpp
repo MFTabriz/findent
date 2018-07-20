@@ -157,6 +157,7 @@ bool isfixedcmtp(const std::string s)
    char cts = firstchar(trim(s));
    return (cts == 0 || c == 'C' || c == 'c' || cts == '!' || c == '*' || cts == '#' || c == 'd' || c == 'D' || firstchars(trim(s),2) == "??"); 
 }
+
 int num_leading_spaces(const std::string &s)
 {
    size_t p = s.find_first_not_of(' ');
@@ -212,12 +213,12 @@ std::string ltab2sp(const std::string& s)
    //   this is counted as 6 spaces
    //
 
-   int si              = 0;
-   bool ready          = 0;
-   const int tabl      = 6;
-   bool firsttab       = 1;
-   std::string leader  = "";
-   int removed         = 0;
+   int         si       = 0;
+   bool        ready    = 0;
+   const int   tabl     = 6;
+   bool        firsttab = 1;
+   std::string leader   = "";
+   int         removed  = 0;
 
    for (unsigned int j=0; j<s.length(); j++)
    {
