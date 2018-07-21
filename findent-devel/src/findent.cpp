@@ -10,53 +10,20 @@
 
 #include "debug.h"
 #include "emacs_plugin.h"
+#include "findent.h"
 #include "flags.h"
+#include "free2free.h"
 #include "functions.h"
-#include "fortranline.h"
 #include "gedit_plugin.h"
 #include "lexer.h"
 #include "line_prep.h"
 #include "parser.h"
-#include "pre_analyzer.h"
 #include "prop.h"
 #include "readme_plugin.h"
 #include "simpleostream.h"
 #include "usage.h"
 #include "version.h"
 #include "vim_plugin.h"
-
-
-int               determine_fix_or_free(const bool store);
-void              empty_dolabels();
-void              get_full_statement();
-int               guess_indent(const std::string str);
-int               guess_fixedfree(const std::string s);
-std::string       handle_dos(const std::string s);
-void              handle_fixed(bool &more);
-void              handle_free(bool &more);
-void              handle_last_usable_only();
-void              handle_prc(std::string s, const int pregentype, bool &more);
-bool              handle_pre(const std::string s, const int pretype);
-void              handle_reading_from_tty();
-void              indent_and_output();
-void              init_indent();
-void              mygetline();
-void              output_line();
-void              pop_all(void);
-int               pop_dolabel();
-int               pop_indent();
-struct propstruct pop_rprops();
-void              push_all(void);
-void              push_indent(int p);
-void              push_dolabel(int l);
-void              push_rprops(struct propstruct p);
-void              set_default_indents();
-void              top_all(void);
-int               top_dolabel();
-int               top_indent();
-struct            propstruct top_rprops();
-int               what_to_return(void);
-std::string       whatrprop(struct propstruct p);
 
 
 int               cur_indent;
@@ -595,8 +562,8 @@ void get_full_statement()
 	 {
 	    std::string s1 = ltab2sp(s);
 	    if (s1.length() > 6)
-//	       nbseen = (s[0] != 'c' && s[0] != 'C' && s[0] != 'd' && s[0] != 'D' 
-//		     && fcts != '!' && s[0] != '*' && fcts != '#' && firstchars(trim(s),2) != "??");
+	       //	       nbseen = (s[0] != 'c' && s[0] != 'C' && s[0] != 'd' && s[0] != 'D' 
+	       //		     && fcts != '!' && s[0] != '*' && fcts != '#' && firstchars(trim(s),2) != "??");
 	       nbseen = (s[0] != 'c' && s[0] != 'C' && s[0] != 'd' && s[0] != 'D' 
 		     && fcts != "!" && s[0] != '*' && fcts != "#" && curline.first2chars() != "??");
 	 }
@@ -757,7 +724,7 @@ void handle_free(bool &more)
    //
    // remove trailing comment and trailing white space
    //
-   
+
    remove_trailing_comment(full_statement);
    full_statement = rtrim(full_statement);
 
@@ -941,6 +908,9 @@ void output_line()
 
    if (! flags.apply_indent)
    {
+      //
+      // no indention requested:
+      //
       while (! olines.empty())
       {
 	 mycout << olines.front() << endline;
@@ -951,113 +921,7 @@ void output_line()
    }
 
    if (input_format == FREE)
-   {
-      std::string firstline  = lines.front();
-      std::string ofirstline = olines.front();
-      char ofc               = firstchar(ofirstline);
-      lines.pop_front();
-      olines.pop_front();
-      lexer_set(firstline,SCANFIXPRE);
-      int pretype = yylex();
-      if(!handle_pre(firstline, pretype))
-      {
-	 int l;
-	 if (firstline != "" || lines.size() > 1)
-	 {
-	    if (flags.label_left && labellength > 0)
-	    {
-	       //
-	       // put label at start of line
-	       //
-	       std::string label = firstline.substr(0,labellength);
-	       firstline    = trim(firstline.substr(labellength));
-	       mycout << label;
-	       l = cur_indent - labellength;
-	       if ( l <= 0 )
-		  l=1;
-	    }
-	    else
-	       l = cur_indent;
-	    //
-	    // If first character of original line is '!', do not indent
-	    // Do not use start_indent: on the next run the first char could
-	    // be space and not '!'
-	    //
-	    if(ofc == '!')
-	       l=0;
-	    //
-	    // if this is a comment line, and the original line did not start
-	    // with '!', and cur_indent == 0: put a space before this line, 
-	    // to make sure that re-indenting will give the same result
-	    //
-	    if (ofc != '!' && firstchar(firstline) == '!' && cur_indent == 0)
-	       l=1;
-
-	    if (l<0)
-	       l=0;
-	    mycout << std::string(l,' '); 
-	 }
-	 mycout << firstline << endline;
-      }
-
-      while (!lines.empty())
-      {
-	 mycout.reset();
-	 //
-	 // sometimes, there are preprocessor statements within a continuation ...
-	 //
-	 std::string s  = lines.front();
-	 std::string os = olines.front();
-	 char fc  = firstchar(s);
-	 char ofc  = firstchar(os);
-	 lines.pop_front();
-	 olines.pop_front();
-	 lexer_set(s,SCANFIXPRE);
-	 int pretype = yylex();
-	 if(!handle_pre(s,pretype))
-	 {
-	    if (flags.indent_cont || fc == '&')
-	    {
-	       int l = 0;
-	       //
-	       // if first character of original line == '!', do not indent
-	       // Do not use start_indent: on the next run the first char could
-	       // be space and not '!'
-	       //
-	       if (ofc == '!')
-		  l = 0;
-	       else
-	       {
-		  if (fc == '&')
-		  {
-		     //
-		     // if continuation starts with '&', use current indentation
-		     // else use current indentation + flags.cont_indent 
-		     //
-		     l = std::max(cur_indent,0);
-		  }
-		  else
-		  {
-		     l = std::max(cur_indent+flags.cont_indent,0);
-		  }
-	       }
-	       //
-	       // if this is a comment line, and the original line did not start
-	       // with '!', and cur_indent == 0: put a at least one space before this line, 
-	       // to make sure that re-indenting will give the same result
-	       //
-	       if (ofc != '!' && fc == '!' && cur_indent == 0)
-		  l=std::max(1,flags.cont_indent);
-	       mycout << std::string(l,' ');
-	       mycout << s <<endline;
-	    }
-	    else
-	    {
-	       mycout << os << endline;
-	    }
-	 }
-      }
-   }
+      free2free();
    else   // input_format = FIXED, output can be FREE or FIXED
    {
       unsigned int old_indent = 0;
@@ -1101,14 +965,10 @@ void output_line()
 		     //
 		     // special hack for lines starting with 'd' or 'D'
 		     //
-		     case 'd' :
-		     case 'D' :
+		     case 'd' : case 'D' :
 			mycout << "!" + rtrim(os) << endline;
 			break;
-		     case 'c':
-		     case 'C':
-		     case '*':
-		     case '!':
+		     case 'c': case 'C': case '*': case '!':
 			mycout << '!' << rtrim(os.substr(1)) << endline;
 			break;
 		     default:  // this must be a ! comment, not starting in column 1
@@ -1321,6 +1181,7 @@ void output_line()
       }
    }
 }           // end of output_line
+
 
 int determine_fix_or_free(const bool store)
 {
