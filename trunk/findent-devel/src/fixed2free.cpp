@@ -10,7 +10,8 @@ void fixed2free()
    int lineno = 0;
    std::string needamp = "";
 
-   while(!lines.empty())
+   //while(!lines.empty())
+   while(!curlines.empty())
    {
       mycout.reset();
       lineno++;
@@ -19,6 +20,7 @@ void fixed2free()
       char ofc       = firstchar(os);
       lines.pop_front();
       olines.pop_front();
+      curlines.pop_front();
       lexer_set(s,SCANFIXPRE);
       int pretype = yylex();
       if (handle_pre(s,pretype))
@@ -63,7 +65,8 @@ void fixed2free()
 	       std::string s6 = ltab2sp(s.substr(6))+'x';
 	       first_indent = s6.find_first_not_of(' ');
 	    }
-	    if (s != "" || lines.size() > 1)
+	    //if (s != "" || lines.size() > 1)
+	    if (s != "" || curlines.size() > 1)
 	    {
 	       if (flags.label_left && labellength > 0)
 	       {
@@ -129,24 +132,32 @@ void fixed2free()
 	 // and the non-comment line needs a leading &
 	 //
 	 needamp="";
-	 std::deque<std::string>::iterator it= lines.begin();
-	 char prevlchar = 0;
+	 //std::deque<std::string>::iterator it= lines.begin();
+	 std::deque<fortranline>::iterator it= curlines.begin();
+	 //char prevlchar = 0;
+	 std::string prevlchar = "";
 	 bool inpreproc = 0;
-	 while(it != lines.end())
+	 //while(it != lines.end())
+	 while(it != curlines.end())
 	 {
 	    //
 	    // if previous lastchar was '\\', do not consider this 
 	    // line, if we are in a preprocessor statement
 	    //
-	    if (inpreproc && prevlchar == '\\')
+	    //if (inpreproc && prevlchar == '\\')
+	    if (inpreproc && prevlchar == "\\")
 	    {
-	       prevlchar = lastchar(*it);
+	       //prevlchar = lastchar(*it);
+	       //prevlchar = (*it).lastchar();
+	       prevlchar = it->lastchar();
 	       *it++;
 	       continue;
 	    }
-	    prevlchar = lastchar(*it);
-	    inpreproc = (firstchar(*it) == '#' || firstchars(*it,2) == "??");
-	    if (!isfixedcmtp(*it++))
+	    //prevlchar = lastchar(*it);
+	    prevlchar = it->lastchar();
+	    //inpreproc = (firstchar(*it) == '#' || firstchars(*it,2) == "??");
+	    inpreproc = (it->firstchar() == "#" || it->first2chars() == "??");
+	    if (!isfixedcmtp((it++)->orig()))
 	    {
 	       needamp =  '&';
 	       //
