@@ -123,7 +123,7 @@ findent_SOURCES = findent.cpp mylexer.cpp myparser.cpp lexer.h parser.h \
 		  line_prep.cpp pre_analyzer.cpp debug.h \
 		  functions.cpp functions.h \
 		  line_prep.h pre_analyzer.h version.h \
-		  findent.h simpleostream.h \
+		  simpleostream.h \
 		  vim_plugin.cpp vim_plugin.h \
 		  gedit_plugin.cpp gedit_plugin.h \
 		  emacs_plugin.cpp emacs_plugin.h \
