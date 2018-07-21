@@ -266,3 +266,44 @@ std::string ltab2sp(const std::string& s)
    return leader + trim(s.substr(removed));
 }
 
+void remove_trailing_comment(std::string &s)
+{
+   //
+   // removes trailing comment, but only if not part of an
+   // unterminated string.
+   // e.g:
+   // 'print *, " Hi! and goodbye'
+   // becomes:
+   // 'print *, " Hi! and goodbye'
+   // but
+   // 'print *, " Hi! and goodbye" ! say goodbye'
+   // becomes
+   // 'print *, " Hi! and goodbye" '
+   //
+
+   bool instring = 0;
+   char q        = ' ';
+   for (unsigned int i=0; i<s.size(); i++)
+   {
+      if (instring)
+      {
+	 if(s[i] == q)
+	    instring = 0;
+      }
+      else
+      {
+	 switch(s[i])
+	 {
+	    case '"': case '\'':
+	       instring = 1;
+	       q = s[i];
+	       break;
+	    case '!':
+	       s.erase(i,std::string::npos);
+	       return;
+	 }
+      }
+   }
+   return;
+}              // end of remove_trailing_comment
+
