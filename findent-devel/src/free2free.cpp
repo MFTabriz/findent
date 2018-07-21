@@ -7,6 +7,7 @@ void free2free()
    char ofc               = firstchar(ofirstline);
    lines.pop_front();
    olines.pop_front();
+   curlines.pop_front();
    lexer_set(firstline,SCANFIXPRE);
    int pretype = yylex();
    if(!handle_pre(firstline, pretype))
@@ -50,23 +51,31 @@ void free2free()
       mycout << firstline << endline;
    }
 
-   while (!lines.empty())
+   //while (!lines.empty())
+   while (!curlines.empty())
    {
       mycout.reset();
       //
       // sometimes, there are preprocessor statements within a continuation ...
       //
-      std::string s  = lines.front();
-      std::string os = olines.front();
-      char fc  = firstchar(s);
-      char ofc  = firstchar(os);
+      //std::string s  = lines.front();
+      //std::string os = olines.front();
+      //std::string s  = curlines.front().trim();
+      //std::string os = curlines.front().orig();
+
+      //char fc  = firstchar(s);
+      //char ofc  = firstchar(os);
+      std::string fc  = curlines.front().firstchar();
+      std::string ofc = curlines.front().orig().substr(0,1);
+      int pretype = curlines.front().scanfixpre();
       lines.pop_front();
       olines.pop_front();
-      lexer_set(s,SCANFIXPRE);
-      int pretype = yylex();
-      if(!handle_pre(s,pretype))
+      //lexer_set(s,SCANFIXPRE);
+      //int pretype = yylex();
+      // if(!handle_pre(s,pretype))
+      if(!handle_pre(curlines.front().trim(),pretype))
       {
-	 if (flags.indent_cont || fc == '&')
+	 if (flags.indent_cont || fc == "&")
 	 {
 	    int l = 0;
 	    //
@@ -74,11 +83,11 @@ void free2free()
 	    // Do not use start_indent: on the next run the first char could
 	    // be space and not '!'
 	    //
-	    if (ofc == '!')
+	    if (ofc == "!")
 	       l = 0;
 	    else
 	    {
-	       if (fc == '&')
+	       if (fc == "&")
 	       {
 		  //
 		  // if continuation starts with '&', use current indentation
@@ -96,15 +105,16 @@ void free2free()
 	    // with '!', and cur_indent == 0: put a at least one space before this line, 
 	    // to make sure that re-indenting will give the same result
 	    //
-	    if (ofc != '!' && fc == '!' && cur_indent == 0)
+	    if (ofc != "!" && fc == "!" && cur_indent == 0)
 	       l=std::max(1,flags.cont_indent);
 	    mycout << std::string(l,' ');
-	    mycout << s <<endline;
+	    //mycout << s <<endline;
+	    mycout << curlines.front().trim() <<endline;
 	 }
 	 else
-	 {
-	    mycout << os << endline;
-	 }
+	    //mycout << os << endline;
+	    mycout << curlines.front().orig() << endline;
       }
+      curlines.pop_front();
    }
 }

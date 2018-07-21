@@ -132,6 +132,7 @@ class fortranline
    }
    std::string firstchar()
    {
+      // returns first char of ltrim()
       if (!have_first)
       {
 	 if (ltrim().length() > 0)
@@ -170,7 +171,7 @@ class fortranline
    {
       if (!have_ltab2sp)
       {
-	 ltab2sp_line = ::ltab2sp(orig_line);
+	 ltab2sp_line = ::ltab2sp(orig());
 	 have_ltab2sp = 1;
       }
       return ltab2sp_line;

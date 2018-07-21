@@ -6,9 +6,9 @@ void fixed2fixed()
    unsigned int old_indent   = 0;
    unsigned int first_indent = 0;
    char prevquote            = ' ';
-   char preprevquote         = ' ';
 
-   while(!lines.empty())
+   //while(!lines.empty())
+   while(!curlines.empty())
    {
       mycout.reset();
       std::string s  = lines.front();
@@ -17,6 +17,7 @@ void fixed2fixed()
       char ftc       = firstchar(trim(s));
       lines.pop_front();
       olines.pop_front();
+      curlines.pop_front();
       lexer_set(s,SCANFIXPRE);
       int pretype = yylex();
       if (handle_pre(s,pretype))
