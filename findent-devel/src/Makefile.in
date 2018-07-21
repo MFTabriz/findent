@@ -105,7 +105,9 @@ am_findent_OBJECTS = findent.$(OBJEXT) mylexer.$(OBJEXT) \
 	functions.$(OBJEXT) vim_plugin.$(OBJEXT) \
 	gedit_plugin.$(OBJEXT) emacs_plugin.$(OBJEXT) \
 	readme_plugin.$(OBJEXT) flags.$(OBJEXT) usage.$(OBJEXT) \
-	fortranline.$(OBJEXT) free2free.$(OBJEXT)
+	fortranline.$(OBJEXT) free2free.$(OBJEXT) \
+	fixed2fixed.$(OBJEXT) fixed2free.$(OBJEXT) \
+	findent_functions.$(OBJEXT)
 findent_OBJECTS = $(am_findent_OBJECTS)
 findent_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -323,7 +325,8 @@ VIMDIR = $(top_srcdir)/vim
 GEDITDIR = $(top_srcdir)/gedit
 EMACSDIR = $(top_srcdir)/emacs
 READMEDIR = $(top_srcdir)/doc
-findent_SOURCES = findent.cpp mylexer.cpp myparser.cpp lexer.h parser.h \
+findent_SOURCES = findent.cpp findent.h \
+		  mylexer.cpp myparser.cpp lexer.h parser.h \
 		  line_prep.cpp pre_analyzer.cpp debug.h \
 		  functions.cpp functions.h \
 		  line_prep.h pre_analyzer.h version.h \
@@ -334,7 +337,10 @@ findent_SOURCES = findent.cpp mylexer.cpp myparser.cpp lexer.h parser.h \
 		  readme_plugin.cpp readme_plugin.h prop.h \
 		  flags.cpp flags.h usage.cpp usage.h \
 		  fortranline.cpp fortranline.h \
-		  free2free.cpp free2free.h
+		  free2free.cpp free2free.h \
+		  fixed2fixed.cpp fixed2fixed.h \
+		  fixed2free.cpp fixed2free.h \
+		  findent_functions.cpp findent_functions.h
 
 BUILT_SOURCES = parser.cpp parser.h lexer.cpp
 EXTRA_DIST = lexer.l parser.y tocpp.sh builtparser.cpp \
@@ -429,6 +435,9 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/emacs_plugin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/findent.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/findent_functions.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fixed2fixed.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fixed2free.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/flags.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fortranline.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/free2free.Po@am__quote@

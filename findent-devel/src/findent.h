@@ -1,42 +1,21 @@
 #ifndef FINDENT_H
 #define FINDENT_H
-#include "fortranline.h"
-#include "flags.h"
-#include "simpleostream.h"
-#include "pre_analyzer.h"
 
-int               determine_fix_or_free(const bool store);
-void              empty_dolabels();
+#include "flags.h"
+#include "fortranline.h"
+#include "pre_analyzer.h"
+#include "prop.h"
+#include "simpleostream.h"
+
 void              free2free();
 void              get_full_statement();
-int               guess_indent(const std::string str);
-int               guess_fixedfree(const std::string s);
-std::string       handle_dos(const std::string s);
 void              handle_fixed(bool &more);
 void              handle_free(bool &more);
 void              handle_last_usable_only();
 void              handle_prc(std::string s, const int pregentype, bool &more);
-bool              handle_pre(const std::string s, const int pretype);
-void              handle_reading_from_tty();
 void              indent_and_output();
-void              init_indent();
-void              mygetline();
 void              output_line();
-void              pop_all(void);
-int               pop_dolabel();
-int               pop_indent();
-struct propstruct pop_rprops();
-void              push_all(void);
-void              push_indent(int p);
-void              push_dolabel(int l);
-void              push_rprops(struct propstruct p);
 void              set_default_indents();
-void              top_all(void);
-int               top_dolabel();
-int               top_indent();
-struct            propstruct top_rprops();
-int               what_to_return(void);
-std::string       whatrprop(struct propstruct p);
 
 
 extern int               cur_indent;
