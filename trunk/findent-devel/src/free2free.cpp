@@ -1,4 +1,5 @@
 #include "findent.h"
+#include "findent_functions.h"
 void free2free()
 {
    std::string firstline  = lines.front();
