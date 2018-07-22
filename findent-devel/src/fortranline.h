@@ -10,7 +10,9 @@ class fortranline
    std::string trim_line, ltrim_line, rtrim_line, orig_line,chopped_line;
    std::string first, last, first2;
    std::string ltab2sp_line, Rest, Trimmed_line;
+
    int Scanfixpre;
+
    bool have_trim, have_ltrim, have_rtrim, have_first, have_first2, have_last;
    bool have_ltab2sp, have_scanfixpre, have_chopped_line, have_trimmed_line;
 
@@ -107,7 +109,7 @@ class fortranline
    {
       if (!have_rtrim)
       {
-	 rtrim_line = ::rtrim(orig_line);
+	 rtrim_line = ::rtrim(orig());
 	 have_rtrim  = 1;
       }
       return rtrim_line;
@@ -116,7 +118,7 @@ class fortranline
    {
       if (!have_ltrim)
       {
-	 ltrim_line = ::ltrim(orig_line);
+	 ltrim_line = ::ltrim(orig());
 	 have_ltrim  = 1;
       }
       return ltrim_line;
@@ -134,13 +136,7 @@ class fortranline
    {
       // returns first char of ltrim()
       if (!have_first)
-      {
-	 if (ltrim().length() > 0)
-	    first  = ltrim_line[0];
-	 else
-	    first = "";
-	 have_first  = 1;
-      }
+	 first = ltrim().substr(0,1);
       return first;
    }
    std::string lastchar()
@@ -148,7 +144,7 @@ class fortranline
       if (!have_last)
       {
 	 if (rtrim().length() > 0)
-	    last  = rtrim_line[rtrim_line.length()-1];
+	    last = rtrim().substr(rtrim().length()-1);
 	 else
 	    last = "";
 	 have_last  = 1;
@@ -159,10 +155,7 @@ class fortranline
    {
       if (!have_first2)
       {
-	 if (ltrim().length() > 1)
-	    first2  = ltrim_line.substr(0,2);
-	 else
-	    first2 = "";
+	 first2  = ltrim().substr(0,2);
 	 have_first2  = 1;
       }
       return first2;

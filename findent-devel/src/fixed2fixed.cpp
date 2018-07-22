@@ -11,36 +11,37 @@ void fixed2fixed()
    while(!curlines.empty())
    {
       mycout.reset();
-      std::string s  = lines.front();
-      std::string os = olines.front();
-      char ofc       = firstchar(os);
-      char ftc       = firstchar(trim(s));
+      //std::string s  = lines.front();
+      //std::string os = olines.front();
+      //char ofc       = firstchar(os);
+      //char ftc       = firstchar(trim(s));
+      std::string s   = curlines.front().line();
+      std::string os  = curlines.front().orig();
+      int pretype     = curlines.front().scanfixpre();
+      char ofc        = firstchar(curlines.front().orig());
+      std::string ftc = curlines.front().firstchar();
       lines.pop_front();
       olines.pop_front();
+      //lexer_set(s,SCANFIXPRE);
       curlines.pop_front();
-      lexer_set(s,SCANFIXPRE);
-      int pretype = yylex();
-      if (handle_pre(s,pretype))
-	 continue;
-      if(isfixedcmtp(s))
+      if (!handle_pre(s,pretype))
       {
-	 //
-	 // this is an empty line or comment line
-	 //
-	 if (ofc == '!')                   // do not change lines starting with !
-	    mycout << rtrim(os) << endline;
-	 else if ( ftc == '!')             // indent indented comments
-	    mycout << std::string(6+cur_indent,' ') << trim(s) << endline;
+	 if(isfixedcmtp(s))
+	 {
+	    //
+	    // this is an empty line or comment line
+	    //
+	    if (ofc == '!')                   // do not change lines starting with !
+	       mycout << rtrim(os) << endline;
+	    //else if ( ftc == '!')             // indent indented comments
+	    else if ( ftc == "!")             // indent indented comments
+	       mycout << std::string(6+cur_indent,' ') << trim(s) << endline;
+	    else
+	       mycout << trim(s) << endline;
+	 }
+	 else if(!cleanfive(os)) // check for valid label field
+	    mycout << os << endline;  // garbage in, garbage out
 	 else
-	    mycout << trim(s) << endline;
-      }
-      else if(!cleanfive(os)) // check for valid label field
-      {
-	 mycout << os << endline;  // garbage in, garbage out
-      }
-      else
-      {
-	 if (output_format == FIXED)
 	 {
 	    mycout << s.substr(0,6);
 
@@ -83,7 +84,6 @@ void fixed2fixed()
 	       //
 	       prevquote = fixedmissingquote(prevquote + s);
 	    }
-
 	    mycout << endline;
 	 }
       }

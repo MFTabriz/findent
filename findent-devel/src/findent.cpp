@@ -45,9 +45,9 @@ std::stack<int>                             dolabels;        // to store labels,
 std::stack<std::stack <int> >               dolabels_stack;  // to store dolabels stack
 std::stack<int>                             indent;          // to store indents
 std::stack<std::stack <int> >               indent_stack;    // to store indent stack
-std::deque <fortranline>                    curlinebuffer;   // deque for source lines
-std::deque <std::string>                    lines;           // current line, one continuation line per item
-std::deque <fortranline>                    curlines;        // current line, one continuation line per item
+std::deque<fortranline>                     curlinebuffer;   // deque for source lines
+std::deque<std::string>                     lines;           // current line, one continuation line per item
+std::list<fortranline>                     curlines;        // current line, one continuation line per item
 std::stack<bool>                            nbseen_stack;    // to store nbseen
 std::deque <std::string>                    olines;          // the original line
 std::stack<struct propstruct>               rprops;          // to store routines (module, subroutine ...)
@@ -915,6 +915,7 @@ void output_line()
 	 if (cur_rprop.name != "")
 	    replacement += " " + cur_rprop.name;
 	 lines[0] = s.substr(0,startpos) + replacement + s.substr(endpos);
+	 curlines.front().set_line(lines[0]);
 	 if (! flags.apply_indent)
 	    olines[0] = lines[0];
       }

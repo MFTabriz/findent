@@ -72,6 +72,9 @@ int determine_fix_or_free(const bool store)
 
 bool handle_pre(const std::string s, const int pretype)
 {
+   //
+   // NOTE: handle_pre can pop curlines
+   //
    int ifelse;
    switch(pretype)
    {
@@ -118,7 +121,7 @@ bool handle_pre(const std::string s, const int pretype)
 	 break;
    }
 
-   mycout << s << endline;
+   mycout << trim(s) << endline;
    //char lchar = lastchar(s);
    std::string lchar = std::string(1,lastchar(s));
    //while (!lines.empty())
