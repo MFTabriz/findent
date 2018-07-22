@@ -7,9 +7,10 @@ void free2free()
    char ofc               = firstchar(ofirstline);
    lines.pop_front();
    olines.pop_front();
+   //lexer_set(firstline,SCANFIXPRE);
+   //int pretype = yylex();
+   int pretype = curlines.front().scanfixpre();
    curlines.pop_front();
-   lexer_set(firstline,SCANFIXPRE);
-   int pretype = yylex();
    if(!handle_pre(firstline, pretype))
    {
       int l;
@@ -67,13 +68,16 @@ void free2free()
       //char ofc  = firstchar(os);
       std::string fc  = curlines.front().firstchar();
       std::string ofc = curlines.front().orig().substr(0,1);
-      int pretype = curlines.front().scanfixpre();
+      int pretype     = curlines.front().scanfixpre();
       lines.pop_front();
       olines.pop_front();
       //lexer_set(s,SCANFIXPRE);
       //int pretype = yylex();
       // if(!handle_pre(s,pretype))
-      if(!handle_pre(curlines.front().trim(),pretype))
+      std::string s  = curlines.front().trim();
+      std::string os = curlines.front().orig();
+      curlines.pop_front();
+      if(!handle_pre(s,pretype))
       {
 	 if (flags.indent_cont || fc == "&")
 	 {
@@ -108,13 +112,12 @@ void free2free()
 	    if (ofc != "!" && fc == "!" && cur_indent == 0)
 	       l=std::max(1,flags.cont_indent);
 	    mycout << std::string(l,' ');
-	    //mycout << s <<endline;
-	    mycout << curlines.front().trim() <<endline;
+	    mycout << s <<endline;
+	    //mycout << curlines.front().trim() <<endline;
 	 }
 	 else
-	    //mycout << os << endline;
-	    mycout << curlines.front().orig() << endline;
+	    mycout << os << endline;
+	    //mycout << curlines.front().orig() << endline;
       }
-      curlines.pop_front();
    }
 }

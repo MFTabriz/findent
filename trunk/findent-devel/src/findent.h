@@ -1,6 +1,10 @@
 #ifndef FINDENT_H
 #define FINDENT_H
 
+#include <deque>
+#include <list>
+#include <stack>
+
 #include "flags.h"
 #include "fortranline.h"
 #include "pre_analyzer.h"
@@ -39,9 +43,9 @@ extern std::stack<int>                             dolabels;        // to store 
 extern std::stack<std::stack <int> >               dolabels_stack;  // to store dolabels stack
 extern std::stack<int>                             indent;          // to store indents
 extern std::stack<std::stack <int> >               indent_stack;    // to store indent stack
-extern std::deque <fortranline>                    curlinebuffer;   // deque for source lines
-extern std::deque <std::string>                    lines;           // current line, one continuation line per item
-extern std::deque <fortranline>                    curlines;        // current line, one continuation line per item
+extern std::deque<fortranline>                     curlinebuffer;   // deque for source lines
+extern std::deque<std::string>                     lines;           // current line, one continuation line per item
+extern std::list<fortranline>                     curlines;        // current line, one continuation line per item
 extern std::stack<bool>                            nbseen_stack;    // to store nbseen
 extern std::deque <std::string>                    olines;          // the original line
 extern std::stack<struct propstruct>               rprops;          // to store routines (module, subroutine ...)

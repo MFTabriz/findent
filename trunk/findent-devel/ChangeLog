@@ -63,6 +63,9 @@ findent-2.8.3:
 	   streamlined .h files, added prop.h usage.cpp usage.h
 	   added flags.cpp flags.h lexer.h
 
+	   re-arrange code, to make it better readable.
+	   use list in stead of deque for (cur)lines
+
 
 
 findent-2.8.2: 
