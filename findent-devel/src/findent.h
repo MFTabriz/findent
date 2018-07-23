@@ -4,6 +4,7 @@
 #include <deque>
 #include <list>
 #include <stack>
+#include <string>
 
 #include "flags.h"
 #include "fortranline.h"
@@ -44,10 +45,8 @@ extern std::stack<std::stack <int> >               dolabels_stack;  // to store 
 extern std::stack<int>                             indent;          // to store indents
 extern std::stack<std::stack <int> >               indent_stack;    // to store indent stack
 extern std::deque<fortranline>                     curlinebuffer;   // deque for source lines
-extern std::deque<std::string>                     lines;           // current line, one continuation line per item
-extern std::list<fortranline>                     curlines;        // current line, one continuation line per item
+extern std::list<fortranline>                      curlines;        // current line, one continuation line per item
 extern std::stack<bool>                            nbseen_stack;    // to store nbseen
-extern std::deque <std::string>                    olines;          // the original line
 extern std::stack<struct propstruct>               rprops;          // to store routines (module, subroutine ...)
 extern std::stack<std::stack <struct propstruct> > rprops_stack;
 

@@ -7,22 +7,14 @@ void fixed2fixed()
    unsigned int first_indent = 0;
    char prevquote            = ' ';
 
-   //while(!lines.empty())
    while(!curlines.empty())
    {
       mycout.reset();
-      //std::string s  = lines.front();
-      //std::string os = olines.front();
-      //char ofc       = firstchar(os);
-      //char ftc       = firstchar(trim(s));
       std::string s   = curlines.front().line();
       std::string os  = curlines.front().orig();
       int pretype     = curlines.front().scanfixpre();
       char ofc        = firstchar(curlines.front().orig());
       std::string ftc = curlines.front().firstchar();
-      lines.pop_front();
-      olines.pop_front();
-      //lexer_set(s,SCANFIXPRE);
       curlines.pop_front();
       if (!handle_pre(s,pretype))
       {

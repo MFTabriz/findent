@@ -1,8 +1,8 @@
 #ifndef FINDENT_FINCTIONS_H
 #define FINDENT_FINCTIONS_H
 
-int               determine_fix_or_free(const bool store);
-std::string handle_dos(const std::string s);
+int               determine_fix_or_free();
+std::string       handle_dos(const std::string s);
 int               pop_dolabel();
 int               top_dolabel();
 void              push_dolabel(int l);

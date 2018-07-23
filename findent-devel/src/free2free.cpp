@@ -2,19 +2,16 @@
 #include "findent_functions.h"
 void free2free()
 {
-   std::string firstline  = lines.front();
-   std::string ofirstline = olines.front();
+   std::string firstline  = curlines.front().trimmed_line();
+   std::string ofirstline = curlines.front().orig();
+
    char ofc               = firstchar(ofirstline);
-   lines.pop_front();
-   olines.pop_front();
-   //lexer_set(firstline,SCANFIXPRE);
-   //int pretype = yylex();
    int pretype = curlines.front().scanfixpre();
    curlines.pop_front();
    if(!handle_pre(firstline, pretype))
    {
       int l;
-      if (firstline != "" || lines.size() > 1)
+      if (firstline != "" || curlines.size() > 1)
       {
 	 if (flags.label_left && labellength > 0)
 	 {
@@ -52,30 +49,17 @@ void free2free()
       mycout << firstline << endline;
    }
 
-   //while (!lines.empty())
    while (!curlines.empty())
    {
       mycout.reset();
       //
       // sometimes, there are preprocessor statements within a continuation ...
       //
-      //std::string s  = lines.front();
-      //std::string os = olines.front();
-      //std::string s  = curlines.front().trim();
-      //std::string os = curlines.front().orig();
-
-      //char fc  = firstchar(s);
-      //char ofc  = firstchar(os);
       std::string fc  = curlines.front().firstchar();
       std::string ofc = curlines.front().orig().substr(0,1);
       int pretype     = curlines.front().scanfixpre();
-      lines.pop_front();
-      olines.pop_front();
-      //lexer_set(s,SCANFIXPRE);
-      //int pretype = yylex();
-      // if(!handle_pre(s,pretype))
-      std::string s  = curlines.front().trim();
-      std::string os = curlines.front().orig();
+      std::string s   = curlines.front().trimmed_line();
+      std::string os  = curlines.front().orig();
       curlines.pop_front();
       if(!handle_pre(s,pretype))
       {
@@ -113,11 +97,9 @@ void free2free()
 	       l=std::max(1,flags.cont_indent);
 	    mycout << std::string(l,' ');
 	    mycout << s <<endline;
-	    //mycout << curlines.front().trim() <<endline;
 	 }
 	 else
 	    mycout << os << endline;
-	    //mycout << curlines.front().orig() << endline;
       }
    }
 }

@@ -10,23 +10,15 @@ void fixed2free()
    int lineno = 0;
    std::string needamp = "";
 
-   //while(!lines.empty())
    while(!curlines.empty())
    {
       mycout.reset();
       lineno++;
-      //std::string s  = lines.front();
-      //std::string os = olines.front();
-      //char ofc       = firstchar(os);
       std::string s  = curlines.front().line();
       std::string os = curlines.front().orig();
       int pretype    = curlines.front().scanfixpre();
       char ofc       = firstchar(os);
-      lines.pop_front();
-      olines.pop_front();
       curlines.pop_front();
-      //lexer_set(s,SCANFIXPRE);
-      //int pretype = yylex();
       if (!handle_pre(s,pretype))
       {
 	 if(isfixedcmtp(s))
@@ -67,7 +59,6 @@ void fixed2free()
 		  std::string s6 = ltab2sp(s.substr(6))+'x';
 		  first_indent = s6.find_first_not_of(' ');
 	       }
-	       //if (s != "" || lines.size() > 1)
 	       if (s != "" || curlines.size() > 1)
 	       {
 		  if (flags.label_left && labellength > 0)
@@ -134,12 +125,9 @@ void fixed2free()
 	    // and the non-comment line needs a leading &
 	    //
 	    needamp="";
-	    //std::deque<std::string>::iterator it= lines.begin();
 	    std::list<fortranline>::iterator it= curlines.begin();
-	    //char prevlchar = 0;
 	    std::string prevlchar = "";
 	    bool inpreproc = 0;
-	    //while(it != lines.end())
 	    while(it != curlines.end())
 	    {
 	       //

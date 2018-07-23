@@ -80,6 +80,7 @@ class fortranline
 		  chopped_line = ltab2sp().substr(0,line_length);
 	       else
 		  chopped_line = orig().substr(0,line_length);
+	    have_chopped_line = 1;
 	    break;
 	 case FREE:
 	    if (line_length == 0)
@@ -90,17 +91,29 @@ class fortranline
 	 default:
 	    return orig().substr(0,line_length);
 	    break;
+	    have_chopped_line = 1;
       }
-      have_chopped_line = 1;
       return chopped_line;
    }
 
    std::string trimmed_line()
    {
+      //
+      // result is different for FIXED or FREE, see below:
+      //
       if (!have_trimmed_line)
       {
-	 Trimmed_line = ::trim(line());
-	 have_trimmed_line = 1;
+	 switch(format)
+	 {
+	    case FIXED:
+	       Trimmed_line = ::rtrim(line());
+	       have_trimmed_line = 1;
+	       break;
+	    case FREE:
+	       Trimmed_line = ::trim(line());
+	       have_trimmed_line = 1;
+	       break;
+	 }
       }
       return Trimmed_line;
    }
