@@ -46,10 +46,8 @@ std::stack<std::stack <int> >               dolabels_stack;  // to store dolabel
 std::stack<int>                             indent;          // to store indents
 std::stack<std::stack <int> >               indent_stack;    // to store indent stack
 std::deque<fortranline>                     curlinebuffer;   // deque for source lines
-std::deque<std::string>                     lines;           // current line, one continuation line per item
-std::list<fortranline>                     curlines;        // current line, one continuation line per item
+std::list<fortranline>                      curlines;        // current line, one continuation line per item
 std::stack<bool>                            nbseen_stack;    // to store nbseen
-std::deque <std::string>                    olines;          // the original line
 std::stack<struct propstruct>               rprops;          // to store routines (module, subroutine ...)
 std::stack<std::stack <struct propstruct> > rprops_stack;
 
@@ -107,7 +105,7 @@ int main(int argc, char*argv[])
 
    input_format = flags.input_format;
    if (input_format == UNKNOWN)
-      input_format = determine_fix_or_free(1);
+      input_format = determine_fix_or_free();
 
    fortranline::setformat(input_format);
 
@@ -199,13 +197,9 @@ void handle_last_usable_only()
       }
       if (usable)
 	 usable_line = prev+1;
-      //while (!lines.empty())
       while (!curlines.empty())
       {
-	 //lexer_set(lines.front(),SCANFIXPRE);
-	 //int pretype = yylex();
 	 int pretype = curlines.front().scanfixpre();
-	 //int ifelse  = preb.analyze(trim(lines.front()),pretype);
 	 int ifelse  = preb.analyze(curlines.front().trim(),pretype);
 	 switch(ifelse)
 	 {
@@ -239,8 +233,6 @@ void handle_last_usable_only()
 	    case pre_analyzer::NONE:
 	       break;
 	 }
-	 lines.pop_front();
-	 olines.pop_front();
 	 curlines.pop_front();
       }
       if (end_of_file)
@@ -530,16 +522,11 @@ void get_full_statement()
    while(1)
    {
       if (curlinebuffer.empty())
-      {
 	 mygetline();
-	 // s = curline.orig();
-      }
       else
       {
 	 curline = curlinebuffer.front();
 	 curlinebuffer.pop_front();
-	 // s = curline.orig();
-	 //if (reading_from_tty && s == ".")
 	 if (reading_from_tty && curline.orig() == ".")
 	    end_of_file = 1;
       }
@@ -553,19 +540,15 @@ void get_full_statement()
 	    nbseen = (fcts != "" && fcts != "!" && fcts != "#" && curline.first2chars() != "??");
 	 else
 	 {
-	    //std::string s1 = ltab2sp(s);
-	    //std::string s1 = curline.ltab2sp();
-	    //std::string s = curline.orig();
-	    char fc = curline.orig()[0];
+	    char fc = 0;
+	    if (curline.orig().length() > 0)
+	       fc = curline.orig()[0];
 	    if (curline.ltab2sp().length() > 6)
-	       //nbseen = (s[0] != 'c' && s[0] != 'C' && s[0] != 'd' && s[0] != 'D' 
-		//     && fcts != "!" && s[0] != '*' && fcts != "#" && curline.first2chars() != "??");
-	       nbseen = (fc != 'c' && fc != 'C' && fc != 'd' && fc != 'D' 
+	       nbseen = (fcts != "" && fc != 'c' && fc != 'C' && fc != 'd' && fc != 'D' 
 		     && fcts != "!" && fc != '*' && fcts != "#" && curline.first2chars() != "??");
 	 }
 	 if (flags.auto_firstindent && nbseen)
 	 {
-	    //start_indent = guess_indent(s);
 	    start_indent = guess_indent(curline.orig());
 	    cur_indent   = start_indent;
 	    init_indent();
@@ -573,8 +556,8 @@ void get_full_statement()
 	 }
       }
 
-      int pretype = curline.scanfixpre();
-      bool ispre = 0;
+      int  pretype = curline.scanfixpre();
+      bool ispre   = 0;
       if (!preproc_more)
       {
 	 pregentype = 0;
@@ -599,8 +582,8 @@ void get_full_statement()
 	       pregentype = COCO;
 	       break;
 	    default:
-	       pregentype = 0;
-	       ispre      = 0;
+	       pregentype   = 0;
+	       ispre        = 0;
 	       preproc_more = 0;
 	       break;
 	 }
@@ -608,7 +591,6 @@ void get_full_statement()
 
       if(preproc_more || ispre)
       { 
-	 //handle_prc(s, pregentype, preproc_more);
 	 handle_prc(pregentype, preproc_more);
 	 if (preproc_more || fortran_more)
 	    continue;
@@ -635,7 +617,6 @@ void get_full_statement()
    }
 }           // end of get_full_statement
 
-//void handle_prc(std::string s, const int pregentype, bool &more)
 void handle_prc(const int pregentype, bool &more)
 {
    //
@@ -649,23 +630,13 @@ void handle_prc(const int pregentype, bool &more)
       return;
    }
    std::string sl;
-   //std::string sl1 = trim(s);
-   //std::string sl1 = trim(s);
-   //if (firstchar(sl1) == '#' || firstchars(sl1,2) == "??")  // TODO
    if (curline.firstchar() == "#" || curline.first2chars() == "??")  // TODO
-      //sl = sl1;
       sl = curline.trim();
    else
-      //sl = rtrim(s);
       sl = curline.rtrim();
 
-   lines.push_back(sl);
-   //olines.push_back(s);
-   olines.push_back(curline.orig());
    curlines.push_back(curline);
-   //char lc=lastchar(sl);
    std::string lc=curline.lastchar();
-   //if((pregentype == CPP && lc == '\\') || (pregentype == COCO && lc == '&'))
    if((pregentype == CPP && lc == "\\") || (pregentype == COCO && lc == "&"))
       more = 1;
    else
@@ -689,7 +660,6 @@ void handle_free(bool &more)
    //
    // handle findentfix: 
    //
-   //if (lines.empty())
    if (curlines.empty())
       if (curline.scanfixpre() == FINDENTFIX)
 	 full_statement = curline.rest();
@@ -713,8 +683,6 @@ void handle_free(bool &more)
 
    if (sl == "" || firstchar(sl) == '!' )
    {
-      lines.push_back(curline.trimmed_line());
-      olines.push_back(curline.orig());
       curlines.push_back(curline);
       return;
    }
@@ -735,15 +703,12 @@ void handle_free(bool &more)
    if (more)            // chop off '&' :
       full_statement.erase(full_statement.length()-1);
 
-   lines.push_back(curline.trimmed_line());
-   olines.push_back(curline.orig());
    curlines.push_back(curline);
 }           // end of handle_free
 
 
 void handle_fixed(bool &more)
 {
-   //std::string s = curline.orig();
    if(end_of_file)
    {
       more = 0;
@@ -763,7 +728,6 @@ void handle_fixed(bool &more)
 
    if (curline.scanfixpre() == FINDENTFIX)
    {
-      //if (lines.empty())
       if (curlines.empty())
 	 full_statement = curline.rest();
       else 
@@ -775,19 +739,14 @@ void handle_fixed(bool &more)
       }
    }
 
-   //if (isfixedcmtp(s))
    if (isfixedcmtp(curline.orig()))
       //
       // this is a blank or comment or preprocessor line
       //
    {
-      //lines.push_back(trim(s));
-      //olines.push_back(s);
-      lines.push_back(curline.trim());
-      olines.push_back(curline.orig());
       curlines.push_back(curline);
 
-      if (lines.size() ==1)
+      if (curlines.size() ==1)
 	 more = 0;   // do not expect continuation lines
       else
 	 more = 1;      // but here we do
@@ -797,29 +756,20 @@ void handle_fixed(bool &more)
    //
    // replace leading tabs by spaces
    //
-   //s = ltab2sp(s);
 
    std::string sl;
-   //sl = s.substr(0,5);
    sl = curline.line().substr(0,5);
-   //if (s.length() >6)
    if (curline.line().length() >6)
-      //sl = sl+' '+s.substr(6);
       sl = sl+' '+curline.line().substr(6);
 
    //
    // this is a line with code
    //
-   //if (lines.empty())
    if (curlines.empty())
    {
       //
       // this is the first line
       //
-      //lines.push_back(s);
-      //olines.push_back(s);
-      lines.push_back(curline.line());
-      olines.push_back(curline.line());
       curlines.push_back(curline);
       full_statement += trim(sl);
       remove_trailing_comment(full_statement);
@@ -831,7 +781,6 @@ void handle_fixed(bool &more)
    //
    // this is possibly a continuation line
    //
-   //if (s.length() < 6 || s[5] == ' ' || s[5] == '0')
    if (curline.line().length() < 6 || curline.line()[5] == ' ' || curline.line()[5] == '0')
    {
       //
@@ -846,10 +795,6 @@ void handle_fixed(bool &more)
    //
    // this is a continuation line
    //
-   //lines.push_back(s);
-   //olines.push_back(s);
-   lines.push_back(curline.line());
-   olines.push_back(curline.line());
    curlines.push_back(curline);
    full_statement += rtrim((rtrim(sl)+"      ").substr(6));
    remove_trailing_comment(full_statement);
@@ -861,7 +806,6 @@ void handle_fixed(bool &more)
 
 void output_line()
 {
-   //if (lines.empty())
    if (curlines.empty())
       return;
 
@@ -878,7 +822,7 @@ void output_line()
 	 // returns false. The scanned characters will be replaced by something
 	 // like: 'end subroutine mysub'
 	 //
-	 std::string s   = lines[0];
+	 std::string s = curlines.front().trimmed_line();
 	 size_t startpos = s.find_first_not_of(' ',labellength);
 	 size_t endpos   = s.length();
 	 for (size_t i=startpos; i<s.length(); i++)
@@ -914,10 +858,7 @@ void output_line()
 	    replacement = stoupper(replacement);
 	 if (cur_rprop.name != "")
 	    replacement += " " + cur_rprop.name;
-	 lines[0] = s.substr(0,startpos) + replacement + s.substr(endpos);
-	 curlines.front().set_line(lines[0]);
-	 if (! flags.apply_indent)
-	    olines[0] = lines[0];
+	 curlines.front().set_line(s.substr(0,startpos) + replacement + s.substr(endpos));
       }
    }
 
@@ -926,12 +867,9 @@ void output_line()
       //
       // no indention requested:
       //
-      //while (! olines.empty())
       while (! curlines.empty())
       {
-	 mycout << olines.front() << endline;
-	 lines.pop_front();
-	 olines.pop_front();
+	 mycout << curlines.front().orig() << endline;
 	 curlines.pop_front();
       }
       return;

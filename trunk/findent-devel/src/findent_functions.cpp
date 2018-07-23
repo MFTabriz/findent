@@ -4,9 +4,8 @@
 #include "findent.h"
 #include "findent_functions.h"
 
-int determine_fix_or_free(const bool store)
+int determine_fix_or_free()
 {
-   // apperantly: store is always 1 ...
    int rc;
    std::string s;
    int n = 0;
@@ -23,19 +22,12 @@ int determine_fix_or_free(const bool store)
 	 // end input from terminal:
 	 //
 
-	 if(store && reading_from_tty)
-	 {
-	    //linebuffer.push_back(s);       // s == "."
+	 if(reading_from_tty)
 	    curlinebuffer.push_back(curline);
-	 }
 	 break;
       }
 
-      if (store)
-      {
-	 //linebuffer.push_back(s);
-	 curlinebuffer.push_back(curline);
-      }
+      curlinebuffer.push_back(curline);
 
       rc = guess_fixedfree(s);
       switch(rc)
@@ -122,32 +114,22 @@ bool handle_pre(const std::string s, const int pretype)
    }
 
    mycout << trim(s) << endline;
-   //char lchar = lastchar(s);
    std::string lchar = std::string(1,lastchar(s));
-   //while (!lines.empty())
    while (!curlines.empty())
    {
-      //if (pregentype == CPP && lchar != '\\')
       if (pregentype == CPP && lchar != "\\")
 	 return 1;
       // coco continuation lines must start with ??, but we ignore that
 
-      //if (pregentype == COCO && lchar != '&')
       if (pregentype == COCO && lchar != "&")
 	 return 1;
 
-      //mycout <<lines.front() << endline;
       if(pregentype == COCO)                            // TODO 
 	 mycout <<curlines.front().ltrim() << endline;
       else
 	 mycout <<curlines.front().orig() << endline;
 
-
-      //std::cerr << "1 "<<lines.front()<<"]"<< std::endl;
-      //std::cerr << "2 "<<curlines.front().orig()<<"]"<< std::endl;
-      lchar = lastchar(lines.front());
-      lines.pop_front();
-      olines.pop_front();
+      lchar = curlines.front().lastchar();
       curlines.pop_front();
    }
    return 1;
