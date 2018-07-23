@@ -107,7 +107,7 @@ am_findent_OBJECTS = findent.$(OBJEXT) mylexer.$(OBJEXT) \
 	readme_plugin.$(OBJEXT) flags.$(OBJEXT) usage.$(OBJEXT) \
 	fortranline.$(OBJEXT) free2free.$(OBJEXT) \
 	fixed2fixed.$(OBJEXT) fixed2free.$(OBJEXT) \
-	findent_functions.$(OBJEXT)
+	free2fixed.$(OBJEXT) findent_functions.$(OBJEXT)
 findent_OBJECTS = $(am_findent_OBJECTS)
 findent_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -340,6 +340,7 @@ findent_SOURCES = findent.cpp findent.h \
 		  free2free.cpp free2free.h \
 		  fixed2fixed.cpp fixed2fixed.h \
 		  fixed2free.cpp fixed2free.h \
+		  free2fixed.cpp free2fixed.h \
 		  findent_functions.cpp findent_functions.h
 
 BUILT_SOURCES = parser.cpp parser.h lexer.cpp
@@ -440,6 +441,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fixed2free.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/flags.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fortranline.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/free2fixed.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/free2free.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/functions.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gedit_plugin.Po@am__quote@

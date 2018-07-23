@@ -134,6 +134,7 @@ findent_SOURCES = findent.cpp findent.h \
 		  free2free.cpp free2free.h \
 		  fixed2fixed.cpp fixed2fixed.h \
 		  fixed2free.cpp fixed2free.h \
+		  free2fixed.cpp free2fixed.h \
 		  findent_functions.cpp findent_functions.h
 
 
