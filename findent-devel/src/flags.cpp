@@ -313,12 +313,17 @@ int Flags::get_flags(int argc, char *argv[])
 	    module_indent     = atoi(optarg);           // --indent_module=nn
 	    break;
 	 case 'o' :
-	    if(std::string(optarg) == "free")           // --output_format=free/same
+	    if(std::string(optarg) == "free")           // --output_format=free
 	    {
 	       output_format = FREE;
 	       break;
 	    }
-	    if(std::string(optarg) == "same")
+	    if(std::string(optarg) == "fixed")           // --output_format=fixed
+	    {
+	       output_format = FIXED;
+	       break;
+	    }
+	    if(std::string(optarg) == "same")            // --output_format=same
 	    {
 	       output_format = 0;
 	       break;

@@ -7,6 +7,7 @@
 #include "fixed2fixed.h"
 #include "fixed2free.h"
 #include "free2free.h"
+#include "free2fixed.h"
 #include "functions.h"
 #include "gedit_plugin.h"
 #include "lexer.h"
@@ -875,14 +876,30 @@ void output_line()
       return;
    }
 
-   if (input_format == FREE)
-      free2free();
-   else   // input_format = FIXED, output can be FREE or FIXED
+   switch(input_format)
    {
-      if (output_format == FREE)
-	 fixed2free();
-      else
-	 fixed2fixed();
+      case FREE:
+	 switch(output_format)
+	 {
+	    case FREE:
+	       free2free();
+	       break;
+	    case FIXED:
+	       free2fixed();
+	       break;
+	 }
+	 break;
+      case FIXED:
+	 switch(output_format)
+	 {
+	    case FREE:
+	       fixed2free();
+	       break;
+	    case FIXED:
+	       fixed2fixed();
+	       break;
+	 }
+	 break;
    }
 }           // end of output_line
 
