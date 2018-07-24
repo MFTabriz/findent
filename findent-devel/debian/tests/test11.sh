@@ -6,16 +6,16 @@ else
 fi
 rc=0
 cat << eof > prog
-   program prog
+  program prog
   continue
-  !comment
 eof
 cat << eof > expect
-2
+5
 eof
 
-../doit "-lastusable --last_usable" "-ifree -Ia" "" 
+../doit "-lastindent --last_indent" "-ifree -Ia -i3"
 rc=`expr $rc + $?`
 
 . ../postlude
+
 exit $rc

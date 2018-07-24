@@ -5,10 +5,11 @@ void free2free()
    std::string firstline  = curlines.front().trimmed_line();
    std::string ofirstline = curlines.front().orig();
 
+   std::list<fortranline> dummy;
    char ofc               = firstchar(ofirstline);
    int pretype = curlines.front().scanfixpre();
    curlines.pop_front();
-   if(!handle_pre(firstline, pretype))
+   if(!handle_pre(firstline, pretype, 1, dummy))
    {
       int l;
       if (firstline != "" || curlines.size() > 1)
@@ -61,7 +62,7 @@ void free2free()
       std::string s   = curlines.front().trimmed_line();
       std::string os  = curlines.front().orig();
       curlines.pop_front();
-      if(!handle_pre(s,pretype))
+      if(!handle_pre(s,pretype,1,dummy))
       {
 	 if (flags.indent_cont || fc == "&")
 	 {

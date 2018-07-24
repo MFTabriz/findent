@@ -9,6 +9,7 @@ void fixed2free()
    std::string  outputline;
    int lineno = 0;
    std::string needamp = "";
+   std::list<fortranline> dummy;
 
    while(!curlines.empty())
    {
@@ -19,7 +20,7 @@ void fixed2free()
       int pretype    = curlines.front().scanfixpre();
       char ofc       = firstchar(os);
       curlines.pop_front();
-      if (!handle_pre(s,pretype))
+      if (!handle_pre(s,pretype,1,dummy))
       {
 	 if(isfixedcmtp(s))
 	 {
@@ -137,15 +138,11 @@ void fixed2free()
 	       //if (inpreproc && prevlchar == '\\')
 	       if (inpreproc && prevlchar == "\\")
 	       {
-		  //prevlchar = lastchar(*it);
-		  //prevlchar = (*it).lastchar();
 		  prevlchar = it->lastchar();
 		  *it++;
 		  continue;
 	       }
-	       //prevlchar = lastchar(*it);
 	       prevlchar = it->lastchar();
-	       //inpreproc = (firstchar(*it) == '#' || firstchars(*it,2) == "??");
 	       inpreproc = (it->firstchar() == "#" || it->first2chars() == "??");
 	       if (!isfixedcmtp((it++)->orig()))
 	       {

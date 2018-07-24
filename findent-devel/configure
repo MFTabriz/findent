@@ -4572,6 +4572,10 @@ ac_config_files="$ac_config_files test/progfixedfree.f"
 
 ac_config_files="$ac_config_files test/progfixedfree.f.try.f.ref"
 
+ac_config_files="$ac_config_files test/progfreefixed.f"
+
+ac_config_files="$ac_config_files test/progfreefixed.f.try.f.ref"
+
 ac_config_files="$ac_config_files test/progfree-dos.f"
 
 ac_config_files="$ac_config_files test/progfree-dos.f.try.f.ref"
@@ -6161,6 +6165,8 @@ do
     "test/progfixedfree-dos.f.try.f.ref") CONFIG_FILES="$CONFIG_FILES test/progfixedfree-dos.f.try.f.ref" ;;
     "test/progfixedfree.f") CONFIG_FILES="$CONFIG_FILES test/progfixedfree.f" ;;
     "test/progfixedfree.f.try.f.ref") CONFIG_FILES="$CONFIG_FILES test/progfixedfree.f.try.f.ref" ;;
+    "test/progfreefixed.f") CONFIG_FILES="$CONFIG_FILES test/progfreefixed.f" ;;
+    "test/progfreefixed.f.try.f.ref") CONFIG_FILES="$CONFIG_FILES test/progfreefixed.f.try.f.ref" ;;
     "test/progfree-dos.f") CONFIG_FILES="$CONFIG_FILES test/progfree-dos.f" ;;
     "test/progfree-dos.f.try.f.ref") CONFIG_FILES="$CONFIG_FILES test/progfree-dos.f.try.f.ref" ;;
     "test/progfree.f") CONFIG_FILES="$CONFIG_FILES test/progfree.f" ;;
