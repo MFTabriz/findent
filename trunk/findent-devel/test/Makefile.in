@@ -98,7 +98,8 @@ CONFIG_CLEAN_FILES = prelude postlude test-compile.sh doit \
 	progfixed-dos.f progfixed-dos.f.try.f.ref progfixed.f \
 	progfixed.f.try.f.ref progfixedfree-dos.f \
 	progfixedfree-dos.f.try.f.ref progfixedfree.f \
-	progfixedfree.f.try.f.ref progfree-dos.f \
+	progfixedfree.f.try.f.ref progfreefixed.f \
+	progfreefixed.f.try.f.ref progfree-dos.f \
 	progfree-dos.f.try.f.ref progfree.f progfree.f.try.f.ref \
 	progfree1.f progfree1.f.try.f.ref progfixed1.f \
 	progfixed1.f.try.f.ref manpage.ref help.ref vim_fortran.ref \
@@ -347,7 +348,9 @@ am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/doit.in \
 	$(srcdir)/progfree-dos.f.in \
 	$(srcdir)/progfree-dos.f.try.f.ref.in $(srcdir)/progfree.f.in \
 	$(srcdir)/progfree.f.try.f.ref.in $(srcdir)/progfree1.f.in \
-	$(srcdir)/progfree1.f.try.f.ref.in $(srcdir)/readme.ref.in \
+	$(srcdir)/progfree1.f.try.f.ref.in \
+	$(srcdir)/progfreefixed.f.in \
+	$(srcdir)/progfreefixed.f.try.f.ref.in $(srcdir)/readme.ref.in \
 	$(srcdir)/test-compile.sh.in $(srcdir)/vim_findent.ref.in \
 	$(srcdir)/vim_fortran.ref.in $(srcdir)/vim_help.ref.in \
 	$(top_srcdir)/test-driver
@@ -456,12 +459,14 @@ top_srcdir = @top_srcdir@
 TESTS = test1.sh test2.sh test3.sh test4.sh test5.sh test6.sh \
 	test7.sh test8.sh \
 	test9.sh test10.sh test11.sh test12.sh \
-	test13.sh test14.sh test15.sh test16.sh test17.sh test18.sh
+	test13.sh test14.sh test15.sh test16.sh test17.sh test18.sh \
+	test19.sh
 
 EXTRA_DIST = test1.sh test2.sh test3.sh test4.sh test5.sh \
 	test6.sh test7.sh test8.sh \
 	test9.sh test10.sh test11.sh test12.sh \
-	test13.sh test14.sh test15.sh test16.sh test17.sh test18.sh
+	test13.sh test14.sh test15.sh test16.sh test17.sh test18.sh \
+	test19.sh
 
 all: all-am
 
@@ -519,6 +524,10 @@ progfixedfree-dos.f.try.f.ref: $(top_builddir)/config.status $(srcdir)/progfixed
 progfixedfree.f: $(top_builddir)/config.status $(srcdir)/progfixedfree.f.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 progfixedfree.f.try.f.ref: $(top_builddir)/config.status $(srcdir)/progfixedfree.f.try.f.ref.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+progfreefixed.f: $(top_builddir)/config.status $(srcdir)/progfreefixed.f.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+progfreefixed.f.try.f.ref: $(top_builddir)/config.status $(srcdir)/progfreefixed.f.try.f.ref.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 progfree-dos.f: $(top_builddir)/config.status $(srcdir)/progfree-dos.f.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
@@ -830,6 +839,13 @@ test17.sh.log: test17.sh
 test18.sh.log: test18.sh
 	@p='test18.sh'; \
 	b='test18.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+test19.sh.log: test19.sh
+	@p='test19.sh'; \
+	b='test19.sh'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \

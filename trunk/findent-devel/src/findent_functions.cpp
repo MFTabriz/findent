@@ -62,7 +62,8 @@ int determine_fix_or_free()
 //     or, if there is no #else, from the code before the #if{,def,ndef}
 //
 
-bool handle_pre(const std::string s, const int pretype)
+bool handle_pre(const std::string s, const int pretype, 
+      const bool output, std::list<fortranline> &c)
 {
    //
    // NOTE: handle_pre can pop curlines
@@ -113,7 +114,11 @@ bool handle_pre(const std::string s, const int pretype)
 	 break;
    }
 
-   mycout << trim(s) << endline;
+   if(output)
+      mycout << trim(s) << endline;
+   else
+      c.push_back(trim(s));
+
    std::string lchar = std::string(1,lastchar(s));
    while (!curlines.empty())
    {
@@ -125,9 +130,15 @@ bool handle_pre(const std::string s, const int pretype)
 	 return 1;
 
       if(pregentype == COCO)                            // TODO 
-	 mycout <<curlines.front().ltrim() << endline;
+	 if(output)
+	    mycout <<curlines.front().ltrim() << endline;
+	 else
+	    c.push_back(trim(s));
       else
-	 mycout <<curlines.front().orig() << endline;
+	 if(output)
+	    mycout <<curlines.front().orig() << endline;
+	 else
+	    c.push_back(trim(s));
 
       lchar = curlines.front().lastchar();
       curlines.pop_front();
@@ -351,6 +362,7 @@ void push_all()
    nbseen_stack.push(nbseen);
    rprops_stack.push(rprops);
    dolabels_stack.push(dolabels);
+   needcon_stack.push(needcon);
 }         // end of push_all
 
 void top_all()
@@ -363,6 +375,8 @@ void top_all()
       rprops = rprops_stack.top();
    if (!dolabels_stack.empty())
       dolabels = dolabels_stack.top();
+   if (!needcon_stack.empty())
+      needcon = needcon_stack.top();
 }         // end of top_all
 
 void pop_all()
@@ -375,6 +389,8 @@ void pop_all()
       rprops_stack.pop();
    if (!dolabels_stack.empty())
       dolabels_stack.pop();
+   if (!needcon_stack.empty())
+      needcon_stack.pop();
 }        // end of pop_all
 
 int what_to_return()

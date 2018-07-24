@@ -2,141 +2,48 @@
 if test -e prelude ; then
    . ./prelude
 else
+   unset FINDENT
    . ./debian/tests/prelude
 fi
-rc=0
-doit=../doit
-cat << eof > prog
-      program main
-      #define foo \\
-bar \\
-  a
-      contains
-      #ifdef foo \\
-  bar \\
- a
-      subroutine sub()
-      #elif bar==1
-      subroutine sub(a)
-      #else
-      subroutine sub(a,b)
-      #endif
-      continue
-      end subroutine
-      end program
+cat <<eof > prog1.f || exit 1
+program prog1
+continue
+end program prog1
 eof
-cat << eof > expect
-      program main
-#define foo \\
-bar \\
-  a
-      contains
-#ifdef foo \\
-  bar \\
- a
-         subroutine sub()
-#elif bar==1
-         subroutine sub(a)
-#else
-         subroutine sub(a,b)
-#endif
-            continue
-         end subroutine
-      end program
+cat << eof > prog2.f || exit 1
+module modprog2
+integer i
+end module
+program prog2
+use modprog2
+continue
+end program prog2
+eof
+cat << eof > prog1.f.ref || exit 1
+program prog1
+     continue
+end program prog1
+eof
+cat << eof > prog2.f.ref || exit 1
+module modprog2
+     integer i
+end module
+program prog2
+     use modprog2
+     continue
+end program prog2
 eof
 
-$doit "-ifixed --input_format=fixed" "-I0 -i3" "for fixed input"
-rc=`expr $rc + $?`
+$WFINDENT -i5 prog1.f prog2.f
+sed -i 's/\r//' prog1.f
+sed -i 's/\r//' prog2.f
+for i in 1 2 ; do
+   cmp -s prog$i.f prog$i.f.ref
+   if [ $? -ne 0 ] ; then
+      echo "prog$i.f and prog$i.f.ref are not equal"
+      exit 1
+   fi
+done
 
-cat << eof > expect
-program main
-#define foo \\
-bar \\
-  a
-contains
-#ifdef foo \\
-  bar \\
- a
-   subroutine sub()
-#elif bar==1
-   subroutine sub(a)
-#else
-   subroutine sub(a,b)
-#endif
-      continue
-   end subroutine
-end program
-eof
-
-$doit "-ifree --input_format=free" "-I0 -i3" "for free input"
-rc=`expr $rc + $?`
-
-cat << eof > prog
-      program main
-      ??logical::foo = .true. &
-      ?? .or. &
-      ?? .or. .false.
-      contains
-      ??if(foo) &
-      ?? then
-      subroutine sub()
-      ??else  if(bar) then
-      subroutine sub(a)
-      ??else
-      subroutine sub(a,b)
-      ??endif
-      continue
-      end subroutine
-      ?? logical a= &
-      ?? .true.
-      end program
-eof
-cat << eof > expect
-      program main
-??logical::foo = .true. &
-?? .or. &
-?? .or. .false.
-      contains
-??if(foo) &
-?? then
-         subroutine sub()
-??else  if(bar) then
-         subroutine sub(a)
-??else
-         subroutine sub(a,b)
-??endif
-            continue
-         end subroutine
-?? logical a= &
-?? .true.
-      end program
-eof
-
-$doit "-ifixed --input_format=fixed" "-I0 -i3" "for fixed input"
-rc=`expr $rc + $?`
-
-cat << eof > expect
-program main
-??logical::foo = .true. &
-?? .or. &
-?? .or. .false.
-contains
-??if(foo) &
-?? then
-   subroutine sub()
-??else  if(bar) then
-   subroutine sub(a)
-??else
-   subroutine sub(a,b)
-??endif
-      continue
-   end subroutine
-?? logical a= &
-?? .true.
-end program
-eof
-
-$doit "-ifree --input_format=free" "-I0 -i3" "for free input"
-rc=`expr $rc + $?`
 . ../postlude
-exit $rc
+exit 0

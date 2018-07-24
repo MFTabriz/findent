@@ -33,6 +33,7 @@ int               labellength;
 int               lines_read          = 0;
 simpleostream     mycout;
 bool              nbseen;                    // true if non-blank-line is seen 
+bool              needcon             = 0;   // true if next line needs continuation (free2fixed())
 int               num_lines;                 // number of lines read sofar
 int               output_format;
 pre_analyzer      prea;
@@ -42,6 +43,7 @@ bool              refactor_end_found;
 int               start_indent;
 int               stlabel;
 
+std::stack<bool>                            needcon_stack;   // used with free2fixed, 1: next line is a continuation
 std::stack<int>                             dolabels;        // to store labels, necessary for labelled do
 std::stack<std::stack <int> >               dolabels_stack;  // to store dolabels stack
 std::stack<int>                             indent;          // to store indents

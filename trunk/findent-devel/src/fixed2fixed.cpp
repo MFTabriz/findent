@@ -6,6 +6,7 @@ void fixed2fixed()
    unsigned int old_indent   = 0;
    unsigned int first_indent = 0;
    char prevquote            = ' ';
+   std::list<fortranline> dummy;
 
    while(!curlines.empty())
    {
@@ -16,7 +17,7 @@ void fixed2fixed()
       char ofc        = firstchar(curlines.front().orig());
       std::string ftc = curlines.front().firstchar();
       curlines.pop_front();
-      if (!handle_pre(s,pretype))
+      if (!handle_pre(s,pretype,1,dummy))
       {
 	 if(isfixedcmtp(s))
 	 {

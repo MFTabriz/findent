@@ -35,11 +35,13 @@ extern int               labellength;
 extern int               lines_read;
 extern simpleostream     mycout;
 extern bool              nbseen;                    // true if non-blank-line is seen 
+extern bool              needcon;
 extern int               output_format;
 extern pre_analyzer      prea;
 extern bool              reading_from_tty;
 extern int               start_indent;
 
+extern std::stack<bool>                            needcon_stack;   // used with free2fixed, 1: next line is a continuation
 extern std::stack<int>                             dolabels;        // to store labels, necessary for labelled do
 extern std::stack<std::stack <int> >               dolabels_stack;  // to store dolabels stack
 extern std::stack<int>                             indent;          // to store indents
