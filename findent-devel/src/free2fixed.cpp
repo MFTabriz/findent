@@ -5,114 +5,91 @@
 void free2fixed(void)
 {
    std::list<fortranline> localcurlines;
-   std::string firstline  = curlines.front().trimmed_line();
-   std::string ofirstline = curlines.front().orig();
+   std::string s  = curlines.front().trimmed_line();
+   std::string os = curlines.front().orig();
    std::string outputline;
    std::string lc = curlines.front().lastchar();
 
-   std::string ofc               = std::string(firstchar(ofirstline),1);
+   std::string ofc = std::string(1,firstchar(os));
    std::string fc = curlines.front().firstchar();
    int pretype = curlines.front().scanfixpre();
+   bool iscontinuation = 0;
    curlines.pop_front();
-   if(!handle_pre(firstline, pretype, 0, localcurlines))
+   if(!handle_pre(s, pretype, 0, localcurlines))
    {
-      int l;
-      if (firstline != "" || curlines.size() > 1)
+      if (flags.label_left && labellength > 0)  // this is a line starting with a label
       {
-	 if (flags.label_left && labellength > 0)
-	 {
-	    //
-	    // put label at start of line
-	    //
-	    std::string label = firstline.substr(0,labellength);
-	    firstline         = trim(firstline.substr(labellength));
-	    outputline        = label;
-	    //mycout << label;
-	    l = cur_indent - labellength;
-	    if ( l <= 0 )
-	       l=1;
-	 }
-	 else
-	    l = cur_indent;
 	 //
-	 // if this is a comment line, and the original line did not start
-	 // with '!', and cur_indent == 0: put a space before this line, 
-	 // to make sure that re-indenting will give the same result
+	 // put label at start of line
 	 //
-	 if (ofc != "!" && fc == "!" && cur_indent == 0)
-	    l=1;
-
-	 if (l<0)
-	    l=0;
-	 if(ofc == "!")
-	    outputline = "";
-	 else
-	 {
-	    l = l+6-labellength;
-	    //mycout << std::string(l,' '); 
-	    outputline += std::string(l,' ');
-	 }
+	 std::string label = s.substr(0,labellength);
+	 s         = trim(s.substr(labellength));
+	 outputline        = label + "       " + s;
       }
-      //mycout << firstline << endline;
-      if (lc == "&" && fc != "!")
+      else if (ofc == "!")    // this is a comment line with "!" in column 1
+	 outputline = os;
+      else if(fc == "!")    //  this is a comment line with "!" after column 1
+	 outputline = "      "+s;
+      else if (fc == "&")  // line like '  &  x+10', output: '     &  x+10'
+	 // BTW: this should not happen for the first line
       {
-	 needcon = 1;
-	 firstline=firstline.substr(0,firstline.length()-1);
+	 iscontinuation = 1;
+	 outputline     = "      " + ltrim(os).substr(1);    
       }
-      localcurlines.push_back(outputline+firstline);
+      else
+	 outputline = "      " + os;
+      if (lastchar(outputline) == '&')    // a continuation line will follow
+      {
+	 needcon    = 1;
+	 outputline = outputline.substr(0,outputline.length()-1); // remove trailing &
+      }
+      if (iscontinuation)   // again, this should not happen
+      {
+	 outputline = outputline.substr(0,5) + "&" + outputline.substr(6);
+      }
+      localcurlines.push_back(outputline);
    }
 
    while (!curlines.empty())
    {
-      //mycout.reset();
-      outputline = "";
       //
       // sometimes, there are preprocessor statements within a continuation ...
       //
-      std::string fc  = curlines.front().firstchar();
-      std::string ofc = curlines.front().orig().substr(0,1);
-      int pretype     = curlines.front().scanfixpre();
-      std::string s   = curlines.front().trimmed_line();
-      std::string os  = curlines.front().orig();
-      std::string lc = curlines.front().lastchar();
+      fc  = curlines.front().firstchar();
+      ofc = curlines.front().orig().substr(0,1);
+      pretype     = curlines.front().scanfixpre();
+      s   = curlines.front().trimmed_line();
+      os  = curlines.front().orig();
+      lc = curlines.front().lastchar();
       curlines.pop_front();
       if(!handle_pre(s,pretype,0,localcurlines))
       {
-	 if (flags.indent_cont || fc == "&")
+	 iscontinuation = needcon;
+	 if (ofc == "!")    // this is a comment line with "!" in column 1
+	    outputline = os;
+	 else if (fc == "!")    //  this is a comment line with "!" after column 1
+	    outputline = "      "+s;
+	 else if (fc == "&")  // line like '  &  x+10', output: '     &  x+10'
 	 {
-	    int l = 0;
-	    if (ofc == "!")
-	       localcurlines.push_back(os);
-	    else
-	    {
-	       if (fc == "!")
-		  localcurlines.push_back(s);
-	       else
-	       {
-		  if (needcon)
-		     outputline = "     &";
-		  else
-		     outputline = "      ";
-		  if (lc == "&")
-		  {
-		     needcon = 1;
-		     s = s.substr(0,s.length()-1);
-		  }
-		  if (fc == "&")
-		     s = s.substr(1);
-		  localcurlines.push_back(outputline + s);
-	       }
-	    }
-
-	    //mycout << std::string(l,' ');
-	    //mycout << s <<endline;
+	    iscontinuation = 1;
+	    outputline     = "      " + ltrim(os).substr(1);    
 	 }
 	 else
-	    //mycout << os << endline;
-	    localcurlines.push_back(fortranline(os));
+	    outputline = "      " + os;
+	 if (lastchar(outputline) == '&')    // a continuation line will follow
+	 {
+	    needcon    = 1;
+	    outputline = outputline.substr(0,outputline.length()-1); // remove trailing &
+	 }
+	 if (iscontinuation)   
+	 {
+	    outputline = outputline.substr(0,5) + "&" + outputline.substr(6);
+	 }
+	 localcurlines.push_back(outputline);
       }
    }
    curlines = localcurlines;
+
 #if 1
    fixed2fixed();
 #else
