@@ -503,12 +503,12 @@ void get_full_statement()
    // #endif
    //     )
    //
-   // std::string s;
+
    full_statement       = "";
    indent_handled       = 0;
    bool preproc_more    = 0;
    bool fortran_more    = 0;
-   int pregentype       = 0;
+   int pretype          = 0;
 
    while(1)
    {
@@ -547,42 +547,19 @@ void get_full_statement()
 	 }
       }
 
-      int  pretype = curline.scanfixpre();
-      bool ispre   = 0;
-      if (!preproc_more)
+      if (end_of_file)
       {
-	 pregentype = 0;
-	 switch(pretype)
-	 {
-	    case CPP_IF: case CPP_ENDIF: case CPP_ELSE: case CPP_ELIF: case CPP: 
-	       pregentype = CPP;
-	       ispre      = 1;
-	       break;
-	    case COCO_IF: case COCO_ENDIF: case COCO_ELSE: case COCO_ELIF: case COCO: 
-	       pregentype = COCO;
-	       ispre      = 1;
-	       break;
-	 }
-      }
-      else if(pregentype == COCO)  // coco continuation lines must start with ??
-      {
-	 pretype = curline.scanfixpre();
-	 switch(pretype)
-	 {
-	    case COCO_IF: case COCO_ENDIF: case COCO_ELSE: case COCO_ELIF: case COCO: 
-	       pregentype = COCO;
-	       break;
-	    default:
-	       pregentype   = 0;
-	       ispre        = 0;
-	       preproc_more = 0;
-	       break;
-	 }
+	 preproc_more = 0;
+	 fortran_more = 0;
+	 break;
       }
 
-      if(preproc_more || ispre)
-      { 
-	 handle_prc(pregentype, preproc_more);
+      if (!preproc_more)
+	 pretype = curline.getpregentype();
+
+      if (pretype == CPP || pretype == COCO)
+      {
+	 handle_prc(pretype,curlines,preproc_more);
 	 if (preproc_more || fortran_more)
 	    continue;
 	 else
@@ -608,30 +585,44 @@ void get_full_statement()
    }
 }           // end of get_full_statement
 
-void handle_prc(const int pregentype, bool &more)
+
+void handle_prc(int &p, std::list<fortranline> &c, bool &more)
 {
    //
-   // adds preprocessor continuation line curline to full statement
-   // more = 1: more preprocessor lines are to expected
-   //        0: this line is complete
+   // handles preprocessor lines and their continuations:
+   // the lines are pushed on c. If a continuation is expected,
+   // more = 1, else more = 0 and p=0
    //
-   if(end_of_file)
+   switch(p)
    {
-      more = 0;
-      return;
+      case CPP:
+	 c.push_back(curline);
+	 if(curline.lastchar() == "\\")
+	    more = 1;
+	 else 
+	 {
+	    p    = 0;
+	    more = 0;
+	 }
+	 return;
+	 break;
+      case COCO:
+	 c.push_back(curline);
+	 if(curline.first2chars() == "??" && curline.lastchar() == "&")
+	    more = 1;
+	 else
+	 {
+	    p    = 0;
+	    more = 0;
+	 }
+	 return;
+	 break;
+      default:
+	 p    = 0;
+	 more = 0;
+	 return;
+	 break;
    }
-   std::string sl;
-   if (curline.firstchar() == "#" || curline.first2chars() == "??")  // TODO
-      sl = curline.trim();
-   else
-      sl = curline.rtrim();
-
-   curlines.push_back(curline);
-   std::string lc=curline.lastchar();
-   if((pregentype == CPP && lc == "\\") || (pregentype == COCO && lc == "&"))
-      more = 1;
-   else
-      more = 0;
 }         // end of handle_prc
 
 void handle_free(bool &more)
@@ -643,12 +634,6 @@ void handle_free(bool &more)
    // more 1: more lines are to expected
    //      0: this line is complete
    //
-
-   if(end_of_file)
-   {
-      more = 0;
-      return;
-   }
 
    //
    // handle findentfix: 
@@ -709,11 +694,6 @@ void handle_fixed(bool &more)
    // more 1: more lines are to expected
    //      0: this line is complete
    //
-   if(end_of_file)
-   {
-      more = 0;
-      return;
-   }
 
    //
    // if this is a findentfix line:
