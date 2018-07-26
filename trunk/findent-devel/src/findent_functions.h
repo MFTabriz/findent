@@ -3,6 +3,7 @@
 
 int               determine_fix_or_free();
 std::string       handle_dos(const std::string s);
+void              handle_refactor();
 int               pop_dolabel();
 int               top_dolabel();
 void              push_dolabel(int l);

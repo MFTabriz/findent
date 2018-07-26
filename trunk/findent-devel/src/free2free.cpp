@@ -76,18 +76,14 @@ void free2free()
 	       l = 0;
 	    else
 	    {
+	       //
+	       // if continuation starts with '&', use current indentation
+	       // else use current indentation + flags.cont_indent 
+	       //
 	       if (fc == "&")
-	       {
-		  //
-		  // if continuation starts with '&', use current indentation
-		  // else use current indentation + flags.cont_indent 
-		  //
 		  l = std::max(cur_indent,0);
-	       }
 	       else
-	       {
 		  l = std::max(cur_indent+flags.cont_indent,0);
-	       }
 	    }
 	    //
 	    // if this is a comment line, and the original line did not start

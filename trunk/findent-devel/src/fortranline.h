@@ -33,16 +33,16 @@ class fortranline
    void init()
    {
 #ifdef USE_CACHE
-      have_chopped_line = 0;
-      have_first        = 0;
-      have_first2       = 0;
-      have_last         = 0;
-      have_ltab2sp      = 0;
-      have_ltrim        = 0;
-      have_rtrim        = 0;
-      have_scanfixpre   = 0;
-      have_trim         = 0;
-      have_trimmed_line = 0;
+      have_chopped_line     = 0;
+      have_first            = 0;
+      have_first2           = 0;
+      have_last             = 0;
+      have_ltab2sp          = 0;
+      have_ltrim            = 0;
+      have_rtrim            = 0;
+      have_scanfixpre       = 0;
+      have_trim             = 0;
+      have_trimmed_line     = 0;
 #endif
    }
 
@@ -251,6 +251,7 @@ class fortranline
       return ::rtrim(orig());
    }
 #endif
+
 #ifdef USE_CACHE
    std::string ltrim()
    {
@@ -267,6 +268,7 @@ class fortranline
       return ::ltrim(orig());
    }
 #endif
+
 #ifdef USE_CACHE
    std::string trim()
    {
@@ -283,6 +285,7 @@ class fortranline
       return ::trim(orig());
    }
 #endif
+
 #ifdef USE_CACHE
    std::string firstchar()
    {
@@ -301,6 +304,7 @@ class fortranline
       return ltrim().substr(0,1);
    }
 #endif
+
 #ifdef USE_CACHE
    std::string lastchar()
    {
@@ -323,6 +327,7 @@ class fortranline
 	 return "";
    }
 #endif
+
 #ifdef USE_CACHE
    std::string first2chars()
    {
@@ -339,6 +344,7 @@ class fortranline
       return ltrim().substr(0,2);
    }
 #endif
+
 #ifdef USE_CACHE
    std::string ltab2sp()
    {
@@ -356,6 +362,7 @@ class fortranline
    }
 
 #endif
+
 #ifdef USE_CACHE
 
    int scanfixpre()
@@ -364,7 +371,12 @@ class fortranline
       {
 	 lexer_set(trim(),SCANFIXPRE);
 	 Scanfixpre      = yylex();
-	 Rest            = lexer_getrest();
+	 switch(Scanfixpre)
+	 {
+	    case FINDENTFIX:
+	    case FIXFINDENTFIX:
+	       Rest = lexer_getrest();
+	 }
 	 have_scanfixpre = 1;
       }
       if (format == FIXED)
@@ -384,6 +396,7 @@ class fortranline
       return rc;
    }
 #endif
+
 #ifdef USE_CACHE
    std::string rest()
    {
@@ -401,4 +414,41 @@ class fortranline
 	 return "";
    }
 #endif
+
+   bool blank_or_comment()
+   {
+      if (trim() == "")
+	 return 1;
+
+      switch (getformat())
+      {
+	 case FIXED:
+	    switch(::firstchar(orig()))
+	    {
+	       case 'd':
+	       case 'D':
+	       case 'c':
+	       case 'C':
+	       case '!':
+		  return 1;
+	    }
+	    return firstchar() == "!";
+	    break;
+
+	 case FREE:
+	    return firstchar() == "!";
+	    break;
+
+	 case UNKNOWN:
+	    return 0;
+	    break;
+      }
+   }
+
+   bool preproc()
+   {
+      return firstchar() == "#" || first2chars() == "??";
+   }
+
+
 };
