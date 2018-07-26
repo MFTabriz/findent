@@ -17,7 +17,7 @@ void get_full_statement();
 void handle_fixed(bool &more);
 void handle_free(bool &more);
 void handle_last_usable_only();
-void handle_prc(const int pregentype, bool &more);
+void handle_prc(int &pregentype, std::list<fortranline> &c, bool &more);
 void handle_refactor();
 void indent_and_output();
 void output_line();
