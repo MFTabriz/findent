@@ -1,0 +1,18 @@
+get_full_statement() or forlanline():
+   determine type:
+      * blank-or-comment
+get_full_statement:
+   determine type:
+      * need-continuation
+      * is-continuation
+
+fixed2free(): 
+         program p
+	 print *,"a
+        +b"
+	 end
+   should give with -ofree -L20:
+   program p
+      print *,"           &
+      &b"
+   end

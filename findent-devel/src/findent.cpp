@@ -137,18 +137,8 @@ int main(int argc, char*argv[])
       handle_last_usable_only();
       return what_to_return();
    }
-   get_full_statement();
-   cur_indent   = start_indent;
-   indent_and_output();
-   if(end_of_file)
-   {
-      if(flags.last_indent_only)
-      {
-	 std::cout << num_leading_spaces(mycout.get()) << endline;
-      }
-      return what_to_return();
-   }
 
+   cur_indent = start_indent;
    while(1)
    {
       get_full_statement();
@@ -156,14 +146,12 @@ int main(int argc, char*argv[])
       if (end_of_file)
       {
 	 if(flags.last_indent_only)
-	 {
 	    std::cout << num_leading_spaces(mycout.get()) << endline;
-	 }
 	 return what_to_return();
       }
    }
    return what_to_return();
-}
+}        // end of main
 
 //
 // search for the last line that is usable to start indenting
@@ -649,7 +637,9 @@ void handle_prc(const int pregentype, bool &more)
 void handle_free(bool &more)
 {
    //
-   // adds curline to full_statement
+   // adds curline to curlines
+   // adds curline (stripped from comments, preprocessor stuff and 
+   //    continuation stuff)  to full_statement
    // more 1: more lines are to expected
    //      0: this line is complete
    //
@@ -681,7 +671,7 @@ void handle_free(bool &more)
 
    //
    //  if this line is pure comment or empty
-   //     add it to lines
+   //     add it to curlines
    //
 
    if (sl == "" || firstchar(sl) == '!' )
@@ -712,6 +702,13 @@ void handle_free(bool &more)
 
 void handle_fixed(bool &more)
 {
+   //
+   // adds curline to curlines
+   // adds curline (stripped from comments, preprocessor stuff and 
+   //    continuation stuff)  to full_statement
+   // more 1: more lines are to expected
+   //      0: this line is complete
+   //
    if(end_of_file)
    {
       more = 0;
@@ -815,8 +812,55 @@ void output_line()
    mycout.setoutput(!flags.last_indent_only);
    mycout.reset();
 
+   handle_refactor();
+
+   if (! flags.apply_indent)
+   {
+      //
+      // no indention requested:
+      //
+      while (! curlines.empty())
+      {
+	 mycout << curlines.front().orig() << endline;
+	 curlines.pop_front();
+      }
+      return;
+   }
+
+   switch(input_format)
+   {
+      case FREE:
+	 switch(output_format)
+	 {
+	    case FREE:
+	       free2free();
+	       break;
+	    case FIXED:
+	       free2fixed();
+	       break;
+	 }
+	 break;
+      case FIXED:
+	 switch(output_format)
+	 {
+	    case FREE:
+	       fixed2free();
+	       break;
+	    case FIXED:
+	       fixed2fixed();
+	       break;
+	 }
+	 break;
+   }
+}           // end of output_line
+
+void handle_refactor()
+{
    if (flags.refactor_routines && refactor_end_found)
    {
+      //
+      // handle refactor routines
+      //
       if (cur_rprop.kind != 0) // check if corresponding start is ok
       {
 	 //
@@ -864,44 +908,5 @@ void output_line()
 	 curlines.front().set_line(s.substr(0,startpos) + replacement + s.substr(endpos));
       }
    }
-
-   if (! flags.apply_indent)
-   {
-      //
-      // no indention requested:
-      //
-      while (! curlines.empty())
-      {
-	 mycout << curlines.front().orig() << endline;
-	 curlines.pop_front();
-      }
-      return;
-   }
-
-   switch(input_format)
-   {
-      case FREE:
-	 switch(output_format)
-	 {
-	    case FREE:
-	       free2free();
-	       break;
-	    case FIXED:
-	       free2fixed();
-	       break;
-	 }
-	 break;
-      case FIXED:
-	 switch(output_format)
-	 {
-	    case FREE:
-	       fixed2free();
-	       break;
-	    case FIXED:
-	       fixed2fixed();
-	       break;
-	 }
-	 break;
-   }
-}           // end of output_line
+}
 

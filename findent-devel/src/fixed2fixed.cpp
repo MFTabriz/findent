@@ -26,7 +26,6 @@ void fixed2fixed()
 	    //
 	    if (ofc == '!')                   // do not change lines starting with !
 	       mycout << rtrim(os) << endline;
-	    //else if ( ftc == '!')             // indent indented comments
 	    else if ( ftc == "!")             // indent indented comments
 	       mycout << std::string(6+cur_indent,' ') << trim(s) << endline;
 	    else
