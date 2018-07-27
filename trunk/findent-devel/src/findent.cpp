@@ -48,8 +48,8 @@ std::stack<int>                             dolabels;        // to store labels,
 std::stack<std::stack <int> >               dolabels_stack;  // to store dolabels stack
 std::stack<int>                             indent;          // to store indents
 std::stack<std::stack <int> >               indent_stack;    // to store indent stack
-std::deque<fortranline>                     curlinebuffer;   // deque for source lines
-std::list<fortranline>                      curlines;        // current line, one continuation line per item
+linebuffer_t                                curlinebuffer;   // deque for source lines
+lines_t                                     curlines;        // current line, one continuation line per item
 std::stack<bool>                            nbseen_stack;    // to store nbseen
 std::stack<struct propstruct>               rprops;          // to store routines (module, subroutine ...)
 std::stack<std::stack <struct propstruct> > rprops_stack;
@@ -667,28 +667,29 @@ void handle_fixed(bool &more)
       }
    }
 
-   if (isfixedcmtp(curline.orig()))
+   if (curline.blank_or_comment() || curline.getpregentype() != 0)
+   {
       //
       // this is a blank or comment or preprocessor line
       //
-   {
       curlines.push_back(curline);
 
       if (curlines.size() ==1)
 	 more = 0;   // do not expect continuation lines
       else
-	 more = 1;      // but here we do
+	 more = 1;   // but here we do
       return;
    }
+
+   std::string s = curline.line();
 
    //
    // replace leading tabs by spaces
    //
 
-   std::string sl;
-   sl = curline.line().substr(0,5);
-   if (curline.line().length() >6)
-      sl = sl+' '+curline.line().substr(6);
+   std::string sl = s.substr(0,5);
+   if (s.length() >6)
+      sl = sl+' '+s.substr(6);
 
    //
    // this is a line with code
@@ -709,7 +710,7 @@ void handle_fixed(bool &more)
    //
    // this is possibly a continuation line
    //
-   if (curline.line().length() < 6 || curline.line()[5] == ' ' || curline.line()[5] == '0')
+   if (s.length() < 6 || s[5] == ' ' || s[5] == '0')
    {
       //
       // this is not a continuation line
@@ -742,7 +743,7 @@ void output_line()
 
    handle_refactor();
 
-   if (! flags.apply_indent)
+   if (!flags.apply_indent)
    {
       //
       // no indention requested:
@@ -761,7 +762,7 @@ void output_line()
 	 switch(output_format)
 	 {
 	    case FREE:
-	       free2free();
+	       free2free(curlines);
 	       break;
 	    case FIXED:
 	       free2fixed();
@@ -772,10 +773,10 @@ void output_line()
 	 switch(output_format)
 	 {
 	    case FREE:
-	       fixed2free();
+	       fixed2free(curlines);
 	       break;
 	    case FIXED:
-	       fixed2fixed();
+	       fixed2fixed(curlines);
 	       break;
 	 }
 	 break;

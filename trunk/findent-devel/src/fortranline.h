@@ -1,3 +1,5 @@
+#ifndef FORTRANLINE_H
+#define FORTRANLINE_H
 #include <iostream>
 #include <string>
 #include "functions.h"
@@ -459,3 +461,4 @@ class fortranline
    }
 
 };
+#endif

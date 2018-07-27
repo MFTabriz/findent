@@ -62,13 +62,15 @@ int determine_fix_or_free()
 //     or, if there is no #else, from the code before the #if{,def,ndef}
 //
 
-bool handle_pre(const std::string s, const int pretype, 
-      const bool output, std::list<fortranline> &c)
+bool handle_pre(const std::string sxx, const int pretypexx, 
+      const bool output, lines_t &ci, lines_t &co)
 {
    //
-   // NOTE: handle_pre can pop curlines
+   // NOTE: handle_pre can pop ci
    //
    int ifelse;
+   std::string s = ci.front().trimmed_line();
+   int pretype   = ci.front().scanfixpre();
    switch(pretype)
    {
       case CPP:
@@ -117,10 +119,11 @@ bool handle_pre(const std::string s, const int pretype,
    if(output)
       mycout << trim(s) << endline;
    else
-      c.push_back(trim(s));
+      co.push_back(trim(s));
+   ci.pop_front();
 
    std::string lchar = std::string(1,lastchar(s));
-   while (!curlines.empty())
+   while (!ci.empty())
    {
       if (pregentype == CPP && lchar != "\\")
 	 return 1;
@@ -131,17 +134,17 @@ bool handle_pre(const std::string s, const int pretype,
 
       if(pregentype == COCO)                            // TODO 
 	 if(output)
-	    mycout <<curlines.front().ltrim() << endline;
+	    mycout <<ci.front().ltrim() << endline;
 	 else
-	    c.push_back(trim(s));
+	    co.push_back(trim(s));
       else
 	 if(output)
-	    mycout <<curlines.front().orig() << endline;
+	    mycout <<ci.front().orig() << endline;
 	 else
-	    c.push_back(trim(s));
+	    co.push_back(trim(s));
 
-      lchar = curlines.front().lastchar();
-      curlines.pop_front();
+      lchar = ci.front().lastchar();
+      ci.pop_front();
    }
    return 1;
 }       // end of handle_pre

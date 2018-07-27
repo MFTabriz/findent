@@ -1,26 +1,31 @@
+#include <algorithm>
+#include <string>
 #include "findent.h"
 #include "findent_functions.h"
-void free2free()
+#include "findent_types.h"
+void free2free(lines_t &lines)
 {
-   std::string firstline  = curlines.front().trimmed_line();
-   std::string ofirstline = curlines.front().orig();
-
-   std::list<fortranline> dummy;
-   char ofc               = firstchar(ofirstline);
-   int pretype = curlines.front().scanfixpre();
-   curlines.pop_front();
-   if(!handle_pre(firstline, pretype, 1, dummy))
+   //
+   // because continuation lines are handled slightly different
+   // (user can choose between indent or original), the first
+   // line is treated separately
+   //
+   std::string firstline  = lines.front().trimmed_line();
+   int pretype;
+   lines_t dummy;
+   if(!handle_pre(firstline, pretype, 1, lines, dummy))
    {
-      int l;
-      if (firstline != "" || curlines.size() > 1)
+      int l=0;
+      if (firstline != "" || lines.size() > 1)
       {
+	 std::string ofc = lines.front().orig().substr(0,1);
 	 if (flags.label_left && labellength > 0)
 	 {
 	    //
 	    // put label at start of line
 	    //
 	    std::string label = firstline.substr(0,labellength);
-	    firstline    = trim(firstline.substr(labellength));
+	    firstline         = trim(firstline.substr(labellength));
 	    mycout << label;
 	    l = cur_indent - labellength;
 	    if ( l <= 0 )
@@ -33,14 +38,14 @@ void free2free()
 	 // Do not use start_indent: on the next run the first char could
 	 // be space and not '!'
 	 //
-	 if(ofc == '!')
+	 if(ofc == "!")
 	    l=0;
 	 //
 	 // if this is a comment line, and the original line did not start
 	 // with '!', and cur_indent == 0: put a space before this line, 
 	 // to make sure that re-indenting will give the same result
 	 //
-	 if (ofc != '!' && firstchar(firstline) == '!' && cur_indent == 0)
+	 if (ofc != "!" && firstchar(firstline) == '!' && cur_indent == 0)
 	    l=1;
 
 	 if (l<0)
@@ -48,22 +53,21 @@ void free2free()
 	 mycout << std::string(l,' '); 
       }
       mycout << firstline << endline;
+      lines.pop_front();
    }
 
-   while (!curlines.empty())
+   while (!lines.empty())
    {
       mycout.reset();
       //
       // sometimes, there are preprocessor statements within a continuation ...
       //
-      std::string fc  = curlines.front().firstchar();
-      std::string ofc = curlines.front().orig().substr(0,1);
-      int pretype     = curlines.front().scanfixpre();
-      std::string s   = curlines.front().trimmed_line();
-      std::string os  = curlines.front().orig();
-      curlines.pop_front();
-      if(!handle_pre(s,pretype,1,dummy))
+      std::string fc  = lines.front().firstchar();
+      int pretype;
+      std::string s ;
+      if(!handle_pre(s,pretype,1,lines,dummy))
       {
+	 std::string ofc = lines.front().orig().substr(0,1);
 	 if (flags.indent_cont || fc == "&")
 	 {
 	    int l = 0;
@@ -93,10 +97,11 @@ void free2free()
 	    if (ofc != "!" && fc == "!" && cur_indent == 0)
 	       l=std::max(1,flags.cont_indent);
 	    mycout << std::string(l,' ');
-	    mycout << s <<endline;
+	    mycout << lines.front().trimmed_line() << endline;
 	 }
 	 else
-	    mycout << os << endline;
+	    mycout << lines.front().orig() << endline;
+	 lines.pop_front();
       }
    }
 }

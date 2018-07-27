@@ -1,9 +1,11 @@
-#ifndef FINDENT_FINCTIONS_H
-#define FINDENT_FINCTIONS_H
+#ifndef FINDENT_FUNCTIONS_H
+#define FINDENT_FUNCTIONS_H
+
+#include "findent_types.h"
 
 int               determine_fix_or_free();
 std::string       handle_dos(const std::string s);
-void              handle_pre_light(fortranline &fs, int &pregentype, bool &more);
+void              handle_pre_light(fortranline &fs, int &p, bool &more);
 void              handle_refactor();
 int               pop_dolabel();
 int               top_dolabel();
@@ -17,7 +19,7 @@ int               what_to_return(void);
 int               pop_indent();
 struct propstruct pop_rprops();
 bool              handle_pre(const std::string s, const int pretype,
-                  const bool output, std::list<fortranline> &c);
+                  const bool output, lines_t &ci, lines_t &co);
 struct            propstruct top_rprops();
 std::string       whatrprop(struct propstruct p);
 int               guess_indent(const std::string str);
