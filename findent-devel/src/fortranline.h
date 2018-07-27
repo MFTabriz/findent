@@ -438,11 +438,8 @@ class fortranline
 	 case FREE:
 	    return firstchar() == "!";
 	    break;
-
-	 case UNKNOWN:
-	    return 0;
-	    break;
       }
+      return 0;
    }
 
    int getpregentype()
