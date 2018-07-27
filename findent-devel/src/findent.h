@@ -6,6 +6,7 @@
 #include <stack>
 #include <string>
 
+#include "findent_types.h"
 #include "flags.h"
 #include "fortranline.h"
 #include "pre_analyzer.h"

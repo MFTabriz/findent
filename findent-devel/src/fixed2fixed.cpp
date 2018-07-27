@@ -1,38 +1,40 @@
+#include <string>
+#include <algorithm>
+
 #include "fixed2fixed.h"
 #include "findent.h"
 #include "findent_functions.h"
-void fixed2fixed()
+#include "findent_types.h"
+
+void fixed2fixed(lines_t &lines)
 {
    unsigned int old_indent   = 0;
    unsigned int first_indent = 0;
    char prevquote            = ' ';
-   std::list<fortranline> dummy;
+   lines_t dummy;
 
-   while(!curlines.empty())
+   while(!lines.empty())
    {
       mycout.reset();
-      std::string s   = curlines.front().line();
-      std::string os  = curlines.front().orig();
-      int pretype     = curlines.front().scanfixpre();
-      char ofc        = firstchar(curlines.front().orig());
-      std::string ftc = curlines.front().firstchar();
-      curlines.pop_front();
-      if (!handle_pre(s,pretype,1,dummy))
+      std::string s   = lines.front().line();
+      std::string sxxx;
+      int pretypexxx;
+      if (!handle_pre(sxxx,pretypexxx,1,lines,dummy))
       {
-	 if(isfixedcmtp(s))
+	 if(lines.front().blank_or_comment())
 	 {
 	    //
 	    // this is an empty line or comment line
 	    //
-	    if (ofc == '!')                   // do not change lines starting with !
-	       mycout << rtrim(os) << endline;
-	    else if ( ftc == "!")             // indent indented comments
+	    if (firstchar(lines.front().orig()) == '!')                   // do not change lines starting with !
+	       mycout << lines.front().rtrim() << endline;
+	    else if ( lines.front().firstchar() == "!")             // indent indented comments
 	       mycout << std::string(6+cur_indent,' ') << trim(s) << endline;
 	    else
 	       mycout << trim(s) << endline;
 	 }
-	 else if(!cleanfive(os)) // check for valid label field
-	    mycout << os << endline;  // garbage in, garbage out
+	 else if(!cleanfive(lines.front().orig())) // check for valid label field
+	    mycout << lines.front().orig() << endline;  // garbage in, garbage out
 	 else
 	 {
 	    mycout << s.substr(0,6);
@@ -78,6 +80,7 @@ void fixed2fixed()
 	    }
 	    mycout << endline;
 	 }
+      lines.pop_front();
       }
    }
 }

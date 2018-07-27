@@ -15,7 +15,7 @@ void free2fixed(void)
    int pretype = curlines.front().scanfixpre();
    bool iscontinuation = 0;
    curlines.pop_front();
-   if(!handle_pre(s, pretype, 0, localcurlines))
+   if(!handle_pre(s, pretype, 0, curlines, localcurlines))
    {
       if (flags.label_left && labellength > 0)  // this is a line starting with a label
       {
@@ -62,7 +62,7 @@ void free2fixed(void)
       os  = curlines.front().orig();
       lc = curlines.front().lastchar();
       curlines.pop_front();
-      if(!handle_pre(s,pretype,0,localcurlines))
+      if(!handle_pre(s,pretype,0,curlines, localcurlines))
       {
 	 iscontinuation = needcon;
 	 if (ofc == "!")    // this is a comment line with "!" in column 1
@@ -90,7 +90,7 @@ void free2fixed(void)
    }
    curlines = localcurlines;
 
-#if 1
+#if 0
    fixed2fixed();
 #else
    std::cout << "----------------------" << needcon <<std::endl;

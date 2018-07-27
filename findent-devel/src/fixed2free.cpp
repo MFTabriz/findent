@@ -1,6 +1,6 @@
 #include "findent.h"
 #include "findent_functions.h"
-void fixed2free()
+void fixed2free(lines_t &curlines)
 {
    unsigned int old_indent   = 0;
    unsigned int first_indent = 0;
@@ -9,7 +9,7 @@ void fixed2free()
    std::string  outputline;
    int lineno = 0;
    std::string needamp = "";
-   std::list<fortranline> dummy;
+   lines_t dummy;
 
    while(!curlines.empty())
    {
@@ -19,8 +19,8 @@ void fixed2free()
       std::string os = curlines.front().orig();
       int pretype    = curlines.front().scanfixpre();
       char ofc       = firstchar(os);
-      curlines.pop_front();
-      if (!handle_pre(s,pretype,1,dummy))
+      //curlines.pop_front();
+      if (!handle_pre(s,pretype,1,curlines,dummy))
       {
 	 if(isfixedcmtp(s))
 	 {
@@ -126,7 +126,8 @@ void fixed2free()
 	    // and the non-comment line needs a leading &
 	    //
 	    needamp="";
-	    std::list<fortranline>::iterator it= curlines.begin();
+	    lines_t::iterator it= curlines.begin();
+	    it++;
 	    std::string prevlchar = "";
 	    bool inpreproc = 0;
 	    while(it != curlines.end())
@@ -199,5 +200,6 @@ void fixed2free()
 	    mycout << outputline << endline;
 	 }
       }
+      curlines.pop_front();
    }
 }

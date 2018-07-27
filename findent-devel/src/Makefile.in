@@ -341,7 +341,8 @@ findent_SOURCES = findent.cpp findent.h \
 		  fixed2fixed.cpp fixed2fixed.h \
 		  fixed2free.cpp fixed2free.h \
 		  free2fixed.cpp free2fixed.h \
-		  findent_functions.cpp findent_functions.h
+		  findent_functions.cpp findent_functions.h \
+		  findent_types.h
 
 BUILT_SOURCES = parser.cpp parser.h lexer.cpp
 EXTRA_DIST = lexer.l parser.y tocpp.sh builtparser.cpp \

@@ -1,4 +1,5 @@
 #ifndef FIXED2FREE_H
 #define FIXED2FREE_H
-void fixed2free(void);
+#include "findent_types.h"
+void fixed2free(lines_t &lines);
 #endif
