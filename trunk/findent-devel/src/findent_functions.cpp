@@ -146,6 +146,29 @@ bool handle_pre(const std::string s, const int pretype,
    return 1;
 }       // end of handle_pre
 
+void handle_pre_light(fortranline &fs, int &p, bool &more)
+{
+   //
+   // handles preprocessor lines and their continuations:
+   //
+   // fs (input):     line to handle
+   // p  (inout):     input:  type of line: CPP or COCO. 
+   //                 output: if no continuation is expected, p = 0
+   // more (output):  true if a continuation is expected
+   //
+   if(p == CPP)
+      more = (fs.lastchar() == "\\");
+   else
+      //
+      // since COCO lines always start with '??', there is no need
+      // to signify that another COCO line is expected
+      //
+      more = 0;
+
+   if(more == 0)
+      p = 0;
+}         // end of handle_pre_light
+
 int guess_indent(const std::string s)
 {
    //

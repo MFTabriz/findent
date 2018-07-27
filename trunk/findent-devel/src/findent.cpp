@@ -526,18 +526,7 @@ void get_full_statement()
 
       if (!nbseen)
       {
-	 std::string fcts = curline.firstchar();
-	 if (input_format == FREE)
-	    nbseen = (fcts != "" && fcts != "!" && fcts != "#" && curline.first2chars() != "??");
-	 else
-	 {
-	    char fc = 0;
-	    if (curline.orig().length() > 0)
-	       fc = curline.orig()[0];
-	    if (curline.ltab2sp().length() > 6)
-	       nbseen = (fcts != "" && fc != 'c' && fc != 'C' && fc != 'd' && fc != 'D' 
-		     && fcts != "!" && fc != '*' && fcts != "#" && curline.first2chars() != "??");
-	 }
+	 nbseen = !curline.blank_or_comment() && (curline.getpregentype() == 0);
 	 if (flags.auto_firstindent && nbseen)
 	 {
 	    start_indent = guess_indent(curline.orig());
@@ -557,13 +546,13 @@ void get_full_statement()
       if (!preproc_more)
 	 pretype = curline.getpregentype();
 
-      if (pretype == CPP || pretype == COCO)
+      if (pretype != 0)
       {
-	 handle_prc(pretype,curlines,preproc_more);
+	 curlines.push_back(curline);
+	 handle_pre_light(curline,pretype,preproc_more);
 	 if (preproc_more || fortran_more)
 	    continue;
-	 else
-	    break;
+	 break;
       }
 
       if (input_format == FREE)
@@ -571,59 +560,18 @@ void get_full_statement()
 	 handle_free(fortran_more);
 	 if (fortran_more) 
 	    continue;
-	 else
-	    break;
+	 break;
       }
       else
       {
 	 handle_fixed(fortran_more);
 	 if (fortran_more)
 	    continue;
-	 else
-	    break;
+	 break;
       }
    }
 }           // end of get_full_statement
 
-
-void handle_prc(int &p, std::list<fortranline> &c, bool &more)
-{
-   //
-   // handles preprocessor lines and their continuations:
-   // the lines are pushed on c. If a continuation is expected,
-   // more = 1, else more = 0 and p=0
-   //
-   switch(p)
-   {
-      case CPP:
-	 c.push_back(curline);
-	 if(curline.lastchar() == "\\")
-	    more = 1;
-	 else 
-	 {
-	    p    = 0;
-	    more = 0;
-	 }
-	 return;
-	 break;
-      case COCO:
-	 c.push_back(curline);
-	 if(curline.first2chars() == "??" && curline.lastchar() == "&")
-	    more = 1;
-	 else
-	 {
-	    p    = 0;
-	    more = 0;
-	 }
-	 return;
-	 break;
-      default:
-	 p    = 0;
-	 more = 0;
-	 return;
-	 break;
-   }
-}         // end of handle_prc
 
 void handle_free(bool &more)
 {
