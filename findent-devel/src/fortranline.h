@@ -432,6 +432,7 @@ class fortranline
 	       case 'c':
 	       case 'C':
 	       case '!':
+	       case '*':
 		  return 1;
 	    }
 	    return firstchar() == "!";
@@ -458,6 +459,26 @@ class fortranline
 	    default:
 	       return 0;
 	 }
+   }
+
+   bool precpp()
+   {
+      return firstchar() == "#";
+   }
+
+   bool precoco()
+   {
+      return first2chars() == "??";
+   }
+
+   bool pre()
+   {
+      return precpp() || precoco();
+   }
+
+   bool blank_or_comment_or_pre()
+   {
+      return blank_or_comment() || pre();
    }
 
 };

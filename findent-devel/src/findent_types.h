@@ -3,6 +3,6 @@
 #include <list>
 #include <deque>
 #include "fortranline.h"
-using lines_t      = std::list<fortranline>;
-using linebuffer_t = std::deque<fortranline>;
+typedef std::list<fortranline>  lines_t;
+typedef std::deque<fortranline> linebuffer_t;
 #endif
