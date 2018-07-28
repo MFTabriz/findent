@@ -2,7 +2,8 @@
 #include "findent_functions.h"
 #include "free2fixed.h"
 #include "fixed2fixed.h"
-void free2fixed(void)
+#include "findent_types.h"
+void free2fixed(lines_t curlines)
 {
    std::list<fortranline> localcurlines;
    std::string s  = curlines.front().trimmed_line();
@@ -12,10 +13,9 @@ void free2fixed(void)
 
    std::string ofc = std::string(1,firstchar(os));
    std::string fc = curlines.front().firstchar();
-   int pretype = curlines.front().scanfixpre();
    bool iscontinuation = 0;
    curlines.pop_front();
-   if(!handle_pre(s, pretype, 0, curlines, localcurlines))
+   if(!handle_pre(0, curlines, localcurlines))
    {
       if (flags.label_left && labellength > 0)  // this is a line starting with a label
       {
@@ -57,12 +57,11 @@ void free2fixed(void)
       //
       fc  = curlines.front().firstchar();
       ofc = curlines.front().orig().substr(0,1);
-      pretype     = curlines.front().scanfixpre();
       s   = curlines.front().trimmed_line();
       os  = curlines.front().orig();
       lc = curlines.front().lastchar();
       curlines.pop_front();
-      if(!handle_pre(s,pretype,0,curlines, localcurlines))
+      if(!handle_pre(0,curlines, localcurlines))
       {
 	 iscontinuation = needcon;
 	 if (ofc == "!")    // this is a comment line with "!" in column 1

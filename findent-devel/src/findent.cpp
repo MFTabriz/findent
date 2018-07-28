@@ -43,16 +43,16 @@ bool              refactor_end_found;
 int               start_indent;
 int               stlabel;
 
-std::stack<bool>                            needcon_stack;   // used with free2fixed, 1: next line is a continuation
-std::stack<int>                             dolabels;        // to store labels, necessary for labelled do
-std::stack<std::stack <int> >               dolabels_stack;  // to store dolabels stack
-std::stack<int>                             indent;          // to store indents
-std::stack<std::stack <int> >               indent_stack;    // to store indent stack
-linebuffer_t                                curlinebuffer;   // deque for source lines
-lines_t                                     curlines;        // current line, one continuation line per item
-std::stack<bool>                            nbseen_stack;    // to store nbseen
-std::stack<struct propstruct>               rprops;          // to store routines (module, subroutine ...)
-std::stack<std::stack <struct propstruct> > rprops_stack;
+std::stack<bool> needcon_stack;   // used with free2fixed, 1: next line is a continuation
+dolabels_t       dolabels;        // to store labels, necessary for labelled do
+dolabels_stack_t dolabels_stack;  // to store dolabels stack
+indent_t         indent;          // to store indents
+indent_stack_t   indent_stack;    // to store indent stack
+linebuffer_t     curlinebuffer;   // deque for source lines
+lines_t          curlines;        // current line, one continuation line per item
+nbseen_stack_t   nbseen_stack;    // to store nbseen
+rprops_t         rprops;          // to store routines (module, subroutine ...)
+rprops_stack_t   rprops_stack;
 
 int main(int argc, char*argv[])
 {
@@ -342,9 +342,7 @@ void indent_and_output()
 	    cur_indent = top_indent();
 	    push_indent(cur_indent + flags.do_indent);
 	    if (props.dolabel != "")
-	    {
 	       push_dolabel(string2number<int>(props.dolabel));
-	    }
 	    break;
 	 case SELECTCASE:
 	 case SELECTTYPE:
@@ -765,7 +763,7 @@ void output_line()
 	       free2free(curlines);
 	       break;
 	    case FIXED:
-	       free2fixed();
+	       free2fixed(curlines);
 	       break;
 	 }
 	 break;

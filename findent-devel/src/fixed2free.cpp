@@ -17,8 +17,7 @@ void fixed2free(lines_t &lines)
       mycout.reset();
       lineno++;
       std::string s  = lines.front().line();
-      int pretype    = lines.front().scanfixpre();
-      if (!handle_pre(s,pretype,1,lines,dummy))
+      if (!handle_pre(1,lines,dummy))
       {
 	 if(lines.front().blank_or_comment())
 	 {

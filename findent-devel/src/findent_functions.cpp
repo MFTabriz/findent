@@ -62,8 +62,7 @@ int determine_fix_or_free()
 //     or, if there is no #else, from the code before the #if{,def,ndef}
 //
 
-bool handle_pre(const std::string sxx, const int pretypexx, 
-      const bool output, lines_t &ci, lines_t &co)
+bool handle_pre(const bool output, lines_t &ci, lines_t &co)
 {
    //
    // NOTE: handle_pre can pop ci
