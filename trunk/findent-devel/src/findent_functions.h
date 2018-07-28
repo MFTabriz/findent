@@ -18,8 +18,7 @@ void              pop_all(void);
 int               what_to_return(void);
 int               pop_indent();
 struct propstruct pop_rprops();
-bool              handle_pre(const std::string s, const int pretype,
-                  const bool output, lines_t &ci, lines_t &co);
+bool              handle_pre(const bool output, lines_t &ci, lines_t &co);
 struct            propstruct top_rprops();
 std::string       whatrprop(struct propstruct p);
 int               guess_indent(const std::string str);

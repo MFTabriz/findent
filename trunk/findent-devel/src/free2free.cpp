@@ -11,9 +11,8 @@ void free2free(lines_t &lines)
    // line is treated separately
    //
    std::string firstline  = lines.front().trimmed_line();
-   int pretype;
    lines_t dummy;
-   if(!handle_pre(firstline, pretype, 1, lines, dummy))
+   if(!handle_pre(1, lines, dummy))
    {
       int l=0;
       if (firstline != "" || lines.size() > 1)
@@ -63,9 +62,8 @@ void free2free(lines_t &lines)
       // sometimes, there are preprocessor statements within a continuation ...
       //
       std::string fc  = lines.front().firstchar();
-      int pretype;
       std::string s ;
-      if(!handle_pre(s,pretype,1,lines,dummy))
+      if(!handle_pre(1,lines,dummy))
       {
 	 std::string ofc = lines.front().orig().substr(0,1);
 	 if (flags.indent_cont || fc == "&")
