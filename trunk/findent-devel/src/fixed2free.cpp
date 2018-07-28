@@ -1,6 +1,7 @@
 #include "findent.h"
 #include "findent_functions.h"
-void fixed2free(lines_t &curlines)
+#include "fortranline.h"
+void fixed2free(lines_t &lines)
 {
    unsigned int old_indent   = 0;
    unsigned int first_indent = 0;
@@ -11,18 +12,15 @@ void fixed2free(lines_t &curlines)
    std::string needamp = "";
    lines_t dummy;
 
-   while(!curlines.empty())
+   while(!lines.empty())
    {
       mycout.reset();
       lineno++;
-      std::string s  = curlines.front().line();
-      std::string os = curlines.front().orig();
-      int pretype    = curlines.front().scanfixpre();
-      char ofc       = firstchar(os);
-      //curlines.pop_front();
-      if (!handle_pre(s,pretype,1,curlines,dummy))
+      std::string s  = lines.front().line();
+      int pretype    = lines.front().scanfixpre();
+      if (!handle_pre(s,pretype,1,lines,dummy))
       {
-	 if(isfixedcmtp(s))
+	 if(lines.front().blank_or_comment())
 	 {
 	    //
 	    // this is an empty line or comment line
@@ -31,28 +29,34 @@ void fixed2free(lines_t &curlines)
 	       mycout << endline;
 	    else
 	    {
-	       switch (ofc)
+	       switch (firstchar(lines.front().orig()))
 	       {
 		  //
 		  // special hack for lines starting with 'd' or 'D'
 		  //
 		  case 'd' : case 'D' :
-		     mycout << "!" + rtrim(os) << endline;
+		     mycout << "!" + rtrim(lines.front().orig()) << endline;
 		     break;
 		  case 'c': case 'C': case '*': case '!':
-		     mycout << '!' << rtrim(os.substr(1)) << endline;
+		     mycout << '!' << lines.front().rtrim().substr(1) << endline;
 		     break;
 		  default:  // this must be a ! comment, not starting in column 1
-		     mycout << std::string(std::max(cur_indent,1),' ') << trim(os) << endline;
+		     mycout << std::string(std::max(cur_indent,1),' ') << lines.front().trim() << endline;
 	       }
 	    }
 	 }
-	 else if(!cleanfive(os)) // check for valid label field
-	    mycout << os << endline;  // garbage in, garbage out
+	 else if(!cleanfive(lines.front().orig())) // check for valid label field
+	    mycout << lines.front().orig() << endline;  // garbage in, garbage out
 	 else
 	 {
+	    //
+	    // this must be a line with a (continuation of) a statement
+	    //
 	    outputline = needamp;
 	    if (lineno == 1)
+	       //
+	       // special action for first line: could have a label
+	       //
 	    {
 	       int l;
 	       if (s.length()>6)
@@ -60,7 +64,7 @@ void fixed2free(lines_t &curlines)
 		  std::string s6 = ltab2sp(s.substr(6))+'x';
 		  first_indent = s6.find_first_not_of(' ');
 	       }
-	       if (s != "" || curlines.size() > 1)
+	       if (s != "" || lines.size() > 1)
 	       {
 		  if (flags.label_left && labellength > 0)
 		  {
@@ -120,32 +124,32 @@ void fixed2free(lines_t &curlines)
 	       }
 	    }
 	    //
-	    // check for continuation lines
-	    // there is a continuation line if there is a non-comment in 
-	    // the lines deque, in that case a trailing & is needed
+	    // Check for continuation lines by iterating over the rest of 
+	    // the lines.
+	    // There is a continuation line if there is a non-comment in 
+	    // the lines list, in that case a trailing & is needed
 	    // and the non-comment line needs a leading &
 	    //
 	    needamp="";
-	    lines_t::iterator it= curlines.begin();
-	    it++;
+	    lines_t::iterator it = lines.begin();
+	    it++;                                   // start at next line
 	    std::string prevlchar = "";
 	    bool inpreproc = 0;
-	    while(it != curlines.end())
+	    while(it != lines.end())
 	    {
 	       //
 	       // if previous lastchar was '\\', do not consider this 
 	       // line, if we are in a preprocessor statement
 	       //
-	       //if (inpreproc && prevlchar == '\\')
 	       if (inpreproc && prevlchar == "\\")
 	       {
 		  prevlchar = it->lastchar();
-		  *it++;
+		  it++;
 		  continue;
 	       }
 	       prevlchar = it->lastchar();
-	       inpreproc = (it->firstchar() == "#" || it->first2chars() == "??");
-	       if (!isfixedcmtp((it++)->orig()))
+	       inpreproc = it->precpp();
+	       if(!(it++)->blank_or_comment_or_pre())
 	       {
 		  needamp =  '&';
 		  //
@@ -199,7 +203,7 @@ void fixed2free(lines_t &curlines)
 	    }
 	    mycout << outputline << endline;
 	 }
+	 lines.pop_front();
       }
-      curlines.pop_front();
    }
 }
