@@ -20,22 +20,22 @@ template <typename T>
     return ss >> result ? result : 0;
   }
 
-bool        cleanfive(const std::string s);
-std::string firstchars(const std::string s, const int n);
-char        firstchar(const std::string s);
-char        fixedmissingquote(const std::string s);
+bool        cleanfive(const std::string &s);
+std::string firstchars(const std::string &s, const int n);
+char        firstchar(const std::string &s);
+char        fixedmissingquote(const std::string &s);
 bool        isalnumplus(const char c);
-bool        isfixedcmtp(const std::string s);
-char        lastchar(const std::string s);
+bool        isfixedcmtp(const std::string &s);
+char        lastchar(const std::string &s);
 std::string ltab2sp(const std::string& s);
 std::string ltrim(const std::string& str);
 int         num_leading_spaces(const std::string &s);
 int         ppp(const std::string s);
-std::string remove_blanks(const std::string s);
+std::string remove_blanks(const std::string &s);
 void        remove_trailing_comment(std::string &s);
-std::string rtrim(const std::string& str);
-std::string trim(const std::string& str);
-std::string stolower(const std::string s);
-std::string stoupper(const std::string s);
+std::string rtrim(const std::string &str);
+std::string trim(const std::string &str);
+std::string stolower(const std::string &s);
+std::string stoupper(const std::string &s);
 
 #endif

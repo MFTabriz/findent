@@ -55,7 +55,7 @@ class fortranline
       init();
    }
 
-   fortranline(const std::string& s)
+   fortranline(const std::string &s)
    {
       init();
       orig_line = s;
@@ -106,13 +106,13 @@ class fortranline
    }
 
 #ifdef USE_CACHE
-   void set_line(const std::string& s)
+   void set_line(const std::string &s)
    {
       init();
       orig_line = s;
    }
 #else
-   void set_line(const std::string& s)
+   void set_line(const std::string &s)
    {
       orig_line = s;
    }
