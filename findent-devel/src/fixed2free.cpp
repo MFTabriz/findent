@@ -10,14 +10,13 @@ void fixed2free(lines_t &lines)
    std::string  outputline;
    int lineno = 0;
    std::string needamp = "";
-   lines_t dummy;
 
    while(!lines.empty())
    {
       mycout.reset();
       lineno++;
       std::string s  = lines.front().line();
-      if (!handle_pre(1,lines,dummy))
+      if (!handle_pre(lines))
       {
 	 if(lines.front().blank_or_comment())
 	 {

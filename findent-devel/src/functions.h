@@ -3,6 +3,9 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+#include "simpleostream.h"
+
+extern simpleostream mycout; 
 
 template <typename T>
   std::string number2string ( T number )
@@ -30,7 +33,7 @@ char        lastchar(const std::string &s);
 std::string ltab2sp(const std::string& s);
 std::string ltrim(const std::string& str);
 int         num_leading_spaces(const std::string &s);
-int         ppp(const std::string s);
+int         ppp(const std::string &s);
 std::string remove_blanks(const std::string &s);
 void        remove_trailing_comment(std::string &s);
 std::string rtrim(const std::string &str);

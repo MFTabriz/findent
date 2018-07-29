@@ -62,12 +62,13 @@ int determine_fix_or_free()
 //     or, if there is no #else, from the code before the #if{,def,ndef}
 //
 
-bool handle_pre(const bool output, lines_t &ci, lines_t &co)
+bool handle_pre(lines_t &ci, lines_t *co)
 {
    //
    // NOTE: handle_pre can pop ci
    //
    int ifelse;
+   int output = (co == 0);
    std::string s = ci.front().trimmed_line();
    int pretype   = ci.front().scanfixpre();
    switch(pretype)
@@ -118,7 +119,7 @@ bool handle_pre(const bool output, lines_t &ci, lines_t &co)
    if(output)
       mycout << trim(s) << endline;
    else
-      co.push_back(trim(s));
+      co->push_back(trim(s));
    ci.pop_front();
 
    std::string lchar = std::string(1,lastchar(s));
@@ -135,12 +136,12 @@ bool handle_pre(const bool output, lines_t &ci, lines_t &co)
 	 if(output)
 	    mycout <<ci.front().ltrim() << endline;
 	 else
-	    co.push_back(trim(s));
+	    co->push_back(ci.front().ltrim());
       else
 	 if(output)
 	    mycout <<ci.front().orig() << endline;
 	 else
-	    co.push_back(trim(s));
+	    co->push_back(ci.front().orig());
 
       lchar = ci.front().lastchar();
       ci.pop_front();
@@ -453,3 +454,13 @@ std::string handle_dos(const std::string &s)
       sl.erase(sl.length()-1);
    return sl;
 }         // end of handle_dos
+
+void ppp(const std::string &s, lines_t &lines)
+{
+   lines_t::iterator it = lines.begin();
+   while(it != lines.end()) 
+   {
+      mycout<<s<<it->orig()<<endline;
+      it++;
+   }
+}

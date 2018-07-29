@@ -1,5 +1,6 @@
 #include <string>
 #include <iostream>
+#include <sstream>
 #include "functions.h"
 
 std::string stoupper(const std::string &s)
@@ -54,7 +55,8 @@ std::string remove_blanks(const std::string &s)
 
 int ppp(const std::string &s)     // for ad-hoc debugging purposes
 {
-   std::cout << "ppp:["+s+"]" << std::endl;
+   //return 0;
+   std::cout<< "ppp:["+s+"]" << std::endl;
    return 0;
 }
 
