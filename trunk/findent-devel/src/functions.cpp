@@ -2,7 +2,7 @@
 #include <iostream>
 #include "functions.h"
 
-std::string stoupper(const std::string s)
+std::string stoupper(const std::string &s)
 {
    std::string sl = s;
    int l     = sl.size();
@@ -11,7 +11,7 @@ std::string stoupper(const std::string s)
    return sl;
 }
 
-std::string stolower(const std::string s)
+std::string stolower(const std::string &s)
 {
    std::string sl = s;
    int l     = sl.size();
@@ -20,7 +20,7 @@ std::string stolower(const std::string s)
    return sl;
 }
 
-std::string firstchars(const std::string s, const int n)
+std::string firstchars(const std::string &s, const int n)
 {
    size_t l = s.length();
    switch(l)
@@ -34,7 +34,7 @@ std::string firstchars(const std::string s, const int n)
    }
 }
 
-std::string remove_blanks(const std::string s)
+std::string remove_blanks(const std::string &s)
 {
    std::string sl = "";
    size_t l = s.length();
@@ -52,13 +52,13 @@ std::string remove_blanks(const std::string s)
    return sl;
 }
 
-int ppp(const std::string s)     // for ad-hoc debugging purposes
+int ppp(const std::string &s)     // for ad-hoc debugging purposes
 {
    std::cout << "ppp:["+s+"]" << std::endl;
    return 0;
 }
 
-char firstchar(const std::string s)
+char firstchar(const std::string &s)
 {
    size_t l = s.length();
    if (l == 0)
@@ -66,7 +66,7 @@ char firstchar(const std::string s)
    return s[0];
 }
 
-char lastchar(const std::string s)
+char lastchar(const std::string &s)
 {
    size_t l = s.length();
    if (l == 0)
@@ -75,7 +75,7 @@ char lastchar(const std::string s)
 }
 
 
-std::string rtrim(const std::string& str)
+std::string rtrim(const std::string &str)
 {
    const std::string whitespace = " \t";
 
@@ -85,7 +85,7 @@ std::string rtrim(const std::string& str)
    return str.substr(0,strEnd+1);
 }
 
-std::string ltrim(const std::string& str)
+std::string ltrim(const std::string &str)
 {
    const std::string whitespace = " \t";
    const size_t strBegin = str.find_first_not_of(whitespace);
@@ -95,7 +95,7 @@ std::string ltrim(const std::string& str)
    return str.substr(strBegin);
 }
 
-std::string trim(const std::string& str)
+std::string trim(const std::string &str)
 {
    const std::string whitespace = " \t";
    const size_t strBegin = str.find_first_not_of(whitespace);
@@ -108,7 +108,7 @@ std::string trim(const std::string& str)
    return str.substr(strBegin, strRange);
 }
 
-bool cleanfive(const std::string s)
+bool cleanfive(const std::string &s)
    //
    // returns 1, if columns 1-5 contain only [0-9 \t]
    // else returns 0
@@ -145,7 +145,7 @@ bool isalnumplus(const char c)
    return 0;
 }
 
-bool isfixedcmtp(const std::string s)
+bool isfixedcmtp(const std::string &s)
 {
    //
    // returns 1 if this is a fixed empty line or fixed comment line or preprocessor line
@@ -166,7 +166,7 @@ int num_leading_spaces(const std::string &s)
    return p;
 }
 
-char fixedmissingquote(const std::string s)
+char fixedmissingquote(const std::string &s)
 {
    //
    // investigate if this line terminates a string
@@ -198,7 +198,7 @@ char fixedmissingquote(const std::string s)
    return ' ';
 }
 
-std::string ltab2sp(const std::string& s)
+std::string ltab2sp(const std::string &s)
 {
    //
    // converts leading white space and white space after a statement label

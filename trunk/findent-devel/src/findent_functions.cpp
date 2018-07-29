@@ -171,7 +171,7 @@ void handle_pre_light(fortranline &fs, int &p, bool &more)
       p = 0;
 }         // end of handle_pre_light
 
-int guess_indent(const std::string s)
+int guess_indent(const std::string &s)
 {
    //
    // count spaces at start of line, correct for tabs and & and label
@@ -364,7 +364,7 @@ void empty_dolabels()
       dolabels.pop();
 }       // end of empty_dolabels
 
-int guess_fixedfree(const std::string s)
+int guess_fixedfree(const std::string &s)
 {
    //
    // sometimes, program sources contain carriage control characters
@@ -433,7 +433,7 @@ int what_to_return()
    return 0;
 }              // end of what_to_return
 
-std::string handle_dos(const std::string s)
+std::string handle_dos(const std::string &s)
 {
    //
    // determine if the input is dos format:
