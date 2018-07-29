@@ -11,8 +11,7 @@ void free2free(lines_t &lines)
    // line is treated separately
    //
    std::string firstline  = lines.front().trimmed_line();
-   lines_t dummy;
-   if(!handle_pre(1, lines, dummy))
+   if(!handle_pre(lines))
    {
       int l=0;
       if (firstline != "" || lines.size() > 1)
@@ -63,7 +62,7 @@ void free2free(lines_t &lines)
       //
       std::string fc  = lines.front().firstchar();
       std::string s ;
-      if(!handle_pre(1,lines,dummy))
+      if(!handle_pre(lines))
       {
 	 std::string ofc = lines.front().orig().substr(0,1);
 	 if (flags.indent_cont || fc == "&")

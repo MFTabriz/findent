@@ -11,13 +11,12 @@ void fixed2fixed(lines_t &lines)
    unsigned int old_indent   = 0;
    unsigned int first_indent = 0;
    char prevquote            = ' ';
-   lines_t dummy;
 
    while(!lines.empty())
    {
       mycout.reset();
       std::string s   = lines.front().line();
-      if (!handle_pre(1,lines,dummy))
+      if (!handle_pre(lines))
       {
 	 if(lines.front().blank_or_comment())
 	 {

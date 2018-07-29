@@ -1,103 +1,127 @@
+#include <iostream>
+#include <string>
+#include <sstream>
+
 #include "findent.h"
 #include "findent_functions.h"
 #include "free2fixed.h"
 #include "fixed2fixed.h"
 #include "findent_types.h"
-void free2fixed(lines_t curlines)
-{
-   std::list<fortranline> localcurlines;
-   std::string s  = curlines.front().trimmed_line();
-   std::string os = curlines.front().orig();
-   std::string outputline;
-   std::string lc = curlines.front().lastchar();
+#include "functions.h"
 
-   std::string ofc = std::string(1,firstchar(os));
-   std::string fc = curlines.front().firstchar();
-   bool iscontinuation = 0;
-   curlines.pop_front();
-   if(!handle_pre(0, curlines, localcurlines))
+void free2fixed(lines_t &lines)
+{
+   lines_t nlines;
+   std::ostringstream os;
+   //
+   // because continuation lines are handled slightly different
+   // (user can choose between indent or original), the first
+   // line is treated separately
+   //
+   std::string firstline  = lines.front().trimmed_line();
+   ppp("1:",lines);
+   if(!handle_pre(lines,&nlines))
    {
-      if (flags.label_left && labellength > 0)  // this is a line starting with a label
+      ppp("2:",lines);
+      os.str("");
+      int l=6;
+      if (firstline != "" || lines.size() > 1)
       {
+	 std::string ofc = lines.front().orig().substr(0,1);
+	 if (flags.label_left && labellength > 0)
+	 {
+	    //
+	    // put label at start of line
+	    //
+	    std::string label = firstline.substr(0,labellength);
+	    firstline         = trim(firstline.substr(labellength));
+	    //mycout << label;
+	    os << label << "      ";
+	 }
 	 //
-	 // put label at start of line
+	 // If first character of original line is '!', do not indent
+	 // Do not use start_indent: on the next run the first char could
+	 // be space and not '!'
 	 //
-	 std::string label = s.substr(0,labellength);
-	 s         = trim(s.substr(labellength));
-	 outputline        = label + "       " + s;
+	 if(ofc == "!")
+	    l=0;
+	 //
+	 // if this is a comment line, and the original line did not start
+	 // with '!', and cur_indent == 0: put a space before this line, 
+	 // to make sure that re-indenting will give the same result
+	 //
+	 if (ofc != "!" && firstchar(firstline) == '!' && cur_indent == 0)
+	    l=1;
+
+	 if (l<0)
+	    l=0;
+	 //mycout << std::string(l,' '); 
+	 os << std::string(l,' ');
       }
-      else if (ofc == "!")    // this is a comment line with "!" in column 1
-	 outputline = os;
-      else if(fc == "!")    //  this is a comment line with "!" after column 1
-	 outputline = "      "+s;
-      else if (fc == "&")  // line like '  &  x+10', output: '     &  x+10'
-	 // BTW: this should not happen for the first line
-      {
-	 iscontinuation = 1;
-	 outputline     = "      " + ltrim(os).substr(1);    
-      }
-      else
-	 outputline = "      " + os;
-      if (lastchar(outputline) == '&')    // a continuation line will follow
-      {
-	 needcon    = 1;
-	 outputline = outputline.substr(0,outputline.length()-1); // remove trailing &
-      }
-      if (iscontinuation)   // again, this should not happen
-      {
-	 outputline = outputline.substr(0,5) + "&" + outputline.substr(6);
-      }
-      localcurlines.push_back(outputline);
+      //mycout << firstline << endline;
+      if(firstline.length() > 0)
+	 if(firstline[firstline.length()-1] == '&')
+	    firstline = firstline.substr(0,firstline.length()-1);
+      os << firstline;
+      nlines.push_back(os.str());
+      lines.pop_front();
    }
 
-   while (!curlines.empty())
+   while (!lines.empty())
    {
+      os.str("");
       //
       // sometimes, there are preprocessor statements within a continuation ...
       //
-      fc  = curlines.front().firstchar();
-      ofc = curlines.front().orig().substr(0,1);
-      s   = curlines.front().trimmed_line();
-      os  = curlines.front().orig();
-      lc = curlines.front().lastchar();
-      curlines.pop_front();
-      if(!handle_pre(0,curlines, localcurlines))
+      std::string fc  = lines.front().firstchar();
+      std::string s ;
+      ppp("3:",lines);
+      if(!handle_pre(lines,&nlines))
       {
-	 iscontinuation = needcon;
-	 if (ofc == "!")    // this is a comment line with "!" in column 1
-	    outputline = os;
-	 else if (fc == "!")    //  this is a comment line with "!" after column 1
-	    outputline = "      "+s;
-	 else if (fc == "&")  // line like '  &  x+10', output: '     &  x+10'
-	 {
-	    iscontinuation = 1;
-	    outputline     = "      " + ltrim(os).substr(1);    
-	 }
+	 ppp("4:",lines);
+	 //
+	 // this must be a continuation or a comment line
+	 //
+
+	 std::string ofc = lines.front().orig().substr(0,1);
+	 if (ofc == "!")
+	    os << lines.front().orig();
+	 else if (fc == "!")
+	    os << " " << lines.front().orig();
 	 else
-	    outputline = "      " + os;
-	 if (lastchar(outputline) == '&')    // a continuation line will follow
 	 {
-	    needcon    = 1;
-	    outputline = outputline.substr(0,outputline.length()-1); // remove trailing &
+	    s = lines.front().trimmed_line();
+	    //
+	    // this must be a continuation line
+	    //
+	    if (flags.indent_cont || fc == "&")
+	    {
+	       //
+	       // if continuation starts with '&', chop off '&'
+	       //
+	       if (fc == "&")
+		  s = s.substr(1);
+	       os << "     a";
+	       //
+	       // if last char is '&', discard it
+	       //
+	       if (s.length() > 0)
+		  if(s[s.length()-1] == '&')
+		     s = s.substr(0,s.length() - 1);
+	       os << s;
+	    }
+	    else
+	    {
+	       std::string s = lines.front().rtrim();
+	       if (s.length() > 0)
+		  if(s[s.length()-1] == '&')
+		     s = s.substr(0,s.length() - 1);
+	       os << "     &" + s;
+	    }
 	 }
-	 if (iscontinuation)   
-	 {
-	    outputline = outputline.substr(0,5) + "&" + outputline.substr(6);
-	 }
-	 localcurlines.push_back(outputline);
+	 nlines.push_back(os.str());
+      lines.pop_front();
       }
    }
-   curlines = localcurlines;
-
-#if 0
-   fixed2fixed();
-#else
-   std::cout << "----------------------" << needcon <<std::endl;
-   while (!curlines.empty())
-   {
-      std::cout << curlines.front().orig()<<std::endl;
-      curlines.pop_front();
-   }
-#endif
-   fortranline::setformat(FREE);
+   ppp("result:",nlines);
 }
