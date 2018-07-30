@@ -4,7 +4,7 @@ if test -e prelude ; then
 else
    . ./debian/tests/prelude
 fi
-../test-compile.sh ../progfixed1.f
+../test-compile.sh ../progfree1.f
 rc=$?
 . ../postlude
 exit $rc

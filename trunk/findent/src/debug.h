@@ -1,4 +1,9 @@
 // $Id$
+#include <iostream>
+#include <string>
+
+#include "findent_types.h"
+
 #ifndef DEBUG_H
 #define DEBUG_H
 #define O(x) {std::cerr << " [" << x << "] ";}
@@ -10,4 +15,7 @@
 #define D(x)
 #endif
 #endif
+
+int  ppp(const std::string &s);
+void ppp(const std::string &s,lines_t &lines);
 

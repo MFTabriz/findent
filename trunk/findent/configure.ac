@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(findent, 2.8.3~pre2, wvermin@gmail.com)
+AC_INIT(findent, 2.8.3~pre3, wvermin@gmail.com)
 AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
 AC_CONFIG_SRCDIR([src/findent.cpp])
@@ -79,6 +79,8 @@ AC_CONFIG_FILES([test/progfixedfree-dos.f])
 AC_CONFIG_FILES([test/progfixedfree-dos.f.try.f.ref])
 AC_CONFIG_FILES([test/progfixedfree.f])
 AC_CONFIG_FILES([test/progfixedfree.f.try.f.ref])
+AC_CONFIG_FILES([test/progfreefixed.f])
+AC_CONFIG_FILES([test/progfreefixed.f.try.f.ref])
 AC_CONFIG_FILES([test/progfree-dos.f])
 AC_CONFIG_FILES([test/progfree-dos.f.try.f.ref])
 AC_CONFIG_FILES([test/progfree.f])

@@ -1,0 +1,10 @@
+fixed2free(): 
+         program p
+	 print *,"a
+        +b"
+	 end
+   should give with -ofree -L20:
+   program p
+      print *,"           &
+      &b"
+   end
