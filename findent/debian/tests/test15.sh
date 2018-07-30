@@ -12,454 +12,177 @@ cat << eof > prog
       end
 eof
 cat << eof > expect
-           program main
-              continue
-           end
-eof
-
-$doit "-I5 --start_indent=5" -i3 "for fixed input"
-rc=`expr $rc + $?`
-
-cat << eof > prog
       program main
- continue
+         continue
       end
 eof
-cat << eof > expect
-     program main
-        continue
-     end
-eof
-$doit "-I5 --start_indent=5" -i3 "for free input"
+
+$doit "-iauto --input_format=auto -ifixed --input_format=fixed" "-I0 -i3" "for fixed input"
 rc=`expr $rc + $?`
 
-cat << eof > prog
-        program main
-      continue
-      end
-eof
 cat << eof > expect
-        program main
-           continue
-        end
+program main
+   continue
+end
 eof
-$doit "-Ia --start_indent=a" "-I0 -i3" ""
+
+$doit "-ifree --input_format=free" "-I0 -i3" "for fixed input"
 rc=`expr $rc + $?`
 
 cat << eof > prog
  program main
 continue
-do i=1,10
-do j=1,20
-   continue
-enddo
-enddo
 end
 eof
 
 cat << eof > expect
 program main
-     continue
-     do i=1,10
-          do j=1,20
-               continue
-          enddo
-     enddo
+   continue
 end
 eof
-$doit "-i5 --indent=5" "-I0" ""
-rc=`expr $rc + $?`
 
+$doit "-iauto --input_format=auto -ifree --input_format=free" "-I0 -i3" "for free input"
+rc=`expr $rc + $?`
 
 cat << eof > prog
       program main
-associate( z => sin(theta))
-print *,z
-end associate
+         continue
       end
 eof
+cp prog expect
 
-cat << eof > expect
-program main
-   associate( z => sin(theta))
-        print *,z
-   end associate
-end
-eof
-
-$doit "-a5 --indent_associate=5" "-i3 -I0" ""
+$doit "-i- --indent=none" "" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
 program main
-block
-continue
-end block
+x =                                   10   + 6
 end
 eof
 cat << eof > expect
 program main
-   block
-        continue
-   end block
+   x =                                   10
 end
 eof
 
-$doit "-b5 --indent_block=5" "-i3 -I0" ""
+$doit "-L42 --input_line_length=42" "-I0 -i3" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
         program main
-do i=1,10
-do j=1,5
-   print *,i,j
-enddo
-enddo
-         end
-eof
-
-cat << eof > expect
-program main
-   do i=1,10
-        do j=1,5
-             print *,i,j
-        enddo
-   enddo
-end
-eof
-
-$doit "-d5 --indent_do=5" "-i3 -I0" ""
-rc=`expr $rc + $?`
-
-cat << eof > prog
-  program main
-if (i .eq. 7) then
-   print *,'foo'
-   continue
-endif
-
          continue
          end
 eof
 
 cat << eof > expect
 program main
-   if (i .eq. 7) then
-        print *,'foo'
-        continue
-   endif
-
    continue
 end
 eof
 
-$doit "-f5 --indent_if=5" "-i3 -I0" ""
+$doit "-ofree --output_format=free" "-I0 -i3" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
   program main
-enum, bind(c)
-enumerator :: red = 1, blue black = 5
-enumerator yellow
-end enum
+         continue
          end
 eof
 
 cat << eof > expect
 program main
-   enum, bind(c)
-        enumerator :: red = 1, blue black = 5
-        enumerator yellow
-   end enum
+   continue
 end
 eof
 
-$doit "-E5 --indent_enum=5" "-i3 -I0" ""
+$doit "-osame --output_format=same" "-I0 -i3" "for free input"
+rc=`expr $rc + $?`
+
+cat << eof > prog
+        program main
+         continue
+         end
+eof
+
+cat << eof > expect
+      program main
+         continue
+      end
+eof
+
+$doit "-osame --output_format=same" "-I0 -i3" "for fixed input"
 rc=`expr $rc + $?`
 
 cat << eof > prog
    program main
-forall(k=1:1000)
-x(k) = 23
-y(k) = 67
-end forall
-end
-eof
-
-cat << eof > expect
-program main
-   forall(k=1:1000)
-        x(k) = 23
-        y(k) = 67
-   end forall
-end
-eof
-
-$doit "-F5 --indent_forall=5" "-i3 -I0" ""
-rc=`expr $rc + $?`
-
-cat << eof > prog
-program main
-interface myinterface
-subroutine mysub(x)
-real x
-end subroutine
-end interface
-end
-eof
-
-cat << eof > expect
-program main
-   interface myinterface
-        subroutine mysub(x)
-           real x
-        end subroutine
-   end interface
-end
-eof
-
-$doit "-j5 --indent_interface=5" "-i3 -I0" ""
-rc=`expr $rc + $?`
-
-cat << eof > prog
-   module mymodule
-integer x
+continue
 contains
 subroutine mysub
-continue
-end subroutine
-end module
+         continue
+end
+end
 eof
 
 cat << eof > expect
-module mymodule
-     integer x
-  contains
-     subroutine mysub
-        continue
-     end subroutine
-end module
-eof
-
-$doit "-m5 --indent_module=5" "-i3 -I0" ""
-rc=`expr $rc + $?`
-
-cat << eof > prog
+program main
+   continue
+contains
    subroutine mysub
-continue
-end subroutine
-function myfun(x)
-real x
-end function
-eof
-
-cat << eof > expect
-subroutine mysub
-     continue
-end subroutine
-function myfun(x)
-     real x
-end function
-eof
-
-$doit "-r5 --indent_procedure=5" "-i3 -I0" ""
-rc=`expr $rc + $?`
-
-cat << eof > prog
-program main
       continue
-select case(i)
-   case(1)
-      x=2
-      case(3)
-         x=4
-      end select
-      continue
-   end program
+   end subroutine mysub
+end program main
 eof
 
-cat << eof > expect
-program main
-   continue
-   select case(i)
-      case(1)
-        x=2
-      case(3)
-        x=4
-   end select
-   continue
-end program
-eof
-$doit "-s5 --indent_select=5" "-i3 -I0" ""
+$doit "-Rr --refactor_procedures" "-I0 -i3" "for free input"
 rc=`expr $rc + $?`
 
-cat << eof > prog
-program main
-type mytype
-integer :: i
-real x,y
-end type mytype
-end program
-eof
-cat << eof > expect
-program main
-   type mytype
-        integer :: i
-        real x,y
-   end type mytype
-end program
-eof
-$doit "-t5 --indent_type=5" "-i3 -I0" ""
-rc=`expr $rc + $?`
-
-cat << eof > prog
-program main
-where(x>21)
-y=10
-z=11
-end where
-end program
-eof
-cat << eof > expect
-program main
-   where(x>21)
-        y=10
-        z=11
-   end where
-end program
-eof
-$doit "-w5 --indent_where=5" "-i3 -I0" ""
-rc=`expr $rc + $?`
-
-cat << eof > prog
-program main
-continue
-critical
-x=10
-y=11
-end critical
-end program
-eof
-cat << eof > expect
-program main
-   continue
-   critical
-        x=10
-        y=11
-   end critical
-end program
-eof
-$doit "-x5 --indent_critical=5" "-i3 -I0" ""
-rc=`expr $rc + $?`
-
-cat << eof > prog
-program main
-continue
-contains
-subroutine mysub
-continue
-end subroutine mysub
-end program
-eof
 cat << eof > expect
 program main
    continue
 contains
-subroutine mysub
-   continue
-end subroutine mysub
-end program
+   subroutine mysub
+      continue
+   END SUBROUTINE mysub
+END PROGRAM main
 eof
-$doit "-C- --indent_contains=restart" "-i3 -I0" ""
+
+$doit "-RR --refactor_procedures=upcase" "-I0 -i3" "for free input"
 rc=`expr $rc + $?`
 
 cat << eof > prog
-program main
-continue
-x = x + &
-& 10
-y = y + &
-5
-end program
+       program main
+         continue
+         contains
+         subroutine mysub
+         continue
+         end
+         end
 eof
-cat << eof > expect
-program main
-   continue
-   x = x + &
-   & 10
-   y = y + &
-5
-end program
-eof
-$doit "-k- --indent_continuation=none" "-i3 -I0" ""
-rc=`expr $rc + $?`
 
-cat << eof > prog
-program main
-continue
-select case(i)
-   case(3)
-      x=8
-      case(5)
-         y=2
-      end select
-      continue
-end program
-eof
 cat << eof > expect
-program main
-      continue
-      select case(i)
-        case(3)
-            x=8
-        case(5)
-            y=2
-      end select
-      continue
-end program
-eof
-$doit "-c4 --indent_case=4" "-i6 -I0" ""
-rc=`expr $rc + $?`
-
-cat << eof > prog
-program main
-continue
-contains
-function foo(bar)
-real bar
-continue
-end function
-end program
-eof
-cat << eof > expect
-program main
-      continue
-  contains
-      function foo(bar)
-            real bar
+      program main
+         continue
+      contains
+         subroutine mysub
             continue
-      end function
-end program
+         end subroutine mysub
+      end program main
 eof
-$doit "-C4 --indent_contains=4" "-i6 -I0" ""
+
+$doit "-Rr --refactor_procedures" "-I0 -i3" "for fixed input"
 rc=`expr $rc + $?`
 
-cat << eof > prog
-subroutine mysub
-continue
-entry myentry
-continue
-end subroutine
-eof
 cat << eof > expect
-subroutine mysub
-      continue
-  entry myentry
-      continue
-end subroutine
+      program main
+         continue
+      contains
+         subroutine mysub
+            continue
+         END SUBROUTINE mysub
+      END PROGRAM main
 eof
-$doit "-e4 --indent_entry=4" "-i6 -I0" ""
-rc=`expr $rc + $?`
 
+$doit "-RR --refactor_procedures=upcase" "-I0 -i3" "for fixed input"
+rc=`expr $rc + $?`
 . ../postlude
 exit $rc

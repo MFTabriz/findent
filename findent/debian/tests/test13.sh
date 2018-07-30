@@ -5,32 +5,43 @@ else
    . ./debian/tests/prelude
 fi
 rc=0
-doit=../doit
-cat << eof > prog
-      program fixed
-      continue
-      end
-eof
+exe=$FINDENT
+for flag in -h --help ; do
+   $exe "$flag" | head -n 1 | tr -d '\r' > help.try
+   cmp -s ../help.ref help.try
+   r=$?
+   if [ $r -eq 0 ] ; then
+      echo "$flag : works OK"
+   else
+      echo "$flag : works NOT OK, compare help.try and help.ref"
+   fi
+   rc=`expr $rc + $r` 
+done
 
-cat << eof > expect
-fixed
-eof
+for flag in -H --manpage ; do
+   $exe "$flag" | head -n 1 | tr -d '\r' > manpage.try
+   cmp -s ../manpage.ref manpage.try
+   r=$?
+   if [ $r -eq 0 ] ; then
+      echo "$flag : OK"
+   else
+      echo "$flag : NOT OK, compare manpage.try and manpage.ref"
+   fi
+   rc=`expr $rc + $r` 
+done
 
-$doit "-q --query_fix_free" "" "for fixed input"
-rc=`expr $rc + $?`
-
-cat << eof > prog
-      program free
- continue
-      end
-eof
-
-cat << eof > expect
-free
-eof
-
-$doit "-q --query_fix_free" "" "for free input"
-rc=`expr $rc + $?`
+for flag in -v --version ; do
+   $exe $flag > result
+   if grep -q "^findent version" result ; then
+      echo "$flag: OK"
+   else
+      echo "$flag : NOT OK"
+      echo "expected : findent version ..."
+      echo "got:"
+      cat result
+      rc=`expr $rc + 1`
+   fi
+done
 
 . ../postlude
 exit $rc

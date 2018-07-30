@@ -2,48 +2,23 @@
 if test -e prelude ; then
    . ./prelude
 else
-   unset FINDENT
    . ./debian/tests/prelude
 fi
-cat <<eof > prog1.f || exit 1
-program prog1
-continue
-end program prog1
-eof
-cat << eof > prog2.f || exit 1
-module modprog2
-integer i
-end module
-program prog2
-use modprog2
-continue
-end program prog2
-eof
-cat << eof > prog1.f.ref || exit 1
-program prog1
-     continue
-end program prog1
-eof
-cat << eof > prog2.f.ref || exit 1
-module modprog2
-     integer i
-end module
-program prog2
-     use modprog2
-     continue
-end program prog2
-eof
-
-$WFINDENT -i5 prog1.f prog2.f
-sed -i 's/\r//' prog1.f
-sed -i 's/\r//' prog2.f
-for i in 1 2 ; do
-   cmp -s prog$i.f prog$i.f.ref
-   if [ $? -ne 0 ] ; then
-      echo "prog$i.f and prog$i.f.ref are not equal"
-      exit 1
+exe=$FINDENT
+rc=0
+for f in vim_help gedit_help vim_fortran vim_findent \
+   gedit_external gedit_plugin gedit_plugin_py \
+   emacs_help emacs_findent readme ; do
+   flag="--$f"
+   $exe $flag | head -n 2 | tr -d '\r' > $f.try
+   cmp -s ../$f.ref $f.try
+   r=$?
+   if [ $r -eq 0 ] ; then
+      echo "$flag : works OK"
+   else
+      echo "$flag : works NOT OK, compare $f.try and $f.ref"
    fi
+   rc=`expr $rc + $r` 
 done
-
 . ../postlude
-exit 0
+exit $rc
