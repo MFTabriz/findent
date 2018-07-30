@@ -121,7 +121,7 @@ bin_PROGRAMS    = findent
 
 findent_SOURCES = findent.cpp findent.h \
 		  mylexer.cpp myparser.cpp lexer.h parser.h \
-		  line_prep.cpp pre_analyzer.cpp debug.h \
+		  line_prep.cpp pre_analyzer.cpp debug.cpp debug.h \
 		  functions.cpp functions.h \
 		  line_prep.h pre_analyzer.h version.h \
 		  simpleostream.h \

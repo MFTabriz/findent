@@ -53,13 +53,6 @@ std::string remove_blanks(const std::string &s)
    return sl;
 }
 
-int ppp(const std::string &s)     // for ad-hoc debugging purposes
-{
-   //return 0;
-   std::cout<< "ppp:["+s+"]" << std::endl;
-   return 0;
-}
-
 char firstchar(const std::string &s)
 {
    size_t l = s.length();
@@ -268,7 +261,7 @@ std::string ltab2sp(const std::string &s)
    return leader + trim(s.substr(removed));
 }
 
-void remove_trailing_comment(std::string &s)
+std::string remove_trailing_comment(const std::string &s)
 {
    //
    // removes trailing comment, but only if not part of an
@@ -283,29 +276,30 @@ void remove_trailing_comment(std::string &s)
    // 'print *, " Hi! and goodbye" '
    //
 
+   std::string so = s;
    bool instring = 0;
    char q        = ' ';
-   for (unsigned int i=0; i<s.size(); i++)
+   for (unsigned int i=0; i<so.size(); i++)
    {
       if (instring)
       {
-	 if(s[i] == q)
+	 if(so[i] == q)
 	    instring = 0;
       }
       else
       {
-	 switch(s[i])
+	 switch(so[i])
 	 {
 	    case '"': case '\'':
 	       instring = 1;
-	       q = s[i];
+	       q = so[i];
 	       break;
 	    case '!':
-	       s.erase(i,std::string::npos);
-	       return;
+	       so.erase(i,std::string::npos);
+	       return so;
 	 }
       }
    }
-   return;
+   return so;
 }              // end of remove_trailing_comment
 

@@ -104,44 +104,32 @@ bool handle_pre(lines_t &ci, lines_t *co)
 	 break;
    }
 
-   int pregentype = 0;
-
-   switch(pretype)
-   {
-      case CPP_IF: case CPP_ENDIF: case CPP_ELSE: case CPP_ELIF: case CPP: 
-	 pregentype = CPP;
-	 break;
-      case COCO_IF: case COCO_ENDIF: case COCO_ELSE: case COCO_ELIF: case COCO: 
-	 pregentype = COCO;
-	 break;
-   }
+   int pregentype = ci.front().getpregentype();
 
    if(output)
       mycout << trim(s) << endline;
    else
       co->push_back(trim(s));
+
    ci.pop_front();
 
+   if(pregentype == COCO)
+      return 1;
+
    std::string lchar = std::string(1,lastchar(s));
+
    while (!ci.empty())
    {
-      if (pregentype == CPP && lchar != "\\")
+      //
+      // consume CPP continuation lines
+      //
+      if (lchar != "\\")
 	 return 1;
-      // coco continuation lines must start with ??, but we ignore that
 
-      if (pregentype == COCO && lchar != "&")
-	 return 1;
-
-      if(pregentype == COCO)                            // TODO 
-	 if(output)
-	    mycout <<ci.front().ltrim() << endline;
-	 else
-	    co->push_back(ci.front().ltrim());
+      if(output)
+	 mycout <<ci.front().orig() << endline;
       else
-	 if(output)
-	    mycout <<ci.front().orig() << endline;
-	 else
-	    co->push_back(ci.front().orig());
+	 co->push_back(ci.front().orig());
 
       lchar = ci.front().lastchar();
       ci.pop_front();
@@ -455,12 +443,3 @@ std::string handle_dos(const std::string &s)
    return sl;
 }         // end of handle_dos
 
-void ppp(const std::string &s, lines_t &lines)
-{
-   lines_t::iterator it = lines.begin();
-   while(it != lines.end()) 
-   {
-      mycout<<s<<it->orig()<<endline;
-      it++;
-   }
-}

@@ -175,7 +175,7 @@ void fixed2free(lines_t &lines)
 		  //
 		  std::string work = preprevquote + outputline;
 		  int p0 = work.size();
-		  remove_trailing_comment(work);
+		  work = remove_trailing_comment(work);
 		  int p  = work.size();
 		  if (p0 != p)
 		  {

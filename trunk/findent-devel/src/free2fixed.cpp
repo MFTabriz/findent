@@ -2,6 +2,7 @@
 #include <string>
 #include <sstream>
 
+#include "debug.h"
 #include "findent.h"
 #include "findent_functions.h"
 #include "free2fixed.h"
@@ -19,10 +20,8 @@ void free2fixed(lines_t &lines)
    // line is treated separately
    //
    std::string firstline  = lines.front().trimmed_line();
-   ppp("1:",lines);
    if(!handle_pre(lines,&nlines))
    {
-      ppp("2:",lines);
       os.str("");
       int l=6;
       if (firstline != "" || lines.size() > 1)
@@ -35,7 +34,6 @@ void free2fixed(lines_t &lines)
 	    //
 	    std::string label = firstline.substr(0,labellength);
 	    firstline         = trim(firstline.substr(labellength));
-	    //mycout << label;
 	    os << label << "      ";
 	 }
 	 //
@@ -55,13 +53,17 @@ void free2fixed(lines_t &lines)
 
 	 if (l<0)
 	    l=0;
-	 //mycout << std::string(l,' '); 
 	 os << std::string(l,' ');
       }
-      //mycout << firstline << endline;
-      if(firstline.length() > 0)
-	 if(firstline[firstline.length()-1] == '&')
-	    firstline = firstline.substr(0,firstline.length()-1);
+      //
+      // if last char is '&', discard it
+      // take care of trailing comment
+      //
+      std::string f1 = rtrim(remove_trailing_comment(firstline));
+
+      if (f1.length() > 0)
+	 if(f1[f1.length()-1] == '&')
+	    firstline = f1.substr(0,f1.length()-1)+firstline.substr(f1.length());
       os << firstline;
       nlines.push_back(os.str());
       lines.pop_front();
@@ -75,10 +77,8 @@ void free2fixed(lines_t &lines)
       //
       std::string fc  = lines.front().firstchar();
       std::string s ;
-      ppp("3:",lines);
       if(!handle_pre(lines,&nlines))
       {
-	 ppp("4:",lines);
 	 //
 	 // this must be a continuation or a comment line
 	 //
@@ -101,13 +101,16 @@ void free2fixed(lines_t &lines)
 	       //
 	       if (fc == "&")
 		  s = s.substr(1);
-	       os << "     a";
+	       os << "     &";
 	       //
 	       // if last char is '&', discard it
+	       // take care of trailing comment
 	       //
-	       if (s.length() > 0)
-		  if(s[s.length()-1] == '&')
-		     s = s.substr(0,s.length() - 1);
+	       std::string s1 = rtrim(remove_trailing_comment(s));
+
+	       if (s1.length() > 0)
+		  if(s1[s1.length()-1] == '&')
+		     s = s1.substr(0,s1.length()-1)+s.substr(s1.length());
 	       os << s;
 	    }
 	    else
@@ -120,8 +123,10 @@ void free2fixed(lines_t &lines)
 	    }
 	 }
 	 nlines.push_back(os.str());
-      lines.pop_front();
+	 lines.pop_front();
       }
    }
-   ppp("result:",nlines);
+   fortranline::setformat(FIXED);
+   fixed2fixed(nlines);
+   fortranline::setformat(FREE);
 }
