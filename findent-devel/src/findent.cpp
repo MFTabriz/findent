@@ -568,6 +568,8 @@ void get_full_statement()
 	 break;
       }
    }
+   // TODO if next line is a preproc, comment or blank, add it to curlines
+   // else, push it back
 }           // end of get_full_statement
 
 
@@ -617,8 +619,7 @@ void handle_free(bool &more)
    // remove trailing comment and trailing white space
    //
 
-   remove_trailing_comment(full_statement);
-   full_statement = rtrim(full_statement);
+   full_statement = rtrim(remove_trailing_comment(full_statement));
 
    // 
    // If the last character = '&', a continuation is expected.
@@ -699,8 +700,7 @@ void handle_fixed(bool &more)
       //
       curlines.push_back(curline);
       full_statement += trim(sl);
-      remove_trailing_comment(full_statement);
-      full_statement = rtrim(full_statement);
+      full_statement = rtrim(remove_trailing_comment(full_statement));
       more = 1;      // maybe there are continuation lines
       return;
    }
@@ -724,8 +724,7 @@ void handle_fixed(bool &more)
    //
    curlines.push_back(curline);
    full_statement += rtrim((rtrim(sl)+"      ").substr(6));
-   remove_trailing_comment(full_statement);
-   full_statement = rtrim(full_statement);
+   full_statement = rtrim(remove_trailing_comment(full_statement));
    more = 1;   // look for more continuation lines
    return;
 }           // end of handle_fixed

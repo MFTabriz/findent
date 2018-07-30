@@ -18,7 +18,6 @@ void              pop_all(void);
 int               pop_dolabel();
 int               pop_indent();
 struct propstruct pop_rprops();
-void              ppp(const std::string &s,lines_t &lines);
 struct            propstruct top_rprops();
 void              push_all(void);
 void              push_dolabel(int l);

@@ -11,7 +11,7 @@ bprog="`basename $prog`"
 rm -f "bprog.try.f"
 echo -n "$bprog: "
 case "$bprog" in
-   *fixed*) 
+   *progfixed*) 
       format="-ffixed-form -ffixed-line-length-none -fd-lines-as-comments"
       ;;
    *) 
@@ -21,7 +21,7 @@ esac
 
 $gfortran -fcoarray=single -cpp $format -o prog $prog >/dev/null 2>&1
 if [ $? -ne 0 ] ; then
-   echo -n " original program does not compile "
+   echo -n " original program does not compile using: -fcoarray=single -cpp $format -o prog $prog "
    rc=1
 fi
 
@@ -51,7 +51,7 @@ else
    rc=1
 fi
 case "$bprog" in
-   *free*) 
+   *free.f | *free1.f | *free-dos.f) 
       format="-ffree-form -ffree-line-length-none" 
       ;;
    *) 
@@ -60,7 +60,7 @@ case "$bprog" in
 esac
 $gfortran -fcoarray=single -cpp $format -o prog $bprog.try.f >/dev/null 2>&1
 if [ $? -ne 0 ] ; then
-   echo "        converted program does not compile "
+   echo "        converted program does not compile using: -fcoarray=single -cpp $format -o prog $bprog.try.f "
    rc=1
 fi
 
