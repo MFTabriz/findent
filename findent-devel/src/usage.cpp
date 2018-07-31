@@ -79,6 +79,7 @@ void usage(const bool doman)
    manout("-L<n>g, --input_line_length=<n>g" ,"same as above, but use gfortran convention"                 ,doman);
    manout(" ","for counting the characters with tabbed lines"                                              ,doman);
    manout(" "," example: --input_line_length=72g"                                                          ,doman);
+   manout("-ofixed, --output_format=fixed"     ,"force fixed format output"                                   ,doman);
    manout("-ofree, --output_format=free"     ,"force free format output"                                   ,doman);
    manout("-osame, --output_format=same"     ,"output format same is input format"                         ,doman);
    manout("-Rr, --refactor_procedures"       ,"refactor procedures and modules: the END line"              ,doman);
