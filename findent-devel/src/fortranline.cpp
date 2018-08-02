@@ -1,4 +1,7 @@
+#include <iostream>
+
 #include "fortranline.h"
+
 int fortranline::format;
 int fortranline::line_length;
 bool fortranline::gnu_format;
@@ -18,4 +21,11 @@ void fortranline::print()
    std::cout << "rest: ["           << rest()         << "]" << std::endl;
    std::cout << "format:"           << format2txt()   <<        std::endl;
 }
+
+std::ostream& operator <<(std::ostream &os,fortranline &obj)
+{
+      os<<obj.orig();
+      return os;
+}
+
 

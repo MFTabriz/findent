@@ -16,7 +16,7 @@ void fixed2fixed(lines_t &lines)
    {
       mycout.reset();
       std::string s   = lines.front().line();
-      if (!handle_pre(lines))
+      if (!handle_pre(lines,0))
       {
 	 if(lines.front().blank_or_comment())
 	 {
