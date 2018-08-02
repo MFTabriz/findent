@@ -105,6 +105,8 @@ class fortranline
       return orig_line;
    }
 
+   friend std::ostream& operator <<(std::ostream &os,fortranline &obj);
+
 #ifdef USE_CACHE
    void set_line(const std::string &s)
    {
@@ -448,17 +450,17 @@ class fortranline
    int getpregentype()
    {
       int  pretype = scanfixpre();
-	 switch(pretype)
-	 {
-	    case CPP_IF: case CPP_ENDIF: case CPP_ELSE: case CPP_ELIF: case CPP: 
-	       return CPP;
-	       break;
-	    case COCO_IF: case COCO_ENDIF: case COCO_ELSE: case COCO_ELIF: case COCO: 
-	       return COCO;
-	       break;
-	    default:
-	       return 0;
-	 }
+      switch(pretype)
+      {
+	 case CPP_IF: case CPP_ENDIF: case CPP_ELSE: case CPP_ELIF: case CPP: 
+	    return CPP;
+	    break;
+	 case COCO_IF: case COCO_ENDIF: case COCO_ELSE: case COCO_ELIF: case COCO: 
+	    return COCO;
+	    break;
+	 default:
+	    return 0;
+      }
    }
 
    bool precpp()

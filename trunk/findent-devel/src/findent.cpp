@@ -33,7 +33,7 @@ int               labellength;
 int               lines_read          = 0;
 simpleostream     mycout;
 bool              nbseen;                    // true if non-blank-line is seen 
-bool              needcon             = 0;   // true if next line needs continuation (free2fixed())
+bool              iscon               = 0;   // true if current line is a continuation
 int               num_lines;                 // number of lines read sofar
 int               output_format;
 pre_analyzer      prea;
@@ -43,11 +43,12 @@ bool              refactor_end_found;
 int               start_indent;
 int               stlabel;
 
-std::stack<bool> needcon_stack;   // used with free2fixed, 1: next line is a continuation
+iscon_t          iscon_stack;     // to store iscon
 dolabels_t       dolabels;        // to store labels, necessary for labelled do
 dolabels_stack_t dolabels_stack;  // to store dolabels stack
 indent_t         indent;          // to store indents
 indent_stack_t   indent_stack;    // to store indent stack
+fs_stack_t       fs_stack;        // to store full_statement
 linebuffer_t     curlinebuffer;   // deque for source lines
 lines_t          curlines;        // current line, one continuation line per item
 nbseen_stack_t   nbseen_stack;    // to store nbseen
@@ -142,7 +143,7 @@ int main(int argc, char*argv[])
    while(1)
    {
       get_full_statement();
-      indent_and_output();
+      //indent_and_output();
       if (end_of_file)
       {
 	 if(flags.last_indent_only)
@@ -454,6 +455,32 @@ void indent_and_output()
    }
 }               // end of indent_and_output
 
+void getnext()
+{
+   if (curlinebuffer.empty())
+      mygetline();
+   else
+   {
+      curline = curlinebuffer.front();
+      curlinebuffer.pop_front();
+      if (reading_from_tty && curline.orig() == ".")
+	 end_of_file = 1;
+   }
+
+   num_lines++;
+
+   if (!nbseen)
+   {
+      nbseen = !curline.blank_or_comment() && (curline.getpregentype() == 0);
+      if (flags.auto_firstindent && nbseen)
+      {
+	 start_indent = guess_indent(curline.orig());
+	 cur_indent   = start_indent;
+	 init_indent();
+	 indent_handled = 1;
+      }
+   }
+}
 
 void get_full_statement()
 {
@@ -508,6 +535,10 @@ void get_full_statement()
    bool fortran_more    = 0;
    int pretype          = 0;
 
+   enum{unknown = 1, in_preproc, in_fortran};
+   int state = unknown;
+
+#if 0
    while(1)
    {
       if (curlinebuffer.empty())
@@ -568,10 +599,247 @@ void get_full_statement()
 	 break;
       }
    }
-   // TODO if next line is a preproc, comment or blank, add it to curlines
-   // else, push it back
+#else
+
+   // finite state
+   void handle_fortran(fortranline &line,bool &more, bool &pushback);
+   bool ispre(const std::string &line);
+   std::string line;
+
+   bool f_more = 0;
+   bool p_more;
+   bool pushback;
+   getnext();
+
+start:
+   full_statement = "";
+   if (end_of_file) 
+      goto end_start;
+   pretype = curline.getpregentype();
+   if(pretype == CPP || pretype == COCO)
+      goto in_pre;
+   goto in_fortran;
+
+in_fortran:
+   handle_fortran(curline, f_more, pushback);
+   if (f_more)
+   {
+      getnext();
+      if (end_of_file)
+	 goto end_fortran;
+      pretype = curline.getpregentype();
+      if (pretype == CPP || pretype == COCO)
+      {
+	 indent_and_output();
+	 goto in_pre;
+      }
+      goto in_fortran;
+   }
+   indent_and_output();
+   iscon = 0;                // next line is not a continuation
+   if (!pushback)
+      getnext();
+   goto start;
+
+in_pre:
+   handle_pre_light1(curline,pretype,p_more);
+   if (p_more)
+   {
+      getnext();
+      if (end_of_file)
+	 goto end_pre;
+      goto in_pre;
+   }
+   handle_pre(curlines,f_more);
+   getnext();
+   goto start;
+
+end_start:
+   indent_and_output();
+   return;
+
+end_fortran:
+   indent_and_output();
+   return;
+
+end_pre:
+   indent_and_output();
+   return;
+
+#endif
 }           // end of get_full_statement
 
+void handle_free1(fortranline &curline, bool &more,bool &pushback);
+void handle_fixed1(fortranline &curline, bool &more,bool &pushback);
+
+void handle_fortran(fortranline &line,bool &more, bool &pushback)
+{
+   if (input_format == FREE)
+      handle_free1(line,more,pushback);
+   else
+      handle_fixed1(line,more,pushback);
+}
+
+void handle_free1(fortranline & curline, bool &more,bool &pushback)
+{
+   //
+   // adds curline to curlines
+   // adds curline (stripped from comments, preprocessor stuff and 
+   //    continuation stuff)  to full_statement
+   // more 1: more lines are to expected
+   //      0: this line is complete
+   //
+
+   pushback = 0;
+   //
+   // handle findentfix: 
+   //
+
+   if (curlines.empty())
+      if (curline.scanfixpre() == FINDENTFIX)
+	 full_statement = curline.rest();
+
+   //
+   //  if this line is pure comment or empty
+   //     add it to curlines
+   //
+
+   if (curline.blank_or_comment())
+   {
+      curlines.push_back(curline);
+      more = 0;
+      return;
+   }
+
+   //
+   // sl becomes the first input_line_length characters of curline
+   // and then trimmed left and right:
+   //
+
+   std::string sl = curline.trimmed_line();
+
+   if(curline.firstchar() == "&")
+   {
+      sl.erase(0,1);
+      sl = ltrim(sl);
+   }
+
+   full_statement = full_statement + sl;
+
+   //
+   // remove trailing comment and trailing white space
+   //
+
+   full_statement = rtrim(remove_trailing_comment(full_statement));
+
+   // 
+   // If the last character = '&', a continuation is expected.
+   //
+
+   more = ( lastchar(full_statement) == '&');
+   if (more)            // chop off '&' from full_statement :
+      full_statement.erase(full_statement.length()-1);
+
+   curlines.push_back(curline);
+}           // end of handle_free1
+
+
+void handle_fixed1(fortranline &curline, bool &more,bool &pushback)
+{
+   //
+   // adds curline to curlines
+   // adds curline (stripped from comments, preprocessor stuff and 
+   //    continuation stuff)  to full_statement
+   // more 1: more lines are to expected
+   //      0: this line is complete
+   //
+
+   //
+   // if this is a findentfix line:
+   //    Assume that no continuation lines can follow.
+   //    So, if there are already one or more lines read,
+   //    push this line on curlinebuffer and do not expect
+   //    continuation lines.
+   //    If, however this is the first line, handle this 
+   //    as a normal comment line: in that case no continuation
+   //    lines are requested either.
+   //
+
+   if (curline.scanfixpre() == FINDENTFIX)
+   {
+      if (curlines.empty())
+	 full_statement = curline.rest();
+      else 
+      {
+	 curlinebuffer.push_front(curline);
+	 num_lines--;
+	 more = 0;
+	 return;
+      }
+   }
+
+   if (curline.blank_or_comment() || curline.getpregentype() != 0)
+   {
+      //
+      // this is a blank or comment or preprocessor line
+      //
+      curlines.push_back(curline);
+
+      if (curlines.size() ==1)
+	 more = 0;   // do not expect continuation lines
+      else
+	 more = 1;   // but here we do
+      return;
+   }
+
+   std::string s = curline.line();
+
+   //
+   // replace leading tabs by spaces
+   //
+
+   std::string sl = s.substr(0,5);
+   if (s.length() >6)
+      sl = sl+' '+s.substr(6);
+
+   //
+   // this is a line with code
+   //
+   if (curlines.empty())
+   {
+      //
+      // this is the first line
+      //
+      curlines.push_back(curline);
+      full_statement += trim(sl);
+      full_statement = rtrim(remove_trailing_comment(full_statement));
+      more = 1;      // maybe there are continuation lines
+      return;
+   }
+
+   //
+   // this is possibly a continuation line
+   //
+   if (s.length() < 6 || s[5] == ' ' || s[5] == '0')
+   {
+      //
+      // this is not a continuation line
+      // push it back, we will see it later
+      //
+      curlinebuffer.push_front(curline);
+      num_lines--;
+      more = 0;          // do not look for further continuation lines
+      return;
+   }
+   //
+   // this is a continuation line
+   //
+   curlines.push_back(curline);
+   full_statement += rtrim((rtrim(sl)+"      ").substr(6));
+   full_statement = rtrim(remove_trailing_comment(full_statement));
+   more = 1;   // look for more continuation lines
+   return;
+}           // end of handle_fixed1
 
 void handle_free(bool &more)
 {
@@ -586,31 +854,34 @@ void handle_free(bool &more)
    //
    // handle findentfix: 
    //
+
    if (curlines.empty())
       if (curline.scanfixpre() == FINDENTFIX)
 	 full_statement = curline.rest();
-
-   //
-   // sl becomes the first input_line_length characters of curline
-   // and then trimmed left and right:
-   //
-   std::string sl = curline.trimmed_line();
-
-   if(curline.firstchar() == "&")
-   {
-      sl.erase(0,1);
-      sl = ltrim(sl);
-   }
 
    //
    //  if this line is pure comment or empty
    //     add it to curlines
    //
 
-   if (sl == "" || firstchar(sl) == '!' )
+   if (curline.blank_or_comment())
    {
       curlines.push_back(curline);
+      more = 0;
       return;
+   }
+
+   //
+   // sl becomes the first input_line_length characters of curline
+   // and then trimmed left and right:
+   //
+
+   std::string sl = curline.trimmed_line();
+
+   if(curline.firstchar() == "&")
+   {
+      sl.erase(0,1);
+      sl = ltrim(sl);
    }
 
    full_statement = full_statement + sl;
@@ -624,6 +895,7 @@ void handle_free(bool &more)
    // 
    // If the last character = '&', a continuation is expected.
    //
+
    more = ( lastchar(full_statement) == '&');
    if (more)            // chop off '&' :
       full_statement.erase(full_statement.length()-1);
@@ -743,7 +1015,7 @@ void output_line()
    if (!flags.apply_indent)
    {
       //
-      // no indention requested:
+      // no indentation requested:
       //
       while (! curlines.empty())
       {

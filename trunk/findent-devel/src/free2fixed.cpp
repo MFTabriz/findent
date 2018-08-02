@@ -20,7 +20,7 @@ void free2fixed(lines_t &lines)
    // line is treated separately
    //
    std::string firstline  = lines.front().trimmed_line();
-   if(!handle_pre(lines,&nlines))
+   if(!handle_pre(lines,0,&nlines))
    {
       os.str("");
       int l=6;
@@ -77,7 +77,7 @@ void free2fixed(lines_t &lines)
       //
       std::string fc  = lines.front().firstchar();
       std::string s ;
-      if(!handle_pre(lines,&nlines))
+      if(!handle_pre(lines,0,&nlines))
       {
 	 //
 	 // this must be a continuation or a comment line

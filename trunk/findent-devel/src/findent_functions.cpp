@@ -3,6 +3,7 @@
 
 #include "findent.h"
 #include "findent_functions.h"
+#include "debug.h"
 
 int determine_fix_or_free()
 {
@@ -62,7 +63,7 @@ int determine_fix_or_free()
 //     or, if there is no #else, from the code before the #if{,def,ndef}
 //
 
-bool handle_pre(lines_t &ci, lines_t *co)
+bool handle_pre(lines_t &ci, const bool f_more, lines_t *co)
 {
    //
    // NOTE: handle_pre can pop ci
@@ -92,13 +93,41 @@ bool handle_pre(lines_t &ci, lines_t *co)
 	       top_all();
 	    case pre_analyzer::ENDIF:
 	       pop_all();
-	       break;
 
 	    case pre_analyzer::ENDIFE:
 	       break;
 
 	    default:
 	       return 0;
+	       break;
+	 }
+
+	 switch(ifelse) // iscon needs apart treatment:
+	 {
+	    case pre_analyzer::IF:
+	       iscon = f_more;              // remember if a continuation is needed
+	       iscon_stack.push_back(iscon);
+	       break;
+
+	    case pre_analyzer::ELIF:
+	       iscon = 0;
+	       if (!iscon_stack.empty())
+		  iscon = iscon_stack.back();
+	       break;
+
+	    case pre_analyzer::ELSE:
+	       iscon = iscon_stack.back();
+	       break;
+
+	    case pre_analyzer::ENDIF:
+	    case pre_analyzer::ENDIFE:
+	       iscon = 0;
+	       if (!iscon_stack.empty())
+	       {
+		  iscon_stack.pop_back();
+		  if (!iscon_stack.empty())
+		     iscon = iscon_stack.back();
+	       }
 	       break;
 	 }
 	 break;
@@ -136,6 +165,30 @@ bool handle_pre(lines_t &ci, lines_t *co)
    }
    return 1;
 }       // end of handle_pre
+
+void handle_pre_light1(fortranline &fs, int &p, bool &more)
+{
+   //
+   // handles preprocessor lines and their continuations:
+   //
+   // fs (input):     line to handle
+   // p  (inout):     input:  type of line: CPP or COCO. 
+   //                 output: if no continuation is expected, p = 0
+   // more (output):  true if a continuation is expected
+   //
+   curlines.push_back(fs);
+   if(p == CPP)
+      more = (fs.lastchar() == "\\");
+   else
+      //
+      // since COCO lines always start with '??', there is no need
+      // to signify that another COCO line is expected
+      //
+      more = 0;
+
+   if(more == 0)
+      p = 0;
+}         // end of handle_pre_light1
 
 void handle_pre_light(fortranline &fs, int &p, bool &more)
 {
@@ -225,7 +278,7 @@ void init_indent()
    // if flags.all_indent <= 0: build indent_stack with a number of start_indent's
    //
    while(!indent.empty())
-      indent.pop();
+      indent.pop_back();
    int l=0;
    if(flags.all_indent > 0)
    {
@@ -240,6 +293,7 @@ void init_indent()
 	 push_indent(start_indent);
    }
    push_indent(start_indent);
+
 }             // end of init_indent
 
 void mygetline()
@@ -274,7 +328,7 @@ int pop_indent()
 {
    if (indent.empty())
       return 0;
-   indent.pop();
+   indent.pop_back();
    return top_indent();
 }         // end of pop_indent
 
@@ -282,24 +336,24 @@ int top_indent()
 {
    if (indent.empty())
       return 0;
-   return indent.top();
+   return indent.back();
 }         // end of top_indent
 
 void push_indent(int p)
 {
-   indent.push(p);
+   indent.push_back(p);
 }        // end of push_indent
 
 void push_rprops(struct propstruct p)
 {
-   rprops.push(p);
+   rprops.push_back(p);
 }        // end of push_rprops
 
 struct propstruct pop_rprops()
 {
    if (rprops.empty())
       return empty_rprop;
-   rprops.pop();
+   rprops.pop_back();
    return top_rprops();
 }       // end of pop_rprops
 
@@ -307,7 +361,7 @@ struct propstruct top_rprops()
 {
    if (rprops.empty())
       return empty_rprop;
-   return rprops.top();
+   return rprops.back();
 }       // end of top_rprops
 
 std::string whatrprop(struct propstruct p)
@@ -331,7 +385,7 @@ int pop_dolabel()
 {
    if (dolabels.empty())
       return -1;
-   dolabels.pop();
+   dolabels.pop_back();
    return top_dolabel();
 }        // end of pop_dolabel
 
@@ -339,18 +393,18 @@ int top_dolabel()
 {
    if (dolabels.empty())
       return -1;
-   return dolabels.top();
+   return dolabels.back();
 }        // end of top_dolabel
 
 void push_dolabel(int p)
 {
-   dolabels.push(p);
+   dolabels.push_back(p);
 }       // end of push_dolabel
 
 void empty_dolabels()
 {
    while(!dolabels.empty())
-      dolabels.pop();
+      dolabels.pop_back();
 }       // end of empty_dolabels
 
 int guess_fixedfree(const std::string &s)
@@ -372,39 +426,39 @@ int guess_fixedfree(const std::string &s)
 
 void push_all()
 {
-   indent_stack.push(indent);
-   nbseen_stack.push(nbseen);
-   rprops_stack.push(rprops);
-   dolabels_stack.push(dolabels);
-   needcon_stack.push(needcon);
+   dolabels_stack.push_back(dolabels);
+   fs_stack.push_back(full_statement);
+   indent_stack.push_back(indent);
+   nbseen_stack.push_back(nbseen);
+   rprops_stack.push_back(rprops);
 }         // end of push_all
 
 void top_all()
 {
-   if (!indent_stack.empty())
-      indent = indent_stack.top();
-   if (!nbseen_stack.empty())
-      nbseen = nbseen_stack.top();
-   if (!rprops_stack.empty())
-      rprops = rprops_stack.top();
    if (!dolabels_stack.empty())
-      dolabels = dolabels_stack.top();
-   if (!needcon_stack.empty())
-      needcon = needcon_stack.top();
+      dolabels = dolabels_stack.back();
+   if (!fs_stack.empty())
+      full_statement = fs_stack.back();
+   if (!indent_stack.empty())
+      indent = indent_stack.back();
+   if (!nbseen_stack.empty())
+      nbseen = nbseen_stack.back();
+   if (!rprops_stack.empty())
+      rprops = rprops_stack.back();
 }         // end of top_all
 
 void pop_all()
 {
-   if (!indent_stack.empty())
-      indent_stack.pop();
-   if (!nbseen_stack.empty())
-      nbseen_stack.pop();
-   if (!rprops_stack.empty())
-      rprops_stack.pop();
    if (!dolabels_stack.empty())
-      dolabels_stack.pop();
-   if (!needcon_stack.empty())
-      needcon_stack.pop();
+      dolabels_stack.pop_back();
+   if (!fs_stack.empty())
+      fs_stack.pop_back();
+   if (!indent_stack.empty())
+      indent_stack.pop_back();
+   if (!nbseen_stack.empty())
+      nbseen_stack.pop_back();
+   if (!rprops_stack.empty())
+      rprops_stack.pop_back();
 }        // end of pop_all
 
 int what_to_return()
