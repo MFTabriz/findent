@@ -14,6 +14,7 @@ void free2free(lines_t &lines)
    // line is treated separately
    //
 
+   //ppps("free2free: full stat",full_statement);
    std::string firstline  = lines.front().trimmed_line();
    int l=0;
    if(!iscon)

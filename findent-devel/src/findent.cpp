@@ -21,7 +21,6 @@
 #include "version.h"
 #include "vim_plugin.h"
 
-
 int               cur_indent;
 struct propstruct cur_rprop           = empty_rprop;
 fortranline       curline;
@@ -533,18 +532,11 @@ void get_full_statement()
    //     )
    //
 
-   full_statement       = "";
-   indent_handled       = 0;
-   bool preproc_more    = 0;
-   bool fortran_more    = 0;
-   int pretype          = 0;
-
-   enum{unknown = 1, in_preproc, in_fortran};
-   int state = unknown;
+   full_statement = "";
+   indent_handled = 0;
+   int pretype;
 
    // finite state
-   void handle_fortran(fortranline &line,bool &more, bool &pushback);
-   bool ispre(const std::string &line);
    std::string line;
 
    bool f_more = 0;
@@ -609,58 +601,47 @@ end_pre:
 
 }           // end of get_full_statement
 
-void handle_free1(fortranline &curline, bool &more,bool &pushback);
 void handle_fixed1(fortranline &curline, bool &more,bool &pushback);
 
 void handle_fortran(fortranline &line,bool &more, bool &pushback)
 {
    if (input_format == FREE)
-      handle_free1(line,more,pushback);
+      handle_free(line,more,pushback);
    else
+   {
       handle_fixed1(line,more,pushback);
+   }
 }
 
-void handle_free1(fortranline & curline, bool &more,bool &pushback)
+void handle_free(fortranline & line, bool &more,bool &pushback)
 {
    //
-   // adds curline to curlines
-   // adds curline (stripped from comments, preprocessor stuff and 
+   // adds line to curlines
+   // adds line (stripped from comments, preprocessor stuff and 
    //    continuation stuff)  to full_statement
    // more 1: more lines are to expected
    //      0: this line is complete
    //
 
    pushback = 0;
-   //
-   // handle findentfix: 
-   //
 
    if (curlines.empty())
-   {
-      switch (curline.scanfixpre())
-      {
-	 case FINDENTFIX:
-	    full_statement = curline.rest();
-	    break;
-	 case PPP_ON:
-	    ppp_on = 1;     // debug.h, debug.cpp
-	    break;
-	 case PPP_OFF:
-	    ppp_on = 0;
-	    break;
-      }
-   }
+      handle_findentfix(line);
+   // 
+   // if line is a findentfix line, full_statement is already
+   // taken care for and line will be pushed at the end of this function
+   //
 
-   if (!curline.blank_or_comment())
+   if (!line.blank_or_comment())
    {
       //
-      // sl becomes the first input_line_length characters of curline
+      // sl becomes the first input_line_length characters of line
       // and then trimmed left and right:
       //
 
-      std::string sl = curline.trimmed_line();
+      std::string sl = line.trimmed_line();
 
-      if(curline.firstchar() == "&")
+      if(line.firstchar() == "&")
       {
 	 sl.erase(0,1);
 	 sl = ltrim(sl);
@@ -681,21 +662,40 @@ void handle_free1(fortranline & curline, bool &more,bool &pushback)
       more = ( lastchar(full_statement) == '&');
       if (more)            // chop off '&' from full_statement :
 	 full_statement.erase(full_statement.length()-1);
-
    }
-   curlines.push_back(curline);
-}           // end of handle_free1
+   curlines.push_back(line);
+}           // end of handle_free
 
+bool handle_findentfix(fortranline &line)
+{
+   bool rc = 0;
+   switch (line.scanfixpre())
+   {
+      case FINDENTFIX:
+	 full_statement = rtrim(remove_trailing_comment(line.rest()));
+	 rc = 1;
+	 break;
+      case PPP_ON:
+	 ppp_on = 1;     // debug.h, debug.cpp
+	 break;
+      case PPP_OFF:
+	 ppp_on = 0;
+	 break;
+   }
+   return rc;
+}
 
-void handle_fixed1(fortranline &curline, bool &more,bool &pushback)
+void handle_fixed1(fortranline &line, bool &more, bool &pushback)
 {
    //
-   // adds curline to curlines
-   // adds curline (stripped from comments, preprocessor stuff and 
+   // adds line to curlines
+   // adds line (stripped from comments, preprocessor stuff and 
    //    continuation stuff)  to full_statement
    // more 1: more lines are to expected
    //      0: this line is complete
    //
+
+   pushback = 0;
 
    //
    // if this is a findentfix line:
@@ -708,25 +708,23 @@ void handle_fixed1(fortranline &curline, bool &more,bool &pushback)
    //    lines are requested either.
    //
 
-   if (curline.scanfixpre() == FINDENTFIX)
+   if (handle_findentfix(line))
    {
-      if (curlines.empty())
-	 full_statement = curline.rest();
-      else 
+      ppps("handle",line.orig());
+      if (!curlines.empty())
       {
-	 curlinebuffer.push_front(curline);
-	 num_lines--;
 	 more = 0;
+	 curlines.push_back(line);
 	 return;
       }
    }
 
-   if (curline.blank_or_comment() || curline.getpregentype() != 0)
+   if (line.blank_or_comment())
    {
       //
-      // this is a blank or comment or preprocessor line
+      // this is a blank or comment line
       //
-      curlines.push_back(curline);
+      curlines.push_back(line);
 
       if (curlines.size() ==1)
 	 more = 0;   // do not expect continuation lines
@@ -735,7 +733,7 @@ void handle_fixed1(fortranline &curline, bool &more,bool &pushback)
       return;
    }
 
-   std::string s = curline.line();
+   std::string s = line.line();
 
    //
    // replace leading tabs by spaces
@@ -753,7 +751,7 @@ void handle_fixed1(fortranline &curline, bool &more,bool &pushback)
       //
       // this is the first line
       //
-      curlines.push_back(curline);
+      curlines.push_back(line);
       full_statement += trim(sl);
       full_statement = rtrim(remove_trailing_comment(full_statement));
       more = 1;      // maybe there are continuation lines
@@ -769,82 +767,19 @@ void handle_fixed1(fortranline &curline, bool &more,bool &pushback)
       // this is not a continuation line
       // push it back, we will see it later
       //
-      curlinebuffer.push_front(curline);
-      num_lines--;
+      pushback = 1;
       more = 0;          // do not look for further continuation lines
       return;
    }
    //
    // this is a continuation line
    //
-   curlines.push_back(curline);
+   curlines.push_back(line);
    full_statement += rtrim((rtrim(sl)+"      ").substr(6));
    full_statement = rtrim(remove_trailing_comment(full_statement));
    more = 1;   // look for more continuation lines
    return;
 }           // end of handle_fixed1
-
-void handle_free(bool &more)
-{
-   //
-   // adds curline to curlines
-   // adds curline (stripped from comments, preprocessor stuff and 
-   //    continuation stuff)  to full_statement
-   // more 1: more lines are to expected
-   //      0: this line is complete
-   //
-
-   //
-   // handle findentfix: 
-   //
-
-   if (curlines.empty())
-      if (curline.scanfixpre() == FINDENTFIX)
-	 full_statement = curline.rest();
-
-   //
-   //  if this line is pure comment or empty
-   //     add it to curlines
-   //
-
-   if (curline.blank_or_comment())
-   {
-      curlines.push_back(curline);
-      more = 0;
-      return;
-   }
-
-   //
-   // sl becomes the first input_line_length characters of curline
-   // and then trimmed left and right:
-   //
-
-   std::string sl = curline.trimmed_line();
-
-   if(curline.firstchar() == "&")
-   {
-      sl.erase(0,1);
-      sl = ltrim(sl);
-   }
-
-   full_statement = full_statement + sl;
-
-   //
-   // remove trailing comment and trailing white space
-   //
-
-   full_statement = rtrim(remove_trailing_comment(full_statement));
-
-   // 
-   // If the last character = '&', a continuation is expected.
-   //
-
-   more = ( lastchar(full_statement) == '&');
-   if (more)            // chop off '&' :
-      full_statement.erase(full_statement.length()-1);
-
-   curlines.push_back(curline);
-}           // end of handle_free
 
 
 void handle_fixed(bool &more)

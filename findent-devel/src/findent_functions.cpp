@@ -121,13 +121,9 @@ bool handle_pre(lines_t &ci, const bool f_more, lines_t *co)
 
 	    case pre_analyzer::ENDIF:
 	    case pre_analyzer::ENDIFE:
-	       iscon = 0;
+	       iscon = f_more;
 	       if (!iscon_stack.empty())
-	       {
 		  iscon_stack.pop_back();
-		  if (!iscon_stack.empty())
-		     iscon = iscon_stack.back();
-	       }
 	       break;
 	 }
 	 break;
