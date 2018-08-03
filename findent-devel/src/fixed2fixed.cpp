@@ -9,18 +9,14 @@
 
 void fixed2fixed(lines_t &lines)
 {
-   unsigned int old_indent   = 0;
-   unsigned static int first_indent = 0;
-   char prevquote            = ' ';
+   unsigned int old_indent          = 0;
+   static unsigned int first_indent = 0;
+   char prevquote                   = ' ';
 
-   ppp("fixed2fixed:",lines);
    while(!lines.empty())
    {
       mycout.reset();
       std::string s   = lines.front().line();
-      ppps("fixed2fixed: s",s);
-      //if (!handle_pre(lines,0))
-      //{
       if(lines.front().blank_or_comment())
       {
 	 //
@@ -37,7 +33,6 @@ void fixed2fixed(lines_t &lines)
 	 mycout << lines.front().orig() << endline;  // garbage in, garbage out
       else
       {
-	 ppps("fixed2fixed: cur_indent",number2string(cur_indent));
 	 mycout << s.substr(0,6);
 
 	 if(s.length() > 6)
@@ -65,7 +60,6 @@ void fixed2fixed(lines_t &lines)
 	    if (adjust_indent < 0)
 	       adjust_indent = 0;
 
-	    ppps("fixed2fixed: adjust_indent",number2string(first_indent)+":"+number2string(old_indent)+":"+number2string(adjust_indent));
 	    switch(prevquote)
 	    {
 	       case ' ' :   // no dangling strings, output with indent
@@ -83,6 +77,5 @@ void fixed2fixed(lines_t &lines)
 	 mycout << endline;
       }
       lines.pop_front();
-      //}
    }
 }
