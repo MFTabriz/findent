@@ -10,13 +10,15 @@
 #include "prop.h"
 #include "simpleostream.h"
 
-void free2free();
 void get_full_statement();
+bool handle_findentfix(fortranline &line);
 void handle_fixed(bool &more);
-void handle_free(bool &more);
+void handle_fortran(fortranline &line,bool &more, bool &pushback);
+void handle_free(fortranline &curline, bool &more,bool &pushback);
 void handle_last_usable_only();
 void handle_refactor();
 void indent_and_output();
+bool ispre(const std::string &line);
 void output_line();
 void set_default_indents();
 
