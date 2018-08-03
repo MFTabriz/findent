@@ -218,6 +218,18 @@ where             { D(O("WHERE");Y;);             return WHERE;             }
 }
 
 <state_scanfixpre>{
+{b}*\!{b}*findentfix:ppp-on   { D(O("FINDENTFIX PPP-ON");Y;); 
+				return PPP_ON;
+		              }
+^[c\*]{b}*findentfix:ppp-on   { D(O("FIXFINDENTFIX PPP-ON");Y;);
+				return PPP_ON;
+		              }
+{b}*\!{b}*findentfix:ppp-off  { D(O("FINDENTFIX PPP-OFF");Y;); 
+				return PPP_OFF;
+		              }
+^[c\*]{b}*findentfix:ppp-off  { D(O("FIXFINDENTFIX PPP-OFF");Y;);
+				return PPP_OFF;
+		              }
 {b}*\!{b}*findentfix:         { D(O("FINDENTFIX");Y;); 
                                 size_t l = input_string.length()-yyleng-1;
                                 lexer_rest = input_string.substr(yyleng,l);

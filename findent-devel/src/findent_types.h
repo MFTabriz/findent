@@ -2,8 +2,6 @@
 #define FINDENT_TYPES_H
 
 #include <deque>
-#include <list>
-#include <stack>
 
 #include "fortranline.h"
 #include "prop.h"
@@ -13,7 +11,7 @@ typedef std::deque<dolabels_t>        dolabels_stack_t;
 typedef std::deque<int>               indent_t;
 typedef std::deque<indent_t>          indent_stack_t;
 typedef std::deque<std::string>       fs_stack_t;
-typedef std::list<fortranline>        lines_t;
+typedef std::deque<fortranline>       lines_t;
 typedef std::deque<fortranline>       linebuffer_t;
 typedef std::deque<bool>              nbseen_stack_t;
 typedef std::deque<bool>              iscon_t;
