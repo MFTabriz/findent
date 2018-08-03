@@ -1,4 +1,7 @@
 // $Id$
+#include <iostream>
+#include <string>
+#include <stack>
 
 #include "debug.h"
 #include "emacs_plugin.h"
@@ -240,6 +243,7 @@ void indent_and_output()
 {
    std::string rest = full_statement;
    bool first_time  = 1;
+   indent_handled   = 0;
    while(1)
    {
       line_prep p(rest);
@@ -538,69 +542,6 @@ void get_full_statement()
    enum{unknown = 1, in_preproc, in_fortran};
    int state = unknown;
 
-#if 0
-   while(1)
-   {
-      if (curlinebuffer.empty())
-	 mygetline();
-      else
-      {
-	 curline = curlinebuffer.front();
-	 curlinebuffer.pop_front();
-	 if (reading_from_tty && curline.orig() == ".")
-	    end_of_file = 1;
-      }
-
-      num_lines++;
-
-      if (!nbseen)
-      {
-	 nbseen = !curline.blank_or_comment() && (curline.getpregentype() == 0);
-	 if (flags.auto_firstindent && nbseen)
-	 {
-	    start_indent = guess_indent(curline.orig());
-	    cur_indent   = start_indent;
-	    init_indent();
-	    indent_handled = 1;
-	 }
-      }
-
-      if (end_of_file)
-      {
-	 preproc_more = 0;
-	 fortran_more = 0;
-	 break;
-      }
-
-      if (!preproc_more)
-	 pretype = curline.getpregentype();
-
-      if (pretype != 0)
-      {
-	 curlines.push_back(curline);
-	 handle_pre_light(curline,pretype,preproc_more);
-	 if (preproc_more || fortran_more)
-	    continue;
-	 break;
-      }
-
-      if (input_format == FREE)
-      {
-	 handle_free(fortran_more);
-	 if (fortran_more) 
-	    continue;
-	 break;
-      }
-      else
-      {
-	 handle_fixed(fortran_more);
-	 if (fortran_more)
-	    continue;
-	 break;
-      }
-   }
-#else
-
    // finite state
    void handle_fortran(fortranline &line,bool &more, bool &pushback);
    bool ispre(const std::string &line);
@@ -666,7 +607,6 @@ end_pre:
    indent_and_output();
    return;
 
-#endif
 }           // end of get_full_statement
 
 void handle_free1(fortranline &curline, bool &more,bool &pushback);
@@ -696,50 +636,53 @@ void handle_free1(fortranline & curline, bool &more,bool &pushback)
    //
 
    if (curlines.empty())
-      if (curline.scanfixpre() == FINDENTFIX)
-	 full_statement = curline.rest();
-
-   //
-   //  if this line is pure comment or empty
-   //     add it to curlines
-   //
-
-   if (curline.blank_or_comment())
    {
-      curlines.push_back(curline);
-      more = 0;
-      return;
+      switch (curline.scanfixpre())
+      {
+	 case FINDENTFIX:
+	    full_statement = curline.rest();
+	    break;
+	 case PPP_ON:
+	    ppp_on = 1;     // debug.h, debug.cpp
+	    break;
+	 case PPP_OFF:
+	    ppp_on = 0;
+	    break;
+      }
    }
 
-   //
-   // sl becomes the first input_line_length characters of curline
-   // and then trimmed left and right:
-   //
-
-   std::string sl = curline.trimmed_line();
-
-   if(curline.firstchar() == "&")
+   if (!curline.blank_or_comment())
    {
-      sl.erase(0,1);
-      sl = ltrim(sl);
+      //
+      // sl becomes the first input_line_length characters of curline
+      // and then trimmed left and right:
+      //
+
+      std::string sl = curline.trimmed_line();
+
+      if(curline.firstchar() == "&")
+      {
+	 sl.erase(0,1);
+	 sl = ltrim(sl);
+      }
+
+      full_statement = full_statement + sl;
+
+      //
+      // remove trailing comment and trailing white space
+      //
+
+      full_statement = rtrim(remove_trailing_comment(full_statement));
+
+      // 
+      // If the last character = '&', a continuation is expected.
+      //
+
+      more = ( lastchar(full_statement) == '&');
+      if (more)            // chop off '&' from full_statement :
+	 full_statement.erase(full_statement.length()-1);
+
    }
-
-   full_statement = full_statement + sl;
-
-   //
-   // remove trailing comment and trailing white space
-   //
-
-   full_statement = rtrim(remove_trailing_comment(full_statement));
-
-   // 
-   // If the last character = '&', a continuation is expected.
-   //
-
-   more = ( lastchar(full_statement) == '&');
-   if (more)            // chop off '&' from full_statement :
-      full_statement.erase(full_statement.length()-1);
-
    curlines.push_back(curline);
 }           // end of handle_free1
 

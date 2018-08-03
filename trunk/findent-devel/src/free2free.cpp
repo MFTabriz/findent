@@ -13,6 +13,7 @@ void free2free(lines_t &lines)
    // (user can choose between indent or original), the first
    // line is treated separately
    //
+
    std::string firstline  = lines.front().trimmed_line();
    int l=0;
    if(!iscon)

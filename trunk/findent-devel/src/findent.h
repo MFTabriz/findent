@@ -1,9 +1,6 @@
 #ifndef FINDENT_H
 #define FINDENT_H
 
-#include <deque>
-#include <list>
-#include <stack>
 #include <string>
 
 #include "findent_types.h"
@@ -26,17 +23,18 @@ void set_default_indents();
 
 extern  int            cur_indent;
 extern  fortranline    curline;
-extern  bool           end_of_file;
 extern  std::string    endline;
 extern  bool           endline_set;
+extern  bool           end_of_file;
 extern  Flags          flags;
 extern  std::string    full_statement;
+extern  bool           indent_handled;
 extern  int            input_format;
+extern  bool           iscon;
 extern  int            labellength;
 extern  int            lines_read;
 extern  simpleostream  mycout;
 extern  bool           nbseen;            //  true if non-blank-line is seen
-extern  bool           iscon;
 extern  int            output_format;
 extern  pre_analyzer   prea;
 extern  bool           reading_from_tty;

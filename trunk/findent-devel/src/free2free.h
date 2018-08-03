@@ -1,4 +1,8 @@
 #ifndef FREE2FREE_H
 #define FREE2FREE_H
-void free2free(std::list<fortranline> &lines);
+
+#include "findent_types.h"
+
+void free2free(lines_t &lines);
+
 #endif
