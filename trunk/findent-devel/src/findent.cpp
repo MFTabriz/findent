@@ -532,13 +532,14 @@ void get_full_statement()
    //     )
    //
 
+
+   //
+   // if things get hairy: try a finite state machine
+   //
+   std::string line;
    full_statement = "";
    indent_handled = 0;
    int pretype;
-
-   // finite state
-   std::string line;
-
    bool f_more = 0;
    bool p_more;
    bool pushback;
@@ -551,7 +552,19 @@ start:
    pretype = curline.getpregentype();
    if(pretype == CPP || pretype == COCO)
       goto in_pre;
+   if (is_findentfix(curline))
+      goto in_ffix;
    goto in_fortran;
+
+in_ffix:
+   indent_and_output();
+   curlines.push_back(curline);
+   full_statement = "";
+   indent_and_output();
+   full_statement = rtrim(remove_trailing_comment(curline.rest()));
+   indent_and_output();
+   getnext();
+   goto start;
 
 in_fortran:
    handle_fortran(curline, f_more, pushback);
@@ -566,6 +579,8 @@ in_fortran:
 	 indent_and_output();
 	 goto in_pre;
       }
+      if (is_findentfix(curline))
+	 goto in_ffix;
       goto in_fortran;
    }
    indent_and_output();
@@ -625,13 +640,6 @@ void handle_free(fortranline & line, bool &more,bool &pushback)
 
    pushback = 0;
 
-   if (curlines.empty())
-      handle_findentfix(line);
-   // 
-   // if line is a findentfix line, full_statement is already
-   // taken care for and line will be pushed at the end of this function
-   //
-
    if (!line.blank_or_comment())
    {
       //
@@ -666,13 +674,12 @@ void handle_free(fortranline & line, bool &more,bool &pushback)
    curlines.push_back(line);
 }           // end of handle_free
 
-bool handle_findentfix(fortranline &line)
+bool is_findentfix(fortranline &line)
 {
    bool rc = 0;
    switch (line.scanfixpre())
    {
       case FINDENTFIX:
-	 full_statement = rtrim(remove_trailing_comment(line.rest()));
 	 rc = 1;
 	 break;
       case PPP_ON:
@@ -696,28 +703,6 @@ void handle_fixed1(fortranline &line, bool &more, bool &pushback)
    //
 
    pushback = 0;
-
-   //
-   // if this is a findentfix line:
-   //    Assume that no continuation lines can follow.
-   //    So, if there are already one or more lines read,
-   //    push this line on curlinebuffer and do not expect
-   //    continuation lines.
-   //    If, however this is the first line, handle this 
-   //    as a normal comment line: in that case no continuation
-   //    lines are requested either.
-   //
-
-   if (handle_findentfix(line))
-   {
-      ppps("handle",line.orig());
-      if (!curlines.empty())
-      {
-	 more = 0;
-	 curlines.push_back(line);
-	 return;
-      }
-   }
 
    if (line.blank_or_comment())
    {
