@@ -138,7 +138,6 @@ int main(int argc, char*argv[])
    if (flags.last_usable_only)
    {
       mycout.setoutput(0);
-      //std::cout << "ppp tralala:" << num_lines << std::endl;
       handle_last_usable_only();
       return what_to_return();
    }
@@ -175,16 +174,13 @@ void handle_last_usable_only()
    while(1)
    {
       int prev         = num_lines;
-      //std::cout << "xxx ppp:" << num_lines << std::endl;
       bool usable      = 0;
       get_full_statement();
-      //std::cout << "ppp num_lines:"+number2string(num_lines)+":"+full_statement<< std::endl;
       line_prep p(full_statement);
       propstruct props = parseline(p);
       switch (props.kind)
       {
 	 case BLANK:
-	    //std::cout << "ppp blank" << std::endl;
 	 case CASE:
 	 case CONTAINS:
 	 case ENTRY:
@@ -241,7 +237,6 @@ void handle_last_usable_only()
       if (end_of_file)
       {
 	 std::cout << usable_line << endline;
-	 //std::cout << "ppp hoppa"<<std::endl;
 	 return;
       }
    }
@@ -482,7 +477,6 @@ void getnext()
    num_lines++;
    if (end_of_file)
       num_lines --;
-   //std::cout << "num_lines ppp:" << num_lines << std::endl;
 
    if (!nbseen)
    {

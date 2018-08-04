@@ -20,10 +20,10 @@ void free2fixed(lines_t &lines)
    // line is treated separately
    //
    std::string firstline  = lines.front().trimmed_line();
-   if(!handle_pre(lines,0,&nlines))
+   os.str("");
+   int l=6;
+   if(!iscon)
    {
-      os.str("");
-      int l=6;
       if (firstline != "" || lines.size() > 1)
       {
 	 std::string ofc = lines.front().orig().substr(0,1);
@@ -72,59 +72,53 @@ void free2fixed(lines_t &lines)
    while (!lines.empty())
    {
       os.str("");
-      //
-      // sometimes, there are preprocessor statements within a continuation ...
-      //
       std::string fc  = lines.front().firstchar();
       std::string s ;
-      if(!handle_pre(lines,0,&nlines))
-      {
-	 //
-	 // this must be a continuation or a comment line
-	 //
+      //
+      // this must be a continuation or a comment line
+      //
 
-	 std::string ofc = lines.front().orig().substr(0,1);
-	 if (ofc == "!")
-	    os << lines.front().orig();
-	 else if (fc == "!")
-	    os << " " << lines.front().orig();
+      std::string ofc = lines.front().orig().substr(0,1);
+      if (ofc == "!")
+	 os << lines.front().orig();
+      else if (fc == "!")
+	 os << " " << lines.front().orig();
+      else
+      {
+	 s = lines.front().trimmed_line();
+	 //
+	 // this must be a continuation line
+	 //
+	 if (flags.indent_cont || fc == "&")
+	 {
+	    //
+	    // if continuation starts with '&', chop off '&'
+	    //
+	    if (fc == "&")
+	       s = s.substr(1);
+	    os << "     &";
+	    //
+	    // if last char is '&', discard it
+	    // take care of trailing comment
+	    //
+	    std::string s1 = rtrim(remove_trailing_comment(s));
+
+	    if (s1.length() > 0)
+	       if(s1[s1.length()-1] == '&')
+		  s = s1.substr(0,s1.length()-1)+s.substr(s1.length());
+	    os << s;
+	 }
 	 else
 	 {
-	    s = lines.front().trimmed_line();
-	    //
-	    // this must be a continuation line
-	    //
-	    if (flags.indent_cont || fc == "&")
-	    {
-	       //
-	       // if continuation starts with '&', chop off '&'
-	       //
-	       if (fc == "&")
-		  s = s.substr(1);
-	       os << "     &";
-	       //
-	       // if last char is '&', discard it
-	       // take care of trailing comment
-	       //
-	       std::string s1 = rtrim(remove_trailing_comment(s));
-
-	       if (s1.length() > 0)
-		  if(s1[s1.length()-1] == '&')
-		     s = s1.substr(0,s1.length()-1)+s.substr(s1.length());
-	       os << s;
-	    }
-	    else
-	    {
-	       std::string s = lines.front().rtrim();
-	       if (s.length() > 0)
-		  if(s[s.length()-1] == '&')
-		     s = s.substr(0,s.length() - 1);
-	       os << "     &" + s;
-	    }
+	    std::string s = lines.front().rtrim();
+	    if (s.length() > 0)
+	       if(s[s.length()-1] == '&')
+		  s = s.substr(0,s.length() - 1);
+	    os << "     &" + s;
 	 }
-	 nlines.push_back(os.str());
-	 lines.pop_front();
       }
+      nlines.push_back(os.str());
+      lines.pop_front();
    }
    fortranline::setformat(FIXED);
    fixed2fixed(nlines);

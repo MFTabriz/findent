@@ -62,9 +62,6 @@ void free2free(lines_t &lines)
    while (!lines.empty())
    {
       mycout.reset();
-      //
-      // sometimes, there are preprocessor statements within a continuation ...
-      //
       std::string fc  = lines.front().firstchar();
       std::string s ;
       std::string ofc = lines.front().orig().substr(0,1);
