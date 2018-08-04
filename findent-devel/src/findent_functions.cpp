@@ -106,24 +106,24 @@ bool handle_pre(lines_t &ci, const bool f_more, lines_t *co)
 	 {
 	    case pre_analyzer::IF:
 	       iscon = f_more;              // remember if a continuation is needed
-	       iscon_stack.push_back(iscon);
+	       iscon_store.push_back(iscon);
 	       break;
 
 	    case pre_analyzer::ELIF:
 	       iscon = 0;
-	       if (!iscon_stack.empty())
-		  iscon = iscon_stack.back();
+	       if (!iscon_store.empty())
+		  iscon = iscon_store.back();
 	       break;
 
 	    case pre_analyzer::ELSE:
-	       iscon = iscon_stack.back();
+	       iscon = iscon_store.back();
 	       break;
 
 	    case pre_analyzer::ENDIF:
 	    case pre_analyzer::ENDIFE:
 	       iscon = f_more;
-	       if (!iscon_stack.empty())
-		  iscon_stack.pop_back();
+	       if (!iscon_store.empty())
+		  iscon_store.pop_back();
 	       break;
 	 }
 	 break;
@@ -422,39 +422,39 @@ int guess_fixedfree(const std::string &s)
 
 void push_all()
 {
-   dolabels_stack.push_back(dolabels);
-   fs_stack.push_back(full_statement);
-   indent_stack.push_back(indent);
-   nbseen_stack.push_back(nbseen);
-   rprops_stack.push_back(rprops);
+   dolabels_store.push_back(dolabels);
+   fs_store.push_back(full_statement);
+   indent_store.push_back(indent);
+   nbseen_store.push_back(nbseen);
+   rprops_store.push_back(rprops);
 }         // end of push_all
 
 void top_all()
 {
-   if (!dolabels_stack.empty())
-      dolabels = dolabels_stack.back();
-   if (!fs_stack.empty())
-      full_statement = fs_stack.back();
-   if (!indent_stack.empty())
-      indent = indent_stack.back();
-   if (!nbseen_stack.empty())
-      nbseen = nbseen_stack.back();
-   if (!rprops_stack.empty())
-      rprops = rprops_stack.back();
+   if (!dolabels_store.empty())
+      dolabels = dolabels_store.back();
+   if (!fs_store.empty())
+      full_statement = fs_store.back();
+   if (!indent_store.empty())
+      indent = indent_store.back();
+   if (!nbseen_store.empty())
+      nbseen = nbseen_store.back();
+   if (!rprops_store.empty())
+      rprops = rprops_store.back();
 }         // end of top_all
 
 void pop_all()
 {
-   if (!dolabels_stack.empty())
-      dolabels_stack.pop_back();
-   if (!fs_stack.empty())
-      fs_stack.pop_back();
-   if (!indent_stack.empty())
-      indent_stack.pop_back();
-   if (!nbseen_stack.empty())
-      nbseen_stack.pop_back();
-   if (!rprops_stack.empty())
-      rprops_stack.pop_back();
+   if (!dolabels_store.empty())
+      dolabels_store.pop_back();
+   if (!fs_store.empty())
+      fs_store.pop_back();
+   if (!indent_store.empty())
+      indent_store.pop_back();
+   if (!nbseen_store.empty())
+      nbseen_store.pop_back();
+   if (!rprops_store.empty())
+      rprops_store.pop_back();
 }        // end of pop_all
 
 int what_to_return()

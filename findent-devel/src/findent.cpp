@@ -1,7 +1,6 @@
 // $Id$
 #include <iostream>
 #include <string>
-#include <stack>
 
 #include "debug.h"
 #include "emacs_plugin.h"
@@ -45,17 +44,17 @@ bool              refactor_end_found;
 int               start_indent;
 int               stlabel;
 
-iscon_t          iscon_stack;     // to store iscon
-dolabels_t       dolabels;        // to store labels, necessary for labelled do
-dolabels_stack_t dolabels_stack;  // to store dolabels stack
-indent_t         indent;          // to store indents
-indent_stack_t   indent_stack;    // to store indent stack
-fs_stack_t       fs_stack;        // to store full_statement
 linebuffer_t     curlinebuffer;   // deque for source lines
 lines_t          curlines;        // current line, one continuation line per item
-nbseen_stack_t   nbseen_stack;    // to store nbseen
+dolabels_store_t dolabels_store;  // to store dolabels
+dolabels_t       dolabels;        // to store labels, necessary for labelled do
+fs_store_t       fs_store;        // to store full_statement
+indent_store_t   indent_store;    // to store indent store
+indent_t         indent;          // to store indents
+iscon_t          iscon_store;     // to store iscon
+nbseen_store_t   nbseen_store;    // to store nbseen
+rprops_store_t   rprops_store;
 rprops_t         rprops;          // to store routines (module, subroutine ...)
-rprops_stack_t   rprops_stack;
 
 int main(int argc, char*argv[])
 {
@@ -131,21 +130,26 @@ int main(int argc, char*argv[])
    if(output_format == 0)
       output_format = input_format;
 
+   num_lines        = 0;
    labellength      = 0;
    end_of_file      = 0;
    cur_rprop        = empty_rprop;
    init_indent();
    if (flags.last_usable_only)
    {
+      mycout.setoutput(0);
+      //std::cout << "ppp tralala:" << num_lines << std::endl;
       handle_last_usable_only();
       return what_to_return();
    }
+   if (flags.last_indent_only)
+      mycout.setoutput(0);
 
    cur_indent = start_indent;
    while(1)
    {
       get_full_statement();
-      //indent_and_output();
+      indent_and_output();
       if (end_of_file)
       {
 	 if(flags.last_indent_only)
@@ -163,21 +167,24 @@ int main(int argc, char*argv[])
 void handle_last_usable_only()
 {
    int usable_line = 1;
-   std::stack<int> usables;     // to store usable lines
-   std::stack<int> prevs;       // to store prev-usable lines
+   std::deque<int> usables;     // to store usable lines
+   std::deque<int> prevs;       // to store prev-usable lines
    pre_analyzer preb;
 
    init_indent();
    while(1)
    {
       int prev         = num_lines;
+      //std::cout << "xxx ppp:" << num_lines << std::endl;
       bool usable      = 0;
       get_full_statement();
+      //std::cout << "ppp num_lines:"+number2string(num_lines)+":"+full_statement<< std::endl;
       line_prep p(full_statement);
       propstruct props = parseline(p);
       switch (props.kind)
       {
 	 case BLANK:
+	    //std::cout << "ppp blank" << std::endl;
 	 case CASE:
 	 case CONTAINS:
 	 case ENTRY:
@@ -191,6 +198,7 @@ void handle_last_usable_only()
       }
       if (usable)
 	 usable_line = prev+1;
+#if 0
       while (!curlines.empty())
       {
 	 int pretype = curlines.front().scanfixpre();
@@ -198,15 +206,15 @@ void handle_last_usable_only()
 	 switch(ifelse)
 	 {
 	    case pre_analyzer::IF:
-	       usables.push(usable_line);
-	       prevs.push(prev);
+	       usables.push_back(usable_line);
+	       prevs.push_back(prev);
 	       break;
 
 	    case pre_analyzer::ELIF:
 	       if(!usables.empty())
 	       {
-		  usable_line = usables.top();
-		  prev        = prevs.top();
+		  usable_line = usables.back();
+		  prev        = prevs.back();
 	       }
 	       break;
 
@@ -214,10 +222,10 @@ void handle_last_usable_only()
 	    case pre_analyzer::ENDIF:
 	       if (!usables.empty())
 	       {
-		  usable_line = usables.top();
-		  usables.pop();
-		  prev        = prevs.top();
-		  prevs.pop();
+		  usable_line = usables.back();
+		  usables.pop_back();
+		  prev        = prevs.back();
+		  prevs.pop_back();
 	       }
 	       break;
 
@@ -229,9 +237,11 @@ void handle_last_usable_only()
 	 }
 	 curlines.pop_front();
       }
+#endif
       if (end_of_file)
       {
 	 std::cout << usable_line << endline;
+	 //std::cout << "ppp hoppa"<<std::endl;
 	 return;
       }
    }
@@ -469,8 +479,10 @@ void getnext()
       if (reading_from_tty && curline.orig() == ".")
 	 end_of_file = 1;
    }
-
    num_lines++;
+   if (end_of_file)
+      num_lines --;
+   //std::cout << "num_lines ppp:" << num_lines << std::endl;
 
    if (!nbseen)
    {
@@ -536,96 +548,140 @@ void get_full_statement()
    //
    // if things get hairy: try a finite state machine
    //
-   std::string line;
+   enum {
+      start=1,
+      in_fortran, in_fortran_1,
+      in_pre, 
+      end_start, end_fortran, end_pre, 
+      in_ffix, in_ffix_1, in_ffix_2, in_ffix_3
+   };
    full_statement = "";
    indent_handled = 0;
-   int pretype;
-   bool f_more = 0;
-   bool p_more;
-   bool pushback;
-   getnext();
+   static int pretype;
+   static bool f_more = 0;
+   static bool p_more;
+   static bool pushback;
+   static bool first_call = 1;
 
-start:
-   full_statement = "";
-   if (end_of_file) 
-      goto end_start;
-   pretype = curline.getpregentype();
-   if(pretype == CPP || pretype == COCO)
-      goto in_pre;
-   if (is_findentfix(curline))
-      goto in_ffix;
-   goto in_fortran;
-
-in_ffix:
-   indent_and_output();
-   curlines.push_back(curline);
-   full_statement = "";
-   indent_and_output();
-   full_statement = rtrim(remove_trailing_comment(curline.rest()));
-   indent_and_output();
-   getnext();
-   goto start;
-
-in_fortran:
-   handle_fortran(curline, f_more, pushback);
-   if (f_more)
+   if (first_call)
    {
       getnext();
-      if (end_of_file)
-	 goto end_fortran;
-      pretype = curline.getpregentype();
-      if (pretype == CPP || pretype == COCO)
+      first_call = 0;
+   }
+
+   static int state = start;
+
+   while(1)
+      switch(state)
       {
-	 indent_and_output();
-	 goto in_pre;
+	 case start:
+	    full_statement = "";
+	    if (end_of_file) 
+	    {
+	       state = end_start;
+	       break;
+	    }
+	    pretype = curline.getpregentype();
+	    if(pretype == CPP || pretype == COCO)
+	    {
+	       state = in_pre;
+	       break;
+	    }
+	    if (is_findentfix(curline))
+	    {
+	       state = in_ffix;
+	       break;
+	    }
+	    state = in_fortran;
+	    break;
+
+	 case in_ffix:
+	    state = in_ffix_1;
+	    return;
+
+	 case in_ffix_1:
+	    curlines.push_back(curline);
+	    full_statement = "";
+	    state = in_ffix_2;
+	    return;
+
+	 case in_ffix_2:
+	    full_statement = rtrim(remove_trailing_comment(curline.rest()));
+	    state = in_ffix_3;
+	    return;
+
+	 case in_ffix_3:
+	    getnext();
+	    state = start;
+	    break;
+
+	 case in_fortran:
+	    handle_fortran(curline, f_more, pushback);
+	    if (f_more)
+	    {
+	       getnext();
+	       if (end_of_file)
+	       {
+		  state = end_fortran;
+		  break;
+	       }
+	       pretype = curline.getpregentype();
+	       if (pretype == CPP || pretype == COCO)
+	       {
+		  state = in_pre;
+		  return;
+	       }
+	       if (is_findentfix(curline))
+	       {
+		  state = in_ffix;
+		  break;
+	       }
+	       state = in_fortran;
+	       break;
+	    }
+	    state = in_fortran_1;
+	    return;
+
+	 case in_fortran_1:
+	    iscon = 0;                // next line is not a continuation
+	    if (!pushback)
+	       getnext();
+	    state = start;
+	    break;
+
+	 case in_pre:
+	    handle_pre_light1(curline,pretype,p_more);
+	    if (p_more)
+	    {
+	       getnext();
+	       if (end_of_file)
+	       {
+		  state = end_pre;
+		  break;
+	       }
+	       state = in_pre;
+	       break;
+	    }
+	    handle_pre(curlines,f_more);
+	    getnext();
+	    state = start;
+	    break;
+
+	 case end_start:
+	 case end_fortran:
+	 case end_pre:
+	    state = start;
+	    return;
       }
-      if (is_findentfix(curline))
-	 goto in_ffix;
-      goto in_fortran;
-   }
-   indent_and_output();
-   iscon = 0;                // next line is not a continuation
-   if (!pushback)
-      getnext();
-   goto start;
-
-in_pre:
-   handle_pre_light1(curline,pretype,p_more);
-   if (p_more)
-   {
-      getnext();
-      if (end_of_file)
-	 goto end_pre;
-      goto in_pre;
-   }
-   handle_pre(curlines,f_more);
-   getnext();
-   goto start;
-
-end_start:
-   indent_and_output();
-   return;
-
-end_fortran:
-   indent_and_output();
-   return;
-
-end_pre:
-   indent_and_output();
-   return;
-
 }           // end of get_full_statement
 
-void handle_fixed1(fortranline &curline, bool &more,bool &pushback);
 
 void handle_fortran(fortranline &line,bool &more, bool &pushback)
 {
    if (input_format == FREE)
       handle_free(line,more,pushback);
    else
-   {
-      handle_fixed1(line,more,pushback);
-   }
+      handle_fixed(line,more,pushback);
 }
 
 void handle_free(fortranline & line, bool &more,bool &pushback)
@@ -692,7 +748,7 @@ bool is_findentfix(fortranline &line)
    return rc;
 }
 
-void handle_fixed1(fortranline &line, bool &more, bool &pushback)
+void handle_fixed(fortranline &line, bool &more, bool &pushback)
 {
    //
    // adds line to curlines
@@ -764,113 +820,13 @@ void handle_fixed1(fortranline &line, bool &more, bool &pushback)
    full_statement = rtrim(remove_trailing_comment(full_statement));
    more = 1;   // look for more continuation lines
    return;
-}           // end of handle_fixed1
-
-
-void handle_fixed(bool &more)
-{
-   //
-   // adds curline to curlines
-   // adds curline (stripped from comments, preprocessor stuff and 
-   //    continuation stuff)  to full_statement
-   // more 1: more lines are to expected
-   //      0: this line is complete
-   //
-
-   //
-   // if this is a findentfix line:
-   //    Assume that no continuation lines can follow.
-   //    So, if there are already one or more lines read,
-   //    push this line on curlinebuffer and do not expect
-   //    continuation lines.
-   //    If, however this is the first line, handle this 
-   //    as a normal comment line: in that case no continuation
-   //    lines are requested either.
-   //
-
-   if (curline.scanfixpre() == FINDENTFIX)
-   {
-      if (curlines.empty())
-	 full_statement = curline.rest();
-      else 
-      {
-	 curlinebuffer.push_front(curline);
-	 num_lines--;
-	 more = 0;
-	 return;
-      }
-   }
-
-   if (curline.blank_or_comment() || curline.getpregentype() != 0)
-   {
-      //
-      // this is a blank or comment or preprocessor line
-      //
-      curlines.push_back(curline);
-
-      if (curlines.size() ==1)
-	 more = 0;   // do not expect continuation lines
-      else
-	 more = 1;   // but here we do
-      return;
-   }
-
-   std::string s = curline.line();
-
-   //
-   // replace leading tabs by spaces
-   //
-
-   std::string sl = s.substr(0,5);
-   if (s.length() >6)
-      sl = sl+' '+s.substr(6);
-
-   //
-   // this is a line with code
-   //
-   if (curlines.empty())
-   {
-      //
-      // this is the first line
-      //
-      curlines.push_back(curline);
-      full_statement += trim(sl);
-      full_statement = rtrim(remove_trailing_comment(full_statement));
-      more = 1;      // maybe there are continuation lines
-      return;
-   }
-
-   //
-   // this is possibly a continuation line
-   //
-   if (s.length() < 6 || s[5] == ' ' || s[5] == '0')
-   {
-      //
-      // this is not a continuation line
-      // push it back, we will see it later
-      //
-      curlinebuffer.push_front(curline);
-      num_lines--;
-      more = 0;          // do not look for further continuation lines
-      return;
-   }
-   //
-   // this is a continuation line
-   //
-   curlines.push_back(curline);
-   full_statement += rtrim((rtrim(sl)+"      ").substr(6));
-   full_statement = rtrim(remove_trailing_comment(full_statement));
-   more = 1;   // look for more continuation lines
-   return;
 }           // end of handle_fixed
-
 
 void output_line()
 {
    if (curlines.empty())
       return;
 
-   mycout.setoutput(!flags.last_indent_only);
    mycout.reset();
 
    handle_refactor();
