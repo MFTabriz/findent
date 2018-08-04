@@ -68,6 +68,11 @@ findent-2.8.3:
 
 	   added free2fixed
 
+	~pre4
+	   implemented a finite state machine in get_full_statement()
+	   change list and stack into deque
+
+
 findent-2.8.2: 
 	debianizing ...
 findent-2.8.1:

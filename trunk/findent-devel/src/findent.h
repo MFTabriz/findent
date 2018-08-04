@@ -11,7 +11,7 @@
 #include "simpleostream.h"
 
 void get_full_statement();
-void handle_fixed(bool &more);
+void handle_fixed(fortranline &curline, bool &more,bool &pushback);
 void handle_fortran(fortranline &line,bool &more, bool &pushback);
 void handle_free(fortranline &curline, bool &more,bool &pushback);
 void handle_last_usable_only();
@@ -45,14 +45,14 @@ extern  int            start_indent;
 
 extern linebuffer_t     curlinebuffer;   // deque for source lines
 extern lines_t          curlines;        // current line, one continuation line per item
-extern dolabels_stack_t dolabels_stack;  // to store dolabels stack
+extern dolabels_store_t dolabels_store;  // to store dolabels
 extern dolabels_t       dolabels;        // to store labels, necessary for labelled do
-extern fs_stack_t       fs_stack;        // to store full_statement
-extern indent_stack_t   indent_stack;    // to store indent stack
+extern fs_store_t       fs_store;        // to store full_statement
+extern indent_store_t   indent_store;    // to store indent store
 extern indent_t         indent;          // to store indents
-extern nbseen_stack_t   nbseen_stack;    // to store nbseen
-extern iscon_t          iscon_stack;     // to store iscon
-extern rprops_stack_t   rprops_stack;
+extern nbseen_store_t   nbseen_store;    // to store nbseen
+extern iscon_t          iscon_store;     // to store iscon
+extern rprops_store_t   rprops_store;
 extern rprops_t         rprops;          // to store routines (module, subroutine ...)
 
 #endif
