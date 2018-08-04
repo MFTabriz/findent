@@ -11,7 +11,7 @@ void fixed2fixed(lines_t &lines)
 {
    unsigned int old_indent          = 0;
    static unsigned int first_indent = 0;
-   char prevquote                   = ' ';
+   static char prevquote            = ' ';
 
    while(!lines.empty())
    {
