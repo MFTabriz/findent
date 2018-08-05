@@ -1,3 +1,6 @@
+#include <string>
+#include <vector>
+
 #include "debug.h"
 #include "findent.h"
 #include "findent_functions.h"
@@ -9,7 +12,7 @@ void fixed2free(lines_t &lines)
    static unsigned int first_indent = 0;
    static char prevquote            = ' ';
 
-   lines_t nlines;
+   std::vector <fortranline> nlines;
    std::ostringstream os;
 
    while(!lines.empty())
@@ -46,10 +49,11 @@ void fixed2free(lines_t &lines)
       else
       {
 	 // mycout << s.substr(0,6);
+	 bool iscontinuation;
 
 	 if(s.length() > 6)
 	 {
-	    bool iscontinuation = (s[5] != ' ' && s[5] != '0');
+	    iscontinuation = (s[5] != ' ' && s[5] != '0');
 	    //
 	    // try to honor current indentation
 	    // if this is a continuation line, count the number
@@ -90,6 +94,7 @@ void fixed2free(lines_t &lines)
 	    prevquote = fixedmissingquote(prevquote + s);
 	 }
 	 //mycout << endline;
+
 	 nlines.push_back(os.str());
       }
       lines.pop_front();

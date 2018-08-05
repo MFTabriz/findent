@@ -147,7 +147,10 @@ int main(int argc, char*argv[])
    cur_indent = start_indent;
    while(1)
    {
+      full_statement = "";
       get_full_statement();
+      ppps("full_statement",full_statement);
+      ppp("curlines",curlines);
       indent_and_output();
       if (end_of_file)
       {
@@ -304,7 +307,7 @@ void indent_and_output()
       cur_indent = top_indent();
       refactor_end_found = 0;
       //
-      // for every entity that is eligable for refacoring it's end
+      // for every entity that is eligible for refacoring it's end
       // e.g. subroutine
       // we will push props on the rprops stack
       // for every corresponding end-entity (e.g. endsubroutine) we will
@@ -452,7 +455,7 @@ void indent_and_output()
 	 default:
 	    prev_props = props;
       }
-      if(first_time)  // check to handle multi-statement line
+      if(first_time)  // check to handle multi-statement line like x=1;y=3
       {
 	 output_line();
 	 first_time = 0;
@@ -569,7 +572,7 @@ void get_full_statement()
       switch(state)
       {
 	 case start:
-	    full_statement = "";
+	    //full_statement = "";
 	    if (end_of_file) 
 	    {
 	       state = end_start;
@@ -623,7 +626,8 @@ void get_full_statement()
 	       if (pretype == CPP || pretype == COCO)
 	       {
 		  state = in_pre;
-		  return;
+		  //return;
+		  break;
 	       }
 	       if (is_findentfix(curline))
 	       {
@@ -656,7 +660,7 @@ void get_full_statement()
 	       state = in_pre;
 	       break;
 	    }
-	    handle_pre(curlines,f_more);
+	    //handle_pre(curlines,f_more);
 	    getnext();
 	    state = start;
 	    break;
@@ -670,58 +674,64 @@ void get_full_statement()
 }           // end of get_full_statement
 
 
-void handle_fortran(fortranline &line,bool &more, bool &pushback)
+void handle_fortran(fortranline &line,bool &f_more, bool &pushback)
 {
    if (input_format == FREE)
-      handle_free(line,more,pushback);
+      handle_free(line,f_more,pushback);
    else
-      handle_fixed(line,more,pushback);
+      handle_fixed(line,f_more,pushback);
 }
 
-void handle_free(fortranline & line, bool &more,bool &pushback)
+void handle_free(fortranline &line, bool &f_more, bool &pushback)
 {
    //
    // adds line to curlines
    // adds line (stripped from comments, preprocessor stuff and 
    //    continuation stuff)  to full_statement
-   // more 1: more lines are to expected
-   //      0: this line is complete
+   // f_more 1: more lines are to expected
+   //        0: this line is complete
    //
 
-   pushback = 0;
+   pushback           = 0;
+   static bool p_more = 0;
 
-   if (!line.blank_or_comment())
+   if (p_more || line.pre())
+      handle_pre1(line,f_more,p_more);  //TODO never done
+   else
    {
-      //
-      // sl becomes the first input_line_length characters of line
-      // and then trimmed left and right:
-      //
-
-      std::string sl = line.trimmed_line();
-
-      if(line.firstchar() == "&")
+      if (!line.blank_or_comment())
       {
-	 sl.erase(0,1);
-	 sl = ltrim(sl);
+	 //
+	 // sl becomes the first input_line_length characters of line
+	 // and then trimmed left and right:
+	 //
+
+	 std::string sl = line.trimmed_line();
+
+	 if(line.firstchar() == "&")
+	 {
+	    sl.erase(0,1);
+	    sl = ltrim(sl);
+	 }
+
+	 full_statement = full_statement + sl;
+
+	 //
+	 // remove trailing comment and trailing white space
+	 //
+
+	 full_statement = rtrim(remove_trailing_comment(full_statement));
+
+	 // 
+	 // If the last character = '&', a continuation is expected.
+	 //
+
+	 f_more = ( lastchar(full_statement) == '&');
+	 if (f_more)            // chop off '&' from full_statement :
+	    full_statement.erase(full_statement.length()-1);
       }
-
-      full_statement = full_statement + sl;
-
-      //
-      // remove trailing comment and trailing white space
-      //
-
-      full_statement = rtrim(remove_trailing_comment(full_statement));
-
-      // 
-      // If the last character = '&', a continuation is expected.
-      //
-
-      more = ( lastchar(full_statement) == '&');
-      if (more)            // chop off '&' from full_statement :
-	 full_statement.erase(full_statement.length()-1);
+      curlines.push_back(line);
    }
-   curlines.push_back(line);
 }           // end of handle_free
 
 bool is_findentfix(fortranline &line)
@@ -732,11 +742,11 @@ bool is_findentfix(fortranline &line)
       case FINDENTFIX:
 	 rc = 1;
 	 break;
-      case PPP_ON:
-	 ppp_on = 1;     // debug.h, debug.cpp
+      case P_ON:
+	 p_on = 1;     // debug.h, debug.cpp
 	 break;
-      case PPP_OFF:
-	 ppp_on = 0;
+      case P_OFF:
+	 p_on = 0;
 	 break;
    }
    return rc;
@@ -820,6 +830,8 @@ void output_line()
 {
    if (curlines.empty())
       return;
+
+   ppp("output_line",curlines);
 
    mycout.reset();
 
