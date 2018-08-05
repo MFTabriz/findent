@@ -63,6 +63,89 @@ int determine_fix_or_free()
 //     or, if there is no #else, from the code before the #if{,def,ndef}
 //
 
+void handle_pre1(fortranline &line, const bool f_more, bool &p_more)
+{
+   int ifelse;
+   static int pretype;
+   static int pregentype;
+
+   ppps("handle_pre1",p_more);
+   if (!p_more)   // this is the first line of a preprocessor sequence
+   {
+      pretype    = line.scanfixpre();
+      pregentype = line.getpregentype();
+
+      switch(pretype)
+      {
+	 case CPP:
+	 case COCO:
+	    break;
+	 default:
+	    ifelse = prea.analyze(line.trimmed_line(), pretype);
+	    switch(ifelse)
+	    {
+	       case pre_analyzer::IF:
+		  push_all();
+		  ppp("IF indent",indent);
+		  break;
+
+	       case pre_analyzer::ELIF:
+		  top_all();
+		  ppp("ELIF indent",indent);
+		  break;
+
+	       case pre_analyzer::ELSE:
+		  top_all();
+		  ppp("ELSE indent");
+	       case pre_analyzer::ENDIF:
+		  pop_all();
+		  ppp("ENDIF indent",indent);
+		  break;
+
+	       case pre_analyzer::ENDIFE:
+		  ppp("ENDIFE indent",indent);
+		  break;
+
+	       default:
+		  return;
+		  break;
+	    }
+
+	    switch(ifelse) // iscon needs apart treatment:
+	    {
+	       case pre_analyzer::IF:
+		  iscon = f_more;              // remember if a continuation is needed
+		  iscon_store.push_back(iscon);
+		  break;
+
+	       case pre_analyzer::ELIF:
+		  iscon = 0;
+		  if (!iscon_store.empty())
+		     iscon = iscon_store.back();
+		  break;
+
+	       case pre_analyzer::ELSE:
+		  iscon = iscon_store.back();
+		  break;
+
+	       case pre_analyzer::ENDIF:
+	       case pre_analyzer::ENDIFE:
+		  iscon = f_more;
+		  if (!iscon_store.empty())
+		     iscon_store.pop_back();
+		  break;
+	    }
+	    break;
+      }
+
+      if(pregentype == COCO)
+	 p_more = (line.lastchar() == "&");
+      else
+	 p_more = (line.lastchar() == "\\");
+   }
+   return;
+}       // end of handle_pre1
+
 bool handle_pre(lines_t &ci, const bool f_more, lines_t *co)
 {
    //
@@ -427,6 +510,7 @@ void push_all()
    indent_store.push_back(indent);
    nbseen_store.push_back(nbseen);
    rprops_store.push_back(rprops);
+
 }         // end of push_all
 
 void top_all()
@@ -455,6 +539,7 @@ void pop_all()
       nbseen_store.pop_back();
    if (!rprops_store.empty())
       rprops_store.pop_back();
+
 }        // end of pop_all
 
 int what_to_return()
