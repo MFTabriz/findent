@@ -69,7 +69,6 @@ void handle_pre1(fortranline &line, const bool f_more, bool &p_more)
    static int pretype;
    static int pregentype;
 
-   ppps("handle_pre1",p_more);
    if (!p_more)   // this is the first line of a preprocessor sequence
    {
       pretype    = line.scanfixpre();
@@ -86,24 +85,19 @@ void handle_pre1(fortranline &line, const bool f_more, bool &p_more)
 	    {
 	       case pre_analyzer::IF:
 		  push_all();
-		  ppp("IF indent",indent);
 		  break;
 
 	       case pre_analyzer::ELIF:
 		  top_all();
-		  ppp("ELIF indent",indent);
 		  break;
 
 	       case pre_analyzer::ELSE:
 		  top_all();
-		  ppp("ELSE indent");
 	       case pre_analyzer::ENDIF:
 		  pop_all();
-		  ppp("ENDIF indent",indent);
 		  break;
 
 	       case pre_analyzer::ENDIFE:
-		  ppp("ENDIFE indent",indent);
 		  break;
 
 	       default:
@@ -111,6 +105,7 @@ void handle_pre1(fortranline &line, const bool f_more, bool &p_more)
 		  break;
 	    }
 
+	    ppp("iscon_store 1",iscon_store);
 	    switch(ifelse) // iscon needs apart treatment:
 	    {
 	       case pre_analyzer::IF:
@@ -125,25 +120,71 @@ void handle_pre1(fortranline &line, const bool f_more, bool &p_more)
 		  break;
 
 	       case pre_analyzer::ELSE:
-		  iscon = iscon_store.back();
+		  if (iscon_store.empty())
+		     iscon = 0;
+		  else
+		     iscon = iscon_store.back();
 		  break;
 
 	       case pre_analyzer::ENDIF:
 	       case pre_analyzer::ENDIFE:
-		  iscon = f_more;
-		  if (!iscon_store.empty())
+		  if (iscon_store.empty())
+		     iscon = 0;
+		  else
+		  {
 		     iscon_store.pop_back();
+		     if (!iscon_store.empty())
+			iscon = iscon_store.back();
+		  }
+		  break;
+	    }
+	    ppp("iscon_store 2",iscon_store);
+	    ppps("iscon",iscon);
+
+	    switch(ifelse)
+	    {
+	       case pre_analyzer::IF:
+		  fs_store.push_back(full_statement);
+		  break;
+
+	       case pre_analyzer::ELIF:
+		  if(fs_store.empty())
+		     full_statement = "";
+		  else
+		     full_statement = fs_store.back();
+		  break;
+
+	       case pre_analyzer::ELSE:
+		  if(fs_store.empty())
+		     full_statement = "";
+		  else
+		     full_statement = fs_store.back();
+		  break;
+
+	       case pre_analyzer::ENDIF:
+		  ppp("ENDIF fs1",fs_store);
+	       case pre_analyzer::ENDIFE:
+		  if(fs_store.empty())
+		     full_statement = "";
+		  else
+		  {
+		     fs_store.pop_back();
+		     if (fs_store.empty())
+			full_statement = "";
+		     else
+			full_statement = fs_store.back();
+		     ppp("ENDIF fs",fs_store);
+		  }
 		  break;
 	    }
 	    break;
       }
 
-      if(pregentype == COCO)
-	 p_more = (line.lastchar() == "&");
-      else
-	 p_more = (line.lastchar() == "\\");
    }
-   return;
+   if(pregentype == COCO)
+      p_more = (line.lastchar() == "&");
+   else
+      p_more = (line.lastchar() == "\\");
 }       // end of handle_pre1
 
 bool handle_pre(lines_t &ci, const bool f_more, lines_t *co)
@@ -176,6 +217,7 @@ bool handle_pre(lines_t &ci, const bool f_more, lines_t *co)
 	       top_all();
 	    case pre_analyzer::ENDIF:
 	       pop_all();
+	       break;
 
 	    case pre_analyzer::ENDIFE:
 	       break;
@@ -245,28 +287,26 @@ bool handle_pre(lines_t &ci, const bool f_more, lines_t *co)
    return 1;
 }       // end of handle_pre
 
-void handle_pre_light1(fortranline &fs, int &p, bool &more)
+void handle_pre_light1(fortranline &line, bool &p_more)
 {
    //
    // handles preprocessor lines and their continuations:
    //
-   // fs (input):     line to handle
-   // p  (inout):     input:  type of line: CPP or COCO. 
+   // line (input):   line to handle
+   // p    (inout):   input:  type of line: CPP or COCO. 
    //                 output: if no continuation is expected, p = 0
-   // more (output):  true if a continuation is expected
+   // p_more (output):  true if a continuation is expected
    //
-   curlines.push_back(fs);
-   if(p == CPP)
-      more = (fs.lastchar() == "\\");
-   else
-      //
-      // since COCO lines always start with '??', there is no need
-      // to signify that another COCO line is expected
-      //
-      more = 0;
+   static int pregentype;
 
-   if(more == 0)
-      p = 0;
+   if (!p_more)   // this is the first line of a preprocessor sequence
+      pregentype = line.getpregentype();
+
+   if(pregentype == COCO)
+      p_more = (line.lastchar() == "&");
+   else
+      p_more = (line.lastchar() == "\\");
+
 }         // end of handle_pre_light1
 
 void handle_pre_light(fortranline &fs, int &p, bool &more)
@@ -506,7 +546,7 @@ int guess_fixedfree(const std::string &s)
 void push_all()
 {
    dolabels_store.push_back(dolabels);
-   fs_store.push_back(full_statement);
+   //fs_store.push_back(full_statement);
    indent_store.push_back(indent);
    nbseen_store.push_back(nbseen);
    rprops_store.push_back(rprops);
@@ -517,8 +557,8 @@ void top_all()
 {
    if (!dolabels_store.empty())
       dolabels = dolabels_store.back();
-   if (!fs_store.empty())
-      full_statement = fs_store.back();
+   //   if (!fs_store.empty())
+   //     full_statement = fs_store.back();
    if (!indent_store.empty())
       indent = indent_store.back();
    if (!nbseen_store.empty())
@@ -531,8 +571,8 @@ void pop_all()
 {
    if (!dolabels_store.empty())
       dolabels_store.pop_back();
-   if (!fs_store.empty())
-      fs_store.pop_back();
+   //  if (!fs_store.empty())
+   //    fs_store.pop_back();
    if (!indent_store.empty())
       indent_store.pop_back();
    if (!nbseen_store.empty())
