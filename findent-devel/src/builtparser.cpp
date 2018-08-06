@@ -64,7 +64,7 @@
 /* Copy the first part of user declarations.  */
 #line 1 "parser.y" /* yacc.c:339  */
 
-// $Id: parser.y 333 2018-08-03 07:09:12Z willem_vermin $
+// $Id: parser.y 338 2018-08-05 15:43:25Z willem_vermin $
 #include <iostream>
 
 #include "debug.h"
@@ -174,8 +174,8 @@ extern int yydebug;
     PROBFREE = 320,
     FINDENTFIX = 321,
     FIXFINDENTFIX = 322,
-    PPP_ON = 323,
-    PPP_OFF = 324,
+    P_ON = 323,
+    P_OFF = 324,
     SCANFIXPRE = 325,
     CPP_IF = 326,
     CPP_ENDIF = 327,
@@ -580,31 +580,31 @@ static const char *const yytname[] =
   "ENUM", "ENDENUM", "ASSIGNMENT", "ASSIGN", "TO", "MODULEPROCEDURE",
   "PROCEDURE", "ENDPROCEDURE", "TIDENTIFIER", "BLANK", "FINDFORMAT",
   "UNKNOWN", "FREE", "FIXED", "UNSURE", "PROBFREE", "FINDENTFIX",
-  "FIXFINDENTFIX", "PPP_ON", "PPP_OFF", "SCANFIXPRE", "CPP_IF",
-  "CPP_ENDIF", "CPP_ELSE", "CPP_ELIF", "CPP", "COCO_IF", "COCO_ENDIF",
-  "COCO_ELSE", "COCO_ELIF", "COCO", "IDENTIFIER", "SKIP", "SKIPALL",
-  "SKIPNOOP", "KEYWORD", "ELEMENTAL", "IMPURE", "PURE", "RECURSIVE",
-  "SUBROUTINE", "FUNCTION", "PROGRAM", "EOL", "NAMED_LABEL", "STLABEL",
-  "TYPE", "ENDTYPE", "CLASS", "BASICTYPE", "TYPEC", "QSTRING", "HSTRING",
-  "LR", "LRB", "DOTOPERATOR", "I_NUMBER", "UNCLASSIFIED", "ERROR",
-  "LAST_TOKEN", "'%'", "'*'", "'='", "','", "':'", "$accept", "lline",
-  "labels", "line", "blank", "stlabel", "named_label", "module",
-  "abstractinterface", "contains", "interface", "moduleprocedure",
-  "procedure", "program_stmt", "subroutine_stmt", "subroutine",
-  "subroutine_spec", "subroutinename", "subroutineprefix",
-  "subroutineprefix_spec", "function_stmt", "function", "function_spec",
-  "functionname", "submodule", "intrinsic_type_spec", "kind_selector",
-  "entry", "endassociate", "endblock", "endblockdata", "endcritical",
-  "enddo", "endenum", "endforall", "endfunction", "endif", "endinterface",
-  "endmodule", "endprocedure", "endprogram", "endselect", "endsubmodule",
-  "endsubroutine", "endtype", "endwhere", "simple_end", "gidentifier",
-  "assignment", "else", "elseif", "elsewhere", "if_construct",
-  "where_construct", "forall_construct", "do_construct", "do", "docomma",
-  "selectcase", "selecttype", "case", "casedefault", "classdefault",
-  "classis", "typeis", "block", "blockdata", "associate", "critical",
-  "enum", "type", "type1", "lvalue", "construct_name", "skipall",
-  "skipnoop", "enable_identifier", "enable_skip", "enable_skipall",
-  "enable_skipnoop", "getname", "getstlabel", "getdolabel", "empty", YY_NULLPTR
+  "FIXFINDENTFIX", "P_ON", "P_OFF", "SCANFIXPRE", "CPP_IF", "CPP_ENDIF",
+  "CPP_ELSE", "CPP_ELIF", "CPP", "COCO_IF", "COCO_ENDIF", "COCO_ELSE",
+  "COCO_ELIF", "COCO", "IDENTIFIER", "SKIP", "SKIPALL", "SKIPNOOP",
+  "KEYWORD", "ELEMENTAL", "IMPURE", "PURE", "RECURSIVE", "SUBROUTINE",
+  "FUNCTION", "PROGRAM", "EOL", "NAMED_LABEL", "STLABEL", "TYPE",
+  "ENDTYPE", "CLASS", "BASICTYPE", "TYPEC", "QSTRING", "HSTRING", "LR",
+  "LRB", "DOTOPERATOR", "I_NUMBER", "UNCLASSIFIED", "ERROR", "LAST_TOKEN",
+  "'%'", "'*'", "'='", "','", "':'", "$accept", "lline", "labels", "line",
+  "blank", "stlabel", "named_label", "module", "abstractinterface",
+  "contains", "interface", "moduleprocedure", "procedure", "program_stmt",
+  "subroutine_stmt", "subroutine", "subroutine_spec", "subroutinename",
+  "subroutineprefix", "subroutineprefix_spec", "function_stmt", "function",
+  "function_spec", "functionname", "submodule", "intrinsic_type_spec",
+  "kind_selector", "entry", "endassociate", "endblock", "endblockdata",
+  "endcritical", "enddo", "endenum", "endforall", "endfunction", "endif",
+  "endinterface", "endmodule", "endprocedure", "endprogram", "endselect",
+  "endsubmodule", "endsubroutine", "endtype", "endwhere", "simple_end",
+  "gidentifier", "assignment", "else", "elseif", "elsewhere",
+  "if_construct", "where_construct", "forall_construct", "do_construct",
+  "do", "docomma", "selectcase", "selecttype", "case", "casedefault",
+  "classdefault", "classis", "typeis", "block", "blockdata", "associate",
+  "critical", "enum", "type", "type1", "lvalue", "construct_name",
+  "skipall", "skipnoop", "enable_identifier", "enable_skip",
+  "enable_skipall", "enable_skipnoop", "getname", "getstlabel",
+  "getdolabel", "empty", YY_NULLPTR
 };
 #endif
 

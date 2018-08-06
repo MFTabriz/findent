@@ -553,8 +553,10 @@ void get_full_statement()
       in_ffix, in_ffix_1, in_ffix_2, in_ffix_3
    };
    full_statement = "";
+
+
    indent_handled = 0;
-   static int pretype;
+   static int pretype;  // TODO  is this needed?
    static bool f_more = 0;
    static bool p_more;
    static bool pushback;
@@ -566,13 +568,29 @@ void get_full_statement()
       first_call = 0;
    }
 
+   while(!curlines.empty())
+      curlines.pop_back();
+   /*
+      if(iscon_store.empty())
+      iscon = 0;
+      else 
+      iscon = iscon_store.back();
+      */
+
+   curlines.push_front(fortranline("_"));
+
    static int state = start;
 
    while(1)
       switch(state)
       {
 	 case start:
-	    //full_statement = "";
+	    if (fs_store.empty())
+	       full_statement = "";
+	    else
+	       full_statement = fs_store.back();
+
+	    ppps("start full_statement",full_statement);
 	    if (end_of_file) 
 	    {
 	       state = end_start;
@@ -613,26 +631,34 @@ void get_full_statement()
 	    break;
 
 	 case in_fortran:
+	    if(end_of_file)
+	    {
+	       state = end_fortran;
+	       break;
+	    }
+	    //if (iscon)
+	    //  curlines.front() = fortranline("C");
 	    handle_fortran(curline, f_more, pushback);
 	    if (f_more)
 	    {
-	       getnext();
-	       if (end_of_file)
-	       {
-		  state = end_fortran;
-		  break;
-	       }
+	       getnext(); if (end_of_file) { state = end_fortran; break; }
+
 	       pretype = curline.getpregentype();
 	       if (pretype == CPP || pretype == COCO)
 	       {
-		  state = in_pre;
-		  //return;
-		  break;
-	       }
-	       if (is_findentfix(curline))
-	       {
-		  state = in_ffix;
-		  break;
+		  p_more = 0;
+		  while (1)
+		  {
+		     handle_pre1(curline,f_more,p_more);
+		     curlines.push_back(curline);
+		     if(p_more)
+		     {
+			getnext(); if (end_of_file) { state = end_fortran; break; }
+		     }
+		     else
+			break;
+		  }
+		  getnext();
 	       }
 	       state = in_fortran;
 	       break;
@@ -648,19 +674,18 @@ void get_full_statement()
 	    break;
 
 	 case in_pre:
-	    handle_pre_light1(curline,pretype,p_more);
-	    if (p_more)
+	    p_more = 0;
+	    while(1)
 	    {
-	       getnext();
-	       if (end_of_file)
+	       handle_pre1(curline,iscon,p_more);
+	       curlines.push_back(curline);
+	       if(p_more)
 	       {
-		  state = end_pre;
-		  break;
+		  getnext(); if (end_of_file) { state = end_pre; break; }
 	       }
-	       state = in_pre;
-	       break;
+	       else
+		  break;
 	    }
-	    //handle_pre(curlines,f_more);
 	    getnext();
 	    state = start;
 	    break;
@@ -695,43 +720,38 @@ void handle_free(fortranline &line, bool &f_more, bool &pushback)
    pushback           = 0;
    static bool p_more = 0;
 
-   if (p_more || line.pre())
-      handle_pre1(line,f_more,p_more);  //TODO never done
-   else
+   if (!line.blank_or_comment())
    {
-      if (!line.blank_or_comment())
+      //
+      // sl becomes the first input_line_length characters of line
+      // and then trimmed left and right:
+      //
+
+      std::string sl = line.trimmed_line();
+
+      if(line.firstchar() == "&")
       {
-	 //
-	 // sl becomes the first input_line_length characters of line
-	 // and then trimmed left and right:
-	 //
-
-	 std::string sl = line.trimmed_line();
-
-	 if(line.firstchar() == "&")
-	 {
-	    sl.erase(0,1);
-	    sl = ltrim(sl);
-	 }
-
-	 full_statement = full_statement + sl;
-
-	 //
-	 // remove trailing comment and trailing white space
-	 //
-
-	 full_statement = rtrim(remove_trailing_comment(full_statement));
-
-	 // 
-	 // If the last character = '&', a continuation is expected.
-	 //
-
-	 f_more = ( lastchar(full_statement) == '&');
-	 if (f_more)            // chop off '&' from full_statement :
-	    full_statement.erase(full_statement.length()-1);
+	 sl.erase(0,1);
+	 sl = ltrim(sl);
       }
-      curlines.push_back(line);
+
+      full_statement = full_statement + sl;
+
+      //
+      // remove trailing comment and trailing white space
+      //
+
+      full_statement = rtrim(remove_trailing_comment(full_statement));
+
+      // 
+      // If the last character = '&', a continuation is expected.
+      //
+
+      f_more = ( lastchar(full_statement) == '&');
+      if (f_more)            // chop off '&' from full_statement :
+	 full_statement.erase(full_statement.length()-1);
    }
+   curlines.push_back(line);
 }           // end of handle_free
 
 bool is_findentfix(fortranline &line)
@@ -831,8 +851,6 @@ void output_line()
    if (curlines.empty())
       return;
 
-   ppp("output_line",curlines);
-
    mycout.reset();
 
    handle_refactor();
@@ -881,6 +899,7 @@ void handle_refactor()
 {
    if (flags.refactor_routines && refactor_end_found)
    {
+      ppp("calling refactor");
       //
       // handle refactor routines
       //
@@ -928,7 +947,10 @@ void handle_refactor()
 	    replacement = stoupper(replacement);
 	 if (cur_rprop.name != "")
 	    replacement += " " + cur_rprop.name;
+	 fortranline x=curlines.front();   // TODO
+	 curlines.pop_front();
 	 curlines.front().set_line(s.substr(0,startpos) + replacement + s.substr(endpos));
+	 curlines.push_front(x);
       }
    }
 }
