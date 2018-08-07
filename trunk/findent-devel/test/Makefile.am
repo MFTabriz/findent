@@ -4,7 +4,7 @@
 #	 test13.sh test14.sh test15.sh test16.sh test17.sh test18.sh \
 #	 test19.sh
 
-TESTS = test7.sh
+TESTS = test6.sh test7.sh test8.sh test10.sh test11.sh test12.sh test13.sh test14.sh
 EXTRA_DIST = $(TESTS)
 
 export SRCDIR = $(top_srcdir)

@@ -99,7 +99,7 @@ void fixed2free(lines_t &lines)
       }
       lines.pop_front();
    }
-   ppp("fixfree:",nlines);
+   //ppp<<"fixfree:"<<nlines<<endchar;
 }
 
 void fixed2free1(lines_t &lines)

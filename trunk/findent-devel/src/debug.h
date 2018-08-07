@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <string>
+#include <typeinfo>
 
 #include "findent_types.h"
 
@@ -22,40 +23,41 @@
 // turn off by !findentfix:p-off
 //
 
-extern bool p_on;
+class debugostream 
 
-template <class S, class T> void ppp(S s, T l)
 {
-   //
-   // output s, l with iterator
-   //
-   if (p_on)
-   {
-      typename T::iterator it = l.begin();
-      int i = 0;
-      if (l.empty())
-	 std::cout << "! ppp:" << s << ":empty" << std::endl;
-      else
-	 while(it != l.end()) 
-	    std::cout << "! ppp:" << ++i << ":" << s << ":[" << *it++ << "]" << std::endl;
-   }
-}
+   private:
+      bool output;
+   public:
+      debugostream()
+      {
+	 output = 0;
+      }
+      void off()
+      {
+	 output = 0;
+      }
+      void on()
+      {
+	 output = 1;
+      }
+      template< typename T > debugostream& operator<<( T val )
+      { 
+	 if (output)
+	 {
+	    std::string name = typeid(val).name();
+	    bool b = (typeid(val) == typeid(std::string));
+	    if (name.length() > 2)
+		  b = b || (name.substr(name.length()-1)=="c");
 
-template <class S, class T> void ppps(S s,T t)
-{
-   if(p_on)
-      std::cout << "! ppp:" << s << ":[" << t << "]" << std::endl;
-}
-
-template <class T> void ppp(T t)
-{
-   if(p_on)
-      std::cout << "! ppp:[" << t << "]" << std::endl;
-}
-
-template <class T> void ppps(T t)
-{
-   ppp(t);
-}
+	    if (b)
+	       std::cout << "[";
+	    std::cout << val; 
+	    if (b)
+	       std::cout << "]";
+	 }
+	 return *this; 
+      }
+};
 
 #endif

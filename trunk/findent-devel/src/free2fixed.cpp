@@ -22,7 +22,7 @@ void free2fixed(lines_t &lines)
    std::string firstline  = lines.front().trimmed_line();
    os.str("");
    int l=6;
-   if(!iscon)
+   if(0)   //TODO
    {
       if (firstline != "" || lines.size() > 1)
       {

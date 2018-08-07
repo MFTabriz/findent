@@ -24,6 +24,7 @@ int               cur_indent;
 struct propstruct cur_rprop           = empty_rprop;
 fortranline       curline;
 bool              end_of_file;
+char              endchar             = '\n';
 std::string       endline             = "\n";
 bool              endline_set         = 0;
 Flags             flags;
@@ -34,9 +35,9 @@ int               labellength;
 int               lines_read          = 0;
 simpleostream     mycout;
 bool              nbseen;                    // true if non-blank-line is seen 
-bool              iscon               = 0;   // true if current line is a continuation
 int               num_lines;                 // number of lines read sofar
 int               output_format;
+debugostream      ppp;
 pre_analyzer      prea;
 struct propstruct prev_props;
 bool              reading_from_tty    = 0;
@@ -51,7 +52,6 @@ dolabels_t       dolabels;        // to store labels, necessary for labelled do
 fs_store_t       fs_store;        // to store full_statement
 indent_store_t   indent_store;    // to store indent store
 indent_t         indent;          // to store indents
-iscon_t          iscon_store;     // to store iscon
 nbseen_store_t   nbseen_store;    // to store nbseen
 rprops_store_t   rprops_store;
 rprops_t         rprops;          // to store routines (module, subroutine ...)
@@ -149,8 +149,8 @@ int main(int argc, char*argv[])
    {
       full_statement = "";
       get_full_statement();
-      ppps("full_statement",full_statement);
-      ppp("curlines",curlines);
+      ppp << "main full_statement" << full_statement << endchar;
+      ppp << "main curlines" << curlines << endchar;
       indent_and_output();
       if (end_of_file)
       {
@@ -197,46 +197,6 @@ void handle_last_usable_only()
       }
       if (usable)
 	 usable_line = prev+1;
-#if 0
-      while (!curlines.empty())
-      {
-	 int pretype = curlines.front().scanfixpre();
-	 int ifelse  = preb.analyze(curlines.front().trim(),pretype);
-	 switch(ifelse)
-	 {
-	    case pre_analyzer::IF:
-	       usables.push_back(usable_line);
-	       prevs.push_back(prev);
-	       break;
-
-	    case pre_analyzer::ELIF:
-	       if(!usables.empty())
-	       {
-		  usable_line = usables.back();
-		  prev        = prevs.back();
-	       }
-	       break;
-
-	    case pre_analyzer::ELSE:
-	    case pre_analyzer::ENDIF:
-	       if (!usables.empty())
-	       {
-		  usable_line = usables.back();
-		  usables.pop_back();
-		  prev        = prevs.back();
-		  prevs.pop_back();
-	       }
-	       break;
-
-	    case pre_analyzer::ENDIFE:
-	       break;
-
-	    case pre_analyzer::NONE:
-	       break;
-	 }
-	 curlines.pop_front();
-      }
-#endif
       if (end_of_file)
       {
 	 std::cout << usable_line << endline;
@@ -492,6 +452,9 @@ void getnext()
 	 indent_handled = 1;
       }
    }
+
+   curline.set_con(0);
+   ppp<<"getnext:"<<curline<<endchar;
 }
 
 void get_full_statement()
@@ -570,14 +533,8 @@ void get_full_statement()
 
    while(!curlines.empty())
       curlines.pop_back();
-   /*
-      if(iscon_store.empty())
-      iscon = 0;
-      else 
-      iscon = iscon_store.back();
-      */
 
-   curlines.push_front(fortranline("_"));
+   // curlines.push_front(fortranline("_"));
 
    static int state = start;
 
@@ -585,12 +542,13 @@ void get_full_statement()
       switch(state)
       {
 	 case start:
+	    ppp<<"state: start"<<endchar;
 	    if (fs_store.empty())
 	       full_statement = "";
 	    else
 	       full_statement = fs_store.back();
 
-	    ppps("start full_statement",full_statement);
+	    ppp << "start full_statement" << full_statement << endchar;
 	    if (end_of_file) 
 	    {
 	       state = end_start;
@@ -607,49 +565,50 @@ void get_full_statement()
 	       state = in_ffix;
 	       break;
 	    }
+
 	    state = in_fortran;
 	    break;
 
-	 case in_ffix:
+	 case in_ffix:   // TODO this can be done more simple
+	    ppp<<"state: in_ffix"<<endchar;
 	    state = in_ffix_1;
 	    return;
 
 	 case in_ffix_1:
+	    ppp<<"state: in_ffix_1"<<endchar;
 	    curlines.push_back(curline);
 	    full_statement = "";
 	    state = in_ffix_2;
 	    return;
 
 	 case in_ffix_2:
+	    ppp<<"state: in_ffix_2"<<endchar;
 	    full_statement = rtrim(remove_trailing_comment(curline.rest()));
 	    state = in_ffix_3;
 	    return;
 
 	 case in_ffix_3:
+	    ppp<<"state: in_ffix_3"<<endchar;
 	    getnext();
 	    state = start;
 	    break;
 
 	 case in_fortran:
-	    if(end_of_file)
-	    {
-	       state = end_fortran;
-	       break;
-	    }
-	    //if (iscon)
-	    //  curlines.front() = fortranline("C");
+	    ppp<<"state: in_fortran"<<endchar;
+	    if(end_of_file) { state = end_fortran; break; }
+
+	    curline.set_con(full_statement.length() != 0);
 	    handle_fortran(curline, f_more, pushback);
 	    if (f_more)
 	    {
 	       getnext(); if (end_of_file) { state = end_fortran; break; }
-
 	       pretype = curline.getpregentype();
 	       if (pretype == CPP || pretype == COCO)
 	       {
 		  p_more = 0;
 		  while (1)
 		  {
-		     handle_pre1(curline,f_more,p_more);
+		     handle_pre(curline,f_more,p_more);
 		     curlines.push_back(curline);
 		     if(p_more)
 		     {
@@ -659,6 +618,7 @@ void get_full_statement()
 			break;
 		  }
 		  getnext();
+		  curline.set_con(full_statement.length() != 0);
 	       }
 	       state = in_fortran;
 	       break;
@@ -667,17 +627,18 @@ void get_full_statement()
 	    return;
 
 	 case in_fortran_1:
-	    iscon = 0;                // next line is not a continuation
+	    ppp<<"state: in_fortran_1"<<endchar;
 	    if (!pushback)
 	       getnext();
 	    state = start;
 	    break;
 
 	 case in_pre:
+	    ppp<<"state: in_pre"<<endchar;
 	    p_more = 0;
 	    while(1)
 	    {
-	       handle_pre1(curline,iscon,p_more);
+	       handle_pre(curline,f_more,p_more);
 	       curlines.push_back(curline);
 	       if(p_more)
 	       {
@@ -693,6 +654,7 @@ void get_full_statement()
 	 case end_start:
 	 case end_fortran:
 	 case end_pre:
+	    ppp<<"state: end"<<endchar;
 	    state = start;
 	    return;
       }
@@ -717,8 +679,7 @@ void handle_free(fortranline &line, bool &f_more, bool &pushback)
    //        0: this line is complete
    //
 
-   pushback           = 0;
-   static bool p_more = 0;
+   pushback = 0;
 
    if (!line.blank_or_comment())
    {
@@ -763,10 +724,10 @@ bool is_findentfix(fortranline &line)
 	 rc = 1;
 	 break;
       case P_ON:
-	 p_on = 1;     // debug.h, debug.cpp
+	 ppp.on();     // debug.h, debug.cpp
 	 break;
       case P_OFF:
-	 p_on = 0;
+	 ppp.off();
 	 break;
    }
    return rc;
@@ -899,7 +860,7 @@ void handle_refactor()
 {
    if (flags.refactor_routines && refactor_end_found)
    {
-      ppp("calling refactor");
+      ppp << "calling refactor" << curlines << endchar;
       //
       // handle refactor routines
       //
@@ -911,7 +872,7 @@ void handle_refactor()
 	 // returns false. The scanned characters will be replaced by something
 	 // like: 'end subroutine mysub'
 	 //
-	 std::string s = curlines.front().trimmed_line();
+	 std::string s = curlines.back().trimmed_line();
 	 size_t startpos = s.find_first_not_of(' ',labellength);
 	 size_t endpos   = s.length();
 	 for (size_t i=startpos; i<s.length(); i++)
@@ -947,10 +908,7 @@ void handle_refactor()
 	    replacement = stoupper(replacement);
 	 if (cur_rprop.name != "")
 	    replacement += " " + cur_rprop.name;
-	 fortranline x=curlines.front();   // TODO
-	 curlines.pop_front();
-	 curlines.front().set_line(s.substr(0,startpos) + replacement + s.substr(endpos));
-	 curlines.push_front(x);
+	 curlines.back().set_line(s.substr(0,startpos) + replacement + s.substr(endpos));
       }
    }
 }
