@@ -63,7 +63,7 @@ int determine_fix_or_free()
 //     or, if there is no #else, from the code before the #if{,def,ndef}
 //
 
-void handle_pre1(fortranline &line, const bool f_more, bool &p_more)
+void handle_pre(fortranline &line, const bool f_more, bool &p_more)
 {
    int ifelse;
    static int pretype;
@@ -105,43 +105,8 @@ void handle_pre1(fortranline &line, const bool f_more, bool &p_more)
 		  break;
 	    }
 
-	    ppp("iscon_store 1",iscon_store);
-	    switch(ifelse) // iscon needs apart treatment:
-	    {
-	       case pre_analyzer::IF:
-		  iscon = f_more;              // remember if a continuation is needed
-		  iscon_store.push_back(iscon);
-		  break;
-
-	       case pre_analyzer::ELIF:
-		  iscon = 0;
-		  if (!iscon_store.empty())
-		     iscon = iscon_store.back();
-		  break;
-
-	       case pre_analyzer::ELSE:
-		  if (iscon_store.empty())
-		     iscon = 0;
-		  else
-		     iscon = iscon_store.back();
-		  break;
-
-	       case pre_analyzer::ENDIF:
-	       case pre_analyzer::ENDIFE:
-		  if (iscon_store.empty())
-		     iscon = 0;
-		  else
-		  {
-		     iscon_store.pop_back();
-		     if (!iscon_store.empty())
-			iscon = iscon_store.back();
-		  }
-		  break;
-	    }
-	    ppp("iscon_store 2",iscon_store);
-	    ppps("iscon",iscon);
-
-	    switch(ifelse)
+	    ppp<<"handle_pre fs_store 1"<<fs_store<<endchar;
+	    switch(ifelse) // full_statement needs apart treatment:
 	    {
 	       case pre_analyzer::IF:
 		  fs_store.push_back(full_statement);
@@ -162,21 +127,16 @@ void handle_pre1(fortranline &line, const bool f_more, bool &p_more)
 		  break;
 
 	       case pre_analyzer::ENDIF:
-		  ppp("ENDIF fs1",fs_store);
 	       case pre_analyzer::ENDIFE:
-		  if(fs_store.empty())
-		     full_statement = "";
-		  else
-		  {
+		  if(!fs_store.empty())
 		     fs_store.pop_back();
-		     if (fs_store.empty())
-			full_statement = "";
-		     else
-			full_statement = fs_store.back();
-		     ppp("ENDIF fs",fs_store);
-		  }
+		  break;
+
 		  break;
 	    }
+	    ppp<<"handle_pre fs_store 2"<<fs_store<<endchar;
+	    ppp<<"handle_pre full_statement"<<full_statement<<endchar;
+
 	    break;
       }
 
@@ -185,109 +145,12 @@ void handle_pre1(fortranline &line, const bool f_more, bool &p_more)
       p_more = (line.lastchar() == "&");
    else
       p_more = (line.lastchar() == "\\");
-}       // end of handle_pre1
 
-bool handle_pre(lines_t &ci, const bool f_more, lines_t *co)
-{
-   //
-   // NOTE: handle_pre can pop ci
-   //
-   int ifelse;
-   int output = (co == 0);
-   std::string s = ci.front().trimmed_line();
-   int pretype   = ci.front().scanfixpre();
-   switch(pretype)
-   {
-      case CPP:
-      case COCO:
-	 break;
-      default:
-	 ifelse = prea.analyze(s, pretype);
-	 switch(ifelse)
-	 {
-	    case pre_analyzer::IF:
-	       push_all();
-	       break;
-
-	    case pre_analyzer::ELIF:
-	       top_all();
-	       break;
-
-	    case pre_analyzer::ELSE:
-	       top_all();
-	    case pre_analyzer::ENDIF:
-	       pop_all();
-	       break;
-
-	    case pre_analyzer::ENDIFE:
-	       break;
-
-	    default:
-	       return 0;
-	       break;
-	 }
-
-	 switch(ifelse) // iscon needs apart treatment:
-	 {
-	    case pre_analyzer::IF:
-	       iscon = f_more;              // remember if a continuation is needed
-	       iscon_store.push_back(iscon);
-	       break;
-
-	    case pre_analyzer::ELIF:
-	       iscon = 0;
-	       if (!iscon_store.empty())
-		  iscon = iscon_store.back();
-	       break;
-
-	    case pre_analyzer::ELSE:
-	       iscon = iscon_store.back();
-	       break;
-
-	    case pre_analyzer::ENDIF:
-	    case pre_analyzer::ENDIFE:
-	       iscon = f_more;
-	       if (!iscon_store.empty())
-		  iscon_store.pop_back();
-	       break;
-	 }
-	 break;
-   }
-
-   int pregentype = ci.front().getpregentype();
-
-   if(output)
-      mycout << trim(s) << endline;
-   else
-      co->push_back(trim(s));
-
-   ci.pop_front();
-
-   if(pregentype == COCO)
-      return 1;
-
-   std::string lchar = std::string(1,lastchar(s));
-
-   while (!ci.empty())
-   {
-      //
-      // consume CPP continuation lines
-      //
-      if (lchar != "\\")
-	 return 1;
-
-      if(output)
-	 mycout <<ci.front().orig() << endline;
-      else
-	 co->push_back(ci.front().orig());
-
-      lchar = ci.front().lastchar();
-      ci.pop_front();
-   }
-   return 1;
+   ppp<<"handle_pre "<<line<<" "<<p_more<<" "<<line.lastchar()<<pregentype<<" "<<CPP<<" "<<COCO<<endchar;
 }       // end of handle_pre
 
-void handle_pre_light1(fortranline &line, bool &p_more)
+
+void handle_pre_light(fortranline &line, bool &p_more)
 {
    //
    // handles preprocessor lines and their continuations:
@@ -307,29 +170,6 @@ void handle_pre_light1(fortranline &line, bool &p_more)
    else
       p_more = (line.lastchar() == "\\");
 
-}         // end of handle_pre_light1
-
-void handle_pre_light(fortranline &fs, int &p, bool &more)
-{
-   //
-   // handles preprocessor lines and their continuations:
-   //
-   // fs (input):     line to handle
-   // p  (inout):     input:  type of line: CPP or COCO. 
-   //                 output: if no continuation is expected, p = 0
-   // more (output):  true if a continuation is expected
-   //
-   if(p == CPP)
-      more = (fs.lastchar() == "\\");
-   else
-      //
-      // since COCO lines always start with '??', there is no need
-      // to signify that another COCO line is expected
-      //
-      more = 0;
-
-   if(more == 0)
-      p = 0;
 }         // end of handle_pre_light
 
 int guess_indent(const std::string &s)
@@ -618,3 +458,28 @@ std::string handle_dos(const std::string &s)
    return sl;
 }         // end of handle_dos
 
+void output_pre(lines_t &lines)
+{
+   //
+   // if the first line of lines is a preprocessor line
+   // output this line and the continuation lines
+   // popping lines
+   //
+   if(lines.empty())
+	 return;
+   if (lines.front().pre())
+   {
+      bool p_more = 0;
+      while(1)
+      {
+	 handle_pre_light(lines.front(),p_more);
+	 if (lines.front().pre())
+	    mycout << lines.front().trim() << endline;
+	 else
+	    mycout << lines.front().orig() << endline;
+	 lines.pop_front();
+	 if (lines.empty() || !p_more)
+	    break;
+      }
+   }
+}     // end of output_pre
