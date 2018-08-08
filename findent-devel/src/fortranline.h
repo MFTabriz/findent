@@ -196,11 +196,13 @@ class fortranline
 	 return "";
    }
 
-   bool blank_or_comment()
+   bool blank()
    {
-      if (trim() == "")
-	 return 1;
+      return (trim().length() == 0);
+   }
 
+   bool comment()
+   {
       switch (getformat())
       {
 	 case FIXED:
@@ -222,6 +224,11 @@ class fortranline
 	    break;
       }
       return 0;
+   }
+
+   bool blank_or_comment()
+   {
+      return blank() || comment();
    }
 
    int getpregentype()
