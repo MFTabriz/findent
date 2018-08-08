@@ -23,6 +23,7 @@ template <typename T>
     return ss >> result ? result : 0;
   }
 
+std::string blanks(const int l);
 bool        cleanfive(const std::string &s);
 std::string firstchars(const std::string &s, const int n);
 char        firstchar(const std::string &s);

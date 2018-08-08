@@ -303,3 +303,8 @@ std::string remove_trailing_comment(const std::string &s)
    return so;
 }              // end of remove_trailing_comment
 
+std::string blanks(const int l)
+{
+   return std::string(l,' ');
+}
+

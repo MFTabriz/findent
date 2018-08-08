@@ -513,7 +513,7 @@ void get_full_statement()
       in_fortran, in_fortran_1,
       in_pre, 
       end_start, end_fortran, end_pre, 
-      in_ffix, in_ffix_1, in_ffix_2, in_ffix_3
+      in_ffix
    };
    full_statement = "";
 
@@ -569,29 +569,13 @@ void get_full_statement()
 	    state = in_fortran;
 	    break;
 
-	 case in_ffix:   // TODO this can be done more simple
+	 case in_ffix:
 	    ppp<<"state: in_ffix"<<endchar;
-	    state = in_ffix_1;
-	    return;
-
-	 case in_ffix_1:
-	    ppp<<"state: in_ffix_1"<<endchar;
 	    curlines.push_back(curline);
-	    full_statement = "";
-	    state = in_ffix_2;
-	    return;
-
-	 case in_ffix_2:
-	    ppp<<"state: in_ffix_2"<<endchar;
 	    full_statement = rtrim(remove_trailing_comment(curline.rest()));
-	    state = in_ffix_3;
-	    return;
-
-	 case in_ffix_3:
-	    ppp<<"state: in_ffix_3"<<endchar;
 	    getnext();
 	    state = start;
-	    break;
+	    return;
 
 	 case in_fortran:
 	    ppp<<"state: in_fortran"<<endchar;
@@ -624,6 +608,9 @@ void get_full_statement()
 	       break;
 	    }
 	    state = in_fortran_1;
+	    //
+	    // need state in_fortran_1 to get correct result from last_usable
+	    //
 	    return;
 
 	 case in_fortran_1:
