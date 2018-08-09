@@ -75,7 +75,7 @@ class fortranline
    {
       return gnu_format;
    }
-   std::string orig()
+   std::string orig() const
    {
       return orig_line;
    }
@@ -87,7 +87,7 @@ class fortranline
       orig_line = s;
    }
 
-   std::string line()
+   std::string line() const
    {
       switch(format)
       {
@@ -120,7 +120,7 @@ class fortranline
       }
    }
 
-   std::string trimmed_line()
+   std::string trimmed_line() const
    {
       //
       // result is different for FIXED or FREE, see below:
@@ -137,28 +137,28 @@ class fortranline
       }
    }
 
-   std::string rtrim()
+   std::string rtrim() const
    {
       return ::rtrim(orig());
    }
 
-   std::string ltrim()
+   std::string ltrim() const
    {
       return ::ltrim(orig());
    }
 
-   std::string trim()
+   std::string trim() const
    {
       return ::trim(orig());
    }
 
-   std::string firstchar()
+   std::string firstchar() const
    {
       // returns first char of ltrim()
       return ltrim().substr(0,1);
    }
 
-   std::string lastchar()
+   std::string lastchar() const
    {
       if (rtrim().length() > 0)
 	 return rtrim().substr(rtrim().length()-1);
@@ -166,18 +166,18 @@ class fortranline
 	 return "";
    }
 
-   std::string first2chars()
+   std::string first2chars() const
    {
       return ltrim().substr(0,2);
    }
 
-   std::string ltab2sp()
+   std::string ltab2sp() const
    {
       return ::ltab2sp(orig());
    }
 
 
-   int scanfixpre()
+   int scanfixpre() const
    {
       int rc;
       lexer_set(trim(),SCANFIXPRE);
@@ -188,7 +188,7 @@ class fortranline
       return rc;
    }
 
-   std::string rest()
+   std::string rest() const
    {
       if(scanfixpre()==FINDENTFIX)
 	 return lexer_getrest();
@@ -196,12 +196,12 @@ class fortranline
 	 return "";
    }
 
-   bool blank()
+   bool blank() const
    {
       return (trim().length() == 0);
    }
 
-   bool comment()
+   bool comment() const
    {
       switch (getformat())
       {
@@ -226,12 +226,12 @@ class fortranline
       return 0;
    }
 
-   bool blank_or_comment()
+   bool blank_or_comment() const
    {
       return blank() || comment();
    }
 
-   int getpregentype()
+   int getpregentype() const
    {
       int  pretype = scanfixpre();
       switch(pretype)
@@ -247,22 +247,22 @@ class fortranline
       }
    }
 
-   bool precpp()
+   bool precpp() const
    {
       return firstchar() == "#";
    }
 
-   bool precoco()
+   bool precoco() const
    {
       return first2chars() == "??";
    }
 
-   bool pre()
+   bool pre() const
    {
       return precpp() || precoco();
    }
 
-   bool blank_or_comment_or_pre()
+   bool blank_or_comment_or_pre() const
    {
       return blank_or_comment() || pre();
    }
@@ -272,9 +272,14 @@ class fortranline
       iscontinuation = b;
    }
 
-   bool con()
+   bool con() const
    {
       return iscontinuation;
+   }
+
+   bool fortran() const
+   {
+      return !blank_or_comment_or_pre();
    }
 
 };

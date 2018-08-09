@@ -9,7 +9,7 @@
 void free2free(lines_t &lines)
 {
    //
-   // output lines
+   // output lines input: free format, output: free format
    //
 
    bool isfirst = 1;
@@ -17,7 +17,9 @@ void free2free(lines_t &lines)
    {
       mycout.reset();
 
-      output_pre(lines);
+      // TODO: combine output of pre and blank and comments
+      if(output_pre(lines))
+	 continue;
       if (lines.empty())
 	 return;
 

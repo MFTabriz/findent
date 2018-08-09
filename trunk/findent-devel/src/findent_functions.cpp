@@ -8,15 +8,17 @@
 int determine_fix_or_free()
 {
    int rc;
-   std::string s;
    int n = 0;
    const int nmax = 4000;
+   fortranline line;
+   std::string s;
+   bool eof;
    while ( n < nmax)
    {
       n++;
-      mygetline();
-      s = curline.orig();
-      if (end_of_file)
+      line = mygetline(eof);
+      s    = line.orig();
+      if (eof)
       {
 	 //
 	 // to avoid to have to type twice a dot to
@@ -24,11 +26,11 @@ int determine_fix_or_free()
 	 //
 
 	 if(reading_from_tty)
-	    curlinebuffer.push_back(curline);
+	    curlinebuffer.push_back(line);
 	 break;
       }
 
-      curlinebuffer.push_back(curline);
+      curlinebuffer.push_back(line);
 
       rc = guess_fixedfree(s);
       switch(rc)
@@ -69,15 +71,15 @@ void handle_pre(fortranline &line, const bool f_more, bool &p_more)
    static int pretype;
    static int pregentype;
 
-   if (!p_more)   // this is the first line of a preprocessor sequence
+   pregentype = line.getpregentype();
+   if(pregentype == CPP || pregentype == COCO)
    {
       pretype    = line.scanfixpre();
-      pregentype = line.getpregentype();
-
       switch(pretype)
       {
 	 case CPP:
 	 case COCO:
+	 case FINDENTFIX:
 	    break;
 	 default:
 	    ifelse = prea.analyze(line.trimmed_line(), pretype);
@@ -139,12 +141,13 @@ void handle_pre(fortranline &line, const bool f_more, bool &p_more)
 
 	    break;
       }
-
    }
-   if(pregentype == COCO)
+   if(pregentype == CPP)
+      p_more = (line.lastchar() == "\\");
+   else if(pregentype == COCO)
       p_more = (line.lastchar() == "&");
    else
-      p_more = (line.lastchar() == "\\");
+      p_more = 0;
 
    ppp<<"handle_pre "<<line<<" "<<p_more<<" "<<line.lastchar()<<pregentype<<" "<<CPP<<" "<<COCO<<endchar;
 }       // end of handle_pre
@@ -255,7 +258,7 @@ void init_indent()
 
 }             // end of init_indent
 
-void mygetline()
+fortranline mygetline(bool &eof)
 {
    //
    // reads next line from cin.
@@ -272,15 +275,15 @@ void mygetline()
    //
    // sometimes, files do not end with (cr)lf, hence the test for s=="":
    //
-   end_of_file = (std::cin.eof() && s == "");
+   eof = (std::cin.eof() && s == "");
 
    lines_read ++;
 
-   if (!end_of_file && reading_from_tty)
-      end_of_file = (s == ".");
+   if (!eof && reading_from_tty)
+      eof = (s == ".");
 
    s = handle_dos(s);
-   curline.set_line(s);
+   return fortranline(s);
 }              // end of mygetline
 
 int pop_indent()
@@ -458,21 +461,23 @@ std::string handle_dos(const std::string &s)
    return sl;
 }         // end of handle_dos
 
-void output_pre(lines_t &lines)
+bool output_pre(lines_t &lines)
 {
    //
    // if the first line of lines is a preprocessor line
    // output this line and the continuation lines
    // popping lines
    //
+   ppp<<"output_pre"<<lines<<endchar;
    if(lines.empty())
-	 return;
+      return 0;
    if (lines.front().pre())
    {
       bool p_more = 0;
       while(1)
       {
 	 handle_pre_light(lines.front(),p_more);
+	 ppp<<"output_pre"<<lines.front()<<lines.front().pre()<<endchar;
 	 if (lines.front().pre())
 	    mycout << lines.front().trim() << endline;
 	 else
@@ -481,5 +486,8 @@ void output_pre(lines_t &lines)
 	 if (lines.empty() || !p_more)
 	    break;
       }
+      return 1;
    }
+   else
+      return 0;
 }     // end of output_pre
