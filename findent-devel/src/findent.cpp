@@ -50,8 +50,10 @@ lines_t          curlines;        // current line, one continuation line per ite
 dolabels_store_t dolabels_store;  // to store dolabels
 dolabels_t       dolabels;        // to store labels, necessary for labelled do
 fs_store_t       fs_store;        // to store full_statement
+fortranline      getnext(bool &eof, bool use_wb = 1);
 indent_store_t   indent_store;    // to store indent store
 indent_t         indent;          // to store indents
+linebuffer_t     wizardbuffer;    // to store wizard lines and push back lines from handle_fortran
 nbseen_store_t   nbseen_store;    // to store nbseen
 rprops_store_t   rprops_store;
 rprops_t         rprops;          // to store routines (module, subroutine ...)
@@ -426,35 +428,51 @@ void indent_and_output()
    }
 }               // end of indent_and_output
 
-void getnext()
+fortranline getnext(bool &eof, bool use_wb)
 {
-   if (curlinebuffer.empty())
-      mygetline();
+   fortranline line;
+   if (use_wb && !wizardbuffer.empty())
+   {
+      line = wizardbuffer.front();
+      ppp<<"getnext from wb"<<line<<endchar;
+      wizardbuffer.pop_front();
+      if (reading_from_tty && line.orig() == ".")
+	 eof = 1;
+   }
+   else if (!curlinebuffer.empty())
+   {
+      line = curlinebuffer.front();
+      ppp<<"getnext from cb"<<line<<endchar;
+      curlinebuffer.pop_front();
+      num_lines++;
+      if (reading_from_tty && line.orig() == ".")
+	 eof = 1;
+   }
    else
    {
-      curline = curlinebuffer.front();
-      curlinebuffer.pop_front();
-      if (reading_from_tty && curline.orig() == ".")
-	 end_of_file = 1;
+      line = mygetline(eof);
+      ppp<<"getnext from stdin"<<line<<endchar;
+      if (!eof)
+	 num_lines++;
    }
-   num_lines++;
-   if (end_of_file)
-      num_lines --;
+
+   if(!use_wb && !eof)
+      wizardbuffer.push_back(line);
 
    if (!nbseen)
    {
-      nbseen = !curline.blank_or_comment() && (curline.getpregentype() == 0);
+      nbseen = !line.blank_or_comment() && (line.getpregentype() == 0);
       if (flags.auto_firstindent && nbseen)
       {
-	 start_indent = guess_indent(curline.orig());
+	 start_indent = guess_indent(line.orig());
 	 cur_indent   = start_indent;
 	 init_indent();
 	 indent_handled = 1;
       }
    }
 
-   curline.set_con(0);
-   ppp<<"getnext:"<<curline<<endchar;
+   line.set_con(0);
+   return line;
 }
 
 void get_full_statement()
@@ -527,7 +545,7 @@ void get_full_statement()
 
    if (first_call)
    {
-      getnext();
+      curline = getnext(end_of_file);
       first_call = 0;
    }
 
@@ -573,19 +591,19 @@ void get_full_statement()
 	    ppp<<"state: in_ffix"<<endchar;
 	    curlines.push_back(curline);
 	    full_statement = rtrim(remove_trailing_comment(curline.rest()));
-	    getnext();
+	    curline = getnext(end_of_file);
 	    state = start;
 	    return;
 
 	 case in_fortran:
-	    ppp<<"state: in_fortran"<<endchar;
+	    ppp<<"state: in_fortran "<<f_more<<endchar;
 	    if(end_of_file) { state = end_fortran; break; }
 
 	    curline.set_con(full_statement.length() != 0);
 	    handle_fortran(curline, f_more, pushback);
 	    if (f_more)
 	    {
-	       getnext(); if (end_of_file) { state = end_fortran; break; }
+	       curline = getnext(end_of_file); if (end_of_file) { state = end_fortran; break; }
 	       pretype = curline.getpregentype();
 	       if (pretype == CPP || pretype == COCO)
 	       {
@@ -596,12 +614,12 @@ void get_full_statement()
 		     curlines.push_back(curline);
 		     if(p_more)
 		     {
-			getnext(); if (end_of_file) { state = end_fortran; break; }
+			curline = getnext(end_of_file); if (end_of_file) { state = end_fortran; break; }
 		     }
 		     else
 			break;
 		  }
-		  getnext();
+		  curline = getnext(end_of_file);
 		  curline.set_con(full_statement.length() != 0);
 	       }
 	       state = in_fortran;
@@ -616,7 +634,7 @@ void get_full_statement()
 	 case in_fortran_1:
 	    ppp<<"state: in_fortran_1"<<endchar;
 	    if (!pushback)
-	       getnext();
+	       curline = getnext(end_of_file);
 	    state = start;
 	    break;
 
@@ -629,12 +647,12 @@ void get_full_statement()
 	       curlines.push_back(curline);
 	       if(p_more)
 	       {
-		  getnext(); if (end_of_file) { state = end_pre; break; }
+		  curline = getnext(end_of_file); if (end_of_file) { state = end_pre; break; }
 	       }
 	       else
 		  break;
 	    }
-	    getnext();
+	    curline = getnext(end_of_file);
 	    state = start;
 	    break;
 
@@ -699,7 +717,7 @@ void handle_free(fortranline &line, bool &f_more, bool &pushback)
       if (f_more)            // chop off '&' from full_statement :
 	 full_statement.erase(full_statement.length()-1);
    }
-   curlines.push_back(line);
+   curlines.push_back(line.line());
 }           // end of handle_free
 
 bool is_findentfix(fortranline &line)
@@ -720,37 +738,38 @@ bool is_findentfix(fortranline &line)
    return rc;
 }
 
-void handle_fixed(fortranline &line, bool &more, bool &pushback)
+void handle_fixed(fortranline &line, bool &f_more, bool &pushback)
 {
    //
    // adds line to curlines
    // adds line (stripped from comments, preprocessor stuff and 
    //    continuation stuff)  to full_statement
-   // more 1: more lines are to expected
-   //      0: this line is complete
+   // f_more 1: more lines are to expected
+   //        0: this line is complete
    //
+   // TODO: push back all trailing comments, an extra deque is needed for that
+   // in main. Has consequences for handle_refactor
+   // Implementation: ?
 
    pushback = 0;
 
    if (line.blank_or_comment())
    {
-      //
-      // this is a blank or comment line
-      //
-      curlines.push_back(line);
+      curlines.push_back(line.line());
 
       if (curlines.size() ==1)
-	 more = 0;   // do not expect continuation lines
+	 f_more = 0;   // do not expect continuation lines
       else
-	 more = 1;   // but here we do
+	 f_more = 1;   // but here we do
       return;
    }
 
-   std::string s = line.line();
 
    //
    // replace leading tabs by spaces
    //
+
+   std::string s = line.ltab2sp();
 
    std::string sl = s.substr(0,5);
    if (s.length() >6)
@@ -764,13 +783,23 @@ void handle_fixed(fortranline &line, bool &more, bool &pushback)
       //
       // this is the first line
       //
-      curlines.push_back(line);
+      curlines.push_back(line.line());
       full_statement += trim(sl);
       full_statement = rtrim(remove_trailing_comment(full_statement));
-      more = 1;      // maybe there are continuation lines
+      //f_more = wizard();      // maybe there are continuation lines
+      if (!f_more)
+	 f_more = wizard();
       return;
    }
 
+   // 
+   // special attention for garbage lines:
+   //
+   if(!cleanfive(s))
+   {
+      curlines.push_back(line.line());
+      return;
+   }
    //
    // this is possibly a continuation line
    //
@@ -781,16 +810,17 @@ void handle_fixed(fortranline &line, bool &more, bool &pushback)
       // push it back, we will see it later
       //
       pushback = 1;
-      more = 0;          // do not look for further continuation lines
+      f_more   = 0;          // do not look for further continuation lines
       return;
    }
    //
    // this is a continuation line
    //
-   curlines.push_back(line);
+   curlines.push_back(line.line());
    full_statement += rtrim((rtrim(sl)+"      ").substr(6));
    full_statement = rtrim(remove_trailing_comment(full_statement));
-   more = 1;   // look for more continuation lines
+   if(!f_more)
+      f_more = wizard();   // look for more continuation lines
    return;
 }           // end of handle_fixed
 
@@ -836,6 +866,8 @@ void output_line()
 	       fixed2free(curlines);
 	       break;
 	    case FIXED:
+	       ppp<<"output_line fixed full_statement"<<full_statement<<endchar;
+	       ppp<<"output_line fixed lines"<<curlines<<endchar;
 	       fixed2fixed(curlines);
 	       break;
 	 }
@@ -854,12 +886,25 @@ void handle_refactor()
       if (cur_rprop.kind != 0) // check if corresponding start is ok
       {
 	 //
-	 // modify first line to match the corrsponding module, subroutine ... line  
+	 // modify line to match the corrsponding module, subroutine ... line  
+	 // first, we have to locate that line, the back of the deque
+	 // could have comment or empty lines
+	 //
+	 lines_t::reverse_iterator it = curlines.rbegin();
+	 while (it != curlines.rend())
+	 {
+	    if ( it->blank_or_comment_or_pre() )
+	       it++;
+	    else
+	       break;
+	 }
+
 	 // starting at position labellength + spaces, scan lines[0] until isalnumplus()
 	 // returns false. The scanned characters will be replaced by something
 	 // like: 'end subroutine mysub'
 	 //
-	 std::string s = curlines.back().trimmed_line();
+	 //std::string s = curlines.back().trimmed_line();
+	 std::string s = it->trimmed_line();
 	 size_t startpos = s.find_first_not_of(' ',labellength);
 	 size_t endpos   = s.length();
 	 for (size_t i=startpos; i<s.length(); i++)
@@ -895,8 +940,75 @@ void handle_refactor()
 	    replacement = stoupper(replacement);
 	 if (cur_rprop.name != "")
 	    replacement += " " + cur_rprop.name;
-	 curlines.back().set_line(s.substr(0,startpos) + replacement + s.substr(endpos));
+	 //curlines.back().set_line(s.substr(0,startpos) + replacement + s.substr(endpos));
+	 it->set_line(s.substr(0,startpos) + replacement + s.substr(endpos));
       }
    }
 }
+
+bool wizard()
+{
+   //
+   // look ahead to see if the next format fortran line is a continuation
+   // return 1 if a continuation is found, 0 otherwize
+   // for free format, always return 0
+   //
+
+   // 
+   // TODO: wizard keeps no track of preprocessor statements, so it could be fooled
+   // like:
+   //       do
+   //     #ifdef X
+   //      1  i=1,10
+   //     #else
+   //      2  j=1,10
+   //     #endif
+   //       enddo
+   ppp<<"In wizard"<<curline<<endchar;
+   if (fortranline::getformat() == FREE)
+      return 0;
+
+   fortranline line;
+   bool eof;
+
+   while(1)
+   {
+      line = getnext(eof,0);
+      if (eof)
+	 return 0;
+
+      if (line.pre())
+      {
+	 ppp<<"wizard in pre"<<line <<endchar;
+	 bool p_more = 0;
+	 while(1)
+	 {
+	    handle_pre_light(line,p_more);
+	    if (p_more)
+	    {
+	       line = getnext(eof,0);
+	       if (eof)
+		  return 0;
+	    }
+	    else
+	       break;
+	 }
+	 ppp<<"wizard uit pre"<<line<<endchar;
+	 if(eof)
+	    return 0;
+	 continue;
+      }
+
+      ppp<<"wizard line fortran?"<<line<<endchar;
+      if (line.fortran() && cleanfive(line.orig()))
+      {
+	 std::string s = line.ltab2sp();
+	 if (s.length() < 6)
+	    continue;
+	 ppp<<"end wizard "<<!(s[5] == '0' || s[5] == ' ')<<endchar;
+
+	 return !(s[5] == '0' || s[5] == ' ');
+      }
+   }
+}     // end of wizard
 

@@ -22,7 +22,7 @@ bool is_findentfix(fortranline &line);
 bool ispre(const std::string &line);
 void output_line();
 void set_default_indents();
-
+bool wizard();
 
 extern  int            cur_indent;
 extern  fortranline    curline;
