@@ -11,7 +11,7 @@ class fortranline
 
    std::string orig_line;
 
-   static int format, line_length;
+   static int global_format, line_length;
    static bool gnu_format;
 
    bool iscontinuation;
@@ -40,7 +40,7 @@ class fortranline
 
    static std::string format2txt()
    {
-      switch(getformat())
+      switch(format())
       {
 	 case UNKNOWN:
 	    return "unknown";
@@ -53,13 +53,13 @@ class fortranline
       }
    }
 
-   static void setformat(const int what)
+   static void format(const int what)
    {
-      format = what;
+      global_format = what;
    }
-   static int getformat()
+   static int format()
    {
-      return format;
+      return global_format;
    }
    static void setline_length(const int what)
    {
@@ -91,7 +91,7 @@ class fortranline
 
    std::string line() const
    {
-      switch(format)
+      switch(global_format)
       {
 	 case FIXED:
 	    if (line_length == 0)
@@ -127,7 +127,7 @@ class fortranline
       //
       // result is different for FIXED or FREE, see below:
       //
-      switch(format)
+      switch(global_format)
       {
 	 case FIXED:
 	    return ::rtrim(line());
@@ -184,7 +184,7 @@ class fortranline
       int rc;
       lexer_set(trim(),SCANFIXPRE);
       rc      = yylex();
-      if (format == FIXED)
+      if (global_format == FIXED)
 	 if(rc == FIXFINDENTFIX)
 	    rc = FINDENTFIX;
       return rc;
@@ -205,7 +205,7 @@ class fortranline
 
    bool comment() const
    {
-      switch (getformat())
+      switch (format())
       {
 	 case FIXED:
 	    switch(::firstchar(orig()))

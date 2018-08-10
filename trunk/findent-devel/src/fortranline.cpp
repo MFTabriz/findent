@@ -2,7 +2,7 @@
 
 #include "fortranline.h"
 
-int fortranline::format;
+int fortranline::global_format;
 int fortranline::line_length;
 bool fortranline::gnu_format;
 void fortranline::print()
@@ -19,7 +19,7 @@ void fortranline::print()
    std::cout << "ltab2sp: ["        << ltab2sp()      << "]" << std::endl;
    std::cout << "scanfixpre: "      << scanfixpre()   <<        std::endl;
    std::cout << "rest: ["           << rest()         << "]" << std::endl;
-   std::cout << "format:"           << format2txt()   <<        std::endl;
+   std::cout << "global_format:"    << format2txt()   <<        std::endl;
 }
 
 std::ostream& operator <<(std::ostream &os,fortranline &obj)

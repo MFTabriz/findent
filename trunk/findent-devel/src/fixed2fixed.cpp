@@ -222,9 +222,10 @@ bool wizard(lines_t lines)
    {
       if(it->fortran())
       {
-	 if (it->orig().length() < 6)
+	 std::string s = it->line();
+	 if (s.length() < 6)
 	    return 0;
-	 if (it->orig()[5] != ' ' && it->orig()[5] != '0') 
+	 if (s[5] != ' ' && s[5] != '0') 
 	    return 1;
 	 return 0;
       }
@@ -233,10 +234,16 @@ bool wizard(lines_t lines)
    return 0;
 }
 
-std::string add_amp(const std::string s,const char prevquote)
+std::string add_amp(const std::string s,const char p)
 {
-   std::string sl      = remove_trailing_comment(s,prevquote);
-   std::string slt     = rtrim(sl);
-   std::string so      = slt + "&" + s.substr(slt.length());
-   return so;
+   //
+   // examples:
+   // s = "abc ! comment",  p = ' '   :  result = "abc& ! comment"
+   // s = "ab'c ! comment", p = ' '   :  result = "ab'c ! comment&"
+   // s = "abc ! comment",  p = '\''  :  result = "abc ! comment&"
+   // s = "ab'c ! comment", p = '\''  :  result = "ab'c& ! comment"
+   // p can be ' ', '\'', '"'
+   //
+   std::string slt = rtrim(remove_trailing_comment(s,p));
+   return slt + "&" + s.substr(slt.length());
 }
