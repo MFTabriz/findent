@@ -457,7 +457,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 TESTS = \
-	 test1.sh  test2.sh                                test6.sh  \
+	 test1.sh  test2.sh            test4.sh  test5.sh  test6.sh  \
          test7.sh  test8.sh  test9.sh  test10.sh test11.sh test12.sh \
 	 test13.sh test14.sh           test16.sh test17.sh test18.sh \
 	 test19.sh
@@ -722,6 +722,20 @@ test1.sh.log: test1.sh
 test2.sh.log: test2.sh
 	@p='test2.sh'; \
 	b='test2.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+test4.sh.log: test4.sh
+	@p='test4.sh'; \
+	b='test4.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+test5.sh.log: test5.sh
+	@p='test5.sh'; \
+	b='test5.sh'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \

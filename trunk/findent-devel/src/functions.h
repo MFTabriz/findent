@@ -35,7 +35,7 @@ std::string ltab2sp(const std::string& s);
 std::string ltrim(const std::string& str);
 int         num_leading_spaces(const std::string &s);
 std::string remove_blanks(const std::string &s);
-std::string remove_trailing_comment(const std::string &s);
+std::string remove_trailing_comment(const std::string &s, const char prevquote = ' ');
 std::string rtrim(const std::string &str);
 std::string trim(const std::string &str);
 std::string stolower(const std::string &s);

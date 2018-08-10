@@ -24,7 +24,6 @@ int               cur_indent;
 struct propstruct cur_rprop           = empty_rprop;
 fortranline       curline;
 bool              end_of_file;
-char              endchar             = '\n';
 std::string       endline             = "\n";
 bool              endline_set         = 0;
 Flags             flags;
@@ -471,7 +470,8 @@ fortranline getnext(bool &eof, bool use_wb)
       }
    }
 
-   line.set_con(0);
+   line.iscon(1);
+   ppp<<"getnext finally line"<<line<<endchar;
    return line;
 }
 
@@ -596,11 +596,13 @@ void get_full_statement()
 	    return;
 
 	 case in_fortran:
-	    ppp<<"state: in_fortran "<<f_more<<endchar;
+	    ppp<<"state: in_fortran f_more:"<<f_more<<endchar;
+	    ppp<<"state: in_fortran curline"<<curline<<endchar;
 	    if(end_of_file) { state = end_fortran; break; }
 
-	    curline.set_con(full_statement.length() != 0);
+	    //curline.iscon(full_statement.length() != 0);
 	    handle_fortran(curline, f_more, pushback);
+	    curline.hascon(f_more);
 	    if (f_more)
 	    {
 	       curline = getnext(end_of_file); if (end_of_file) { state = end_fortran; break; }
@@ -620,7 +622,7 @@ void get_full_statement()
 			break;
 		  }
 		  curline = getnext(end_of_file);
-		  curline.set_con(full_statement.length() != 0);
+		  //curline.iscon(full_statement.length() != 0);
 	       }
 	       state = in_fortran;
 	       break;

@@ -23,6 +23,8 @@
 // turn off by !findentfix:p-off
 //
 
+extern  char endchar;
+
 class debugostream 
 
 {

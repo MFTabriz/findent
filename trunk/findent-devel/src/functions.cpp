@@ -261,7 +261,7 @@ std::string ltab2sp(const std::string &s)
    return leader + trim(s.substr(removed));
 }
 
-std::string remove_trailing_comment(const std::string &s)
+std::string remove_trailing_comment(const std::string &s,const char prevquote)
 {
    //
    // removes trailing comment, but only if not part of an
@@ -277,9 +277,9 @@ std::string remove_trailing_comment(const std::string &s)
    //
 
    std::string so = s;
-   bool instring = 0;
-   char q        = ' ';
-   for (unsigned int i=0; i<so.size(); i++)
+   bool instring = prevquote != ' ';
+   char q        = prevquote;
+   for (unsigned int i=0; i<s.size(); i++)
    {
       if (instring)
       {

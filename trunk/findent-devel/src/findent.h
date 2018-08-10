@@ -26,7 +26,6 @@ bool wizard();
 
 extern  int            cur_indent;
 extern  fortranline    curline;
-extern  char           endchar;
 extern  std::string    endline;
 extern  bool           endline_set;
 extern  bool           end_of_file;

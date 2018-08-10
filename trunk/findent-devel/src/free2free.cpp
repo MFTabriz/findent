@@ -12,6 +12,7 @@ void free2free(lines_t &lines)
    // output lines input: free format, output: free format
    //
 
+   ppp<<"free2free lines"<<lines<<endchar;
    bool isfirst = 1;
    while (!lines.empty())
    {
