@@ -430,6 +430,7 @@ void indent_and_output()
 fortranline getnext(bool &eof, bool use_wb)
 {
    fortranline line;
+   eof = 0;
    if (use_wb && !wizardbuffer.empty())
    {
       line = wizardbuffer.front();
