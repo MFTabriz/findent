@@ -14,7 +14,7 @@ void              handle_reading_from_tty();
 void              handle_refactor();
 void              init_indent();
 fortranline       mygetline(bool &eof);
-bool              output_pre(lines_t &lines);
+bool              output_pre(lines_t &lines, lines_t *outlines = 0);
 void              pop_all(void);
 int               pop_dolabel();
 int               pop_indent();

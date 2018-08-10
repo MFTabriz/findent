@@ -461,13 +461,16 @@ std::string handle_dos(const std::string &s)
    return sl;
 }         // end of handle_dos
 
-bool output_pre(lines_t &lines)
+bool output_pre(lines_t &lines, lines_t *outlines)
 {
    //
    // if the first line of lines is a preprocessor line
    // output this line and the continuation lines
    // popping lines
    //
+
+   bool to_mycout = outlines == 0;
+
    ppp<<"output_pre"<<lines<<endchar;
    if(lines.empty())
       return 0;
@@ -479,9 +482,15 @@ bool output_pre(lines_t &lines)
 	 handle_pre_light(lines.front(),p_more);
 	 ppp<<"output_pre"<<lines.front()<<lines.front().pre()<<endchar;
 	 if (lines.front().pre())
-	    mycout << lines.front().trim() << endline;
+	    if (to_mycout)
+	       mycout << lines.front().trim() << endline;
+	    else
+	       outlines->push_back(lines.front().trim());
 	 else
-	    mycout << lines.front().orig() << endline;
+	    if (to_mycout)
+	       mycout << lines.front().orig() << endline;
+	    else
+	       outlines->push_back(lines.front().orig());
 	 lines.pop_front();
 	 if (lines.empty() || !p_more)
 	    break;

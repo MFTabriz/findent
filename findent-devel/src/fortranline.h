@@ -15,12 +15,14 @@ class fortranline
    static bool gnu_format;
 
    bool iscontinuation;
+   bool hascontinuation;
 
    public:
 
    void init()
    {
-      iscontinuation = 0;
+      iscontinuation  = 0;
+      hascontinuation = 0;
    }
 
    void print();
@@ -267,14 +269,24 @@ class fortranline
       return blank_or_comment() || pre();
    }
 
-   void set_con(const bool b)
+   void iscon(const bool b)
    {
       iscontinuation = b;
    }
 
-   bool con() const
+   bool iscon() const
    {
       return iscontinuation;
+   }
+
+   void hascon(const bool b)
+   {
+      hascontinuation = b;
+   }
+
+   bool hascon() const
+   {
+      return hascontinuation;
    }
 
    bool fortran() const
