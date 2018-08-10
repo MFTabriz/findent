@@ -120,7 +120,7 @@ void free2fixed(lines_t &lines)
       nlines.push_back(os.str());
       lines.pop_front();
    }
-   fortranline::setformat(FIXED);
+   fortranline::format(FIXED);
    fixed2fixed(nlines);
-   fortranline::setformat(FREE);
+   fortranline::format(FREE);
 }

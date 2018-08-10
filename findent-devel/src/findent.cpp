@@ -59,7 +59,7 @@ rprops_t         rprops;          // to store routines (module, subroutine ...)
 
 int main(int argc, char*argv[])
 {
-   fortranline::setformat(UNKNOWN);
+   fortranline::format(UNKNOWN);
    int todo = flags.get_flags(argc,argv);
    switch(todo)
    {
@@ -113,7 +113,7 @@ int main(int argc, char*argv[])
    if (input_format == UNKNOWN)
       input_format = determine_fix_or_free();
 
-   fortranline::setformat(input_format);
+   fortranline::format(input_format);
 
    if (flags.only_fix_free)
    {
@@ -471,7 +471,6 @@ fortranline getnext(bool &eof, bool use_wb)
       }
    }
 
-   line.iscon(1);
    ppp<<"getnext finally line"<<line<<endchar;
    return line;
 }
@@ -720,7 +719,7 @@ void handle_free(fortranline &line, bool &f_more, bool &pushback)
       if (f_more)            // chop off '&' from full_statement :
 	 full_statement.erase(full_statement.length()-1);
    }
-   curlines.push_back(line.line());
+   curlines.push_back(line);
 }           // end of handle_free
 
 bool is_findentfix(fortranline &line)
@@ -758,7 +757,7 @@ void handle_fixed(fortranline &line, bool &f_more, bool &pushback)
 
    if (line.blank_or_comment())
    {
-      curlines.push_back(line.line());
+      curlines.push_back(line);
 
       if (curlines.size() ==1)
 	 f_more = 0;   // do not expect continuation lines
@@ -766,7 +765,6 @@ void handle_fixed(fortranline &line, bool &f_more, bool &pushback)
 	 f_more = 1;   // but here we do
       return;
    }
-
 
    //
    // replace leading tabs by spaces
@@ -786,12 +784,11 @@ void handle_fixed(fortranline &line, bool &f_more, bool &pushback)
       //
       // this is the first line
       //
-      curlines.push_back(line.line());
+      curlines.push_back(line);
       full_statement += trim(sl);
       full_statement = rtrim(remove_trailing_comment(full_statement));
-      //f_more = wizard();      // maybe there are continuation lines
       if (!f_more)
-	 f_more = wizard();
+	 f_more = wizard();     // is there a continuation line in the future?
       return;
    }
 
@@ -800,7 +797,7 @@ void handle_fixed(fortranline &line, bool &f_more, bool &pushback)
    //
    if(!cleanfive(s))
    {
-      curlines.push_back(line.line());
+      curlines.push_back(line);
       return;
    }
    //
@@ -819,7 +816,7 @@ void handle_fixed(fortranline &line, bool &f_more, bool &pushback)
    //
    // this is a continuation line
    //
-   curlines.push_back(line.line());
+   curlines.push_back(line);
    full_statement += rtrim((rtrim(sl)+"      ").substr(6));
    full_statement = rtrim(remove_trailing_comment(full_statement));
    if(!f_more)
@@ -968,7 +965,7 @@ bool wizard()
    //     #endif
    //       enddo
    ppp<<"In wizard"<<curline<<endchar;
-   if (fortranline::getformat() == FREE)
+   if (fortranline::format() == FREE)
       return 0;
 
    fortranline line;
