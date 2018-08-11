@@ -19,11 +19,10 @@ void fixed2fixed(lines_t &lines,lines_t *freelines)
    // lines optionally start with comments and/or preprocessor lines
    // lines ends with a fortran line
    //
-   bool to_mycout                   = freelines == 0;
-   unsigned int old_indent          = 0;
-   static unsigned int first_indent = 0;
-   static char prevquote            = ' ';
-   bool isfirst = 1;
+   bool to_mycout            = (freelines == 0);
+   unsigned int old_indent   = 0;
+   unsigned int first_indent = 0;
+   char prevquote            = ' ';
 
    std::ostringstream os;
 
@@ -60,7 +59,7 @@ void fixed2fixed(lines_t &lines,lines_t *freelines)
       {
 	 if (lines.front().firstchar() == "!")
 	 {
-	    if (lines.front().orig().substr(0,1) != "!")
+	    if (lines.front()[0] != '!')
 	       //
 	       // take care of the situation that cur_indent == 0
 	       // but the comment does not start in column 1
@@ -119,7 +118,6 @@ void fixed2fixed(lines_t &lines,lines_t *freelines)
 
       if(s.length() > 6)
       {
-	 isfirst = 0;
 	 //
 	 // output label field including possible continuation character
 	 //
@@ -128,7 +126,7 @@ void fixed2fixed(lines_t &lines,lines_t *freelines)
 	 else
 	    os << s.substr(0,5);
 
-	 bool iscontinuation = (s[5] != ' ' && s[5] != '0');
+	 bool iscontinuation = lines.front().fixedcontinuation();
 	 //
 	 // try to honor current indentation
 	 // if this is a continuation line, count the number
@@ -220,15 +218,8 @@ bool wizard(lines_t lines)
    it++;
    while(it != lines.end())
    {
-      if(it->fortran())
-      {
-	 std::string s = it->line();
-	 if (s.length() < 6)
-	    return 0;
-	 if (s[5] != ' ' && s[5] != '0') 
-	    return 1;
-	 return 0;
-      }
+      if (it-> fortran())
+	 return it->fixedcontinuation();
       it++;
    }
    return 0;

@@ -36,7 +36,7 @@ void free2free(lines_t &lines)
 
       if (lines.front().comment())
       {
-	 if (lines.front().orig().substr(0,1) != "!")
+	 if (lines.front()[0] != '!')
 	    //
 	    // take care of the situation that cur_indent == 0
 	    // but the comment does not start in column 1

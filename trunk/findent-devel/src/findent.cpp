@@ -59,7 +59,7 @@ rprops_t         rprops;          // to store routines (module, subroutine ...)
 
 int main(int argc, char*argv[])
 {
-   fortranline::format(UNKNOWN);
+   fortranline::g_format(UNKNOWN);
    int todo = flags.get_flags(argc,argv);
    switch(todo)
    {
@@ -104,8 +104,8 @@ int main(int argc, char*argv[])
 	 return 0;
    }
 
-   fortranline::setline_length(flags.input_line_length);
-   fortranline::setgnu_format(flags.input_format_gnu);
+   fortranline::line_length(flags.input_line_length);
+   fortranline::gnu_format(flags.input_format_gnu);
    start_indent = flags.start_indent;
    handle_reading_from_tty();
 
@@ -113,7 +113,7 @@ int main(int argc, char*argv[])
    if (input_format == UNKNOWN)
       input_format = determine_fix_or_free();
 
-   fortranline::format(input_format);
+   fortranline::g_format(input_format);
 
    if (flags.only_fix_free)
    {
@@ -436,7 +436,7 @@ fortranline getnext(bool &eof, bool use_wb)
       line = wizardbuffer.front();
       ppp<<"getnext from wb"<<line<<endchar;
       wizardbuffer.pop_front();
-      if (reading_from_tty && line.orig() == ".")
+      if (reading_from_tty && line.str() == ".")
 	 eof = 1;
    }
    else if (!curlinebuffer.empty())
@@ -445,7 +445,7 @@ fortranline getnext(bool &eof, bool use_wb)
       ppp<<"getnext from cb"<<line<<endchar;
       curlinebuffer.pop_front();
       num_lines++;
-      if (reading_from_tty && line.orig() == ".")
+      if (reading_from_tty && line.str() == ".")
 	 eof = 1;
    }
    else
@@ -464,7 +464,7 @@ fortranline getnext(bool &eof, bool use_wb)
       nbseen = !line.blank_or_comment() && (line.getpregentype() == 0);
       if (flags.auto_firstindent && nbseen)
       {
-	 start_indent = guess_indent(line.orig());
+	 start_indent = guess_indent(line.str());
 	 cur_indent   = start_indent;
 	 init_indent();
 	 indent_handled = 1;
@@ -803,7 +803,7 @@ void handle_fixed(fortranline &line, bool &f_more, bool &pushback)
    //
    // this is possibly a continuation line
    //
-   if (s.length() < 6 || s[5] == ' ' || s[5] == '0')
+   if (!line.fixedcontinuation())
    {
       //
       // this is not a continuation line
@@ -840,7 +840,7 @@ void output_line()
       //
       while (! curlines.empty())
       {
-	 mycout << curlines.front().orig() << endline;
+	 mycout << curlines.front().str() << endline;
 	 curlines.pop_front();
       }
       return;
@@ -941,7 +941,7 @@ void handle_refactor()
 	 if (cur_rprop.name != "")
 	    replacement += " " + cur_rprop.name;
 	 //curlines.back().set_line(s.substr(0,startpos) + replacement + s.substr(endpos));
-	 it->set_line(s.substr(0,startpos) + replacement + s.substr(endpos));
+	 it->str(s.substr(0,startpos) + replacement + s.substr(endpos));
       }
    }
 }
@@ -965,7 +965,7 @@ bool wizard()
    //     #endif
    //       enddo
    ppp<<"In wizard"<<curline<<endchar;
-   if (fortranline::format() == FREE)
+   if (fortranline::g_format() == FREE)
       return 0;
 
    fortranline line;
@@ -1000,15 +1000,14 @@ bool wizard()
       }
 
       ppp<<"wizard line fortran?"<<line<<endchar;
-      if (line.fortran() && cleanfive(line.orig()))
+      if (line.fortran() && cleanfive(line.str()))
       {
-	 std::string s = line.ltab2sp();
-	 if (s.length() < 6)
-	    continue;
-	 ppp<<"end wizard "<<!(s[5] == '0' || s[5] == ' ')<<endchar;
-
-	 return !(s[5] == '0' || s[5] == ' ');
+	 //
+	 // return 1 if this is a fixed fortran continuation line
+	 //
+	 return line.fixedcontinuation();
       }
    }
+   return 0;
 }     // end of wizard
 
