@@ -107,7 +107,6 @@ void handle_pre(fortranline &line, const bool f_more, bool &p_more)
 		  break;
 	    }
 
-	    ppp<<"handle_pre fs_store 1"<<fs_store<<endchar;
 	    switch(ifelse) // full_statement needs apart treatment:
 	    {
 	       case pre_analyzer::IF:
@@ -136,9 +135,6 @@ void handle_pre(fortranline &line, const bool f_more, bool &p_more)
 
 		  break;
 	    }
-	    ppp<<"handle_pre fs_store 2"<<fs_store<<endchar;
-	    ppp<<"handle_pre full_statement"<<full_statement<<endchar;
-
 	    break;
       }
    }
@@ -149,7 +145,6 @@ void handle_pre(fortranline &line, const bool f_more, bool &p_more)
    else
       p_more = 0;
 
-   ppp<<"handle_pre "<<line<<" "<<p_more<<" "<<line.lastchar()<<pregentype<<" "<<CPP<<" "<<COCO<<endchar;
 }       // end of handle_pre
 
 
@@ -471,7 +466,6 @@ bool output_pre(lines_t &lines, lines_t *outlines)
 
    bool to_mycout = outlines == 0;
 
-   ppp<<"output_pre"<<lines<<endchar;
    if(lines.empty())
       return 0;
    if (lines.front().pre())
@@ -480,7 +474,6 @@ bool output_pre(lines_t &lines, lines_t *outlines)
       while(1)
       {
 	 handle_pre_light(lines.front(),p_more);
-	 ppp<<"output_pre"<<lines.front()<<lines.front().pre()<<endchar;
 	 if (lines.front().pre())
 	    if (to_mycout)
 	       mycout << lines.front().trim() << endline;

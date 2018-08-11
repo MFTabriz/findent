@@ -150,8 +150,6 @@ int main(int argc, char*argv[])
    {
       full_statement = "";
       get_full_statement();
-      ppp << "main full_statement" << full_statement << endchar;
-      ppp << "main curlines" << curlines << endchar;
       indent_and_output();
       if (end_of_file)
       {
@@ -434,7 +432,6 @@ fortranline getnext(bool &eof, bool use_wb)
    if (use_wb && !wizardbuffer.empty())
    {
       line = wizardbuffer.front();
-      ppp<<"getnext from wb"<<line<<endchar;
       wizardbuffer.pop_front();
       if (reading_from_tty && line.str() == ".")
 	 eof = 1;
@@ -442,7 +439,6 @@ fortranline getnext(bool &eof, bool use_wb)
    else if (!curlinebuffer.empty())
    {
       line = curlinebuffer.front();
-      ppp<<"getnext from cb"<<line<<endchar;
       curlinebuffer.pop_front();
       num_lines++;
       if (reading_from_tty && line.str() == ".")
@@ -451,7 +447,6 @@ fortranline getnext(bool &eof, bool use_wb)
    else
    {
       line = mygetline(eof);
-      ppp<<"getnext from stdin"<<line<<endchar;
       if (!eof)
 	 num_lines++;
    }
@@ -471,7 +466,6 @@ fortranline getnext(bool &eof, bool use_wb)
       }
    }
 
-   ppp<<"getnext finally line"<<line<<endchar;
    return line;
 }
 
@@ -560,13 +554,11 @@ void get_full_statement()
       switch(state)
       {
 	 case start:
-	    ppp<<"state: start"<<endchar;
 	    if (fs_store.empty())
 	       full_statement = "";
 	    else
 	       full_statement = fs_store.back();
 
-	    ppp << "start full_statement" << full_statement << endchar;
 	    if (end_of_file) 
 	    {
 	       state = end_start;
@@ -588,7 +580,6 @@ void get_full_statement()
 	    break;
 
 	 case in_ffix:
-	    ppp<<"state: in_ffix"<<endchar;
 	    curlines.push_back(curline);
 	    full_statement = rtrim(remove_trailing_comment(curline.rest()));
 	    curline = getnext(end_of_file);
@@ -596,13 +587,9 @@ void get_full_statement()
 	    return;
 
 	 case in_fortran:
-	    ppp<<"state: in_fortran f_more:"<<f_more<<endchar;
-	    ppp<<"state: in_fortran curline"<<curline<<endchar;
 	    if(end_of_file) { state = end_fortran; break; }
 
-	    //curline.iscon(full_statement.length() != 0);
 	    handle_fortran(curline, f_more, pushback);
-	    curline.hascon(f_more);
 	    if (f_more)
 	    {
 	       curline = getnext(end_of_file); if (end_of_file) { state = end_fortran; break; }
@@ -622,7 +609,6 @@ void get_full_statement()
 			break;
 		  }
 		  curline = getnext(end_of_file);
-		  //curline.iscon(full_statement.length() != 0);
 	       }
 	       state = in_fortran;
 	       break;
@@ -634,14 +620,12 @@ void get_full_statement()
 	    return;
 
 	 case in_fortran_1:
-	    ppp<<"state: in_fortran_1"<<endchar;
 	    if (!pushback)
 	       curline = getnext(end_of_file);
 	    state = start;
 	    break;
 
 	 case in_pre:
-	    ppp<<"state: in_pre"<<endchar;
 	    p_more = 0;
 	    while(1)
 	    {
@@ -661,7 +645,6 @@ void get_full_statement()
 	 case end_start:
 	 case end_fortran:
 	 case end_pre:
-	    ppp<<"state: end"<<endchar;
 	    state = start;
 	    return;
       }
@@ -687,6 +670,7 @@ void handle_free(fortranline &line, bool &f_more, bool &pushback)
    //
 
    pushback = 0;
+   line.str(line.line()); // get rid of characters after specified input line length
 
    if (!line.blank_or_comment())
    {
@@ -697,7 +681,7 @@ void handle_free(fortranline &line, bool &f_more, bool &pushback)
 
       std::string sl = line.trimmed_line();
 
-      if(line.firstchar() == "&")
+      if(line.firstchar() == '&')
       {
 	 sl.erase(0,1);
 	 sl = ltrim(sl);
@@ -754,6 +738,8 @@ void handle_fixed(fortranline &line, bool &f_more, bool &pushback)
    // Implementation: ?
 
    pushback = 0;
+
+   line.str(line.line()); // get rid of characters after specified input line length
 
    if (line.blank_or_comment())
    {
@@ -866,8 +852,6 @@ void output_line()
 	       fixed2free(curlines);
 	       break;
 	    case FIXED:
-	       ppp<<"output_line fixed full_statement"<<full_statement<<endchar;
-	       ppp<<"output_line fixed lines"<<curlines<<endchar;
 	       fixed2fixed(curlines);
 	       break;
 	 }
@@ -879,7 +863,6 @@ void handle_refactor()
 {
    if (flags.refactor_routines && refactor_end_found)
    {
-      ppp << "calling refactor" << curlines << endchar;
       //
       // handle refactor routines
       //
@@ -964,7 +947,6 @@ bool wizard()
    //      2  j=1,10
    //     #endif
    //       enddo
-   ppp<<"In wizard"<<curline<<endchar;
    if (fortranline::g_format() == FREE)
       return 0;
 
@@ -979,7 +961,6 @@ bool wizard()
 
       if (line.pre())
       {
-	 ppp<<"wizard in pre"<<line <<endchar;
 	 bool p_more = 0;
 	 while(1)
 	 {
@@ -993,13 +974,11 @@ bool wizard()
 	    else
 	       break;
 	 }
-	 ppp<<"wizard uit pre"<<line<<endchar;
 	 if(eof)
 	    return 0;
 	 continue;
       }
 
-      ppp<<"wizard line fortran?"<<line<<endchar;
       if (line.fortran() && cleanfive(line.str()))
       {
 	 //
