@@ -12,10 +12,7 @@ void fixed2free(lines_t &lines)
 {
    lines_t freelines;
 
-   ppp<<"fixed2free lines "<<lines<<endchar;
-
    fixed2fixed(lines, &freelines);
-   ppp<<"fixed2free freelines "<<freelines<<endchar;
    fortranline::g_format(FREE);
    free2free(freelines);
    fortranline::g_format(FIXED);

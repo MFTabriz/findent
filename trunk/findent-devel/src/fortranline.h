@@ -14,8 +14,6 @@ class fortranline
    static int global_format, global_line_length;
    static bool global_gnu_format;
 
-   bool iscontinuation;
-   bool hascontinuation;
    int  local_format;
    bool local_gnu_format;
 
@@ -23,8 +21,6 @@ class fortranline
 
    void init()
    {
-      iscontinuation   = 0;
-      hascontinuation  = 0;
       local_format     = global_format;
       local_gnu_format = global_gnu_format;
    }
@@ -166,10 +162,14 @@ class fortranline
       return ::trim(str());
    }
 
-   std::string firstchar() const
+   char firstchar() const
    {
-      // returns first k-th char of ltrim()
-      return ltrim().substr(0,1);
+      // returns first char of ltrim()
+      if(ltrim().length() > 0)
+	 return ltrim()[0];
+      else
+	 return 0;
+      //return ltrim().substr(0,1);
    }
 
    std::string col(const unsigned int k = 0) const
@@ -270,11 +270,11 @@ class fortranline
 	       case '*':
 		  return 1;
 	    }
-	    return firstchar() == "!";
+	    return firstchar() == '!';
 	    break;
 
 	 case FREE:
-	    return firstchar() == "!";
+	    return firstchar() == '!';
 	    break;
       }
       return 0;
@@ -303,7 +303,7 @@ class fortranline
 
    bool precpp() const
    {
-      return firstchar() == "#";
+      return firstchar() == '#';
    }
 
    bool precoco() const
@@ -319,26 +319,6 @@ class fortranline
    bool blank_or_comment_or_pre() const
    {
       return blank_or_comment() || pre();
-   }
-
-   void iscon(const bool b)
-   {
-      iscontinuation = b;
-   }
-
-   bool iscon() const
-   {
-      return iscontinuation;
-   }
-
-   void hascon(const bool b)
-   {
-      hascontinuation = b;
-   }
-
-   bool hascon() const
-   {
-      return hascontinuation;
    }
 
    bool fortran() const

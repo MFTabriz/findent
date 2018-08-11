@@ -24,7 +24,7 @@ void fortranline::print()
 
 std::ostream& operator <<(std::ostream &os,fortranline &obj)
 {
-      os<<obj.iscon()<<obj.hascon()<<"["<<obj.str()<<"]";
+      os<<"["<<obj.str()<<"]";
       return os;
 }
 

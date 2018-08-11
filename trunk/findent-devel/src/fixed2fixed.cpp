@@ -26,9 +26,6 @@ void fixed2fixed(lines_t &lines,lines_t *freelines)
 
    std::ostringstream os;
 
-   ppp<<"fixed2fixed fs"<<full_statement << endchar;
-   ppp<<"fixed2fixed lines"<<lines << endchar;
-
    while(!lines.empty())
    {
       mycout.reset();
@@ -57,7 +54,7 @@ void fixed2fixed(lines_t &lines,lines_t *freelines)
 
       if (lines.front().comment())
       {
-	 if (lines.front().firstchar() == "!")
+	 if (lines.front().firstchar() == '!')
 	 {
 	    if (lines.front()[0] != '!')
 	       //
@@ -76,7 +73,7 @@ void fixed2fixed(lines_t &lines,lines_t *freelines)
 	 else
 	 {
 	    int l = 1;
-	    if (stoupper(lines.front().firstchar()) == "D")
+	    if (toupper(lines.front().firstchar()) == 'D')
 	       l = 0;
 	    os << "!" << lines.front().trim().substr(l);
 	    freelines->push_back(os.str());
@@ -229,10 +226,10 @@ std::string add_amp(const std::string s,const char p)
 {
    //
    // examples:
-   // s = "abc ! comment",  p = ' '   :  result = "abc& ! comment"
-   // s = "ab'c ! comment", p = ' '   :  result = "ab'c ! comment&"
-   // s = "abc ! comment",  p = '\''  :  result = "abc ! comment&"
-   // s = "ab'c ! comment", p = '\''  :  result = "ab'c& ! comment"
+   // s = "abc ! xyz",  p = ' '   :  result = "abc& ! xyz"
+   // s = "ab'c ! xyz", p = ' '   :  result = "ab'c ! xyz&"
+   // s = "abc ! xyz",  p = '\''  :  result = "abc ! xyz&"
+   // s = "ab'c ! xyz", p = '\''  :  result = "ab'c& ! xyz"
    // p can be ' ', '\'', '"'
    //
    std::string slt = rtrim(remove_trailing_comment(s,p));
