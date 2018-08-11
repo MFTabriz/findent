@@ -3,8 +3,8 @@
 #include "fortranline.h"
 
 int fortranline::global_format;
-int fortranline::line_length;
-bool fortranline::gnu_format;
+int fortranline::global_line_length;
+bool fortranline::global_gnu_format;
 void fortranline::print()
 {
    std::cout << "orig_line: ["      << orig_line      << "]" << std::endl;
@@ -19,12 +19,12 @@ void fortranline::print()
    std::cout << "ltab2sp: ["        << ltab2sp()      << "]" << std::endl;
    std::cout << "scanfixpre: "      << scanfixpre()   <<        std::endl;
    std::cout << "rest: ["           << rest()         << "]" << std::endl;
-   std::cout << "global_format:"    << format2txt()   <<        std::endl;
+   std::cout << "global_format:"    << g_format2txt() <<        std::endl;
 }
 
 std::ostream& operator <<(std::ostream &os,fortranline &obj)
 {
-      os<<obj.iscon()<<obj.hascon()<<"["<<obj.orig()<<"]";
+      os<<obj.iscon()<<obj.hascon()<<"["<<obj.str()<<"]";
       return os;
 }
 

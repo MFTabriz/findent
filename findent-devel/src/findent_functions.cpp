@@ -17,7 +17,7 @@ int determine_fix_or_free()
    {
       n++;
       line = mygetline(eof);
-      s    = line.orig();
+      s    = line.str();
       if (eof)
       {
 	 //
@@ -488,9 +488,9 @@ bool output_pre(lines_t &lines, lines_t *outlines)
 	       outlines->push_back(lines.front().trim());
 	 else
 	    if (to_mycout)
-	       mycout << lines.front().orig() << endline;
+	       mycout << lines.front().str() << endline;
 	    else
-	       outlines->push_back(lines.front().orig());
+	       outlines->push_back(lines.front().str());
 	 lines.pop_front();
 	 if (lines.empty() || !p_more)
 	    break;

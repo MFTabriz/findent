@@ -11,18 +11,22 @@ class fortranline
 
    std::string orig_line;
 
-   static int global_format, line_length;
-   static bool gnu_format;
+   static int global_format, global_line_length;
+   static bool global_gnu_format;
 
    bool iscontinuation;
    bool hascontinuation;
+   int  local_format;
+   bool local_gnu_format;
 
    public:
 
    void init()
    {
-      iscontinuation  = 0;
-      hascontinuation = 0;
+      iscontinuation   = 0;
+      hascontinuation  = 0;
+      local_format     = global_format;
+      local_gnu_format = global_gnu_format;
    }
 
    void print();
@@ -38,9 +42,9 @@ class fortranline
       orig_line = s;
    }
 
-   static std::string format2txt()
+   static std::string g_format2txt()
    {
-      switch(format())
+      switch(g_format())
       {
 	 case UNKNOWN:
 	    return "unknown";
@@ -53,40 +57,47 @@ class fortranline
       }
    }
 
-   static void format(const int what)
+   static void g_format(const int what)
    {
       global_format = what;
    }
-   static int format()
+   static int g_format()
    {
       return global_format;
    }
-   static void setline_length(const int what)
+   static void line_length(const int what)
    {
-      line_length = what;
+      global_line_length = what;
    }
-   static int getline_length()
+   static int line_length()
    {
-      return line_length;
+      return global_line_length;
    }
-   static void setgnu_format(bool what)
+   static void gnu_format(bool what)
    {
-      gnu_format = what;
+      global_gnu_format = what;
    }
-   static bool getgnu_format()
+   static bool gnu_format()
    {
-      return gnu_format;
+      return global_gnu_format;
    }
-   std::string orig() const
+   std::string str() const
    {
       return orig_line;
    }
 
    friend std::ostream& operator <<(std::ostream &os,fortranline &obj);
 
-   void set_line(const std::string &s)
+   void str(const std::string &s)
    {
       orig_line = s;
+   }
+
+   int format() const
+   {
+      if (local_format == UNKNOWN)
+	 return global_format;
+      return local_format;
    }
 
    std::string line() const
@@ -94,7 +105,7 @@ class fortranline
       switch(global_format)
       {
 	 case FIXED:
-	    if (line_length == 0)
+	    if (line_length() == 0)
 	       return ltab2sp();
 	    else
 	       //
@@ -105,21 +116,22 @@ class fortranline
 	       // continuation character is in column 6,
 	       // so this needs extra attention:
 	       //
-	       if(getgnu_format())
-		  return ltab2sp().substr(0,line_length);
+	       if(gnu_format())
+		  return ltab2sp().substr(0,line_length());
 	       else
-		  return orig().substr(0,line_length);
+		  return str().substr(0,line_length());
 	    break;
 	 case FREE:
-	    if (line_length == 0)
-	       return orig();
+	    if (line_length() == 0)
+	       return str();
 	    else
-	       return orig().substr(0,line_length);
+	       return str().substr(0,line_length());
 	    break;
 	 default:
-	    return orig().substr(0,line_length);
+	    return str().substr(0,line_length());
 	    break;
       }
+      return "";   // never reached
    }
 
    std::string trimmed_line() const
@@ -141,23 +153,63 @@ class fortranline
 
    std::string rtrim() const
    {
-      return ::rtrim(orig());
+      return ::rtrim(str());
    }
 
    std::string ltrim() const
    {
-      return ::ltrim(orig());
+      return ::ltrim(str());
    }
 
    std::string trim() const
    {
-      return ::trim(orig());
+      return ::trim(str());
    }
 
    std::string firstchar() const
    {
-      // returns first char of ltrim()
+      // returns first k-th char of ltrim()
       return ltrim().substr(0,1);
+   }
+
+   std::string col(const unsigned int k = 0) const
+   {
+      //returns character in column k of the original line
+      if(format() == FIXED)
+      {
+	 std::string s = ltab2sp();
+	 if(s.length() > k)
+	    return s.substr(k,1);
+	 else
+	    return "";
+      }
+      else
+      {
+	 if(orig_line.length() > k)
+	    return orig_line.substr(k,1);
+	 else
+	    return "";
+      }
+   }
+
+   char operator [] (int i) const
+   {
+      //returns character in column k of the original line
+      if(format() == FIXED)
+      {
+	 std::string s = ltab2sp();
+	 if(s.length() > (unsigned) i)
+	    return s[i];
+	 else
+	    return 0;
+      }
+      else
+      {
+	 if(orig_line.length() > (unsigned) i)
+	    return orig_line[i];
+	 else
+	    return 0;
+      }
    }
 
    std::string lastchar() const
@@ -175,7 +227,7 @@ class fortranline
 
    std::string ltab2sp() const
    {
-      return ::ltab2sp(orig());
+      return ::ltab2sp(str());
    }
 
 
@@ -208,7 +260,7 @@ class fortranline
       switch (format())
       {
 	 case FIXED:
-	    switch(::firstchar(orig()))
+	    switch(::firstchar(str()))
 	    {
 	       case 'd':
 	       case 'D':
@@ -292,6 +344,16 @@ class fortranline
    bool fortran() const
    {
       return !blank_or_comment_or_pre();
+   }
+
+   bool fixedcontinuation() const
+   {
+      //
+      // returns 1 if the line, interpreted as a fixed format line,
+      // contains a character other than 0 or ' ' in column 5
+      //
+      const std::string c = " 0";
+      return c.find((*this)[5]) == std::string::npos;
    }
 
 };
