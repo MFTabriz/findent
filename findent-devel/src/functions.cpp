@@ -74,7 +74,7 @@ std::string rtrim(const std::string &str)
 {
    const std::string whitespace = " \t";
 
-   const size_t strEnd = str.find_last_not_of(whitespace);
+   size_t strEnd = str.find_last_not_of(whitespace);
    if (strEnd == std::string::npos)
       return ""; // no content
    return str.substr(0,strEnd+1);
@@ -83,7 +83,7 @@ std::string rtrim(const std::string &str)
 std::string ltrim(const std::string &str)
 {
    const std::string whitespace = " \t";
-   const size_t strBegin = str.find_first_not_of(whitespace);
+   size_t strBegin = str.find_first_not_of(whitespace);
    if (strBegin == std::string::npos)
       return ""; // no content
 
@@ -93,12 +93,12 @@ std::string ltrim(const std::string &str)
 std::string trim(const std::string &str)
 {
    const std::string whitespace = " \t";
-   const size_t strBegin = str.find_first_not_of(whitespace);
+   size_t strBegin = str.find_first_not_of(whitespace);
    if (strBegin == std::string::npos)
       return ""; // no content
 
-   const size_t strEnd = str.find_last_not_of(whitespace);
-   const size_t strRange = strEnd - strBegin + 1;
+   size_t strEnd = str.find_last_not_of(whitespace);
+   size_t strRange = strEnd - strBegin + 1;
 
    return str.substr(strBegin, strRange);
 }

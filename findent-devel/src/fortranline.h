@@ -10,6 +10,13 @@ class fortranline
 {
 
    std::string orig_line;
+   //
+   // I found that some functions are used repeatedly, the results are
+   // cached here
+   //
+   std::string ltrim_line; bool have_ltrim_line;
+   std::string trim_line;  bool have_trim_line;
+   char firstchar_val;     bool have_firstchar_val;
 
    static int global_format, global_line_length;
    static bool global_gnu_format;
@@ -21,8 +28,11 @@ class fortranline
 
    void init()
    {
-      local_format     = global_format;
-      local_gnu_format = global_gnu_format;
+      local_format        = global_format;
+      local_gnu_format    = global_gnu_format;
+      have_ltrim_line     = 0;
+      have_trim_line      = 0;
+      have_firstchar_val  = 0;
    }
 
    void print();
@@ -86,6 +96,7 @@ class fortranline
 
    void str(const std::string &s)
    {
+      init();
       orig_line = s;
    }
 
@@ -115,16 +126,16 @@ class fortranline
 	       if(gnu_format())
 		  return ltab2sp().substr(0,line_length());
 	       else
-		  return str().substr(0,line_length());
+		  return orig_line.substr(0,line_length());
 	    break;
 	 case FREE:
 	    if (line_length() == 0)
-	       return str();
+	       return orig_line;
 	    else
-	       return str().substr(0,line_length());
+	       return orig_line.substr(0,line_length());
 	    break;
 	 default:
-	    return str().substr(0,line_length());
+	    return orig_line.substr(0,line_length());
 	    break;
       }
       return "";   // never reached
@@ -149,27 +160,47 @@ class fortranline
 
    std::string rtrim() const
    {
-      return ::rtrim(str());
+      return ::rtrim(orig_line);
    }
 
-   std::string ltrim() const
+   std::string ltrim()
    {
-      return ::ltrim(str());
+#if 0
+      return ::ltrim(orig_line);
+#endif
+      if (!have_ltrim_line)
+      {
+	 ltrim_line = ::ltrim(orig_line);
+	 have_ltrim_line = 1;
+      }
+      return ltrim_line;
    }
 
-   std::string trim() const
+   std::string trim() 
    {
-      return ::trim(str());
+#if 0
+      return ::trim(orig_line);
+#endif
+      if (!have_trim_line)
+      {
+	 trim_line = ::trim(orig_line);
+	 have_trim_line = 1;
+      }
+      return trim_line;
    }
 
-   char firstchar() const
+   char firstchar() 
    {
-      // returns first char of ltrim()
-      if(ltrim().length() > 0)
-	 return ltrim()[0];
-      else
-	 return 0;
-      //return ltrim().substr(0,1);
+      // returns first char of ltrim(), 0 if length()=0
+#if 0
+      return *(ltrim()).begin();
+#endif
+      if (!have_firstchar_val)
+      {
+	 firstchar_val = *(ltrim()).begin();
+	 have_firstchar_val = 1;
+      }
+      return firstchar_val;
    }
 
    std::string col(const unsigned int k = 0) const
@@ -220,18 +251,18 @@ class fortranline
 	 return "";
    }
 
-   std::string first2chars() const
+   std::string first2chars() 
    {
       return ltrim().substr(0,2);
    }
 
    std::string ltab2sp() const
    {
-      return ::ltab2sp(str());
+      return ::ltab2sp(orig_line);
    }
 
 
-   int scanfixpre() const
+   int scanfixpre() 
    {
       int rc;
       lexer_set(trim(),SCANFIXPRE);
@@ -242,7 +273,7 @@ class fortranline
       return rc;
    }
 
-   std::string rest() const
+   std::string rest() 
    {
       if(scanfixpre()==FINDENTFIX)
 	 return lexer_getrest();
@@ -250,17 +281,17 @@ class fortranline
 	 return "";
    }
 
-   bool blank() const
+   bool blank() 
    {
       return (trim().length() == 0);
    }
 
-   bool comment() const
+   bool comment() 
    {
       switch (format())
       {
 	 case FIXED:
-	    switch(::firstchar(str()))
+	    switch(::firstchar(orig_line))
 	    {
 	       case 'd':
 	       case 'D':
@@ -280,12 +311,12 @@ class fortranline
       return 0;
    }
 
-   bool blank_or_comment() const
+   bool blank_or_comment() 
    {
       return blank() || comment();
    }
 
-   int getpregentype() const
+   int getpregentype() 
    {
       int  pretype = scanfixpre();
       switch(pretype)
@@ -301,27 +332,27 @@ class fortranline
       }
    }
 
-   bool precpp() const
+   bool precpp() 
    {
       return firstchar() == '#';
    }
 
-   bool precoco() const
+   bool precoco() 
    {
       return first2chars() == "??";
    }
 
-   bool pre() const
+   bool pre() 
    {
       return precpp() || precoco();
    }
 
-   bool blank_or_comment_or_pre() const
+   bool blank_or_comment_or_pre() 
    {
       return blank_or_comment() || pre();
    }
 
-   bool fortran() const
+   bool fortran() 
    {
       return !blank_or_comment_or_pre();
    }
