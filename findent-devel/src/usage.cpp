@@ -52,6 +52,8 @@ void usage(const bool doman)
    }
 
    manout(" ","Below: <n> denotes an unsigned decimal number."                                             ,doman);
+   manout(" ","       <c> denotes a character."                                                            ,doman);
+   manout(" "," ",doman);
    manout(" ","In the long options, you can replace '_' with '-'."                                         ,doman);
    if (!doman)
       std::cout << std::endl;
@@ -62,6 +64,10 @@ void usage(const bool doman)
    manout("-q, --query_fix_free"             ,"guess free or fixed, prints 'fixed' or 'free' and exits"    ,doman);
    //manout("-Q","returncode=2 for free, 4 for fixed",                      doman);
    //manout(" ","      (for usage with vim)",                               doman);
+   manout("--continuation=<c>"               ," ' ': (default) do not change continuation characters"       ,doman);
+   manout(" "," '0': create numbered continuation characters"                                              ,doman);
+   manout(" "," other: use that continuation character"                                                    ,doman);
+   manout(" "," default for conversion from free to fixed is '&'"                                          ,doman);
    manout("-l<n>, --label_left=<n>"          ,"(0/1) 1: move statement labels to start of line (default:1)",doman);
    manout(" ","      (only for free format)"                                                               ,doman);
    manout("-lastindent, --last_indent"       ,"prints computed indentation of last line"                   ,doman);
@@ -79,7 +85,8 @@ void usage(const bool doman)
    manout("-L<n>g, --input_line_length=<n>g" ,"same as above, but use gfortran convention"                 ,doman);
    manout(" ","for counting the characters with tabbed lines"                                              ,doman);
    manout(" "," example: --input_line_length=72g"                                                          ,doman);
-   manout("-ofixed, --output_format=fixed"     ,"force fixed format output"                                   ,doman);
+   manout("-M<n>, --max_indent=<n>"          ,"maximum output indent, default 100, 0: no limit"            ,doman);
+   manout("-ofixed, --output_format=fixed"   ,"force fixed format output"                                  ,doman);
    manout("-ofree, --output_format=free"     ,"force free format output"                                   ,doman);
    manout("-osame, --output_format=same"     ,"output format same is input format"                         ,doman);
    manout("-Rr, --refactor_procedures"       ,"refactor procedures and modules: the END line"              ,doman);

@@ -9,6 +9,9 @@
 class fortranline
 {
 
+   // NOTE:
+   // some functions assume that clean() is called
+   //
    std::string orig_line;
    //
    // I found that some functions are used repeatedly, the results are
@@ -23,6 +26,7 @@ class fortranline
 
    int  local_format;
    bool local_gnu_format;
+   bool is_clean;
 
 
    void init()
@@ -32,6 +36,7 @@ class fortranline
       have_ltrim_line     = 0;
       have_trim_line      = 0;
       have_firstchar_val  = 0;
+      is_clean            = 0;
    }
 
    public:
@@ -110,6 +115,8 @@ class fortranline
 
    void clean()
    {
+      if(is_clean)  // with fixed-format, lines are often read twice
+	 return;
       init();
       switch(format())
       {
@@ -138,6 +145,7 @@ class fortranline
 	       orig_line = ::rtrim(orig_line.substr(0,line_length()));
 	    break;
       }
+      is_clean = 1;
    }
 
    std::string trimmed_line() const
@@ -196,26 +204,15 @@ class fortranline
    char operator [] (int i) const
    {
       //returns character in column k of the original line
-      if(format() == FIXED)
-      {
-	 std::string s = ltab2sp(orig_line);
-	 if(s.length() > (unsigned) i)
-	    return s[i];
-	 else
-	    return 0;
-      }
+      if(orig_line.length() > (unsigned) i)
+	 return orig_line[i];
       else
-      {
-	 if(orig_line.length() > (unsigned) i)
-	    return orig_line[i];
-	 else
-	    return 0;
-      }
+	 return 0;
    }
 
    char lastchar() const
    {
-      return *(rtrim().rbegin());
+      return *orig_line.rbegin();
    }
 
    std::string first2chars() 
@@ -223,8 +220,7 @@ class fortranline
       return ltrim().substr(0,2);
    }
 
-
-   int scanfixpre() 
+   int scanfixpre()
    {
       int rc;
       lexer_set(trim(),SCANFIXPRE);
