@@ -21,6 +21,7 @@ void free2free(lines_t &lines, lines_t *fixedlines)
    bool isfirst = 1;
    const char conchar = '&';
    std::string constring;
+
    if (flags.indent_cont)
       constring = std::string(1,conchar)+blanks(flags.cont_indent);
    else
@@ -72,7 +73,7 @@ void free2free(lines_t &lines, lines_t *fixedlines)
 	 else
 	 {
 	    os << lines.front().trim();
-	    fixedlines->push_back(os.str());
+	    fixedlines->push_back(rtrim(os.str()));
 	    os.str("");
 	 }
 	 lines.pop_front();
@@ -190,12 +191,13 @@ std::string rm_last_amp(const std::string &s)
    //
    // removes trailing &, also as in
    // x = 10 & ! comment
+   // also removes trailing space in result
    //
 
    std::string slt = rtrim(remove_trailing_comment(s));
    std::string so = rtrim(slt);
    if (*so.rbegin() == '&')
-      return  so.erase(so.length() -1)+s.substr(slt.length());
+      return  rtrim(so.erase(so.length() -1)+s.substr(slt.length()));
    else
-      return s;
+      return rtrim(s);
 }

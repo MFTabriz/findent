@@ -6,7 +6,7 @@
 int               determine_fix_or_free();
 void              empty_dolabels();
 int               guess_fixedfree(const std::string &s);
-int               guess_indent(const std::string &s);
+int               guess_indent(fortranline line);
 std::string       handle_dos(const std::string &s);
 void              handle_pre(fortranline &line, const bool f_more, bool &p_more);
 void              handle_pre_light(fortranline &line, bool &p_more);

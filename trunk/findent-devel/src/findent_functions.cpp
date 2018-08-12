@@ -13,11 +13,12 @@ int determine_fix_or_free()
    fortranline line;
    std::string s;
    bool eof;
+   bool p_more = 0;
+   bool skip = 0;
    while ( n < nmax)
    {
       n++;
       line = mygetline(eof);
-      s    = line.str();
       if (eof)
       {
 	 //
@@ -31,7 +32,19 @@ int determine_fix_or_free()
       }
 
       curlinebuffer.push_back(line);
+      handle_pre_light(line,p_more);
+      if(p_more)
+      {
+	 skip = 1;
+	 continue;
+      }
+      if(skip)
+      {
+	 skip = 0;
+	 continue;
+      }
 
+      s = line.str();
       rc = guess_fixedfree(s);
       switch(rc)
       {
@@ -139,9 +152,9 @@ void handle_pre(fortranline &line, const bool f_more, bool &p_more)
       }
    }
    if(pregentype == CPP)
-      p_more = (line.lastchar() == "\\");
+      p_more = (line.lastchar() == '\\');
    else if(pregentype == COCO)
-      p_more = (line.lastchar() == "&");
+      p_more = (line.lastchar() == '&');
    else
       p_more = 0;
 
@@ -164,13 +177,13 @@ void handle_pre_light(fortranline &line, bool &p_more)
       pregentype = line.getpregentype();
 
    if(pregentype == COCO)
-      p_more = (line.lastchar() == "&");
+      p_more = (line.lastchar() == '&');
    else
-      p_more = (line.lastchar() == "\\");
+      p_more = (line.lastchar() == '\\');
 
 }         // end of handle_pre_light
 
-int guess_indent(const std::string &s)
+int guess_indent(fortranline line)
 {
    //
    // count spaces at start of line, correct for tabs and & and label
@@ -181,18 +194,20 @@ int guess_indent(const std::string &s)
 
    if (input_format == FIXED)
    {
-      std::string s1 = ltab2sp(s);
-      si             = s1.find_first_not_of(' ') -6;
+      std::string s = line.str();
+      si             = s.find_first_not_of(' ') -6;
       if (si <0)
 	 si = 0;
       return si;
    }
 
+   std::string s = line.str();
    for (unsigned int j=0; j<s.length(); j++)
    {
       switch (s[j])
       {
-	 case ' ' : case '0' : case '1' : case '2' : case '3' : case '4' : case '5' : case '6' : case '7' : case '8' : case '9' :
+	 case ' ' : case '0' : case '1' : case '2' : case '3' : case '4' : 
+	 case '5' : case '6' : case '7' : case '8' : case '9' :
 	    si ++;
 	    break;
 	 case '&' :
@@ -364,7 +379,7 @@ void empty_dolabels()
       dolabels.pop_back();
 }       // end of empty_dolabels
 
-int guess_fixedfree(const std::string &s)
+int guess_fixedfree(const std::string &s) //TODO chenge to fortranline
 {
    //
    // sometimes, program sources contain carriage control characters

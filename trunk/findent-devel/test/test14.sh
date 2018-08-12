@@ -9,6 +9,10 @@ doit=../doit
 cat << eof > prog
       program fixed
       continue
+      # if xyz || \
+abc
+      x=1
+      # endif
       end
 eof
 
