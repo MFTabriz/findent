@@ -24,7 +24,6 @@ class fortranline
    int  local_format;
    bool local_gnu_format;
 
-   public:
 
    void init()
    {
@@ -34,6 +33,8 @@ class fortranline
       have_trim_line      = 0;
       have_firstchar_val  = 0;
    }
+
+   public:
 
    void print();
 
@@ -107,13 +108,14 @@ class fortranline
       return local_format;
    }
 
-   std::string line() const
+   void clean()
    {
-      switch(global_format)
+      init();
+      switch(format())
       {
 	 case FIXED:
 	    if (line_length() == 0)
-	       return ltab2sp();
+	       orig_line = ltab2sp(orig_line);
 	    else
 	       //
 	       // With tabbed input there is a difference between
@@ -124,21 +126,18 @@ class fortranline
 	       // so this needs extra attention:
 	       //
 	       if(gnu_format())
-		  return ltab2sp().substr(0,line_length());
+		  orig_line = ltab2sp(orig_line).substr(0,line_length());
 	       else
-		  return orig_line.substr(0,line_length());
+		  orig_line = ::rtrim(orig_line.substr(0,line_length()));
 	    break;
 	 case FREE:
-	    if (line_length() == 0)
-	       return orig_line;
-	    else
-	       return orig_line.substr(0,line_length());
-	    break;
 	 default:
-	    return orig_line.substr(0,line_length());
+	    if (line_length() == 0)
+	       orig_line = ::rtrim(orig_line);
+	    else
+	       orig_line = ::rtrim(orig_line.substr(0,line_length()));
 	    break;
       }
-      return "";   // never reached
    }
 
    std::string trimmed_line() const
@@ -146,14 +145,14 @@ class fortranline
       //
       // result is different for FIXED or FREE, see below:
       //
-      switch(global_format)
+      switch(format())
       {
 	 case FIXED:
-	    return ::rtrim(line());
+	    return ::rtrim(orig_line);
 	    break;
 	 case FREE:
 	 default:
-	    return ::trim(line());
+	    return ::trim(orig_line);
 	    break;
       }
    }
@@ -165,9 +164,6 @@ class fortranline
 
    std::string ltrim()
    {
-#if 0
-      return ::ltrim(orig_line);
-#endif
       if (!have_ltrim_line)
       {
 	 ltrim_line = ::ltrim(orig_line);
@@ -178,9 +174,6 @@ class fortranline
 
    std::string trim() 
    {
-#if 0
-      return ::trim(orig_line);
-#endif
       if (!have_trim_line)
       {
 	 trim_line = ::trim(orig_line);
@@ -192,35 +185,12 @@ class fortranline
    char firstchar() 
    {
       // returns first char of ltrim(), 0 if length()=0
-#if 0
-      return *(ltrim()).begin();
-#endif
       if (!have_firstchar_val)
       {
-	 firstchar_val = *(ltrim()).begin();
+	 firstchar_val = *(ltrim().begin());
 	 have_firstchar_val = 1;
       }
       return firstchar_val;
-   }
-
-   std::string col(const unsigned int k = 0) const
-   {
-      //returns character in column k of the original line
-      if(format() == FIXED)
-      {
-	 std::string s = ltab2sp();
-	 if(s.length() > k)
-	    return s.substr(k,1);
-	 else
-	    return "";
-      }
-      else
-      {
-	 if(orig_line.length() > k)
-	    return orig_line.substr(k,1);
-	 else
-	    return "";
-      }
    }
 
    char operator [] (int i) const
@@ -228,7 +198,7 @@ class fortranline
       //returns character in column k of the original line
       if(format() == FIXED)
       {
-	 std::string s = ltab2sp();
+	 std::string s = ltab2sp(orig_line);
 	 if(s.length() > (unsigned) i)
 	    return s[i];
 	 else
@@ -243,22 +213,14 @@ class fortranline
       }
    }
 
-   std::string lastchar() const
+   char lastchar() const
    {
-      if (rtrim().length() > 0)
-	 return rtrim().substr(rtrim().length()-1);
-      else
-	 return "";
+      return *(rtrim().rbegin());
    }
 
    std::string first2chars() 
    {
       return ltrim().substr(0,2);
-   }
-
-   std::string ltab2sp() const
-   {
-      return ::ltab2sp(orig_line);
    }
 
 
@@ -267,7 +229,7 @@ class fortranline
       int rc;
       lexer_set(trim(),SCANFIXPRE);
       rc      = yylex();
-      if (global_format == FIXED)
+      if (format() == FIXED)
 	 if(rc == FIXFINDENTFIX)
 	    rc = FINDENTFIX;
       return rc;

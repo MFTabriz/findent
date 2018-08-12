@@ -88,7 +88,7 @@ void fixed2fixed(lines_t &lines,lines_t *freelines)
       // possibly a continuation line
       //
 
-      std::string s = lines.front().line(); // see fortranline.h for an explanation
+      std::string s = lines.front().str(); // see fortranline.h for an explanation
 
       //
       // if this is not the first line, and label field is not empty:
@@ -131,7 +131,7 @@ void fixed2fixed(lines_t &lines,lines_t *freelines)
 	 //
 	 if (iscontinuation)
 	 {
-	    std::string s6 = ltab2sp(s.substr(6))+'x';
+	    std::string s6 = s.substr(6)+'x';
 	    old_indent = s6.find_first_not_of(' ');
 	    if (!to_mycout)
 	       os << "&";
@@ -141,7 +141,7 @@ void fixed2fixed(lines_t &lines,lines_t *freelines)
 	    //
 	    // count the number of spaces after column 6 of the first line
 	    //
-	    std::string s6 = ltab2sp(s.substr(6))+'x';
+	    std::string s6 = s.substr(6)+'x';
 	    first_indent = s6.find_first_not_of(' ');
 	 }
 	 int adjust_indent = old_indent - first_indent;

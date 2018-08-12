@@ -459,7 +459,7 @@ fortranline getnext(bool &eof, bool use_wb)
       nbseen = !line.blank_or_comment() && (line.getpregentype() == 0);
       if (flags.auto_firstindent && nbseen)
       {
-	 start_indent = guess_indent(line.str());
+	 start_indent = guess_indent(line);
 	 cur_indent   = start_indent;
 	 init_indent();
 	 indent_handled = 1;
@@ -670,7 +670,7 @@ void handle_free(fortranline &line, bool &f_more, bool &pushback)
    //
 
    pushback = 0;
-   line.str(line.line()); // get rid of characters after specified input line length
+   line.clean(); // get rid of characters after specified input line length
 
    if (!line.blank_or_comment())
    {
@@ -702,6 +702,7 @@ void handle_free(fortranline &line, bool &f_more, bool &pushback)
       f_more = ( lastchar(full_statement) == '&');
       if (f_more)            // chop off '&' from full_statement :
 	 full_statement.erase(full_statement.length()-1);
+
    }
    curlines.push_back(line);
 }           // end of handle_free
@@ -739,7 +740,9 @@ void handle_fixed(fortranline &line, bool &f_more, bool &pushback)
 
    pushback = 0;
 
-   line.str(line.line()); // get rid of characters after specified input line length
+   line.clean(); // get rid of characters after specified input line length
+
+   // and replace leading tabs by spaces
 
    if (line.blank_or_comment())
    {
@@ -756,7 +759,7 @@ void handle_fixed(fortranline &line, bool &f_more, bool &pushback)
    // replace leading tabs by spaces
    //
 
-   std::string s = line.ltab2sp();
+   std::string s = line.str();
 
    std::string sl = s.substr(0,5);
    if (s.length() >6)
