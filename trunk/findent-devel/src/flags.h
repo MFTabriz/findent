@@ -11,6 +11,7 @@ class Flags
 
    enum {
       DO_NOTHING = 1000,
+      DO_CONCHAR,
       DO_EMACS_FINDENT,
       DO_EMACS_HELP,
       DO_GEDIT_EXTERNAL,
@@ -35,6 +36,7 @@ class Flags
 
    bool apply_indent        ; // 1: output indented line, else output original lines
    bool auto_firstindent;
+   char conchar             ; // continuation character output by fixed2fixed, see manpage
    bool indent_cont;
    bool indent_contain;
    bool input_format_gnu;
@@ -42,6 +44,7 @@ class Flags
    bool label_left_default;
    bool last_indent_only;
    bool last_usable_only;
+   int  max_indent          ; // maximum allowed indent
    bool only_fix_free       ; // 1: determine only if fixed or free (-q)
    bool refactor_routines   ; // 1: refactor routine-end statements
    bool return_format       ; // 1: return 2 if format==free, 4 if format==fixed

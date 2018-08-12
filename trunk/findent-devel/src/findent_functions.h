@@ -13,6 +13,7 @@ void              handle_pre_light(fortranline &line, bool &p_more);
 void              handle_reading_from_tty();
 void              handle_refactor();
 void              init_indent();
+int               M(const int k);
 fortranline       mygetline(bool &eof);
 bool              output_pre(lines_t &lines, lines_t *outlines = 0);
 void              pop_all(void);

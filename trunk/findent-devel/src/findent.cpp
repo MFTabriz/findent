@@ -451,6 +451,13 @@ fortranline getnext(bool &eof, bool use_wb)
 	 num_lines++;
    }
 
+   //
+   // remove trailing white space
+   // FIXED: convert leading tab to space
+   //
+   
+   line.clean();
+
    if(!use_wb && !eof)
       wizardbuffer.push_back(line);
 
@@ -551,6 +558,7 @@ void get_full_statement()
    static int state = start;
 
    while(1)
+   {
       switch(state)
       {
 	 case start:
@@ -648,6 +656,7 @@ void get_full_statement()
 	    state = start;
 	    return;
       }
+   }
 }           // end of get_full_statement
 
 
@@ -670,7 +679,6 @@ void handle_free(fortranline &line, bool &f_more, bool &pushback)
    //
 
    pushback = 0;
-   line.clean(); // get rid of characters after specified input line length
 
    if (!line.blank_or_comment())
    {
@@ -739,10 +747,6 @@ void handle_fixed(fortranline &line, bool &f_more, bool &pushback)
    // Implementation: ?
 
    pushback = 0;
-
-   line.clean(); // get rid of characters after specified input line length
-
-   // and replace leading tabs by spaces
 
    if (line.blank_or_comment())
    {

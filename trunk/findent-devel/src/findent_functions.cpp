@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cstdio>
 #include <unistd.h>
 
@@ -508,3 +509,15 @@ bool output_pre(lines_t &lines, lines_t *outlines)
    else
       return 0;
 }     // end of output_pre
+
+int M(const int k)
+{
+   //
+   // used to delimit indentation
+   //
+   if (flags.max_indent <= 0)
+      return k;
+   else
+      return std::min(flags.max_indent,k);
+}  // end of M
+

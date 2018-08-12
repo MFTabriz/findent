@@ -11,6 +11,8 @@
 bool wizard(lines_t lines);
 std::string add_amp(const std::string s,const char prevquote);
 
+int cindex = 0;
+
 void fixed2fixed(lines_t &lines,lines_t *freelines)
 {
    //
@@ -63,7 +65,7 @@ void fixed2fixed(lines_t &lines,lines_t *freelines)
 	       //
 	    {
 	       if(to_mycout)
-		  mycout << blanks(std::max(cur_indent+6,1));
+		  mycout << blanks(M(std::max(cur_indent+6,1)));
 	       else
 		  os << blanks(1);
 	    }
@@ -88,7 +90,7 @@ void fixed2fixed(lines_t &lines,lines_t *freelines)
       // possibly a continuation line
       //
 
-      std::string s = lines.front().str(); // see fortranline.h for an explanation
+      std::string s = lines.front().str();
 
       //
       // if this is not the first line, and label field is not empty:
@@ -115,6 +117,24 @@ void fixed2fixed(lines_t &lines,lines_t *freelines)
 
       if(s.length() > 6)
       {
+	 bool iscontinuation = lines.front().fixedcontinuation();
+	 if (iscontinuation)
+	 {
+	    const std::string cc = "123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+	    if (flags.conchar != ' ')
+	    {
+	       if (flags.conchar == '0')
+	       {
+		  s.at(5) = cc[cindex];
+		  cindex++;
+		  if (cindex >= cc.length())
+		     cindex = 0;
+	       }
+	       else
+		  s.at(5) = flags.conchar;
+	    }
+	 }
 	 //
 	 // output label field including possible continuation character
 	 //
@@ -123,7 +143,6 @@ void fixed2fixed(lines_t &lines,lines_t *freelines)
 	 else
 	    os << s.substr(0,5);
 
-	 bool iscontinuation = lines.front().fixedcontinuation();
 	 //
 	 // try to honor current indentation
 	 // if this is a continuation line, count the number
@@ -132,7 +151,7 @@ void fixed2fixed(lines_t &lines,lines_t *freelines)
 	 if (iscontinuation)
 	 {
 	    std::string s6 = s.substr(6)+'x';
-	    old_indent = s6.find_first_not_of(' ');
+	    old_indent     = s6.find_first_not_of(' ');
 	    if (!to_mycout)
 	       os << "&";
 	 }
@@ -143,6 +162,7 @@ void fixed2fixed(lines_t &lines,lines_t *freelines)
 	    //
 	    std::string s6 = s.substr(6)+'x';
 	    first_indent = s6.find_first_not_of(' ');
+	    cindex = 0;
 	 }
 	 int adjust_indent = old_indent - first_indent;
 	 if (adjust_indent < 0)
@@ -152,7 +172,8 @@ void fixed2fixed(lines_t &lines,lines_t *freelines)
 	 {
 	    case ' ' :   // no dangling strings, output with indent
 	       if(to_mycout)
-		  mycout << blanks(std::max(adjust_indent+cur_indent,0)) << trim(s.substr(6));
+		  mycout << blanks(M(std::max(adjust_indent+cur_indent,0))) 
+		     << trim(s.substr(6));
 	       else
 		  os << trim(s.substr(6));
 	       break;
@@ -235,3 +256,4 @@ std::string add_amp(const std::string s,const char p)
    std::string slt = rtrim(remove_trailing_comment(s,p));
    return slt + "&" + s.substr(slt.length());
 }
+
