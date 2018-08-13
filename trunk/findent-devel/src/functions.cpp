@@ -53,56 +53,6 @@ std::string remove_blanks(const std::string &s)
    return sl;
 }
 
-char firstchar(const std::string &s)
-{
-   size_t l = s.length();
-   if (l == 0)
-      return 0;
-   return s[0];
-}
-
-char lastchar(const std::string &s)
-{
-   size_t l = s.length();
-   if (l == 0)
-      return 0;
-   return s[l-1];
-}
-
-
-std::string rtrim(const std::string &str)
-{
-   const std::string whitespace = " \t";
-
-   size_t strEnd = str.find_last_not_of(whitespace);
-   if (strEnd == std::string::npos)
-      return ""; // no content
-   return str.substr(0,strEnd+1);
-}
-
-std::string ltrim(const std::string &str)
-{
-   const std::string whitespace = " \t";
-   size_t strBegin = str.find_first_not_of(whitespace);
-   if (strBegin == std::string::npos)
-      return ""; // no content
-
-   return str.substr(strBegin);
-}
-
-std::string trim(const std::string &str)
-{
-   const std::string whitespace = " \t";
-   size_t strBegin = str.find_first_not_of(whitespace);
-   if (strBegin == std::string::npos)
-      return ""; // no content
-
-   size_t strEnd = str.find_last_not_of(whitespace);
-   size_t strRange = strEnd - strBegin + 1;
-
-   return str.substr(strBegin, strRange);
-}
-
 bool cleanfive(const std::string &s)
    //
    // returns 1, if columns 1-5 contain only [0-9 \t]
@@ -208,57 +158,22 @@ std::string ltab2sp(const std::string &s)
    //   this is counted as 6 spaces
    //
 
-   int         si       = 0;
-   bool        ready    = 0;
-   const int   tabl     = 6;
-   bool        firsttab = 1;
-   std::string leader   = "";
-   int         removed  = 0;
+   const std::string d1_9  =  "123456789";
+   const std::string db0_9 = " 0123456789";
+   size_t p = s.substr(0,6).find_first_of('\t');
+   if (p == std::string::npos)
+      return rtrim(s);                  // no tab in first 6 columns
 
-   for (unsigned int j=0; j<s.length(); j++)
+   if (s.find_first_not_of(db0_9) == p) //  all space or numeric before tab? 
    {
-      switch (s[j])
-      {
-	 case ' ' :
-	    si ++;
-	    removed++;
-	    leader = leader + " ";
-	    break;
-	 case '\t' :
-	    if (firsttab)
-	    {
-	       firsttab = 0;
-	       if (si < 6)
-		  //
-		  // investigate next char: if 1-9, count this tab as 5 spaces
-		  //
-		  if (s.length() > j+1)
-		     if (s[j+1] >= '1' && s[j+1] <= '9')
-		     {
-			si = 5;
-			removed++;
-			leader = std::string(5,' ');
-			break;
-		     }
-	    }
-	    si = (si/tabl)*tabl + tabl;
-	    leader = leader + std::string(si - leader.length(),' ');
-	    break;
-	 case '0': case '1': case '2': case '3': case '4':
-	 case '5': case '6': case '7': case '8': case '9':
-	    si++;
-	    removed++;
-	    leader += s[j];
-	    firsttab = 0;
-	    break;
-	 default:
-	    ready = 1;
-	    break;
-      }
-      if(ready)
-	 break;
+      if (s.length() == p+1)                                   // ' 100 T'  ->' 100', ' T'-> ''
+	 return rtrim(s.substr(0,p));
+      if (d1_9.find(s[p+1]) == std::string::npos)              // ' 10 Tx'  -> ' 10   x'
+	 return rtrim(s.substr(0,p)+blanks(6-p)+s.substr(p+1));
+      return    rtrim(s.substr(0,p)+blanks(5-p)+s.substr(p+1));// ' 10 T1x' -> ' 10  1x'
    }
-   return leader + trim(s.substr(removed));
+   else
+      return rtrim(s);
 }
 
 std::string remove_trailing_comment(const std::string &s,const char prevquote)
@@ -302,9 +217,3 @@ std::string remove_trailing_comment(const std::string &s,const char prevquote)
    }
    return so;
 }              // end of remove_trailing_comment
-
-std::string blanks(const int l)
-{
-   return std::string(l,' ');
-}
-

@@ -11,7 +11,7 @@
 bool wizard(lines_t lines);
 std::string add_amp(const std::string s,const char prevquote);
 
-int cindex = 0;
+size_t cindex = 0;
 
 void fixed2fixed(lines_t &lines,lines_t *freelines)
 {
