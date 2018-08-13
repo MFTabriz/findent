@@ -1,11 +1,6 @@
-#include <string>
-#include <vector>
-
 #include "debug.h"
-#include "findent.h"
-#include "findent_functions.h"
+#include "findent_types.h"
 #include "fixed2fixed.h"
-#include "fortranline.h"
 #include "free2free.h"
 
 void fixed2free(lines_t &lines)

@@ -20,7 +20,8 @@ void usage(const bool doman)
       std::cout << ".SH SYNOPSIS"                                                               << std::endl;
       std::cout << ".B findent"                                                                 << std::endl;
       std::cout << "[\\fIOPTION\\fR]..."                                                        << std::endl;
-      std::cout << ".PP"<<std::endl<< "Findent reads from STDIN and writes to STDOUT."          << std::endl;
+      std::cout << ".PP"                                                                        << std::endl;
+      std::cout << "Findent reads from STDIN and writes to STDOUT."                             << std::endl;
       std::cout << ".SH DESCRIPTION"                                                            << std::endl;
       std::cout << "Findent indents a Fortran source. Findent uses various kinds of"            << std::endl;
       std::cout << "indentations, see OPTIONS. Findent can convert from fixed form to"          << std::endl;
@@ -38,14 +39,17 @@ void usage(const bool doman)
    {
       std::cout << "findent [options]"                                                        << std::endl;
       std::cout << "   Format fortran source."                                                << std::endl;
-      std::cout << "   Reads from STDIN, writes to STDOUT."                                   << std::endl;
+      std::cout << "   Findent eads from STDIN, writes to STDOUT."                            << std::endl;
+      std::cout << "   Findent uses various kinds of indentations, see OPTIONS."              << std::endl;
+      std::cout << "   Findent can convert from fixed form to free form and vice versa and"   << std::endl;
+      std::cout << "   can supplement END statements, see 'Refactor' below."                  << std::endl;
       std::cout << "   Comment lines with '!' in column one are not indented."                << std::endl;
       std::cout << "   You can correct findent related indenting errors by"                   << std::endl;
       std::cout << "   inserting comment lines: "                                             << std::endl;
       std::cout << "    !  findentfix: <fortran statement>"                                   << std::endl;
       std::cout << "   where <fortran statement> is for example DO, END, WHERE() etcetera."   << std::endl;
       std::cout << "   Findent will adjust the indentation according to <fortran statement>." << std::endl;
-      std::cout << "Options (errors are silently ignored):"                                   << std::endl;
+      std::cout << "OPTIONS (errors are silently ignored):"                                   << std::endl;
       std::cout                                                                               << std::endl;
       std::cout << "  General options:"                                                       << std::endl;
       std::cout                                                                               << std::endl;
@@ -184,10 +188,14 @@ void usage(const bool doman)
       std::cout << ".PP" << std::endl << ".SS" << std::endl;
    }
    std::cout << "Examples:"                    << std::endl;
-   manout(" ","indent: findent < in.f > out.f"                ,doman);
-   manout(" ","        findent -i2 -r0 < in.f > out.f"        ,doman);
-   manout(" ","convert: findent -ofree < prog.f > prog.f90"   ,doman);
-   manout(" ","refactor 'end': findent -Rr < in.f90 > out.f90",doman);
+   manout(" ","indent: findent < in.f > out.f"                                  ,doman);
+   manout(" ","        findent -i2 -r0 < in.f > out.f"                          ,doman);
+   manout(" ",""                                                                ,doman);
+   manout(" ","convert fixed to free form: findent -ofree < prog.f > prog.f90"  ,doman);
+   manout(" ",""                                                                ,doman);
+   manout(" ","convert free to fixed form: findent -ofixed < prog.f90 > prog.f" ,doman);
+   manout(" ",""                                                                ,doman);
+   manout(" ","refactor 'end': findent -Rr < in.f90 > out.f90"                  ,doman);
    if(doman)
    {
       std::cout << ".SH COPYRIGHT" << std::endl;

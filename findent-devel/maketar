@@ -1,5 +1,4 @@
 #!/bin/bash
-# $Id$
 curdir=`pwd`                                       || exit 1
 version=`./getversion`                             || exit 1
 echo "version = $version"

@@ -45,8 +45,7 @@ int determine_fix_or_free()
 	 continue;
       }
 
-      s = line.str();
-      rc = guess_fixedfree(s);
+      rc = guess_fixedfree(line);
       switch(rc)
       {
 	 case UNSURE : 
@@ -380,7 +379,7 @@ void empty_dolabels()
       dolabels.pop_back();
 }       // end of empty_dolabels
 
-int guess_fixedfree(const std::string &s) //TODO chenge to fortranline
+int guess_fixedfree(fortranline &line)
 {
    //
    // sometimes, program sources contain carriage control characters
@@ -388,6 +387,8 @@ int guess_fixedfree(const std::string &s) //TODO chenge to fortranline
    // I cannot get the lexer to respond to [:cntrl:]
    // so I handle that here:
    //
+   std::string s = line.str();
+
    if (firstchar(s) != '\t')
       if(firstchar(s) < 32)
 	 return UNSURE;
@@ -400,7 +401,6 @@ int guess_fixedfree(const std::string &s) //TODO chenge to fortranline
 void push_all()
 {
    dolabels_store.push_back(dolabels);
-   //fs_store.push_back(full_statement);
    indent_store.push_back(indent);
    nbseen_store.push_back(nbseen);
    rprops_store.push_back(rprops);
@@ -411,8 +411,6 @@ void top_all()
 {
    if (!dolabels_store.empty())
       dolabels = dolabels_store.back();
-   //   if (!fs_store.empty())
-   //     full_statement = fs_store.back();
    if (!indent_store.empty())
       indent = indent_store.back();
    if (!nbseen_store.empty())
@@ -425,8 +423,6 @@ void pop_all()
 {
    if (!dolabels_store.empty())
       dolabels_store.pop_back();
-   //  if (!fs_store.empty())
-   //    fs_store.pop_back();
    if (!indent_store.empty())
       indent_store.pop_back();
    if (!nbseen_store.empty())
@@ -509,15 +505,3 @@ bool output_pre(lines_t &lines, lines_t *outlines)
    else
       return 0;
 }     // end of output_pre
-
-int M(const int k)
-{
-   //
-   // used to delimit indentation
-   //
-   if (flags.max_indent <= 0)
-      return k;
-   else
-      return std::min(flags.max_indent,k);
-}  // end of M
-

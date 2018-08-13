@@ -15,6 +15,9 @@ void free2free(lines_t &lines, lines_t *fixedlines)
    //
    // output lines input: free format, output: free format
    //
+   // TODO: but not urgent: it would be nicer to change the format
+   // of 'fixedlines' to fixed
+   //
 
    bool to_mycout = (fixedlines == 0);
    std::ostringstream os;
@@ -32,7 +35,7 @@ void free2free(lines_t &lines, lines_t *fixedlines)
    {
       mycout.reset();
 
-      // TODO: combine output of pre and blank and comments
+      // TODO (not urgent): combine output of pre and blank and comments
       if(output_pre(lines,fixedlines))
       	 continue;
       if (lines.empty())

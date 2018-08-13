@@ -45,8 +45,7 @@ inline std::string trim(const std::string &str)
 
 inline char firstchar(const std::string &s)
 {
-   size_t l = s.length();
-   if (l == 0)
+   if (s.length() == 0)
       return 0;
    return s[0];
 }
@@ -58,8 +57,6 @@ inline char lastchar(const std::string &s)
       return 0;
    return s[l-1];
 }
-
-
 
 extern simpleostream mycout; 
 

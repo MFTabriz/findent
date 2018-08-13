@@ -1,15 +1,7 @@
-#include <iostream>
-#include <string>
-#include <sstream>
-
 #include "debug.h"
-#include "findent.h"
-#include "findent_functions.h"
-#include "free2fixed.h"
-#include "free2free.h"
-#include "fixed2fixed.h"
 #include "findent_types.h"
-#include "functions.h"
+#include "fixed2fixed.h"
+#include "free2free.h"
 
 void free2fixed(lines_t &lines)
 {

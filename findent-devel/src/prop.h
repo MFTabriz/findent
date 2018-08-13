@@ -1,5 +1,8 @@
 #ifndef PROP_H
 #define PROP_H
+
+#include <string>
+
 struct propstruct
 {
    int         kind;
@@ -11,4 +14,5 @@ struct propstruct
 const struct propstruct empty_rprop={0,"","",""};
 
 propstruct parseline(class line_prep p);
+
 #endif

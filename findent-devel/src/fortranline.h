@@ -1,5 +1,6 @@
 #ifndef FORTRANLINE_H
 #define FORTRANLINE_H
+
 #include <iostream>
 #include <string>
 #include "functions.h"
@@ -17,9 +18,9 @@ class fortranline
    // I found that some functions are used repeatedly, the results are
    // cached here
    //
-   std::string ltrim_line; bool have_ltrim_line;
-   std::string trim_line;  bool have_trim_line;
-   char firstchar_val;     bool have_firstchar_val;
+   std::string ltrim_cache; bool ltrim_cached;
+   std::string trim_cache;  bool trim_cached;
+   char firstchar_cache;    bool firstchar_cached;
 
    static int global_format, global_line_length;
    static bool global_gnu_format;
@@ -33,10 +34,10 @@ class fortranline
    {
       local_format        = global_format;
       local_gnu_format    = global_gnu_format;
-      have_ltrim_line     = 0;
-      have_trim_line      = 0;
-      have_firstchar_val  = 0;
-      is_clean            = 0;
+      ltrim_cached     = 0;
+      trim_cached      = 0;
+      firstchar_cached = 0;
+      is_clean         = 0;
    }
 
    public:
@@ -172,33 +173,36 @@ class fortranline
 
    std::string ltrim()
    {
-      if (!have_ltrim_line)
+      if (!ltrim_cached)
       {
-	 ltrim_line = ::ltrim(orig_line);
-	 have_ltrim_line = 1;
+	 ltrim_cache = ::ltrim(orig_line);
+	 ltrim_cached = 1;
       }
-      return ltrim_line;
+      return ltrim_cache;
    }
 
    std::string trim() 
    {
-      if (!have_trim_line)
+      if (!trim_cached)
       {
-	 trim_line = ::trim(orig_line);
-	 have_trim_line = 1;
+	 trim_cache = ::trim(orig_line);
+	 trim_cached = 1;
       }
-      return trim_line;
+      return trim_cache;
    }
 
    char firstchar() 
    {
       // returns first char of ltrim(), 0 if length()=0
-      if (!have_firstchar_val)
+      if (!firstchar_cached)
       {
-	 firstchar_val = *(ltrim().begin());
-	 have_firstchar_val = 1;
+	 if (ltrim().length()>0)
+	    firstchar_cache = ltrim()[0];
+	 else
+	    firstchar_cache = 0;
+	 firstchar_cached = 1;
       }
-      return firstchar_val;
+      return firstchar_cache;
    }
 
    char operator [] (int i) const
@@ -212,7 +216,10 @@ class fortranline
 
    char lastchar() const
    {
-      return *orig_line.rbegin();
+      if (orig_line.length() > 0)
+	 return *orig_line.rbegin();
+      else
+	 return 0;
    }
 
    std::string first2chars() 

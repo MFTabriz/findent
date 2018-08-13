@@ -1,4 +1,3 @@
-// $Id$
 #ifndef LINE_PREP_H
 #define LINE_PREP_H
 
