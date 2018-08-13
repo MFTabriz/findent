@@ -1,5 +1,6 @@
 #ifndef LEXER_H
 #define LEXER_H
+
 void yyerror(const char *c);
 extern "C" int yylex();
 void lexer_enable(const int k);
@@ -10,4 +11,5 @@ std::string lexer_getname(void);
 std::string lexer_getstlabel(void);
 std::string lexer_geti_number(void);
 std::string lexer_getrest(void);
+
 #endif

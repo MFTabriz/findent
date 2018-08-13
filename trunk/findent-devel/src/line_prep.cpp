@@ -1,4 +1,3 @@
-// $Id$
 #include "line_prep.h"
 #include "debug.h"
 

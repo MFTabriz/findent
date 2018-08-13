@@ -1,4 +1,3 @@
-// $Id$
 #include <iostream>
 #include <string>
 
@@ -455,7 +454,7 @@ fortranline getnext(bool &eof, bool use_wb)
    // remove trailing white space
    // FIXED: convert leading tab to space
    //
-   
+
    line.clean();
 
    if(!use_wb && !eof)
@@ -508,21 +507,10 @@ void get_full_statement()
    //
    // In this example, full_statement will contain:
    //
-   //    subroutine compute(x x,y)
-   // ( this is not correct, of course, but it will not prevent 
-   //   correct indenting)
+   //    subroutine compute(x,y)
+   // ( this is only correct if 'one' is not defined, but it 
+   //   will not prevent correct indenting)
    //
-   // and lines will contain:
-   //    subroutine compute(x x,y)
-   //
-   // #ifdef one
-   //      x &
-   // #else
-   //      x,y &
-   // #endif
-   //     )
-   //
-
 
    //
    // if things get hairy: try a finite state machine
@@ -534,11 +522,15 @@ void get_full_statement()
       end_start, end_fortran, end_pre, 
       in_ffix
    };
+
    full_statement = "";
-
-
    indent_handled = 0;
-   static int pretype;  // TODO  is this needed?
+
+   //
+   // 'pushback' and 'first_call' must be static in this version,
+   // for safety 'pretype' and 'f_more' and 'p_more' are also made static
+   //
+   static int pretype;     // 
    static bool f_more = 0;
    static bool p_more;
    static bool pushback;
@@ -628,7 +620,7 @@ void get_full_statement()
 	    return;
 
 	 case in_fortran_1:
-	    if (!pushback)
+	    if (!pushback)                     // here is why pushback has to be static
 	       curline = getnext(end_of_file);
 	    state = start;
 	    break;
@@ -666,7 +658,7 @@ void handle_fortran(fortranline &line,bool &f_more, bool &pushback)
       handle_free(line,f_more,pushback);
    else
       handle_fixed(line,f_more,pushback);
-}
+}  // end of handle_fortran
 
 void handle_free(fortranline &line, bool &f_more, bool &pushback)
 {
@@ -930,7 +922,6 @@ void handle_refactor()
 	    replacement = stoupper(replacement);
 	 if (cur_rprop.name != "")
 	    replacement += " " + cur_rprop.name;
-	 //curlines.back().set_line(s.substr(0,startpos) + replacement + s.substr(endpos));
 	 it->str(s.substr(0,startpos) + replacement + s.substr(endpos));
       }
    }

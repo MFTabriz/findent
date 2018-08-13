@@ -21,6 +21,9 @@ void fixed2fixed(lines_t &lines,lines_t *freelines)
    // lines optionally start with comments and/or preprocessor lines
    // lines ends with a fortran line
    //
+   // TODO: but nor urgent: it would be neater to change the format 
+   // of 'freelines' to free
+   //
    bool to_mycout            = (freelines == 0);
    unsigned int old_indent   = 0;
    unsigned int first_indent = 0;
@@ -32,7 +35,7 @@ void fixed2fixed(lines_t &lines,lines_t *freelines)
    {
       mycout.reset();
 
-      // TODO: combine output of pre and blank and comments
+      // TODO but not urgent: combine output of pre and blank and comments
       if(output_pre(lines,freelines))
 	 continue;
       if (lines.empty())

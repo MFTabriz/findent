@@ -34,5 +34,3 @@ Examples: $ findent < in.f90 > out.f90
      :help =
    in vim or gvim.
 
-
-# $Id: README.1st 81 2015-07-30 12:34:19Z willem_vermin $
