@@ -1,5 +1,4 @@
 #!/bin/sh
-# $Id$
 dir=`pwd`
 ./bootstrap                                                       || exit 1
 ./configure --with-windows                                        || exit 1 

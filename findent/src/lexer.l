@@ -1,5 +1,4 @@
 %{
-// $Id$
 #include <iostream>
 #include <stack>
 #include <string>
@@ -218,6 +217,18 @@ where             { D(O("WHERE");Y;);             return WHERE;             }
 }
 
 <state_scanfixpre>{
+{b}*\!{b}*findentfix:p-on   { D(O("FINDENTFIX P-ON");Y;); 
+				return P_ON;
+		              }
+^[c\*]{b}*findentfix:p-on   { D(O("FIXFINDENTFIX P-ON");Y;);
+				return P_ON;
+		              }
+{b}*\!{b}*findentfix:p-off  { D(O("FINDENTFIX P-OFF");Y;); 
+				return P_OFF;
+		              }
+^[c\*]{b}*findentfix:p-off  { D(O("FIXFINDENTFIX P-OFF");Y;);
+				return P_OFF;
+		              }
 {b}*\!{b}*findentfix:         { D(O("FINDENTFIX");Y;); 
                                 size_t l = input_string.length()-yyleng-1;
                                 lexer_rest = input_string.substr(yyleng,l);
@@ -332,7 +343,7 @@ void lexer_set(class line_prep p, const int state)
    lexer_enable(state);
 }
 
-void lexer_set(std::string s, const int state)
+void lexer_set(const std::string &s, const int state)
 {
    input_string  = s+'\n';
    D(O("lexer_set");O(input_string););

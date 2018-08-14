@@ -1,4 +1,6 @@
 #!/bin/bash
+echo "do not use, use './makedeb all'"
+exit 1
 # This script assumes that root has created a pbuilder environment
 # for sid (and for wheezy and i386-wheezy).
 # The configfiles are resp. ~/root/pbuilderrc.sid , 
@@ -36,9 +38,12 @@ for dist in $dists; do
 	 arch=amd64
 	 ;;
    esac
-   pdebuild  --architecture $arch --debbuildopts "-us -uc"  -- --configfile ~root/pbuilderrc.$dist \
-      --hookdir ~/pbuilderhooks || exit 1
+   cp debian.xenial/* debian || exit 1
+   #pdebuild  --architecture $arch --debbuildopts "-us -uc"  -- --configfile ~root/pbuilderrc.$dist \
+   #   --hookdir ~/pbuilderhooks || exit 1
+   dpkg-buildpackage -us -uc --check-command=lintian --check-option='--profile' --check-option=debian
    debsign $debdir/*.changes
+   cp debian.sid/* debian || exit 1
    echo creating .deb for $dist ...
    sudo pbuilder --build --configfile /root/pbuilderrc.$dist --buildresult $debdirbuild $debdir/*dsc
    sudo chown -h $USER.$USER $debdirbuild/*

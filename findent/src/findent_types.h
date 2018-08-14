@@ -2,20 +2,36 @@
 #define FINDENT_TYPES_H
 
 #include <deque>
-#include <list>
-#include <stack>
 
 #include "fortranline.h"
 #include "prop.h"
 
-typedef std::stack<int>               dolabels_t;
-typedef std::stack<dolabels_t>        dolabels_stack_t;
-typedef std::stack<int>               indent_t;
-typedef std::stack<indent_t>          indent_stack_t;
-typedef std::list<fortranline>        lines_t;
+template <class C> std::ostream& operator <<(std::ostream &os, std::deque<C> &obj)
+{
+   if (obj.empty())
+   {
+      os << ":empty";
+      return os;
+   }
+
+   os << std::endl;
+
+   typename std::deque<C>::iterator it = obj.begin();
+   int i = 0;
+   while (it != obj.end())
+      os << ++i << ":" << *it++ << std::endl;
+   return os;
+}
+
+typedef std::deque<int>               dolabels_t;
+typedef std::deque<dolabels_t>        dolabels_store_t;
+typedef std::deque<int>               indent_t;
+typedef std::deque<indent_t>          indent_store_t;
+typedef std::deque<std::string>       fs_store_t;
+typedef std::deque<fortranline>       lines_t;
 typedef std::deque<fortranline>       linebuffer_t;
-typedef std::stack<bool>              nbseen_stack_t;
-typedef std::stack<struct propstruct> rprops_t;
-typedef std::stack<rprops_t>          rprops_stack_t;
+typedef std::deque<bool>              nbseen_store_t;
+typedef std::deque<struct propstruct> rprops_t;
+typedef std::deque<rprops_t>          rprops_store_t;
 
 #endif

@@ -1,4 +1,3 @@
-$Id$
 findent-2.8.3:
 	parser.y, lexer.l: changed detection of do-constructs
 	     DO , 
@@ -67,6 +66,19 @@ findent-2.8.3:
 	   use list in stead of deque for (cur)lines
 
 	   added free2fixed
+
+	~pre4
+	   implemented a finite state machine in get_full_statement()
+	   change list and stack into deque
+
+	   implemented user-choosable continuation character
+
+	   cleaned up code
+
+	   made some optimizations
+
+	   adapted documentation
+
 
 findent-2.8.2: 
 	debianizing ...
