@@ -36,9 +36,12 @@ for dist in $dists; do
 	 arch=amd64
 	 ;;
    esac
+   compat=`cat debian/compat`
+   cp debian.xenial/* debian || exit 1
    pdebuild  --architecture $arch --debbuildopts "-us -uc"  -- --configfile ~root/pbuilderrc.$dist \
       --hookdir ~/pbuilderhooks || exit 1
    debsign $debdir/*.changes
+   cp debian.sid/* debian || exit 1
    echo creating .deb for $dist ...
    sudo pbuilder --build --configfile /root/pbuilderrc.$dist --buildresult $debdirbuild $debdir/*dsc
    sudo chown -h $USER.$USER $debdirbuild/*

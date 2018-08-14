@@ -4250,7 +4250,7 @@ void lexer_set(class line_prep p, const int state)
    lexer_enable(state);
 }
 
-void lexer_set(std::string s, const int state)
+void lexer_set(const std::string &s, const int state)
 {
    input_string  = s+'\n';
    D(O("lexer_set");O(input_string););
