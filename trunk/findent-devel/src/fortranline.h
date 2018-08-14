@@ -21,6 +21,8 @@ class fortranline
    std::string ltrim_cache; bool ltrim_cached;
    std::string trim_cache;  bool trim_cached;
    char firstchar_cache;    bool firstchar_cached;
+   int scanfixpre_cache;    bool scanfixpre_cached;
+
 
    static int global_format, global_line_length;
    static bool global_gnu_format;
@@ -34,10 +36,11 @@ class fortranline
    {
       local_format        = global_format;
       local_gnu_format    = global_gnu_format;
-      ltrim_cached     = 0;
-      trim_cached      = 0;
-      firstchar_cached = 0;
-      is_clean         = 0;
+      ltrim_cached      = 0;
+      trim_cached       = 0;
+      firstchar_cached  = 0;
+      is_clean          = 0;
+      scanfixpre_cached = 0;
    }
 
    public:
@@ -229,13 +232,16 @@ class fortranline
 
    int scanfixpre()
    {
-      int rc;
-      lexer_set(trim(),SCANFIXPRE);
-      rc      = yylex();
-      if (format() == FIXED)
-	 if(rc == FIXFINDENTFIX)
-	    rc = FINDENTFIX;
-      return rc;
+      if(!scanfixpre_cached)
+      {
+	 lexer_set(trim(),SCANFIXPRE);
+	 scanfixpre_cache = yylex();
+	 if (format() == FIXED)
+	    if(scanfixpre_cache == FIXFINDENTFIX)
+	       scanfixpre_cache = FINDENTFIX;
+	 scanfixpre_cached = 1;
+      }
+      return scanfixpre_cache;
    }
 
    std::string rest() 
