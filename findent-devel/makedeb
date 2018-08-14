@@ -7,7 +7,7 @@ tar=$PWD/../versions/findent-$version.tar.gz
 dir=findent-$version
 dsc=findent_$version-1.dsc
 debdir=$PWD/../debian/findent-$version-deb
-for d in debian debian.xenial debian.wheezy ; do
+for d in debian debian.xenial debian.wheezy debian.sid ; do
    if [ -e $d/changelog ] ; then
       sed -i "1s/(.*)/($version-1)/" $d/changelog   || exit 1
    fi
@@ -35,7 +35,7 @@ if test "x$1" != xall ; then
    exit 0
 fi
 cd ..
-#for dist in sid ; do
+#for dist in amd64-sid ; do
 #for dist in amd64-wheezy ; do
 for dist in i386-wheezy amd64-wheezy amd64-sid ; do
    workdir=`mktemp -d --tmpdir findent-pbuilder-$dist.XXXXXXX`
@@ -45,13 +45,14 @@ for dist in i386-wheezy amd64-wheezy amd64-sid ; do
    cd w || exit 1
    tar xf $tar || exit 1
    cd $dir || exit 1
-   echo compat before $dist: `cat debian/compat` `grep Standards-Version debian/control`
    case $dist in
       *wheezy*)
-	 cp debian.wheezy/* debian || exit
+	 cp debian.wheezy/* debian || exit 1
+	 ;;
+      *sid*)
+	 cp debian.sid/* debian || exit 1
 	 ;;
    esac
-   echo compat after $dist: `cat debian/compat` `grep Standards-Version debian/control`
    dh_make --yes -s --createorig
    cd ..
    dpkg-source -b $dir || exit 1
