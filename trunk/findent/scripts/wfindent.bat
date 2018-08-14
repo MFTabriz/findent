@@ -1,5 +1,4 @@
 @echo off
-REM $Id$
 setlocal EnableDelayedExpansion EnableExtensions
 if -%1-==-- (
   echo wfindent is a wrapper for findent

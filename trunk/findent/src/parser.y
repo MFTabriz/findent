@@ -1,5 +1,4 @@
 %{
-// $Id$
 #include <iostream>
 
 #include "debug.h"
@@ -30,6 +29,7 @@ struct propstruct properties;
 %token TIDENTIFIER
 %token BLANK
 %token FINDFORMAT UNKNOWN FREE FIXED UNSURE PROBFREE FINDENTFIX FIXFINDENTFIX
+%token P_ON P_OFF
 %token SCANFIXPRE
 %token CPP_IF CPP_ENDIF CPP_ELSE CPP_ELIF CPP
 %token COCO_IF COCO_ENDIF COCO_ELSE COCO_ELIF COCO

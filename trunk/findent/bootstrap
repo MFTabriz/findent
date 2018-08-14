@@ -13,6 +13,10 @@ autoreconf -fvi                                     || exit 1
 ./configure                                         || exit 1
 cp test/*.f test/*.ref test/*.sh \
    test/doit debian/tests                           || exit 1
+echo "Tests:" > debian/tests/control                || exit 1
+for f in debian/tests/test?.sh debian/tests/test??.sh ; do
+   echo "     `basename $f`" >> debian/tests/control       || exit 1
+done
 make builtparser builtlexer                         || exit 1
 make distclean                                      || exit 1
 echo "bootstrap done"

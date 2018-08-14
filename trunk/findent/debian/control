@@ -3,7 +3,7 @@ Section: devel
 Priority: optional
 Maintainer: Willem Vermin <wvermin@gmail.com>
 Build-Depends: debhelper (>= 11), flex, bison, gfortran
-Standards-Version: 4.1.4
+Standards-Version: 4.2.0
 Homepage: https://sourceforge.net/projects/findent/
 
 Package: findent

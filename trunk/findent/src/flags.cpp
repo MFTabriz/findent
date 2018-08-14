@@ -7,6 +7,8 @@
 #include "flags.h"
 #include "parser.h"
 
+#define optargcheck if (!optarg || strlen(optarg)==0) break;
+
 void Flags::set_defaults(void)
 {
    label_left_default  = 1;
@@ -15,12 +17,14 @@ void Flags::set_defaults(void)
 
    apply_indent        = 1;
    auto_firstindent    = 0;
+   conchar             = ' ';
    input_format        = UNKNOWN;
    input_format_gnu    = 0;
    input_line_length   = 0;
    label_left          = label_left_default;
    last_indent_only    = 0;
    last_usable_only    = 0;
+   max_indent          = 100;
    only_fix_free       = 0;
    output_format       = 0;
    refactor_routines   = 0;
@@ -98,6 +102,8 @@ int Flags::get_flags(int argc, char *argv[])
    {
       {"indent"             , required_argument, 0, DO_INDENT            },
 
+      {"continuation"       , required_argument, 0, DO_CONCHAR           },
+
       {"indent_associate"   , required_argument, 0, 'a'                  },
       {"indent-associate"   , required_argument, 0, 'a'                  },
 
@@ -155,6 +161,9 @@ int Flags::get_flags(int argc, char *argv[])
 
       {"indent_module"      , required_argument, 0, 'm'                  },
       {"indent-module"      , required_argument, 0, 'm'                  },
+
+      {"max_indent"         , required_argument, 0, 'M'                  },
+      {"max-indent"         , required_argument, 0, 'M'                  },
 
       {"output_format"      , required_argument, 0, 'o'                  },
       {"output-format"      , required_argument, 0, 'o'                  },
@@ -218,39 +227,48 @@ int Flags::get_flags(int argc, char *argv[])
    int option_index = 0;
    std::string option_name;
    int retval = DO_NOTHING;
-   while((c=getopt_long(nflags,allflags,"a:b:c:C:d:e:E:f:F:hHi:I:j:k:l:L:m:o:qQr:R:s:t:vw:x:",
+   while((c=getopt_long(nflags,allflags,"a:b:c:C:d:e:E:f:F:hHi:I:j:k:l:L:m:M:o:qQr:R:s:t:vw:x:",
 	       longopts, &option_index))!=-1)
    {
       switch(c)
       {
 	 case 'a' :                            // --indent_associate=nn
+	    optargcheck
 	    associate_indent  = atoi(optarg);
 	    break;
 	 case 'b' :
+	    optargcheck
 	    block_indent      = atoi(optarg);  // --indent_block=nn
 	    break;
 	 case 'c' :
+	    optargcheck
 	    case_indent       = atoi(optarg);  // --indent_case=nn
 	    break;
 	 case 'C' :                            // --indent_contains=nn/none
-	    if(optarg[0] == '-')
+	    optargcheck
+	    if(strlen(optarg)>0 && optarg[0] == '-')
 	       indent_contain = 0;
 	    else
 	       contains_indent   = atoi(optarg);
 	    break;
 	 case 'd' :                            // --indent_do=nn
+	    optargcheck
 	    do_indent         = atoi(optarg);
 	    break;
 	 case 'e' :
+	    optargcheck
 	    entry_indent      = atoi(optarg);  // --indent_entry=nn
 	    break;
 	 case 'E' :
+	    optargcheck
 	    enum_indent       = atoi(optarg);  // --indent_enum=nn
 	    break;
 	 case 'f' :
+	    optargcheck
 	    if_indent         = atoi(optarg);  // --indent_if=nn
 	    break;
 	 case 'F' :   
+	    optargcheck
 	    forall_indent     = atoi(optarg);  // --indent_forall=nn
 	    break;
 	 case 'h' :                            // --help
@@ -262,13 +280,14 @@ int Flags::get_flags(int argc, char *argv[])
 	    retval = DO_MANPAGE;
 	    break;
 	 case 'i' :                            // --input_format=fixed/free/auto
+	    optargcheck
 	    if      (std::string(optarg) == "fixed")
 	       input_format = FIXED;
 	    else if (std::string(optarg) == "free")
 	       input_format = FREE;
 	    else if (std::string(optarg) == "auto")
 	       input_format = UNKNOWN;
-	    else if (optarg[0] == '-')        // --indent=no/nn
+	    else if (strlen(optarg)>0 && optarg[0] == '-')        // --indent=no/nn
 	       apply_indent = 0;
 	    else
 	    {
@@ -281,7 +300,8 @@ int Flags::get_flags(int argc, char *argv[])
 	     )
 	       break;
 	 case 'I' :                          // --start_indent=nn/auto
-	    if (optarg[0] == 'a')
+	    optargcheck
+	    if (strlen(optarg)>0 && optarg[0] == 'a')
 	       auto_firstindent = 1;
 	    else
 	    {
@@ -290,15 +310,18 @@ int Flags::get_flags(int argc, char *argv[])
 	    }
 	    break;
 	 case 'j' :
+	    optargcheck
 	    interface_indent  = atoi(optarg);  // --indent_interface=nn
 	    break;
 	 case 'k' :                           // --indent_continuation=nn/no
-	    if (optarg[0] == '-' || !strcmp(optarg,"none"))
+	    optargcheck
+	    if (strlen(optarg)>0 && (optarg[0] == '-' || !strcmp(optarg,"none")))
 	       indent_cont = 0;
 	    else
 	       cont_indent = atoi(optarg);
 	    break;
 	 case 'l' :
+	    optargcheck
 	    if(std::string(optarg) == "astindent")       // --last_indent
 	       last_indent_only = 1;
 	    else if(std::string(optarg) == "astusable")  // --last_usable
@@ -307,12 +330,22 @@ int Flags::get_flags(int argc, char *argv[])
 	       label_left     = (atoi(optarg) != 0);     // --label_left=0/1
 	    break;
 	 case 'L' :
-	    input_line_length = atoi(optarg);            // --input_line_length=nn
-	    input_format_gnu  = (optarg[strlen(optarg)-1] == 'g');
+	    optargcheck
+	    if (strlen(optarg)>0)
+	    {
+	       input_line_length = atoi(optarg);            // --input_line_length=nn
+	       input_format_gnu  = (optarg[strlen(optarg)-1] == 'g');
+	    }
 	 case 'm' :
+	    optargcheck
 	    module_indent     = atoi(optarg);           // --indent_module=nn
 	    break;
+	 case 'M' :
+	    optargcheck
+	    max_indent        = atoi(optarg);           // --max-indent=nn
+	    break;
 	 case 'o' :
+	    optargcheck
 	    if(std::string(optarg) == "free")           // --output_format=free
 	    {
 	       output_format = FREE;
@@ -340,9 +373,11 @@ int Flags::get_flags(int argc, char *argv[])
 	    return_format = 1;
 	    break;
 	 case 'r' :                                    // --indent_procedure
+	    optargcheck
 	    routine_indent    = atoi(optarg);
 	    break;
 	 case 'R':                                     // --refactor_procedures[=upcase]
+	    optargcheck
 	    switch(optarg[0])
 	    {
 	       case 'R' :
@@ -353,27 +388,38 @@ int Flags::get_flags(int argc, char *argv[])
 	    }
 	    break;
 	 case 's' :                                 // --indent_select=nn
+	    optargcheck
 	    select_indent     = atoi(optarg);
 	    break;
 	 case 't' :
+	    optargcheck
 	    type_indent       = atoi(optarg);       // --indent_type=nn
 	    break;
 	 case 'v' :
 	    retval = DO_VERSION;
 	    break;
 	 case 'w' :
+	    optargcheck
 	    where_indent      = atoi(optarg);       // --indent_where=nn
 	    break;
 	 case 'x' :
+	    optargcheck
 	    critical_indent   = atoi(optarg);       // --indent_critical=nn
 	    break;
+	 case DO_CONCHAR:
+	    optargcheck
+	    if (strlen(optarg) > 0)
+	       conchar=optarg[0];
+	    break;
 	 case DO_INDENT_CONTAINS:
+	    optargcheck
 	    if (!strcmp(optarg,"restart"))
 	       indent_contain = 0;
 	    else
 	       contains_indent = atoi(optarg);
 	    break;
 	 case DO_INPUT_FORMAT:
+	    optargcheck
 	    if (!strcmp(optarg,"fixed"))
 	       input_format = FIXED;
 	    else if (!strcmp(optarg,"free"))
@@ -382,6 +428,7 @@ int Flags::get_flags(int argc, char *argv[])
 	       input_format = UNKNOWN;
 	    break;
 	 case DO_INDENT:
+	    optargcheck
 	    if (!strcmp(optarg,"none"))
 	       apply_indent = 0;
 	    else
@@ -397,12 +444,13 @@ int Flags::get_flags(int argc, char *argv[])
 	    last_usable_only = 1;
 	    break;
 	 case DO_LABEL_LEFT:
+	    optargcheck
 	    label_left       = (atoi(optarg) != 0);     // --label_left=0/1
 	    break;
 	 case DO_REFACTOR_PROCEDURE:
 	    refactor_routines    = 1;
 	    upcase_routine_type  = 0;
-	    if (optarg != 0)
+	    if (optarg != 0 && strlen(optarg) > 0)
 	    {
 	       if (!strcmp(optarg,"upcase"))
 		  upcase_routine_type = 1;

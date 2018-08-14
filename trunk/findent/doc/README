@@ -4,7 +4,7 @@ findent, what?
 ==============
 
    findent is an indenter for Fortran programs, fixed and free format.
-   findent can also translate fixed format to free format.
+   findent can also translate fixed format to free format and vice versa.
 
    findent will take care of:
 
@@ -586,6 +586,5 @@ Issues
 I am happy to receive comments, error reports and suggestions for
 improvements.
 
-Januari 2018, Willem Vermin, wvermin@gmail.com
+August 2018, Willem Vermin, wvermin@gmail.com
 
-# $Id: README 206 2017-07-19 07:06:28Z willem_vermin $
