@@ -1,7 +1,7 @@
 findent: indents/beautifies/converts Fortran sources
 
  - findent supports Fortran-2008
- - findent can convert from fixed form to free form
+ - findent can convert from fixed form to free form and vice-versa
  - binaries for Unix and Windows (findent and findent.exe respectively)
  - high speed: 50K - 100K lines per second
  - since version 2.7.0, findent is very vim-aware an can be used
