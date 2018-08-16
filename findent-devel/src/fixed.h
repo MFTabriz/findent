@@ -6,7 +6,6 @@
 class Fixed : public Fortran
 {
    public:
-      Fixed(Flags f) : Fortran(f) {}
       void build_statement(fortranline &line, bool &f_more, bool &pushback);
       void output(lines_t &lines,lines_t *freelines = 0);
       void output_converted(lines_t &lines);

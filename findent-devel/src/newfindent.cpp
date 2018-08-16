@@ -3,14 +3,17 @@
 #include "fortran.h"
 #include "free.h"
 #include "newfindent.h"
+#include "readlines.h"
 
-void newfindent()
+int main()
 {
+   Findent findent;
    Flags flags;
-   Fortran *a, *b;
-   a = new Fixed(flags);
-   b = new Free(flags);
 
-   delete a;
+   Fortran *a, *b;
+   a = new Fixed();
+   b = new Free();
+
    delete b;
+   delete a;
 }
