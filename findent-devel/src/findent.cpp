@@ -19,6 +19,8 @@
 #include "version.h"
 #include "vim_plugin.h"
 
+#include "newfindent.h"
+
 int               cur_indent;
 struct propstruct cur_rprop           = empty_rprop;
 fortranline       curline;
@@ -31,7 +33,6 @@ bool              indent_handled;
 int               input_format;
 int               labellength;
 int               lines_read          = 0;
-simpleostream     mycout;
 bool              nbseen;                    // true if non-blank-line is seen 
 int               num_lines;                 // number of lines read sofar
 int               output_format;
@@ -58,6 +59,7 @@ rprops_t         rprops;          // to store routines (module, subroutine ...)
 
 int main(int argc, char*argv[])
 {
+   newfindent();
    fortranline::g_format(UNKNOWN);
    int todo = flags.get_flags(argc,argv);
    switch(todo)

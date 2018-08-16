@@ -124,7 +124,7 @@ findent_SOURCES = findent.cpp findent.h \
 		  line_prep.cpp pre_analyzer.cpp debug.cpp debug.h \
 		  functions.cpp functions.h \
 		  line_prep.h pre_analyzer.h version.h \
-		  simpleostream.h \
+		  simpleostream.h simpleostream.cpp \
 		  vim_plugin.cpp vim_plugin.h \
 		  gedit_plugin.cpp gedit_plugin.h \
 		  emacs_plugin.cpp emacs_plugin.h \
@@ -136,7 +136,11 @@ findent_SOURCES = findent.cpp findent.h \
 		  fixed2free.cpp fixed2free.h \
 		  free2fixed.cpp free2fixed.h \
 		  findent_functions.cpp findent_functions.h \
-		  findent_types.h
+		  readlines.cpp readlines.h \
+		  newfindent.cpp newfindent.h \
+		  findent_types.h \
+		  fortran.h \
+		  fixed.cpp fixed.h free.cpp free.h
 
 
 BUILT_SOURCES = parser.cpp parser.h lexer.cpp
