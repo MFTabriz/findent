@@ -4,6 +4,16 @@
 #include "findent_types.h"
 #include "readlines.h"
 
+// linebuffer_t Readlines::curlinebuffer;
+// bool         Readlines::indent_handled;
+// int          Readlines::input_format;
+// int          Readlines::lines_read;
+//int          Readlines::num_lines;
+// bool         Readlines::reading_from_tty;
+//linebuffer_t Readlines::wizardbuffer;
+// bool         Readlines::endline_set;
+
+
 fortranline Readlines::getnext(bool &eof, bool use_wb)
 {
    fortranline line;
@@ -45,8 +55,8 @@ fortranline Readlines::getnext(bool &eof, bool use_wb)
       nbseen = !line.blank_or_comment() && (line.getpregentype() == 0);
       if (flags.auto_firstindent && nbseen)
       {
-	 *p_start_indent = guess_indent(line);
-	 *p_cur_indent   = *p_start_indent;
+	 start_indent = guess_indent(line);
+	 cur_indent   = start_indent;
 	 init_indent();
 	 indent_handled = 1;
       }
@@ -142,3 +152,24 @@ int Readlines::guess_indent(fortranline line)
    }
    return si;
 }                // end of guess_indent
+
+std::string Readlines::handle_dos(const std::string &s)
+{
+   //
+   // determine if the input is dos format:
+   // side effect: sets endline if not already been set
+   //
+   std::string sl;
+   sl = s;
+   if (!endline_set)
+   {
+      if (sl != "" && lastchar(sl) == '\r')
+      {
+	 endline = "\r\n";
+      }
+      endline_set = 1;
+   }
+   if (sl != "" && lastchar(sl) =='\r')
+      sl.erase(sl.length()-1);
+   return sl;
+}         // end of handle_dos

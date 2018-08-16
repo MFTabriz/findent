@@ -19,8 +19,6 @@
 #include "version.h"
 #include "vim_plugin.h"
 
-#include "newfindent.h"
-
 int               cur_indent;
 struct propstruct cur_rprop           = empty_rprop;
 fortranline       curline;
@@ -59,7 +57,6 @@ rprops_t         rprops;          // to store routines (module, subroutine ...)
 
 int main(int argc, char*argv[])
 {
-   newfindent();
    fortranline::g_format(UNKNOWN);
    int todo = flags.get_flags(argc,argv);
    switch(todo)

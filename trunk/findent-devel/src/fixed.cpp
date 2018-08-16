@@ -317,7 +317,7 @@ void Fixed::output_converted(lines_t &lines)
 
    output(lines, &freelines);
    fortranline::g_format(FREE);
-   Fortran *f = new Free(flags);
+   Fortran *f = new Free();
    f->output(freelines);
    delete f;
    fortranline::g_format(FIXED);
@@ -350,7 +350,7 @@ bool Fixed::wizard()
 
    while(1)
    {
-      line = Readlines::getnext(eof,0);
+      line = readlines.getnext(eof,0);
       if (eof)
 	 return 0;
 
@@ -362,7 +362,7 @@ bool Fixed::wizard()
 	    handle_pre_light(line,p_more);
 	    if (p_more)
 	    {
-	       line = Readlines::getnext(eof,0);
+	       line = readlines.getnext(eof,0);
 	       if (eof)
 		  return 0;
 	    }

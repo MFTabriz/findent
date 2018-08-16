@@ -243,7 +243,7 @@ void Free::output_converted(lines_t &lines)
 
    output(lines, &fixedlines);
    fortranline::g_format(FIXED);
-   Fortran *f = new Fixed(flags);
+   Fortran *f = new Fixed();
    f->output(fixedlines);
    delete f;
    fortranline::g_format(FREE);

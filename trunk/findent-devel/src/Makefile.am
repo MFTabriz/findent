@@ -65,8 +65,11 @@ if MAKEMAN
 
 man1_MANS = findent.1
 
-findent.1: findent
-	: | ./findent -H > $@
+#findent.1: findent
+#	: | ./findent -H > $@
+
+findent.1:
+	touch $@
 
 endif
 
@@ -117,7 +120,7 @@ emacs_help.inc: $(EMACSDIR)/README $(TOCPP)
 readme.inc: $(READMEDIR)/README $(TOCPP)
 	$(TOCPP) < $(READMEDIR)/README > $@
 
-bin_PROGRAMS    = findent
+bin_PROGRAMS    = newfindent
 
 findent_SOURCES = findent.cpp findent.h \
 		  mylexer.cpp myparser.cpp lexer.h parser.h \
@@ -135,13 +138,21 @@ findent_SOURCES = findent.cpp findent.h \
 		  fixed2fixed.cpp fixed2fixed.h \
 		  fixed2free.cpp fixed2free.h \
 		  free2fixed.cpp free2fixed.h \
-		  findent_functions.cpp findent_functions.h \
+		  findent_types.h \
+		  findent_functions.cpp findent_functions.h
+
+newfindent_SOURCES = \
+		  flags.cpp flags.h \
+		  functions.cpp functions.h \
+		  mylexer.cpp myparser.cpp lexer.h parser.h \
+		  fortranline.cpp fortranline.h \
+		  simpleostream.h simpleostream.cpp \
 		  readlines.cpp readlines.h \
 		  newfindent.cpp newfindent.h \
 		  findent_types.h \
-		  fortran.h \
-		  fixed.cpp fixed.h free.cpp free.h
-
+		  fortran.cpp fortran.h \
+		  fixed.cpp fixed.h free.cpp free.h \
+		  findentclass.cpp findentclass.h
 
 BUILT_SOURCES = parser.cpp parser.h lexer.cpp
 
