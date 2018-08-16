@@ -102,12 +102,14 @@ am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_findent_OBJECTS = findent.$(OBJEXT) mylexer.$(OBJEXT) \
 	myparser.$(OBJEXT) line_prep.$(OBJEXT) pre_analyzer.$(OBJEXT) \
-	debug.$(OBJEXT) functions.$(OBJEXT) vim_plugin.$(OBJEXT) \
-	gedit_plugin.$(OBJEXT) emacs_plugin.$(OBJEXT) \
-	readme_plugin.$(OBJEXT) flags.$(OBJEXT) usage.$(OBJEXT) \
-	fortranline.$(OBJEXT) free2free.$(OBJEXT) \
+	debug.$(OBJEXT) functions.$(OBJEXT) simpleostream.$(OBJEXT) \
+	vim_plugin.$(OBJEXT) gedit_plugin.$(OBJEXT) \
+	emacs_plugin.$(OBJEXT) readme_plugin.$(OBJEXT) flags.$(OBJEXT) \
+	usage.$(OBJEXT) fortranline.$(OBJEXT) free2free.$(OBJEXT) \
 	fixed2fixed.$(OBJEXT) fixed2free.$(OBJEXT) \
-	free2fixed.$(OBJEXT) findent_functions.$(OBJEXT)
+	free2fixed.$(OBJEXT) findent_functions.$(OBJEXT) \
+	readlines.$(OBJEXT) newfindent.$(OBJEXT) fixed.$(OBJEXT) \
+	free.$(OBJEXT)
 findent_OBJECTS = $(am_findent_OBJECTS)
 findent_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -330,7 +332,7 @@ findent_SOURCES = findent.cpp findent.h \
 		  line_prep.cpp pre_analyzer.cpp debug.cpp debug.h \
 		  functions.cpp functions.h \
 		  line_prep.h pre_analyzer.h version.h \
-		  simpleostream.h \
+		  simpleostream.h simpleostream.cpp \
 		  vim_plugin.cpp vim_plugin.h \
 		  gedit_plugin.cpp gedit_plugin.h \
 		  emacs_plugin.cpp emacs_plugin.h \
@@ -342,7 +344,11 @@ findent_SOURCES = findent.cpp findent.h \
 		  fixed2free.cpp fixed2free.h \
 		  free2fixed.cpp free2fixed.h \
 		  findent_functions.cpp findent_functions.h \
-		  findent_types.h
+		  readlines.cpp readlines.h \
+		  newfindent.cpp newfindent.h \
+		  findent_types.h \
+		  fortran.h \
+		  fixed.cpp fixed.h free.cpp free.h
 
 BUILT_SOURCES = parser.cpp parser.h lexer.cpp
 EXTRA_DIST = lexer.l parser.y tocpp.sh builtparser.cpp \
@@ -439,10 +445,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/emacs_plugin.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/findent.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/findent_functions.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fixed.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fixed2fixed.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fixed2free.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/flags.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fortranline.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/free.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/free2fixed.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/free2free.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/functions.Po@am__quote@
@@ -450,8 +458,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/line_prep.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mylexer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/myparser.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/newfindent.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pre_analyzer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readlines.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readme_plugin.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simpleostream.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/usage.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vim_plugin.Po@am__quote@
 
