@@ -56,7 +56,7 @@ class Flags
    int cont_indent;
    int contains_indent;
    int critical_indent;
-   int default_indent;
+   static int default_indent;
    int do_indent;
    int entry_indent;
    int enum_indent;

@@ -9,6 +9,8 @@
 
 #define optargcheck if (!optarg || strlen(optarg)==0) break;
 
+int Flags::default_indent;
+
 void Flags::set_defaults(void)
 {
    label_left_default  = 1;

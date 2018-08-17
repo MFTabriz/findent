@@ -102,7 +102,7 @@ am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_newfindent_OBJECTS = flags.$(OBJEXT) functions.$(OBJEXT) \
 	mylexer.$(OBJEXT) myparser.$(OBJEXT) fortranline.$(OBJEXT) \
-	simpleostream.$(OBJEXT) readlines.$(OBJEXT) \
+	simpleostream.$(OBJEXT) readlines.$(OBJEXT) docs.$(OBJEXT) \
 	newfindent.$(OBJEXT) fortran.$(OBJEXT) fixed.$(OBJEXT) \
 	free.$(OBJEXT) findentclass.$(OBJEXT)
 newfindent_OBJECTS = $(am_newfindent_OBJECTS)
@@ -348,6 +348,7 @@ newfindent_SOURCES = \
 		  fortranline.cpp fortranline.h \
 		  simpleostream.h simpleostream.cpp \
 		  readlines.cpp readlines.h \
+		  docs.cpp docs.h \
 		  newfindent.cpp newfindent.h \
 		  findent_types.h \
 		  fortran.cpp fortran.h \
@@ -445,6 +446,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/docs.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/findentclass.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fixed.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/flags.Po@am__quote@
@@ -782,6 +784,12 @@ gedit_plugin.o: gedit_external.inc gedit_plugin.inc gedit_plugin_py.inc \
 emacs_plugin.o: emacs_findent.inc emacs_help.inc
 
 readme_plugin.o: readme.inc
+
+docs.o:   \
+	vim_fortran.inc vim_findent.inc vim_help.inc \
+	   gedit_external.inc gedit_plugin.inc gedit_plugin_py.inc gedit_help.inc \
+           emacs_findent.inc emacs_help.inc \
+	   readme.inc
 
 vim_fortran.inc: $(VIMDIR)/fortran.vim $(TOCPP)
 	$(TOCPP) < $(VIMDIR)/fortran.vim > $@

@@ -77,12 +77,19 @@ findent.o: parser.h
 
 vim_plugin.o: vim_fortran.inc vim_findent.inc vim_help.inc
 
+
 gedit_plugin.o: gedit_external.inc gedit_plugin.inc gedit_plugin_py.inc \
    gedit_help.inc
 
 emacs_plugin.o: emacs_findent.inc emacs_help.inc
 
 readme_plugin.o: readme.inc
+
+docs.o:   \ 
+	vim_fortran.inc vim_findent.inc vim_help.inc \
+	   gedit_external.inc gedit_plugin.inc gedit_plugin_py.inc gedit_help.inc \
+           emacs_findent.inc emacs_help.inc \
+	   readme.inc
 
 TOCPP     = $(top_srcdir)/src/tocpp.sh
 VIMDIR    = $(top_srcdir)/vim
@@ -148,6 +155,7 @@ newfindent_SOURCES = \
 		  fortranline.cpp fortranline.h \
 		  simpleostream.h simpleostream.cpp \
 		  readlines.cpp readlines.h \
+		  docs.cpp docs.h \
 		  newfindent.cpp newfindent.h \
 		  findent_types.h \
 		  fortran.cpp fortran.h \
