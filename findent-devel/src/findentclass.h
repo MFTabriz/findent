@@ -7,12 +7,14 @@
 class Findent
 {
    public:
-      void init()
+      void init(Flags f)
       {
 	 cur_indent   = 0;
 	 start_indent = 0;
 	 nbseen       = 0;
 	 endline      = "\n";
+
+	 flags        = f;
       }
 
    protected:
