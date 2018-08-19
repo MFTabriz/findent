@@ -33,5 +33,6 @@ typedef std::deque<fortranline>       linebuffer_t;
 typedef std::deque<bool>              nbseen_store_t;
 typedef std::deque<struct propstruct> rprops_t;
 typedef std::deque<rprops_t>          rprops_store_t;
+typedef struct propstruct             prop_t;
 
 #endif

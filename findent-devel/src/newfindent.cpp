@@ -19,9 +19,8 @@ int main(int argc, char*argv[])
       return 0;
 
    Findent findent;
-   findent.init(flags);
+   return findent.run(flags);
 
-   std::cout << "aan het werk!" << std::endl;
    Fortran *a, *b;
    a = new Fixed();
    b = new Free();

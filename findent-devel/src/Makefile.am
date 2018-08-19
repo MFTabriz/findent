@@ -149,18 +149,22 @@ findent_SOURCES = findent.cpp findent.h \
 		  findent_functions.cpp findent_functions.h
 
 newfindent_SOURCES = \
-		  flags.cpp flags.h \
-		  functions.cpp functions.h \
-		  mylexer.cpp myparser.cpp lexer.h parser.h \
-		  fortranline.cpp fortranline.h \
-		  simpleostream.h simpleostream.cpp \
-		  readlines.cpp readlines.h \
 		  docs.cpp docs.h \
-		  newfindent.cpp newfindent.h \
 		  findent_types.h \
-		  fortran.cpp fortran.h \
+		  findentclass.cpp findentclass.h \
+		  findentrun.cpp findentrun.h \
 		  fixed.cpp fixed.h free.cpp free.h \
-		  findentclass.cpp findentclass.h
+		  flags.cpp flags.h \
+		  fortran.cpp fortran.h \
+		  fortranline.cpp fortranline.h \
+		  functions.cpp functions.h \
+		  lexer.h mylexer.cpp \
+		  newfindent.cpp newfindent.h \
+		  parser.h myparser.cpp \
+		  pre_analyzer.cpp pre_analyzer.h \
+		  readlines.cpp readlines.h \
+		  simpleostream.h simpleostream.cpp
+
 
 BUILT_SOURCES = parser.cpp parser.h lexer.cpp
 
