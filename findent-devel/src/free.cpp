@@ -2,15 +2,14 @@
 #include <string>
 #include <sstream>
 
-#include "debug.h"
-#include "findent_functions.h"
-#include "findent_types.h"
+#include "ndebug.h"
+#include "nfindent_types.h"
 #include "fixed.h"
 #include "free.h"
 #include "readlines.h"
 #include "simpleostream.h"
 
-void Free::build_statement(fortranline &line, bool &f_more, bool &pushback)
+void Free::build_statement(Fortranline &line, bool &f_more, bool &pushback)
 {
    //
    // adds line to curlines
@@ -98,7 +97,7 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
 	    mycout << endline;
 	 else
 	 {
-	    fixedlines->push_back(fortranline(""));
+	    fixedlines->push_back(Fortranline(""));
 	    os.str("");
 	 }
 	 lines.pop_front();
@@ -242,11 +241,11 @@ void Free::output_converted(lines_t &lines)
    lines_t fixedlines;
 
    output(lines, &fixedlines);
-   fortranline::g_format(FIXED);
+   Fortranline::g_format(FIXED);
    Fortran *f = new Fixed();
    f->output(fixedlines);
    delete f;
-   fortranline::g_format(FREE);
+   Fortranline::g_format(FREE);
 }   // end of output_converted
 
 std::string Free::rm_last_amp(const std::string &s)

@@ -1,8 +1,8 @@
 #include <iostream>
 #include "docs.h"
-#include "flags.h"
-#include "functions.h"
+#include "nflags.h"
 #include "version.h"
+#include "functions.h"
 
 bool Docs::print(int todo)
 {

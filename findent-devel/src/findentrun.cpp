@@ -1,18 +1,23 @@
 #include "findentclass.h"
+#include "free.h"
+#include "fixed.h"
+#include "fortran.h"
 
-int Findent::run(Flags &f)
+int Findent::run()
 {
-   init(f);
 
    handle_reading_from_tty();
+
+   rl = new Readlines;
+   rl->init();
 
    if (input_format == UNKNOWN)
       input_format = determine_fix_or_free();
 
-   fortranline::g_format(input_format);
+   Fortranline::g_format(input_format);
    if (flags.only_fix_free)
    {
-      std::cout << fortranline::g_format2txt() << std::endl;
+      std::cout << Fortranline::g_format2txt() << std::endl;
       return what_to_return();
    }
 
@@ -22,12 +27,20 @@ int Findent::run(Flags &f)
    if(output_format == 0)
       output_format = input_format;
 
+   Fortran *source;
+   switch (input_format)
+   {
+      case FREE: source = new Free(); break;
+      case FIXED: source = new Fixed(); break;
+   }
+
+   std::cout << "MIES" << source->get() << std::endl;
    init_indent();
 
    if (flags.last_usable_only)
    {
       mycout.setoutput(0);
-      //handle_last_usable_only();
+      source->handle_last_usable_only();
       return what_to_return();
    }
    return 0;

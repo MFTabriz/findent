@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#include "findent_types.h"
+#include "nfindent_types.h"
 #include "readlines.h"
 
 // linebuffer_t Readlines::curlinebuffer;
@@ -14,9 +14,9 @@
 // bool         Readlines::endline_set;
 
 
-fortranline Readlines::getnext(bool &eof, bool use_wb)
+Fortranline Readlines::getnext(bool &eof, bool use_wb)
 {
-   fortranline line;
+   Fortranline line;
    eof = 0;
    if (use_wb && !wizardbuffer.empty())
    {
@@ -81,7 +81,7 @@ void Readlines::handle_reading_from_tty()
    }
 }                // end of handle_reading_from_tty
 
-fortranline Readlines::mygetline(bool &eof)
+Fortranline Readlines::mygetline(bool &eof, bool buffer)
 {
    //
    // reads next line from cin.
@@ -103,13 +103,21 @@ fortranline Readlines::mygetline(bool &eof)
    lines_read ++;
 
    if (!eof && reading_from_tty)
+   {
       eof = (s == ".");
+      if (eof)
+	 curlinebuffer.push_back(Fortranline(s));
+   }
 
    s = handle_dos(s);
-   return fortranline(s);
+
+   if(buffer)
+      curlinebuffer.push_back(Fortranline(s));
+
+   return Fortranline(s);
 }              // end of mygetline
 
-int Readlines::guess_indent(fortranline line)
+int Readlines::guess_indent(Fortranline line)
 {
    //
    // count spaces at start of line, correct for tabs and & and label
