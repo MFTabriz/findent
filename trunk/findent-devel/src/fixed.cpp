@@ -3,14 +3,13 @@
 #include <string>
 
 #include "fixed.h"
-#include "debug.h"
-#include "findent_functions.h"
-#include "findent_types.h"
+#include "ndebug.h"
+#include "nfindent_types.h"
 #include "free.h"
 #include "readlines.h"
 #include "simpleostream.h"
 
-void Fixed::build_statement(fortranline &line, bool &f_more, bool &pushback)
+void Fixed::build_statement(Fortranline &line, bool &f_more, bool &pushback)
 {
    //
    // adds line to curlines
@@ -133,7 +132,7 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	    mycout << endline;
 	 else
 	 {
-	    freelines->push_back(fortranline(""));
+	    freelines->push_back(Fortranline(""));
 	    os.str("");
 	 }
 	 lines.pop_front();
@@ -316,11 +315,11 @@ void Fixed::output_converted(lines_t &lines)
    lines_t freelines;
 
    output(lines, &freelines);
-   fortranline::g_format(FREE);
+   Fortranline::g_format(FREE);
    Fortran *f = new Free();
    f->output(freelines);
    delete f;
-   fortranline::g_format(FIXED);
+   Fortranline::g_format(FIXED);
 }    // end of output_converted
 
 
@@ -342,10 +341,10 @@ bool Fixed::wizard()
    //      2  j=1,10
    //     #endif
    //       enddo
-   if (fortranline::g_format() == FREE)
+   if (Fortranline::g_format() == FREE)
       return 0;
 
-   fortranline line;
+   Fortranline line;
    bool eof;
 
    while(1)
