@@ -22,7 +22,6 @@ class Indent
       }
    protected:
 
-
       void        init_indent();
       void        push_indent(int p);
       std::string handle_dos(const std::string &s);

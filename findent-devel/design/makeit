@@ -1,0 +1,3 @@
+#!/bin/bash
+g++ -Wall -O0 findentclass.cpp free.cpp fortran.cpp newfindent.cpp || exit 1
+./a.out
