@@ -2,9 +2,10 @@
 
 #include "nfortranline.h"
 
-int  Fortranline::global_format;
-int  Fortranline::global_line_length;
-bool Fortranline::global_gnu_format;
+int global_format;
+int global_line_length;
+bool global_gnu_format;
+
 void Fortranline::print()
 {
    std::cout << "orig_line: ["      << orig_line      << "]" << std::endl;

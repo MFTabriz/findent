@@ -61,4 +61,5 @@ class debugostream
       }
 };
 
+extern debugostream ppp;
 #endif

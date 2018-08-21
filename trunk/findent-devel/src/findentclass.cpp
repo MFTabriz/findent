@@ -1,6 +1,8 @@
 #include "findentclass.h"
-#include <cstdio>
+#include "nfortranline.h"
+#include <stdio.h>
 #include <unistd.h>
+#include "ndebug.h"
 
 
 int Findent::determine_fix_or_free()
@@ -16,7 +18,7 @@ int Findent::determine_fix_or_free()
    while ( n < nmax)
    {
       n++;
-      line = rl->mygetline(eof,1);
+      line = mygetline(eof,1);
       if (eof)
       {
 	 //
@@ -131,4 +133,187 @@ int Findent::what_to_return()
       }
    return 0;
 }              // end of what_to_return
+
+void Findent::init_indent()
+{
+   //
+   // fills the indent-stack until indent 0
+   // if flags.all_indent <= 0: build indent_stack with a number of start_indent's
+   //
+   while(!indent.empty())
+      indent.pop_back();
+   int l=0;
+   if(flags.all_indent > 0)
+   {
+      for (l = start_indent%flags.all_indent; l<start_indent; l+=flags.all_indent)
+      {
+	 push_indent(l);
+      }
+   }
+   else
+   {
+      for (int i=0; i<100; i++)
+	 push_indent(start_indent);
+   }
+   push_indent(start_indent);
+
+}             // end of init_indent
+
+void Findent::push_indent(int p)
+{
+   indent.push_back(p);
+}
+
+std::string Findent::handle_dos(const std::string &s)
+{
+   //
+   // determine if the input is dos format:
+   // side effect: sets endline if not already been set
+   //
+   std::string sl;
+   sl = s;
+   if (!endline_set)
+   {
+      if (sl != "" && lastchar(sl) == '\r')
+      {
+	 endline = "\r\n";
+      }
+      endline_set = 1;
+   }
+   if (sl != "" && lastchar(sl) =='\r')
+      sl.erase(sl.length()-1);
+   return sl;
+}         // end of handle_dos
+
+int Findent::guess_indent(Fortranline line)
+{
+   //
+   // count spaces at start of line, correct for tabs and & and label
+   //
+   int si         = 0;
+   bool ready     = 0;
+   const int tabl = 8;
+
+   if (line.format() == FIXED)
+   {
+      std::string s = line.str();
+      si             = s.find_first_not_of(' ') -6;
+      if (si <0)
+	 si = 0;
+      return si;
+   }
+
+   std::string s = line.str();
+   for (unsigned int j=0; j<s.length(); j++)
+   {
+      switch (s[j])
+      {
+	 case ' ' : case '0' : case '1' : case '2' : case '3' : case '4' : 
+	 case '5' : case '6' : case '7' : case '8' : case '9' :
+	    si ++;
+	    break;
+	 case '&' :
+	    si++;
+	    ready = 1;
+	    break;
+	 case '\t' :
+	    si = (si/tabl)*tabl + tabl;
+	    break;
+	 default:
+	    ready = 1;
+	    break;
+      }
+      if(ready)
+	 break;
+   }
+   return si;
+}                // end of guess_indent
+
+Fortranline Findent::getnext(bool &eof, bool use_wb)
+{
+   Fortranline line;
+   eof = 0;
+   if (use_wb && !wizardbuffer.empty())
+   {
+      line = wizardbuffer.front();
+      wizardbuffer.pop_front();
+      if (reading_from_tty && line.str() == ".")
+	 eof = 1;
+   }
+   else if (!curlinebuffer.empty())
+   {
+      line = curlinebuffer.front();
+      curlinebuffer.pop_front();
+      num_lines++;
+      if (reading_from_tty && line.str() == ".")
+	 eof = 1;
+   }
+   else
+   {
+      line = mygetline(eof);
+      if (!eof)
+	 num_lines++;
+   }
+
+   //
+   // remove trailing white space
+   // FIXED: convert leading tab to space
+   //
+
+   line.clean();
+
+   if(!use_wb && !eof)
+      wizardbuffer.push_back(line);
+
+   if (!nbseen)
+   {
+      nbseen = !line.blank_or_comment() && (line.getpregentype() == 0);
+      if (flags.auto_firstindent && nbseen)
+      {
+	 start_indent = guess_indent(line);
+	 cur_indent   = start_indent;
+	 init_indent();
+	 indent_handled = 1;
+      }
+   }
+
+   return line;
+}
+
+Fortranline Findent::mygetline(bool &eof, bool buffer)
+{
+   //
+   // reads next line from cin.
+   // side effects:
+   //   end_of_file is set if endoffile condition is met
+   //   endline is set to \n or \r\n
+   //   lines_read is incremented
+   //
+
+   std::string s;
+
+   getline(std::cin,s);
+
+   //
+   // sometimes, files do not end with (cr)lf, hence the test for s=="":
+   //
+   eof = (std::cin.eof() && s == "");
+
+   lines_read ++;
+
+   if (!eof && reading_from_tty)
+   {
+      eof = (s == ".");
+      if (eof)
+	 curlinebuffer.push_back(Fortranline(s));
+   }
+
+   s = handle_dos(s);
+
+   if(buffer)
+      curlinebuffer.push_back(Fortranline(s));
+
+   return Fortranline(s);
+}              // end of mygetline
+
 

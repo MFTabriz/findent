@@ -100,12 +100,12 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_newfindent_OBJECTS = nline_prep.$(OBJEXT) npre_analyzer.$(OBJEXT) \
-	functions.$(OBJEXT) ndebug.$(OBJEXT) docs.$(OBJEXT) \
-	findentclass.$(OBJEXT) findentrun.$(OBJEXT) fixed.$(OBJEXT) \
-	free.$(OBJEXT) nflags.$(OBJEXT) fortran.$(OBJEXT) \
-	nfortranline.$(OBJEXT) indentclass.$(OBJEXT) mylexer.$(OBJEXT) \
-	newfindent.$(OBJEXT) myparser.$(OBJEXT) readlines.$(OBJEXT) \
+am_newfindent_OBJECTS = docs.$(OBJEXT) findentclass.$(OBJEXT) \
+	findentrun.$(OBJEXT) fixed.$(OBJEXT) fortran.$(OBJEXT) \
+	free.$(OBJEXT) functions.$(OBJEXT) mylexer.$(OBJEXT) \
+	ndebug.$(OBJEXT) newfindent.$(OBJEXT) nflags.$(OBJEXT) \
+	nfortranline.$(OBJEXT) nline_prep.$(OBJEXT) \
+	npre_analyzer.$(OBJEXT) myparser.$(OBJEXT) \
 	simpleostream.$(OBJEXT)
 newfindent_OBJECTS = $(am_newfindent_OBJECTS)
 newfindent_LDADD = $(LDADD)
@@ -344,23 +344,22 @@ findent_SOURCES = findent.cpp findent.h \
 		  findent_functions.cpp findent_functions.h
 
 newfindent_SOURCES = \
-		  nline_prep.cpp nline_prep.h \
-		  npre_analyzer.cpp npre_analyzer.h \
-		  functions.cpp functions.h \
-		  ndebug.cpp ndebug.h \
 		  docs.cpp docs.h \
-		  nfindent_types.h \
 		  findentclass.cpp findentclass.h \
 		  findentrun.cpp findentrun.h \
-		  fixed.cpp fixed.h free.cpp free.h \
-		  nflags.cpp nflags.h \
+		  fixed.cpp fixed.h \
 		  fortran.cpp fortran.h \
-		  nfortranline.cpp nfortranline.h \
-		  indentclass.cpp indentclass.h \
+		  free.cpp free.h \
+		  functions.cpp functions.h \
 		  lexer.h mylexer.cpp \
+		  ndebug.cpp ndebug.h \
 		  newfindent.cpp newfindent.h \
+		  nfindent_types.h \
+		  nflags.cpp nflags.h \
+		  nfortranline.cpp nfortranline.h \
+		  nline_prep.cpp nline_prep.h \
+		  npre_analyzer.cpp npre_analyzer.h \
 		  parser.h myparser.cpp \
-		  readlines.cpp readlines.h \
 		  simpleostream.h simpleostream.cpp
 
 BUILT_SOURCES = parser.cpp parser.h lexer.cpp
@@ -461,7 +460,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fortran.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/free.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/functions.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/indentclass.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mylexer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/myparser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ndebug.Po@am__quote@
@@ -470,7 +468,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nfortranline.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nline_prep.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/npre_analyzer.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/readlines.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simpleostream.Po@am__quote@
 
 .cpp.o:
