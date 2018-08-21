@@ -169,7 +169,9 @@ void Fortran::get_full_statement()
 
    Fortranline curline;
 
-   bool my_end;  // g++ forbids getnext(end_of_file) ???
+   bool my_end;  // g++ forbids rl->getnext(end_of_file) ???
+//                  error: invalid initialization of non-const reference of type ‘bool&’ from an rvalue of type ‘bool’
+//
 
    if (first_call)
    {
