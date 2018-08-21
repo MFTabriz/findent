@@ -1,12 +1,13 @@
 #ifndef NFORTRANLINE_H
 #define NFORTRANLINE_H
 
-#include <iostream>
-#include <string>
-
-#include "parser.h"
-#include "lexer.h"
 #include "functions.h"
+#include "lexer.h"
+#include "parser.h"
+
+extern int global_format;
+extern int global_line_length;
+extern bool global_gnu_format;
 
 class Fortranline
 {
@@ -24,19 +25,14 @@ class Fortranline
    char firstchar_cache;    bool firstchar_cached;
    int scanfixpre_cache;    bool scanfixpre_cached;
 
-
-   static int global_format, global_line_length;
-   static bool global_gnu_format;
-
    int  local_format;
    bool local_gnu_format;
    bool is_clean;
 
-
    void init()
    {
-      local_format        = global_format;
-      local_gnu_format    = global_gnu_format;
+      local_format      = global_format;
+      local_gnu_format  = global_gnu_format;
       ltrim_cached      = 0;
       trim_cached       = 0;
       firstchar_cached  = 0;
@@ -76,7 +72,7 @@ class Fortranline
 
    static void g_format(const int what)
    {
-      global_format = what;
+      global_format=what;
    }
    static int g_format()
    {
@@ -84,7 +80,7 @@ class Fortranline
    }
    static void line_length(const int what)
    {
-      global_line_length = what;
+      global_line_length=what;
    }
    static int line_length()
    {
@@ -92,7 +88,7 @@ class Fortranline
    }
    static void gnu_format(bool what)
    {
-      global_gnu_format = what;
+      global_gnu_format=what;
    }
    static bool gnu_format()
    {
@@ -341,4 +337,6 @@ class Fortranline
 
 };
 std::ostream& operator <<(std::ostream &os,Fortranline &obj);
+
+
 #endif

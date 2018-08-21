@@ -2,14 +2,12 @@
 #include "free.h"
 #include "fixed.h"
 #include "fortran.h"
+#include "ndebug.h"
 
 int Findent::run()
 {
 
    handle_reading_from_tty();
-
-   rl = new Readlines;
-   rl->init();
 
    if (input_format == UNKNOWN)
       input_format = determine_fix_or_free();
@@ -30,19 +28,20 @@ int Findent::run()
    Fortran *source;
    switch (input_format)
    {
-      case FREE: source = new Free(); break;
-      case FIXED: source = new Fixed(); break;
+      case FREE: source = new Free(this); break;
+      case FIXED: source = new Fixed(this); break;
    }
 
-   std::cout << "MIES" << source->get() << std::endl;
    init_indent();
 
    if (flags.last_usable_only)
    {
       mycout.setoutput(0);
       source->handle_last_usable_only();
+      delete source;
       return what_to_return();
    }
+   delete source;
    return 0;
 
 }

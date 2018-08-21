@@ -22,12 +22,12 @@ bool Fortran::output_pre(lines_t &lines, lines_t *outlines)
 	 handle_pre_light(lines.front(),p_more);
 	 if (lines.front().pre())
 	    if (to_mycout)
-	       mycout << lines.front().trim() << endline;
+	       mycout << lines.front().trim() << fi->get_endline();
 	    else
 	       outlines->push_back(lines.front().trim());
 	 else
 	    if (to_mycout)
-	       mycout << lines.front().str() << endline;
+	       mycout << lines.front().str() << fi->get_endline();
 	    else
 	       outlines->push_back(lines.front().str());
 	 lines.pop_front();
@@ -74,10 +74,10 @@ void Fortran::handle_last_usable_only()
    std::deque<int> prevs;       // to store prev-usable lines
    pre_analyzer preb;
 
-   init_indent();
+   fi->init_indent();
    while(1)
    {
-      int prev         = num_lines;
+      int prev         = fi->get_num_lines();
       bool usable      = 0;
       get_full_statement();
       line_prep p(full_statement);
@@ -98,9 +98,9 @@ void Fortran::handle_last_usable_only()
       }
       if (usable)
 	 usable_line = prev+1;
-      if (end_of_file)
+      if (fi->get_end_of_file())
       {
-	 std::cout << usable_line << endline;
+	 std::cout << usable_line << fi->get_endline();
 	 return;
       }
    }
@@ -155,7 +155,7 @@ void Fortran::get_full_statement()
    };
 
    full_statement = "";
-   indent_handled = 0;
+   fi->set_indent_handled(0);
 
    //
    // 'pushback' and 'first_call' must be static in this version,
@@ -170,12 +170,12 @@ void Fortran::get_full_statement()
    Fortranline curline;
 
    bool my_end;  // g++ forbids rl->getnext(end_of_file) ???
-//                  error: invalid initialization of non-const reference of type ‘bool&’ from an rvalue of type ‘bool’
-//
+   //                  error: invalid initialization of non-const reference of type ‘bool&’ from an rvalue of type ‘bool’
+   //
 
    if (first_call)
    {
-      curline = rl->getnext(my_end);
+      curline = fi->getnext(my_end);
       first_call = 0;
    }
 
@@ -219,8 +219,8 @@ void Fortran::get_full_statement()
 	 case in_ffix:
 	    curlines.push_back(curline);
 	    full_statement = rtrim(remove_trailing_comment(curline.rest()));
-	    curline = rl->getnext(my_end);
-	    end_of_file = my_end;
+	    curline = fi->getnext(my_end);
+	    fi->set_end_of_file(my_end);
 	    state = start;
 	    return;
 
@@ -230,7 +230,7 @@ void Fortran::get_full_statement()
 	    build_statement(curline, f_more, pushback);
 	    if (f_more)
 	    {
-	       curline = rl->getnext(my_end); if (my_end) { state = end_fortran; break; }
+	       curline = fi->getnext(my_end); if (my_end) { state = end_fortran; break; }
 	       pretype = curline.getpregentype();
 	       if (pretype == CPP || pretype == COCO)
 	       {
@@ -241,12 +241,12 @@ void Fortran::get_full_statement()
 		     curlines.push_back(curline);
 		     if(p_more)
 		     {
-			curline = rl->getnext(my_end); if (my_end) { state = end_fortran; break; }
+			curline = fi->getnext(my_end); if (my_end) { state = end_fortran; break; }
 		     }
 		     else
 			break;
 		  }
-		  curline = rl->getnext(my_end);
+		  curline = fi->getnext(my_end);
 	       }
 	       state = in_fortran;
 	       break;
@@ -255,14 +255,14 @@ void Fortran::get_full_statement()
 	    //
 	    // need state in_fortran_1 to get correct result from last_usable
 	    //
-	    end_of_file = my_end;
+	    fi->set_end_of_file(my_end);
 	    return;
 
 	 case in_fortran_1:
 	    if (!pushback)                     // here is why pushback has to be static
-	       curline = rl->getnext(my_end);
+	       curline = fi->getnext(my_end);
 	    state = start;
-	    end_of_file = my_end;
+	    fi->set_end_of_file(my_end);
 	    break;
 
 	 case in_pre:
@@ -273,26 +273,26 @@ void Fortran::get_full_statement()
 	       curlines.push_back(curline);
 	       if(p_more)
 	       {
-		  curline = rl->getnext(my_end); if (my_end) { state = end_pre; break; }
+		  curline = fi->getnext(my_end); if (my_end) { state = end_pre; break; }
 	       }
 	       else
 		  break;
 	    }
-	    curline = rl->getnext(my_end);
+	    curline = fi->getnext(my_end);
 	    state = start;
-	    end_of_file = my_end;
+	    fi->set_end_of_file(my_end);
 	    break;
 
 	 case end_start:
 	 case end_fortran:
 	 case end_pre:
 	    state = start;
-	    end_of_file = my_end;
+	    fi->set_end_of_file(my_end);
 	    return;
       }
-      end_of_file = my_end;
+      fi->set_end_of_file(my_end);
    }
-   end_of_file = my_end;
+   fi->set_end_of_file(my_end);
 }           // end of get_full_statement
 
 bool Fortran::is_findentfix(Fortranline &line)

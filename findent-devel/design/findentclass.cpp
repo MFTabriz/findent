@@ -2,6 +2,7 @@
 #include "findentclass.h"
 #include "fortran.h"
 #include "free.h"
+#include "fixed.h"
 #include "nfortranline.h"
 
 Fortranline Findent::mygetline()
@@ -15,7 +16,7 @@ Fortranline Findent::mygetline()
 int Findent::determine_fix_or_free()
 {
    mygetline();
-   return 1;
+   return 2;
 }
 
 void Findent::run()
@@ -24,6 +25,8 @@ void Findent::run()
    Fortran *source;
    if (ff == 1)
       source = new Free(this);
+   else
+      source = new Fixed(this);
    std::cout << "RUN" << std::endl;
    std::cout << ff << std::endl;
    std::cout << "source curlines:" << source->getcurlines() << std::endl;

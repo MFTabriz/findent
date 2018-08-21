@@ -16,16 +16,20 @@ int main(int argc, char*argv[])
    if (docs.print(todo))
       return 0;
 
-   Findent findent = Findent(flags);
-   findent.set(123);
+   Findent *findent ;
+   findent = new Findent(flags);
+   findent->set(123);
 
-   Fortran *a, *b;
-   a = new Fixed();
-   b = new Free();
+   std::cout << "MIES"<< findent->get() << std::endl;
+   Fortran* a;
+   Fortran *b;
+   a = new Fixed(findent);
+   b = new Free(findent);
 
    std::cout << "AAP"<< a->get() << std::endl;
    std::cout << "NOOT"<< b->get() << std::endl;
+   findent->run();
    delete b;
    delete a;
-   return findent.run();
+   delete findent;
 }

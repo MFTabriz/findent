@@ -1,3 +1,16 @@
+/*
+#include <deque>
+#include <string>
+#include <iostream>
+#include "parser.h"
+#include "nfindent_types.h"
+#include "nflags.h"
+#include "prop.h"
+#include "findentclass.h"
+#include "lexer.h"
+#include "nfortranline.h"
+#include "ndebug.h"
+*/
 #include "nline_prep.h"
 #include "ndebug.h"
 

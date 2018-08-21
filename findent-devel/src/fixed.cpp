@@ -6,7 +6,6 @@
 #include "ndebug.h"
 #include "nfindent_types.h"
 #include "free.h"
-#include "readlines.h"
 #include "simpleostream.h"
 
 void Fixed::build_statement(Fortranline &line, bool &f_more, bool &pushback)
@@ -112,6 +111,7 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 
    std::ostringstream os;
    size_t cindex = 0;
+   std::string endline = fi->get_endline();
 
    while(!lines.empty())
    {
@@ -150,7 +150,7 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	       //
 	    {
 	       if(to_mycout)
-		  mycout << blanks(M(std::max(cur_indent+6,1)));
+		  mycout << blanks(M(std::max(fi->get_cur_indent()+6,1)));
 	       else
 		  os << blanks(1);
 	    }
@@ -207,9 +207,9 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	 {
 	    const std::string cc = "123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-	    if (flags.conchar != ' ')
+	    if (fi->get_flags()->conchar != ' ')
 	    {
-	       if (flags.conchar == '0')
+	       if (fi->get_flags()->conchar == '0')
 	       {
 		  s.at(5) = cc[cindex];
 		  cindex++;
@@ -217,7 +217,7 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 		     cindex = 0;
 	       }
 	       else
-		  s.at(5) = flags.conchar;
+		  s.at(5) = fi->get_flags()->conchar;
 	    }
 	 }
 	 //
@@ -257,7 +257,7 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	 {
 	    case ' ' :   // no dangling strings, output with indent
 	       if(to_mycout)
-		  mycout << blanks(M(std::max(adjust_indent+cur_indent,0))) 
+		  mycout << blanks(M(std::max(adjust_indent+fi->get_cur_indent(),0))) 
 		     << trim(s.substr(6));
 	       else
 		  os << trim(s.substr(6));
@@ -316,7 +316,7 @@ void Fixed::output_converted(lines_t &lines)
 
    output(lines, &freelines);
    Fortranline::g_format(FREE);
-   Fortran *f = new Free();
+   Fortran *f = new Free(fi);
    f->output(freelines);
    delete f;
    Fortranline::g_format(FIXED);
@@ -341,6 +341,7 @@ bool Fixed::wizard()
    //      2  j=1,10
    //     #endif
    //       enddo
+
    if (Fortranline::g_format() == FREE)
       return 0;
 
@@ -349,7 +350,7 @@ bool Fixed::wizard()
 
    while(1)
    {
-      line = readlines.getnext(eof,0);
+      line = fi->getnext(eof,0);
       if (eof)
 	 return 0;
 
@@ -361,7 +362,7 @@ bool Fixed::wizard()
 	    handle_pre_light(line,p_more);
 	    if (p_more)
 	    {
-	       line = readlines.getnext(eof,0);
+	       line = fi->getnext(eof,0);
 	       if (eof)
 		  return 0;
 	    }
