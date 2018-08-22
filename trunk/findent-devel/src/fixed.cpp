@@ -111,7 +111,6 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 
    std::ostringstream os;
    size_t cindex = 0;
-   std::string endline = fi->get_endline();
 
    while(!lines.empty())
    {
@@ -129,7 +128,7 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	 // a completely blank line, that is simple:
 	 //
 	 if(to_mycout)
-	    mycout << endline;
+	    mycout << fi->endline;
 	 else
 	 {
 	    freelines->push_back(Fortranline(""));
@@ -150,13 +149,13 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	       //
 	    {
 	       if(to_mycout)
-		  mycout << blanks(M(std::max(fi->get_cur_indent()+6,1)));
+		  mycout << blanks(M(std::max(fi->cur_indent+6,1)));
 	       else
 		  os << blanks(1);
 	    }
 	 }
 	 if(to_mycout)
-	    mycout << lines.front().trim() << endline;
+	    mycout << lines.front().trim() << fi->endline;
 	 else
 	 {
 	    int l = 1;
@@ -188,7 +187,7 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	 // garbage in, garbage out
 	 //
 	 if(to_mycout)
-	    mycout << lines.front().rtrim() << endline;
+	    mycout << lines.front().rtrim() << fi->endline;
 	 else
 	 {
 	    os << lines.front().rtrim();
@@ -207,9 +206,9 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	 {
 	    const std::string cc = "123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-	    if (fi->get_flags()->conchar != ' ')
+	    if (fi->flags.conchar != ' ')
 	    {
-	       if (fi->get_flags()->conchar == '0')
+	       if (fi->flags.conchar == '0')
 	       {
 		  s.at(5) = cc[cindex];
 		  cindex++;
@@ -217,7 +216,7 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 		     cindex = 0;
 	       }
 	       else
-		  s.at(5) = fi->get_flags()->conchar;
+		  s.at(5) = fi->flags.conchar;
 	    }
 	 }
 	 //
@@ -257,7 +256,7 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	 {
 	    case ' ' :   // no dangling strings, output with indent
 	       if(to_mycout)
-		  mycout << blanks(M(std::max(adjust_indent+fi->get_cur_indent(),0))) 
+		  mycout << blanks(M(std::max(adjust_indent+fi->cur_indent,0))) 
 		     << trim(s.substr(6));
 	       else
 		  os << trim(s.substr(6));
@@ -274,7 +273,7 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	 //
 	 prevquote = fixedmissingquote(prevquote + s);
 	 if(to_mycout)
-	    mycout << endline;
+	    mycout << fi->endline;
 	 else
 	 {
 	    char c;
@@ -296,7 +295,7 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
       // output a line that does not fulfill above conditions
       //
       if(to_mycout)
-	 mycout << s << endline;
+	 mycout << s << fi->endline;
       else
       {
 	 os << s;

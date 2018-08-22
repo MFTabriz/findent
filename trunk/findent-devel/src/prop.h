@@ -1,6 +1,7 @@
 #ifndef PROP_H
 #define PROP_H
 
+#include <deque>
 #include <string>
 
 struct propstruct
