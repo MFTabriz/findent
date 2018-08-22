@@ -358,7 +358,7 @@ bool Fixed::wizard()
 	 bool p_more = 0;
 	 while(1)
 	 {
-	    handle_pre_light(line,p_more);
+	    fi->handle_pre_light(line,p_more);
 	    if (p_more)
 	    {
 	       line = fi->getnext(eof,0);

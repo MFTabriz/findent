@@ -65,8 +65,8 @@ if MAKEMAN
 
 man1_MANS = findent.1
 
-findent.1: newfindent
-	: | ./newfindent -H > $@
+findent.1: findent
+	: | ./findent -H > $@
 
 #findent.1:
 #	touch $@
@@ -127,9 +127,9 @@ emacs_help.inc: $(EMACSDIR)/README $(TOCPP)
 readme.inc: $(READMEDIR)/README $(TOCPP)
 	$(TOCPP) < $(READMEDIR)/README > $@
 
-bin_PROGRAMS    = newfindent
+bin_PROGRAMS    = findent
 
-findent_SOURCES = findent.cpp findent.h \
+oldfindent_SOURCES = findent.cpp findent.h \
 		  mylexer.cpp myparser.cpp lexer.h parser.h \
 		  line_prep.cpp pre_analyzer.cpp debug.cpp debug.h \
 		  functions.cpp functions.h \
@@ -148,7 +148,7 @@ findent_SOURCES = findent.cpp findent.h \
 		  findent_types.h \
 		  findent_functions.cpp findent_functions.h
 
-newfindent_SOURCES = \
+findent_SOURCES = \
 		  docs.cpp docs.h \
 		  findentclass.cpp findentclass.h \
 		  findentrun.cpp findentrun.h \
@@ -166,6 +166,7 @@ newfindent_SOURCES = \
 		  nline_prep.cpp nline_prep.h \
 		  npre_analyzer.cpp npre_analyzer.h \
 		  parser.h myparser.cpp \
+		  prop.cpp prop.h \
 		  simpleostream.h simpleostream.cpp
 
 

@@ -3,6 +3,13 @@
 #include "nline_prep.h"
 
 
+#define Cur_indent   fi->cur_indent
+#define FLAGS        fi->flags
+#define Endline      fi->endline
+#define End_of_file  fi->end_of_file
+#define Getnext      fi->getnext
+#define Curline      (*curline)
+
 bool Fortran::output_pre(lines_t &lines, lines_t *outlines)
 {
    //
@@ -20,15 +27,15 @@ bool Fortran::output_pre(lines_t &lines, lines_t *outlines)
       bool p_more = 0;
       while(1)
       {
-	 handle_pre_light(lines.front(),p_more);
+	 fi->handle_pre_light(lines.front(),p_more);
 	 if (lines.front().pre())
 	    if (to_mycout)
-	       mycout << lines.front().trim() << fi->endline;
+	       mycout << lines.front().trim() << Endline;
 	    else
 	       outlines->push_back(F(lines.front().trim()));
 	 else
 	    if (to_mycout)
-	       mycout << lines.front().str() << fi->endline;
+	       mycout << lines.front().str() << Endline;
 	    else
 	       outlines->push_back(F(lines.front().str()));
 	 lines.pop_front();
@@ -40,28 +47,6 @@ bool Fortran::output_pre(lines_t &lines, lines_t *outlines)
    else
       return 0;
 }     // end of output_pre
-
-void Fortran::handle_pre_light(Fortranline &line, bool &p_more)
-{
-   //
-   // handles preprocessor lines and their continuations:
-   //
-   // line (input):   line to handle
-   // p    (inout):   input:  type of line: CPP or COCO. 
-   //                 output: if no continuation is expected, p = 0
-   // p_more (output):  true if a continuation is expected
-   //
-   static int pregentype;
-
-   if (!p_more)   // this is the first line of a preprocessor sequence
-      pregentype = line.getpregentype();
-
-   if(pregentype == COCO)
-      p_more = (line.lastchar() == '&');
-   else
-      p_more = (line.lastchar() == '\\');
-
-}         // end of handle_pre_light
 
 
 void Fortran::handle_last_usable_only()
@@ -99,9 +84,9 @@ void Fortran::handle_last_usable_only()
       }
       if (usable)
 	 usable_line = prev+1;
-      if (fi->end_of_file)
+      if (End_of_file)
       {
-	 std::cout << usable_line << fi->endline;
+	 std::cout << usable_line << Endline;
 	 return;
       }
    }
@@ -168,12 +153,11 @@ void Fortran::get_full_statement()
    static bool pushback;
    static bool first_call = 1;
 
-   Fortranline curline(gl);
 
 
    if (first_call)
    {
-      curline = fi->getnext(fi->end_of_file);
+      Curline = Getnext(End_of_file);
       first_call = 0;
    }
 
@@ -189,23 +173,24 @@ void Fortran::get_full_statement()
       switch(state)
       {
 	 case start:
+	    ppp<<"START:"<<Curline<<endchar;
 	    if (fs_store.empty())
 	       full_statement = "";
 	    else
 	       full_statement = fs_store.back();
 
-	    if (fi->end_of_file) 
+	    if (End_of_file) 
 	    {
 	       state = end_start;
 	       break;
 	    }
-	    pretype = curline.getpregentype();
+	    pretype = Curline.getpregentype();
 	    if(pretype == CPP || pretype == COCO)
 	    {
 	       state = in_pre;
 	       break;
 	    }
-	    if (is_findentfix(curline))
+	    if (is_findentfix(Curline))
 	    {
 	       state = in_ffix;
 	       break;
@@ -215,35 +200,36 @@ void Fortran::get_full_statement()
 	    break;
 
 	 case in_ffix:
-	    curlines.push_back(curline);
-	    full_statement = rtrim(remove_trailing_comment(curline.rest()));
-	    curline = fi->getnext(fi->end_of_file);
+	    curlines.push_back(Curline);
+	    full_statement = rtrim(remove_trailing_comment(Curline.rest()));
+	    Curline = Getnext(End_of_file);
+	    ppp<<"in_FFIX:"<<full_statement<<Curline<<endchar;
 	    state = start;
 	    return;
 
 	 case in_fortran:
-	    if(fi->end_of_file) { state = end_fortran; break; }
+	    if(End_of_file) { state = end_fortran; break; }
 
-	    build_statement(curline, f_more, pushback);
+	    build_statement(Curline, f_more, pushback);
 	    if (f_more)
 	    {
-	       curline = fi->getnext(fi->end_of_file); if (fi->end_of_file) { state = end_fortran; break; }
-	       pretype = curline.getpregentype();
+	       Curline = Getnext(End_of_file); if (End_of_file) { state = end_fortran; break; }
+	       pretype = Curline.getpregentype();
 	       if (pretype == CPP || pretype == COCO)
 	       {
 		  p_more = 0;
 		  while (1)
 		  {
-		     handle_pre(curline,f_more,p_more);
-		     curlines.push_back(curline);
+		     handle_pre(Curline,f_more,p_more);
+		     curlines.push_back(Curline);
 		     if(p_more)
 		     {
-			curline = fi->getnext(fi->end_of_file); if (fi->end_of_file) { state = end_fortran; break; }
+			Curline = Getnext(End_of_file); if (End_of_file) { state = end_fortran; break; }
 		     }
 		     else
 			break;
 		  }
-		  curline = fi->getnext(fi->end_of_file);
+		  Curline = Getnext(End_of_file);
 	       }
 	       state = in_fortran;
 	       break;
@@ -256,7 +242,7 @@ void Fortran::get_full_statement()
 
 	 case in_fortran_1:
 	    if (!pushback)                     // here is why pushback has to be static
-	       curline = fi->getnext(fi->end_of_file);
+	       Curline = Getnext(End_of_file);
 	    state = start;
 	    break;
 
@@ -264,16 +250,16 @@ void Fortran::get_full_statement()
 	    p_more = 0;
 	    while(1)
 	    {
-	       handle_pre(curline,f_more,p_more);
-	       curlines.push_back(curline);
+	       handle_pre(Curline,f_more,p_more);
+	       curlines.push_back(Curline);
 	       if(p_more)
 	       {
-		  curline = fi->getnext(fi->end_of_file); if (fi->end_of_file) { state = end_pre; break; }
+		  Curline = Getnext(End_of_file); if (End_of_file) { state = end_pre; break; }
 	       }
 	       else
 		  break;
 	    }
-	    curline = fi->getnext(fi->end_of_file);
+	    Curline = Getnext(End_of_file);
 	    state = start;
 	    break;
 
@@ -385,3 +371,330 @@ void Fortran::handle_pre(Fortranline &line, const bool f_more, bool &p_more)
       p_more = 0;
 
 }       // end of handle_pre
+
+void Fortran::indent_and_output()
+{
+   std::string rest = full_statement;
+   bool first_time  = 1;
+   fi->indent_handled   = 0;
+   while(1)
+   {
+      line_prep p(rest);
+      propstruct props = parseline(p); 
+      labellength = props.label.size();
+      if (labellength > 0)
+	 //
+	 // if there was a previous labeled do, handle it:
+	 //
+      {
+	 int ilabel = string2number<int>(props.label);
+	 while ( top_dolabel() == ilabel )
+	 {
+	    pop_indent();
+	    pop_dolabel();
+	    Cur_indent = top_indent();
+	    fi->indent_handled = 1;
+	 }
+      }
+      //
+      // if the previous non-blank line was PROCEDURE (module procedure)
+      // then determine if this was a procedure with content
+      // if so: take delayed action with respect to indenting
+      //
+      if (prev_props.kind == PROCEDURE)
+      {
+	 switch (props.kind)
+	 {
+	    case ASSIGNMENT:
+	    case UNCLASSIFIED:
+	    case BLOCK:
+	    case CONTAINS:
+	    case CRITICAL:
+	    case DO:
+	    case END:
+	    case ENDPROCEDURE:
+	    case ENTRY:
+	    case ENUM:
+	    case FORALL:
+	    case IF:
+	    case SELECTCASE:
+	    case SELECTTYPE:
+	    case TYPE:
+	    case WHERE:
+	       Cur_indent = top_indent();
+	       push_indent(Cur_indent + FLAGS.routine_indent);
+	       empty_dolabels();
+	       push_rprops(prev_props);
+	       break;
+	    default:
+	       break;
+	 }
+      }
+      Cur_indent = top_indent();
+      refactor_end_found = 0;
+      //
+      // for every entity that is eligible for refacoring it's end
+      // e.g. subroutine
+      // we will push props on the rprops stack
+      // for every corresponding end-entity (e.g. endsubroutine) we will
+      // pop the rprops stack
+      // 
+      switch(props.kind)
+      {
+	 case SUBROUTINE:
+	 case FUNCTION:
+	 case PROGRAM:
+	 case BLOCKDATA:
+	    Cur_indent = top_indent();
+	    push_indent(Cur_indent + FLAGS.routine_indent);
+	    empty_dolabels();
+	    push_rprops(props);
+	    break;
+	 case MODULE:
+	 case SUBMODULE:
+	    Cur_indent = top_indent();
+	    push_indent(Cur_indent + FLAGS.module_indent);
+	    empty_dolabels();
+	    push_rprops(props);
+	    break;
+	 case BLOCK:
+	    Cur_indent = top_indent();
+	    push_indent(Cur_indent + FLAGS.block_indent);
+	    break;
+	 case CRITICAL:
+	    Cur_indent = top_indent();
+	    push_indent(Cur_indent + FLAGS.critical_indent);
+	    break;
+	 case ENUM:
+	    Cur_indent = top_indent();
+	    push_indent(Cur_indent + FLAGS.enum_indent);
+	    empty_dolabels();
+	    break;
+	 case ABSTRACTINTERFACE:
+	 case INTERFACE:
+	    Cur_indent = top_indent();
+	    push_indent(Cur_indent + FLAGS.interface_indent);
+	    empty_dolabels();
+	    break;
+	 case DO:
+	    Cur_indent = top_indent();
+	    push_indent(Cur_indent + FLAGS.do_indent);
+	    if (props.dolabel != "")
+	       push_dolabel(string2number<int>(props.dolabel));
+	    break;
+	 case SELECTCASE:
+	 case SELECTTYPE:
+	    Cur_indent = top_indent();
+	    push_indent(Cur_indent + FLAGS.select_indent);
+	    break;
+	 case CASE:
+	 case CASEDEFAULT:
+	 case CLASSDEFAULT:
+	 case CLASSIS:
+	 case TYPEIS:
+	    Cur_indent -= FLAGS.case_indent;
+	    break;
+	 case END:
+	 case ENDBLOCKDATA:
+	 case ENDFUNCTION:
+	 case ENDMODULE:
+	 case ENDPROCEDURE:
+	 case ENDPROGRAM:
+	 case ENDSUBROUTINE:
+	    refactor_end_found = 1;
+	    if (!fi->indent_handled)
+	       Cur_indent = pop_indent();
+	    cur_rprop = top_rprops();
+	    pop_rprops();
+	    break;
+	 case ENDASSOCIATE:
+	 case ENDBLOCK:
+	 case ENDCRITICAL:
+	 case ENDDO:
+	 case ENDENUM:
+	 case ENDFORALL:
+	 case ENDIF:
+	 case ENDINTERFACE:
+	 case ENDSELECT:
+	 case ENDSUBMODULE:
+	 case ENDTYPE:
+	 case ENDWHERE:
+	    if (!fi->indent_handled)
+	       Cur_indent = pop_indent();
+	    break;
+	 case PROCEDURE:  // in fact: moduleprocedure
+	    //
+	    // depending on what follows this will be 
+	    // recognized as a module procedure with content
+	    // or only a moduleprocedure specification
+	    //
+	    break;
+	 case CONTAINS:
+	    if (FLAGS.indent_contain)
+	       Cur_indent -= FLAGS.contains_indent;
+	    else
+	    {
+	       Cur_indent = fi->start_indent;
+	       pop_indent();
+	       push_indent(Cur_indent);
+	    }
+	    break;
+	 case IF:
+	    Cur_indent = top_indent();
+	    push_indent(Cur_indent + FLAGS.if_indent);
+	    break;
+	 case ELSE:
+	    Cur_indent -= FLAGS.if_indent;
+	    break;
+	 case ELSEIF:
+	    Cur_indent -= FLAGS.if_indent;
+	    break;
+	 case ELSEWHERE:
+	    Cur_indent -= FLAGS.where_indent;
+	    break;
+	 case ENTRY:
+	    Cur_indent -= FLAGS.entry_indent;
+	    break;
+	 case WHERE:
+	    Cur_indent = top_indent();
+	    push_indent(Cur_indent + FLAGS.where_indent);
+	    break;
+	 case ASSOCIATE:
+	    Cur_indent = top_indent();
+	    push_indent(Cur_indent + FLAGS.associate_indent);
+	    break;
+	 case TYPE:
+	    Cur_indent = top_indent();
+	    push_indent(Cur_indent + FLAGS.type_indent);
+	    break;
+	 case FORALL:
+	    Cur_indent = top_indent();
+	    push_indent(Cur_indent + FLAGS.forall_indent);
+	    break;
+	 default:
+	    Cur_indent = top_indent();
+      }
+      switch(props.kind)
+      {
+	 case BLANK:
+	    break;
+	 default:
+	    prev_props = props;
+      }
+      if(first_time)  // check to handle multi-statement line like x=1;y=3
+      {
+	 output_line();
+	 first_time = 0;
+      }
+      rest = p.get_line_rest();
+      if (rest == "")
+	 break;
+   }
+}               // end of indent_and_output
+
+void Fortran::output_line()
+{
+   if (curlines.empty())
+      return;
+
+   mycout.reset();
+
+   handle_refactor();
+
+   if (!FLAGS.apply_indent)
+   {
+      //
+      // no indentation requested:
+      //
+      while (! curlines.empty())
+      {
+	 mycout << curlines.front().str() << Endline;
+	 curlines.pop_front();
+      }
+      return;
+   }
+
+   if (fi->input_format == fi->output_format)
+      output(curlines);
+   else
+      output_converted(curlines);
+   
+
+}           // end of output_line
+
+void Fortran::handle_refactor()
+{
+   if (FLAGS.refactor_routines && refactor_end_found)
+   {
+      //
+      // handle refactor routines
+      //
+      if (cur_rprop.kind != 0) // check if corresponding start is ok
+      {
+	 //
+	 // modify line to match the corrsponding module, subroutine ... line  
+	 // first, we have to locate that line, the back of the deque
+	 // could have comment or empty lines
+	 //
+	 lines_t::reverse_iterator it = curlines.rbegin();
+	 while (it != curlines.rend())
+	 {
+	    if ( it->blank_or_comment_or_pre() )
+	       it++;
+	    else
+	       break;
+	 }
+
+	 // starting at position labellength + spaces, scan lines[0] until isalnumplus()
+	 // returns false. The scanned characters will be replaced by something
+	 // like: 'end subroutine mysub'
+	 //
+	 //std::string s = curlines.back().trimmed_line();
+	 std::string s = it->trimmed_line();
+	 size_t startpos = s.find_first_not_of(' ',labellength);
+	 size_t endpos   = s.length();
+	 for (size_t i=startpos; i<s.length(); i++)
+	 {
+	    if (!isalnumplus(s[i]))
+	    {
+	       endpos = i;
+	       break;
+	    }
+	 }
+	 //
+	 // correct endpos for trailing spaces:
+	 //
+	 for (size_t i=endpos-1; ;i--)
+	 {
+	    bool r;
+	    switch(s[i])
+	    {
+	       case ' ':
+	       case '\t':
+		  r = 0;
+		  break;
+	       default:
+		  endpos = i+1;
+		  r = 1;
+		  break;
+	    }
+	    if (r)
+	       break;
+	 }
+	 std::string replacement = "end " + whatrprop(cur_rprop);
+	 if (FLAGS.upcase_routine_type)
+	    replacement = stoupper(replacement);
+	 if (cur_rprop.name != "")
+	    replacement += " " + cur_rprop.name;
+	 it->str(s.substr(0,startpos) + replacement + s.substr(endpos));
+      }
+   }
+}
+
+
+#undef Cur_indent
+#undef FLAGS
+#undef Endline
+#undef End_of_file
+#undef Getnext
+#undef Curline
