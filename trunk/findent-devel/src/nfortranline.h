@@ -3,13 +3,11 @@
 
 #include <deque>
 
+class Findent;
 #include "functions.h"
 #include "lexer.h"
 #include "parser.h"
-
-extern int global_format;
-extern int global_line_length;
-extern bool global_gnu_format;
+#include "globals.h"
 
 class Fortranline
 {
@@ -27,14 +25,15 @@ class Fortranline
    char firstchar_cache;    bool firstchar_cached;
    int scanfixpre_cache;    bool scanfixpre_cached;
 
-   int  local_format;
-   bool local_gnu_format;
-   bool is_clean;
+   bool     is_clean;
+   Globals* gl;
+   int      local_format;
+   bool     local_gnu_format;
 
    void init()
    {
-      local_format      = global_format;
-      local_gnu_format  = global_gnu_format;
+      local_format      = gl->global_format;
+      local_gnu_format  = gl->global_gnu_format;
       ltrim_cached      = 0;
       trim_cached       = 0;
       firstchar_cached  = 0;
@@ -42,22 +41,28 @@ class Fortranline
       scanfixpre_cached = 0;
    }
 
+   void init(Globals* g)
+   {
+      gl                = g;
+      init();
+   }
+
    public:
 
    void print();
 
-   Fortranline()
+   Fortranline(Globals* g)
    {
-      init();
+      init(g);
    }
 
-   Fortranline(const std::string &s)
+   Fortranline(Globals*g, const std::string &s)
    {
-      init();
+      init(g);
       orig_line = s;
    }
 
-   static std::string g_format2txt()
+   std::string g_format2txt()
    {
       switch(g_format())
       {
@@ -72,29 +77,29 @@ class Fortranline
       }
    }
 
-   static void g_format(const int what)
+   void g_format(const int what)
    {
-      global_format=what;
+      gl->global_format = what;
    }
-   static int g_format()
+   int g_format()
    {
-      return global_format;
+      return gl->global_format;
    }
-   static void line_length(const int what)
+   void line_length(const int what)
    {
-      global_line_length=what;
+      gl->global_line_length=what;
    }
-   static int line_length()
+   int line_length()
    {
-      return global_line_length;
+      return gl->global_line_length;
    }
-   static void gnu_format(bool what)
+   void gnu_format(bool what)
    {
-      global_gnu_format=what;
+      gl->global_gnu_format=what;
    }
-   static bool gnu_format()
+   bool gnu_format()
    {
-      return global_gnu_format;
+      return gl->global_gnu_format;
    }
    std::string str() const
    {
@@ -112,7 +117,7 @@ class Fortranline
    int format() const
    {
       if (local_format == UNKNOWN)
-	 return global_format;
+	 return gl->global_format;
       return local_format;
    }
 

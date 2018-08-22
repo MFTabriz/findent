@@ -12,10 +12,21 @@ int Findent::run()
    if (input_format == UNKNOWN)
       input_format = determine_fix_or_free();
 
-   Fortranline::g_format(input_format);
+   gl->global_format = input_format;
    if (flags.only_fix_free)
    {
-      std::cout << Fortranline::g_format2txt() << std::endl;
+      switch(input_format)
+      {
+	 case FREE:
+	    std::cout << "free" << std::endl;
+	    break;
+	 case FIXED:
+	    std::cout << "fixed" << std::endl;
+	    break;
+	 default:
+	    std::cout << "free" << std::endl;
+	    break;
+      }
       return what_to_return();
    }
 

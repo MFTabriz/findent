@@ -102,9 +102,9 @@ am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_newfindent_OBJECTS = docs.$(OBJEXT) findentclass.$(OBJEXT) \
 	findentrun.$(OBJEXT) fixed.$(OBJEXT) fortran.$(OBJEXT) \
-	free.$(OBJEXT) functions.$(OBJEXT) mylexer.$(OBJEXT) \
-	ndebug.$(OBJEXT) newfindent.$(OBJEXT) nflags.$(OBJEXT) \
-	nfortranline.$(OBJEXT) nline_prep.$(OBJEXT) \
+	free.$(OBJEXT) functions.$(OBJEXT) globals.$(OBJEXT) \
+	mylexer.$(OBJEXT) ndebug.$(OBJEXT) newfindent.$(OBJEXT) \
+	nflags.$(OBJEXT) nfortranline.$(OBJEXT) nline_prep.$(OBJEXT) \
 	npre_analyzer.$(OBJEXT) myparser.$(OBJEXT) \
 	simpleostream.$(OBJEXT)
 newfindent_OBJECTS = $(am_newfindent_OBJECTS)
@@ -351,6 +351,7 @@ newfindent_SOURCES = \
 		  fortran.cpp fortran.h \
 		  free.cpp free.h \
 		  functions.cpp functions.h \
+		  globals.cpp globals.h \
 		  lexer.h mylexer.cpp \
 		  ndebug.cpp ndebug.h \
 		  newfindent.cpp newfindent.h \
@@ -460,6 +461,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fortran.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/free.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/functions.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/globals.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mylexer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/myparser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ndebug.Po@am__quote@
@@ -778,11 +780,11 @@ uninstall-man: uninstall-man1
 @USEFLEX_FALSE@	@echo "*******************************************************"
 @USEFLEX_FALSE@	cp $< $@
 
-#findent.1: findent
-#	: | ./findent -H > $@
+@MAKEMAN_TRUE@findent.1: newfindent
+@MAKEMAN_TRUE@	: | ./newfindent -H > $@
 
-@MAKEMAN_TRUE@findent.1:
-@MAKEMAN_TRUE@	touch $@
+#findent.1:
+#	touch $@
 
 findent.o: parser.h
 

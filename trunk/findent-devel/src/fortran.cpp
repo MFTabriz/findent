@@ -2,6 +2,7 @@
 #include "npre_analyzer.h"
 #include "nline_prep.h"
 
+
 bool Fortran::output_pre(lines_t &lines, lines_t *outlines)
 {
    //
@@ -24,12 +25,12 @@ bool Fortran::output_pre(lines_t &lines, lines_t *outlines)
 	    if (to_mycout)
 	       mycout << lines.front().trim() << fi->endline;
 	    else
-	       outlines->push_back(lines.front().trim());
+	       outlines->push_back(F(lines.front().trim()));
 	 else
 	    if (to_mycout)
 	       mycout << lines.front().str() << fi->endline;
 	    else
-	       outlines->push_back(lines.front().str());
+	       outlines->push_back(F(lines.front().str()));
 	 lines.pop_front();
 	 if (lines.empty() || !p_more)
 	    break;
@@ -167,7 +168,7 @@ void Fortran::get_full_statement()
    static bool pushback;
    static bool first_call = 1;
 
-   Fortranline curline;
+   Fortranline curline(gl);
 
 
    if (first_call)
