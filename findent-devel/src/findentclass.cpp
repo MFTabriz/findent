@@ -10,7 +10,7 @@ int Findent::determine_fix_or_free()
    int rc;
    int n = 0;
    const int nmax = 4000;
-   Fortranline line;
+   Fortranline line(gl);
    std::string s;
    bool eof;
    bool p_more = 0;
@@ -231,7 +231,7 @@ int Findent::guess_indent(Fortranline line)
 
 Fortranline Findent::getnext(bool &eof, bool use_wb)
 {
-   Fortranline line;
+   Fortranline line(gl);
    eof = 0;
    if (use_wb && !wizardbuffer.empty())
    {
@@ -305,15 +305,15 @@ Fortranline Findent::mygetline(bool &eof, bool buffer)
    {
       eof = (s == ".");
       if (eof)
-	 curlinebuffer.push_back(Fortranline(s));
+	 curlinebuffer.push_back(Fortranline(gl,s));
    }
 
    s = handle_dos(s);
 
    if(buffer)
-      curlinebuffer.push_back(Fortranline(s));
+      curlinebuffer.push_back(Fortranline(gl,s));
 
-   return Fortranline(s);
+   return Fortranline(gl,s);
 }              // end of mygetline
 
 

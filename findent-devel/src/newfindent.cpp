@@ -20,6 +20,8 @@ int main(int argc, char*argv[])
    findent = new Findent(flags);
    findent->set(123);
 
+   testje t;
+   t.doit();
    std::cout << "MIES"<< findent->get() << std::endl;
    Fortran* a;
    Fortran *b;

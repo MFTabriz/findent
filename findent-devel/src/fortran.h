@@ -17,6 +17,7 @@ class Fortran
       Fortran(Findent *f)
       {
 	 fi = f;
+	 gl = f->gl;
       }
 
       virtual void build_statement(Fortranline &line, bool &f_more, bool &pushback) = 0;
@@ -43,6 +44,7 @@ class Fortran
       Findent*         fi;
       fs_store_t       fs_store;
       std::string      full_statement;
+      Globals*         gl;
       indent_store_t   indent_store;    // to store indent store
       int              labellength;
       nbseen_store_t   nbseen_store;    // to store nbseen
@@ -60,6 +62,11 @@ class Fortran
 	    return k;
 	 else
 	    return std::min(fi->flags.max_indent,k);
+      }
+
+      Fortranline F(const std::string &s)
+      {
+	 return Fortranline(gl,s);
       }
       std::string statement() 
       { 

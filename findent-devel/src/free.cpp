@@ -97,7 +97,7 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
 	    mycout << endline;
 	 else
 	 {
-	    fixedlines->push_back(Fortranline(""));
+	    fixedlines->push_back(F(""));
 	    os.str("");
 	 }
 	 lines.pop_front();
@@ -123,7 +123,7 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
 	 else
 	 {
 	    os << lines.front().trim();
-	    fixedlines->push_back(rtrim(os.str()));
+	    fixedlines->push_back(F(rtrim(os.str())));
 	    os.str("");
 	 }
 	 lines.pop_front();
@@ -157,7 +157,7 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
 	    else
 	    {
 	       os << label << blanks(6) << firstline;
-	       fixedlines->push_back(rm_last_amp(os.str()));
+	       fixedlines->push_back(F(rm_last_amp(os.str())));
 	       os.str("");
 	    }
 
@@ -176,7 +176,7 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
 	       os << blanks(5) << constring << lines.front().rtrim().substr(1);
 	    else
 	       os << blanks(5) << ' ' <<lines.front().rtrim();
-	    fixedlines->push_back(rm_last_amp(os.str()));
+	    fixedlines->push_back(F(rm_last_amp(os.str())));
 	    os.str("");
 	 }
 	 lines.pop_front();
@@ -198,7 +198,7 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
 	 else
 	 {
 	    os << blanks(5) << constring << lines.front().trim().substr(1);
-	    fixedlines->push_back(rm_last_amp(os.str()));
+	    fixedlines->push_back(F(rm_last_amp(os.str())));
 	    os.str("");
 	 }
 	 lines.pop_front();
@@ -213,7 +213,7 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
 	 else
 	 {
 	    os << blanks(5) << constring << lines.front().rtrim();
-	    fixedlines->push_back(rm_last_amp(os.str()));
+	    fixedlines->push_back(F(rm_last_amp(os.str())));
 	    os.str("");
 	 }
 	 lines.pop_front();
@@ -229,7 +229,7 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
       else
       {
 	 os << blanks(5) << constring << lines.front().rtrim();
-	 fixedlines->push_back(rm_last_amp(os.str()));
+	 fixedlines->push_back(F(rm_last_amp(os.str())));
 	 os.str("");
       }
       lines.pop_front();
@@ -241,11 +241,11 @@ void Free::output_converted(lines_t &lines)
    lines_t fixedlines;
 
    output(lines, &fixedlines);
-   Fortranline::g_format(FIXED);
+   gl->global_format = FIXED;
    Fortran *f = new Fixed(fi);
    f->output(fixedlines);
    delete f;
-   Fortranline::g_format(FREE);
+   gl->global_format = FREE;
 }   // end of output_converted
 
 std::string Free::rm_last_amp(const std::string &s)

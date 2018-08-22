@@ -65,11 +65,11 @@ if MAKEMAN
 
 man1_MANS = findent.1
 
-#findent.1: findent
-#	: | ./findent -H > $@
+findent.1: newfindent
+	: | ./newfindent -H > $@
 
-findent.1:
-	touch $@
+#findent.1:
+#	touch $@
 
 endif
 
@@ -156,6 +156,7 @@ newfindent_SOURCES = \
 		  fortran.cpp fortran.h \
 		  free.cpp free.h \
 		  functions.cpp functions.h \
+		  globals.cpp globals.h \
 		  lexer.h mylexer.cpp \
 		  ndebug.cpp ndebug.h \
 		  newfindent.cpp newfindent.h \

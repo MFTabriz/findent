@@ -131,7 +131,7 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	    mycout << fi->endline;
 	 else
 	 {
-	    freelines->push_back(Fortranline(""));
+	    freelines->push_back(F(""));
 	    os.str("");
 	 }
 	 lines.pop_front();
@@ -162,7 +162,7 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	    if (toupper(lines.front().firstchar()) == 'D')
 	       l = 0;
 	    os << "!" << lines.front().trim().substr(l);
-	    freelines->push_back(os.str());
+	    freelines->push_back(F(os.str()));
 	    os.str("");
 	 }
 	 lines.pop_front();
@@ -191,7 +191,7 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	 else
 	 {
 	    os << lines.front().rtrim();
-	    freelines->push_back(os.str());
+	    freelines->push_back(F(os.str()));
 	    os.str("");
 	 }
 
@@ -282,10 +282,10 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	       c = ' ';
 	       if(iscontinuation)
 		  c = prevquote;
-	       freelines->push_back(add_amp(os.str(),c));
+	       freelines->push_back(F(add_amp(os.str(),c)));
 	    }
 	    else
-	       freelines->push_back(os.str());
+	       freelines->push_back(F(os.str()));
 	    os.str("");
 	 }
 	 lines.pop_front();
@@ -300,9 +300,9 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
       {
 	 os << s;
 	 if (wizard(lines))       // more fortran lines follow
-	    freelines->push_back(add_amp(os.str(),prevquote));
+	    freelines->push_back(F(add_amp(os.str(),prevquote)));
 	 else
-	    freelines->push_back(os.str());
+	    freelines->push_back(F(os.str()));
 	 os.str("");
       }
       lines.pop_front();
@@ -314,11 +314,11 @@ void Fixed::output_converted(lines_t &lines)
    lines_t freelines;
 
    output(lines, &freelines);
-   Fortranline::g_format(FREE);
+   gl->global_format = FREE;
    Fortran *f = new Free(fi);
    f->output(freelines);
    delete f;
-   Fortranline::g_format(FIXED);
+   gl->global_format = FREE;
 }    // end of output_converted
 
 
@@ -341,10 +341,10 @@ bool Fixed::wizard()
    //     #endif
    //       enddo
 
-   if (Fortranline::g_format() == FREE)
+   if (gl->global_format == FREE)
       return 0;
 
-   Fortranline line;
+   Fortranline line(gl);
    bool eof;
 
    while(1)
