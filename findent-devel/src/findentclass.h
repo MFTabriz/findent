@@ -1,20 +1,18 @@
 #ifndef FINDENTCLASS_H
 #define FINDENTCLASS_H
 
-#include <deque>
 #include "nflags.h"
 #include "prop.h"
 #include "nfindent_types.h"
-#include "parser.h"
 #include "ndebug.h"
-
-class Fortranline;
-
-typedef std::deque<Fortranline>       lines_t;
-typedef std::deque<Fortranline>       linebuffer_t;
+#include "nfortranline.h"
 
 class Findent
 {
+
+   friend class Fortran;
+   friend class Fixed;
+   friend class Free;
 
    public:
    Findent() {}
@@ -49,23 +47,6 @@ class Findent
    void set(int what){ testint = what;}
    int  get()        { return testint;} //testing
    int testint;
-
-   int get_num_lines()       { return num_lines; }
-
-   Flags* get_flags()        { return &flags; }
-
-   indent_t get_indent()     { return indent; }
-
-   bool get_nbseen()         { return nbseen; }
-   std::string get_endline() { return endline; }
-   int get_cur_indent()      { return cur_indent; }
-   bool get_end_of_file()    { return end_of_file; }
-
-   void set_nbseen(bool what)      { nbseen = what; }
-   void set_indent(indent_t what)  { indent = what; }
-   void set_end_of_file(bool what)  { end_of_file = what; }
-   void set_indent_handled(bool what)  { indent_handled = what; }
-
 
    void          init_indent();
 

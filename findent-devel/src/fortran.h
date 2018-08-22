@@ -33,7 +33,7 @@ class Fortran
 
       int get_num()
       {
-	 return fi->get_num_lines();
+	 return fi->num_lines;
       }
    protected:
 
@@ -56,10 +56,10 @@ class Fortran
 	 //
 	 // used to delimit indentation
 	 //
-	 if (fi->get_flags()->max_indent <= 0)
+	 if (fi->flags.max_indent <= 0)
 	    return k;
 	 else
-	    return std::min(fi->get_flags()->max_indent,k);
+	    return std::min(fi->flags.max_indent,k);
       }
       std::string statement() 
       { 
@@ -73,8 +73,8 @@ class Fortran
       void push_all()
       {
 	 dolabels_store.push_back(dolabels);
-	 indent_store.push_back(fi->get_indent());
-	 nbseen_store.push_back(fi->get_nbseen());
+	 indent_store.push_back(fi->indent);
+	 nbseen_store.push_back(fi->nbseen);
 	 rprops_store.push_back(rprops);
 
       }         // end of push_all
@@ -85,10 +85,10 @@ class Fortran
 	    dolabels = dolabels_store.back();
 	 if (!indent_store.empty())
 	    //indent = indent_store.back();
-	    fi->set_indent(indent_store.back());
+	    fi->indent=indent_store.back();
 	 if (!nbseen_store.empty())
 	    //nbseen = nbseen_store.back();
-	    fi->set_nbseen(nbseen_store.back());
+	    fi->nbseen=nbseen_store.back();
 	 if (!rprops_store.empty())
 	    rprops = rprops_store.back();
       }         // end of top_all

@@ -65,15 +65,15 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
    // of 'fixedlines' to fixed
    //
 
-   std::string endline = fi->get_endline();
+   std::string endline = fi->endline;
    bool to_mycout = (fixedlines == 0);
    std::ostringstream os;
    bool isfirst = 1;
    const char conchar = '&';
    std::string constring;
 
-   if (fi->get_flags()->indent_cont)
-      constring = std::string(1,conchar)+blanks(fi->get_flags()->cont_indent);
+   if (fi->flags.indent_cont)
+      constring = std::string(1,conchar)+blanks(fi->flags.cont_indent);
    else
       constring = std::string(1,conchar);
    constring = std::string(1,conchar);
@@ -113,9 +113,9 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
 	    // but the comment does not start in column 1
 	    //
 	    if(to_mycout)
-	       mycout << blanks(M(std::max(fi->get_cur_indent(),1)));
+	       mycout << blanks(M(std::max(fi->cur_indent,1)));
 	    else
-	       os << blanks(std::max(fi->get_cur_indent(),1));
+	       os << blanks(std::max(fi->cur_indent,1));
 	 }
 
 	 if(to_mycout)
@@ -142,7 +142,7 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
 	 // if label: handle it
 	 //
 	 isfirst = 0;
-	 if (fi->get_flags()->label_left && labellength > 0)
+	 if (fi->flags.label_left && labellength > 0)
 	 {
 	    //
 	    // put label at start of line
@@ -151,7 +151,7 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
 	    std::string label     = firstline.substr(0,labellength);
 	    firstline             = trim(firstline.substr(labellength));
 
-	    int l = M(std::max(fi->get_cur_indent() - labellength,1));  // put at least one space after label
+	    int l = M(std::max(fi->cur_indent - labellength,1));  // put at least one space after label
 	    if(to_mycout)
 	       mycout << label << blanks(l) << firstline << endline;
 	    else
@@ -169,7 +169,7 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
 	 // (even if it starts with '&')
 	 //
 	 if(to_mycout)
-	    mycout << blanks(M(std::max(fi->get_cur_indent(),0))) << lines.front().trim() << endline;
+	    mycout << blanks(M(std::max(fi->cur_indent,0))) << lines.front().trim() << endline;
 	 else
 	 {
 	    if(lines.front().firstchar() == '&')
@@ -194,7 +194,7 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
       if (lines.front().firstchar() == '&')
       {
 	 if(to_mycout)
-	    mycout << blanks(M(std::max(fi->get_cur_indent(),0))) << lines.front().trim() << endline;
+	    mycout << blanks(M(std::max(fi->cur_indent,0))) << lines.front().trim() << endline;
 	 else
 	 {
 	    os << blanks(5) << constring << lines.front().trim().substr(1);
@@ -205,9 +205,9 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
 	 continue;
       }
 
-      if (fi->get_flags()->indent_cont)    // indentation of continuation lines is requested
+      if (fi->flags.indent_cont)    // indentation of continuation lines is requested
       {
-	 int l = M(std::max(fi->get_cur_indent()+fi->get_flags()->cont_indent,0));
+	 int l = M(std::max(fi->cur_indent+fi->flags.cont_indent,0));
 	 if(to_mycout)
 	    mycout << blanks(l) << lines.front().trim() << endline;
 	 else

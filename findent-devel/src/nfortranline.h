@@ -1,6 +1,8 @@
 #ifndef NFORTRANLINE_H
 #define NFORTRANLINE_H
 
+#include <deque>
+
 #include "functions.h"
 #include "lexer.h"
 #include "parser.h"
@@ -336,7 +338,10 @@ class Fortranline
    }
 
 };
+
 std::ostream& operator <<(std::ostream &os,Fortranline &obj);
 
+typedef std::deque<Fortranline> lines_t;
+typedef std::deque<Fortranline> linebuffer_t;
 
 #endif
