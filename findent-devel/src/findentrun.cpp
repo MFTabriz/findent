@@ -52,6 +52,26 @@ int Findent::run()
       delete source;
       return what_to_return();
    }
+
+   if (flags.last_indent_only)
+      mycout.setoutput(0);
+
+   cur_indent = start_indent;
+
+   while(1)
+   {
+      source->full_statement = "";
+      source->get_full_statement();
+      source->indent_and_output();
+      if (end_of_file)
+      {
+	 if(flags.last_indent_only)
+	    std::cout << num_leading_spaces(mycout.get()) << endline;
+	 return what_to_return();
+      }
+   }
+
+   return what_to_return();
    delete source;
    return 0;
 

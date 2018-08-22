@@ -71,7 +71,7 @@ void Findent::handle_pre_light(Fortranline &line, bool &p_more)
    //                 output: if no continuation is expected, p = 0
    // p_more (output):  true if a continuation is expected
    //
-   static int pregentype;
+   static int pregentype;  // TODO to class?
 
    if (!p_more)   // this is the first line of a preprocessor sequence
       pregentype = line.getpregentype();

@@ -18,18 +18,12 @@ int main(int argc, char*argv[])
 
    Findent *findent ;
    findent = new Findent(flags);
-   findent->set(123);
 
-   testje t;
-   t.doit();
-   std::cout << "MIES"<< findent->get() << std::endl;
    Fortran* a;
    Fortran *b;
    a = new Fixed(findent);
    b = new Free(findent);
 
-   std::cout << "AAP"<< a->get() << std::endl;
-   std::cout << "NOOT"<< b->get() << std::endl;
    findent->run();
    delete b;
    delete a;
