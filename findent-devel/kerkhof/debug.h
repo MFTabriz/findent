@@ -5,7 +5,7 @@
 #include <string>
 #include <typeinfo>
 
-#include "nfindent_types.h"
+#include "findent_types.h"
 
 #define O(x) {std::cerr << " [" << x << "] ";}
 #define Y O(yytext);O(YY_START)
@@ -16,7 +16,6 @@
 #define D(x)
 #endif
 
-#define FL __func__<<__FILE__<<__LINE__<<':'
 //
 // ad-hoc debugging
 // turn on by  !findentfix:p-on
@@ -62,5 +61,4 @@ class debugostream
       }
 };
 
-extern debugostream ppp;
 #endif

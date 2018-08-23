@@ -3,8 +3,8 @@
 #include <string>
 
 #include "fixed.h"
-#include "ndebug.h"
-#include "nfindent_types.h"
+#include "debug.h"
+#include "findent_types.h"
 #include "free.h"
 #include "simpleostream.h"
 

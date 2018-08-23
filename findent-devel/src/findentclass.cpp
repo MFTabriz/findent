@@ -1,8 +1,8 @@
 #include "findentclass.h"
-#include "nfortranline.h"
+#include "fortranline.h"
 #include <stdio.h>
 #include <unistd.h>
-#include "ndebug.h"
+#include "debug.h"
 
 
 int Findent::determine_fix_or_free()

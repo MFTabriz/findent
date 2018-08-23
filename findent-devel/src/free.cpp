@@ -2,8 +2,8 @@
 #include <string>
 #include <sstream>
 
-#include "ndebug.h"
-#include "nfindent_types.h"
+#include "debug.h"
+#include "findent_types.h"
 #include "fixed.h"
 #include "free.h"
 #include "simpleostream.h"

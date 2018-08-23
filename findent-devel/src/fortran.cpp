@@ -1,6 +1,6 @@
 #include "fortran.h"
-#include "npre_analyzer.h"
-#include "nline_prep.h"
+#include "pre_analyzer.h"
+#include "line_prep.h"
 
 
 #define Cur_indent   fi->cur_indent
