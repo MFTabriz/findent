@@ -21,7 +21,6 @@ class Fortran
 	 cur_rprop          = empty_rprop;
 	 curline            = new Fortranline(gl);
 	 prev_props         = empty_rprop;
-	 labellength        = 0;
 	 refactor_end_found = 0;
       }
 
@@ -53,7 +52,6 @@ class Fortran
       fs_store_t       fs_store;
       Globals*         gl;
       indent_store_t   indent_store;    // to store indent store
-      int              labellength;
       nbseen_store_t   nbseen_store;    // to store nbseen
       pre_analyzer     prea;
       Readlines        readlines;

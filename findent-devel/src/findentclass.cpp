@@ -26,12 +26,9 @@ int Findent::determine_fix_or_free()
 	 // end input from terminal:
 	 //
 
-//	 if(reading_from_tty)
-//	    rl->curlinebuffer.push_back(line);
 	 break;
       }
 
-      //rl->curlinebuffer.push_back(line);
       handle_pre_light(line,p_more);
       if(p_more)
       {
@@ -310,7 +307,7 @@ Fortranline Findent::mygetline(bool &eof, bool buffer)
 
    s = handle_dos(s);
 
-   if(buffer)
+   if(buffer && !eof)
       curlinebuffer.push_back(Fortranline(gl,s));
 
    return Fortranline(gl,s);

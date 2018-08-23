@@ -11,7 +11,6 @@ class Free : public Fortran
       void output(lines_t &lines, lines_t *freelines = 0);
       void output_converted(lines_t &lines);
 
-
    private:
       std::string rm_last_amp(const std::string &s);
 

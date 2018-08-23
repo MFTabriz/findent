@@ -72,11 +72,14 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
    const char conchar = '&';
    std::string constring;
 
-   if (fi->flags.indent_cont)
-      constring = std::string(1,conchar)+blanks(fi->flags.cont_indent);
-   else
+   if (!to_mycout)
+   {
+      if (fi->flags.indent_cont)
+	 constring = std::string(1,conchar)+blanks(fi->flags.cont_indent);
+      else
+	 constring = std::string(1,conchar);
       constring = std::string(1,conchar);
-   constring = std::string(1,conchar);
+   }
 
    while (!lines.empty())
    {
@@ -84,7 +87,7 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
 
       // TODO (not urgent): combine output of pre and blank and comments
       if(output_pre(lines,fixedlines))
-      	 continue;
+	 continue;
       if (lines.empty())
 	 return;
 
@@ -142,16 +145,16 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
 	 // if label: handle it
 	 //
 	 isfirst = 0;
-	 if (fi->flags.label_left && labellength > 0)
+	 if (fi->flags.label_left && fi->labellength > 0)
 	 {
 	    //
 	    // put label at start of line
 	    //
 	    std::string firstline = lines.front().trim();
-	    std::string label     = firstline.substr(0,labellength);
-	    firstline             = trim(firstline.substr(labellength));
+	    std::string label     = firstline.substr(0,fi->labellength);
+	    firstline             = trim(firstline.substr(fi->labellength));
 
-	    int l = M(std::max(fi->cur_indent - labellength,1));  // put at least one space after label
+	    int l = M(std::max(fi->cur_indent - fi->labellength,1));  // put at least one space after label
 	    if(to_mycout)
 	       mycout << label << blanks(l) << firstline << endline;
 	    else

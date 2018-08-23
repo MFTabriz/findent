@@ -21,23 +21,21 @@ class Findent
 	 cur_indent         = 0;
 	 cur_rprop          = empty_rprop;
 	 end_of_file        = 0;
-	 end_of_file        = 0;
 	 endline            = "\n";
 	 flags              = f;
 	 indent_handled     = 0;
+	 labellength        = 0;
 	 nbseen             = 0;
 	 num_lines          = 0;
 	 start_indent       = 0;
 	 gl->global_format      = UNKNOWN;
-	 gl->global_gnu_format  = 0;
-	 gl->global_line_length = 0;
+	 gl->global_line_length = flags.input_line_length;
+	 gl->global_gnu_format  = flags.input_format_gnu;;
 
 	 // private
 	 all_indent         = 0;
 	 endline_set        = 0;
-	 input_format       = UNKNOWN;
 	 input_format       = flags.input_format;
-	 labellength        = 0;
 	 lines_read         = 0;
 	 output_format      = 0;
 	 reading_from_tty   = 0;
@@ -60,6 +58,7 @@ class Findent
       bool         indent_handled;
       indent_t     indent;          // to store indents
       int          input_format;
+      int          labellength;
       bool         nbseen;
       int          num_lines;
       int          output_format;
@@ -71,7 +70,6 @@ class Findent
       linebuffer_t curlinebuffer;   // deque for source lines
       prop_t       cur_rprop;
       bool         endline_set;
-      int          labellength;
       int          lines_read;
       bool         reading_from_tty;
       linebuffer_t wizardbuffer;    // to store wizard lines and push back lines from handle_fortran
