@@ -1,15 +1,14 @@
-#ifndef NFORTRANLINE_H
-#define NFORTRANLINE_H
+#ifndef FORTRANLINE_H
+#define FORTRANLINE_H
 
-#include <deque>
+#include <iostream>
+#include <string>
 
-class Findent;
 #include "functions.h"
-#include "lexer.h"
 #include "parser.h"
-#include "globals.h"
+#include "lexer.h"
 
-class Fortranline
+class fortranline
 {
 
    // NOTE:
@@ -25,15 +24,19 @@ class Fortranline
    char firstchar_cache;    bool firstchar_cached;
    int scanfixpre_cache;    bool scanfixpre_cached;
 
-   bool     is_clean;
-   Globals* gl;
-   int      local_format;
-   bool     local_gnu_format;
+
+   static int global_format, global_line_length;
+   static bool global_gnu_format;
+
+   int  local_format;
+   bool local_gnu_format;
+   bool is_clean;
+
 
    void init()
    {
-      local_format      = gl->global_format;
-      local_gnu_format  = gl->global_gnu_format;
+      local_format        = global_format;
+      local_gnu_format    = global_gnu_format;
       ltrim_cached      = 0;
       trim_cached       = 0;
       firstchar_cached  = 0;
@@ -41,28 +44,22 @@ class Fortranline
       scanfixpre_cached = 0;
    }
 
-   void init(Globals* g)
-   {
-      gl                = g;
-      init();
-   }
-
    public:
 
    void print();
 
-   Fortranline(Globals* g)
+   fortranline()
    {
-      init(g);
+      init();
    }
 
-   Fortranline(Globals*g, const std::string &s)
+   fortranline(const std::string &s)
    {
-      init(g);
+      init();
       orig_line = s;
    }
 
-   std::string g_format2txt()
+   static std::string g_format2txt()
    {
       switch(g_format())
       {
@@ -77,36 +74,36 @@ class Fortranline
       }
    }
 
-   void g_format(const int what)
+   static void g_format(const int what)
    {
-      gl->global_format = what;
+      global_format = what;
    }
-   int g_format()
+   static int g_format()
    {
-      return gl->global_format;
+      return global_format;
    }
-   void line_length(const int what)
+   static void line_length(const int what)
    {
-      gl->global_line_length=what;
+      global_line_length = what;
    }
-   int line_length()
+   static int line_length()
    {
-      return gl->global_line_length;
+      return global_line_length;
    }
-   void gnu_format(bool what)
+   static void gnu_format(bool what)
    {
-      gl->global_gnu_format=what;
+      global_gnu_format = what;
    }
-   bool gnu_format()
+   static bool gnu_format()
    {
-      return gl->global_gnu_format;
+      return global_gnu_format;
    }
    std::string str() const
    {
       return orig_line;
    }
 
-   friend std::ostream& operator <<(std::ostream &os,Fortranline &obj);
+   friend std::ostream& operator <<(std::ostream &os,fortranline &obj);
 
    void str(const std::string &s)
    {
@@ -117,7 +114,7 @@ class Fortranline
    int format() const
    {
       if (local_format == UNKNOWN)
-	 return gl->global_format;
+	 return global_format;
       return local_format;
    }
 
@@ -343,10 +340,5 @@ class Fortranline
    }
 
 };
-
-std::ostream& operator <<(std::ostream &os,Fortranline &obj);
-
-typedef std::deque<Fortranline> lines_t;
-typedef std::deque<Fortranline> linebuffer_t;
-
+std::ostream& operator <<(std::ostream &os,fortranline &obj);
 #endif

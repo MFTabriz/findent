@@ -1,6 +1,6 @@
 #include <iostream>
 #include "docs.h"
-#include "nflags.h"
+#include "flags.h"
 #include "version.h"
 #include "functions.h"
 

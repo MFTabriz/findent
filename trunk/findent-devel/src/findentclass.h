@@ -1,11 +1,11 @@
 #ifndef FINDENTCLASS_H
 #define FINDENTCLASS_H
 
-#include "nflags.h"
+#include "flags.h"
 #include "prop.h"
-#include "nfindent_types.h"
-#include "ndebug.h"
-#include "nfortranline.h"
+#include "findent_types.h"
+#include "debug.h"
+#include "fortranline.h"
 #include "globals.h"
 
 class Findent

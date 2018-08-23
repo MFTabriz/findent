@@ -2,10 +2,13 @@
 
 #include "fortranline.h"
 
-int fortranline::global_format;
-int fortranline::global_line_length;
-bool fortranline::global_gnu_format;
-void fortranline::print()
+/*
+int global_format;
+int global_line_length;
+bool global_gnu_format;
+*/
+
+void Fortranline::print()
 {
    std::cout << "orig_line: ["      << orig_line      << "]" << std::endl;
    std::cout << "trim: ["           << trim()         << "]" << std::endl;
@@ -20,10 +23,8 @@ void fortranline::print()
    std::cout << "global_format:"    << g_format2txt() <<        std::endl;
 }
 
-std::ostream& operator <<(std::ostream &os,fortranline &obj)
+std::ostream& operator <<(std::ostream &os,Fortranline &obj)
 {
       os<<"["<<obj.str()<<"]";
       return os;
 }
-
-

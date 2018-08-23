@@ -1,13 +1,12 @@
 #ifndef FORTRAN_H
 #define FORTRAN_H
 
-#include "nfindent_types.h"
+#include "findent_types.h"
 #include "findentclass.h"
-#include "nfortranline.h"
-#include "readlines.h"
+#include "fortranline.h"
 #include "simpleostream.h"
 #include "pre_analyzer.h"
-#include "ndebug.h"
+#include "debug.h"
 
 class Fortran
 {
@@ -54,7 +53,6 @@ class Fortran
       indent_store_t   indent_store;    // to store indent store
       nbseen_store_t   nbseen_store;    // to store nbseen
       pre_analyzer     prea;
-      Readlines        readlines;
       rprops_store_t   rprops_store;
       rprops_t         rprops;          // to store routines (module, subroutine ...)
       bool              refactor_end_found;

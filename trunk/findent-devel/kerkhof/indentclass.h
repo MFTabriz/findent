@@ -4,9 +4,9 @@
 #include <iostream>
 #include <string>
 
-#include "nfortranline.h"
-#include "nflags.h"
-#include "nfindent_types.h"
+#include "fortranline.h"
+#include "flags.h"
+#include "findent_types.h"
 
 class Indent
 {

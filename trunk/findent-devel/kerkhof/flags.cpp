@@ -4,7 +4,7 @@
 #include <string>
 
 #include "debug.h"
-#include "nflags.h"
+#include "flags.h"
 #include "parser.h"
 
 #define optargcheck if (!optarg || strlen(optarg)==0) break;

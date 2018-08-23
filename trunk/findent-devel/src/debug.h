@@ -16,6 +16,7 @@
 #define D(x)
 #endif
 
+#define FL __func__<<__FILE__<<__LINE__<<':'
 //
 // ad-hoc debugging
 // turn on by  !findentfix:p-on
@@ -61,4 +62,5 @@ class debugostream
       }
 };
 
+extern debugostream ppp;
 #endif

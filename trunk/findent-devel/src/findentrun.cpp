@@ -2,7 +2,7 @@
 #include "free.h"
 #include "fixed.h"
 #include "fortran.h"
-#include "ndebug.h"
+#include "debug.h"
 
 int Findent::run()
 {

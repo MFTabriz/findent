@@ -100,13 +100,12 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(man1dir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_findent_OBJECTS = docs.$(OBJEXT) findentclass.$(OBJEXT) \
-	findentrun.$(OBJEXT) fixed.$(OBJEXT) fortran.$(OBJEXT) \
+am_findent_OBJECTS = debug.$(OBJEXT) docs.$(OBJEXT) findent.$(OBJEXT) \
+	findentclass.$(OBJEXT) findentrun.$(OBJEXT) fixed.$(OBJEXT) \
+	flags.$(OBJEXT) fortran.$(OBJEXT) fortranline.$(OBJEXT) \
 	free.$(OBJEXT) functions.$(OBJEXT) globals.$(OBJEXT) \
-	mylexer.$(OBJEXT) ndebug.$(OBJEXT) newfindent.$(OBJEXT) \
-	nflags.$(OBJEXT) nfortranline.$(OBJEXT) nline_prep.$(OBJEXT) \
-	npre_analyzer.$(OBJEXT) myparser.$(OBJEXT) prop.$(OBJEXT) \
-	simpleostream.$(OBJEXT)
+	line_prep.$(OBJEXT) mylexer.$(OBJEXT) myparser.$(OBJEXT) \
+	pre_analyzer.$(OBJEXT) prop.$(OBJEXT) simpleostream.$(OBJEXT)
 findent_OBJECTS = $(am_findent_OBJECTS)
 findent_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -324,45 +323,29 @@ VIMDIR = $(top_srcdir)/vim
 GEDITDIR = $(top_srcdir)/gedit
 EMACSDIR = $(top_srcdir)/emacs
 READMEDIR = $(top_srcdir)/doc
-oldfindent_SOURCES = findent.cpp findent.h \
-		  mylexer.cpp myparser.cpp lexer.h parser.h \
-		  line_prep.cpp pre_analyzer.cpp debug.cpp debug.h \
-		  functions.cpp functions.h \
-		  line_prep.h pre_analyzer.h version.h \
-		  simpleostream.h simpleostream.cpp \
-		  vim_plugin.cpp vim_plugin.h \
-		  gedit_plugin.cpp gedit_plugin.h \
-		  emacs_plugin.cpp emacs_plugin.h \
-		  readme_plugin.cpp readme_plugin.h prop.h \
-		  flags.cpp flags.h usage.cpp usage.h \
-		  fortranline.cpp fortranline.h \
-		  free2free.cpp free2free.h \
-		  fixed2fixed.cpp fixed2fixed.h \
-		  fixed2free.cpp fixed2free.h \
-		  free2fixed.cpp free2fixed.h \
-		  findent_types.h \
-		  findent_functions.cpp findent_functions.h
-
 findent_SOURCES = \
-		  docs.cpp docs.h \
-		  findentclass.cpp findentclass.h \
-		  findentrun.cpp findentrun.h \
-		  fixed.cpp fixed.h \
-		  fortran.cpp fortran.h \
-		  free.cpp free.h \
-		  functions.cpp functions.h \
-		  globals.cpp globals.h \
-		  lexer.h mylexer.cpp \
-		  ndebug.cpp ndebug.h \
-		  newfindent.cpp newfindent.h \
-		  nfindent_types.h \
-		  nflags.cpp nflags.h \
-		  nfortranline.cpp nfortranline.h \
-		  nline_prep.cpp nline_prep.h \
-		  npre_analyzer.cpp npre_analyzer.h \
-		  parser.h myparser.cpp \
-		  prop.cpp prop.h \
-		  simpleostream.h simpleostream.cpp
+		  debug.cpp              debug.h           \
+		  docs.cpp               docs.h            \
+		  findent.cpp            findent.h         \
+		                         findent_types.h   \
+		  findentclass.cpp       findentclass.h    \
+		  findentrun.cpp         findentrun.h      \
+		  fixed.cpp              fixed.h           \
+		  flags.cpp              flags.h           \
+		  fortran.cpp            fortran.h         \
+		  fortranline.cpp        fortranline.h     \
+		  free.cpp               free.h            \
+		  functions.cpp          functions.h       \
+		  globals.cpp            globals.h         \
+		                         lexer.h           \
+		  line_prep.cpp          line_prep.h       \
+		  mylexer.cpp                              \
+		  myparser.cpp                             \
+		                         parser.h          \
+		  pre_analyzer.cpp       pre_analyzer.h    \
+		  prop.cpp               prop.h            \
+		  simpleostream.h        simpleostream.cpp \
+                  version.h
 
 BUILT_SOURCES = parser.cpp parser.h lexer.cpp
 EXTRA_DIST = lexer.l parser.y tocpp.sh builtparser.cpp \
@@ -455,22 +438,22 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/debug.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/docs.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/findent.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/findentclass.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/findentrun.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fixed.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/flags.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fortran.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fortranline.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/free.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/functions.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/globals.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/line_prep.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mylexer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/myparser.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ndebug.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/newfindent.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nflags.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nfortranline.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nline_prep.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/npre_analyzer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pre_analyzer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/prop.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simpleostream.Po@am__quote@
 
@@ -785,9 +768,6 @@ uninstall-man: uninstall-man1
 @MAKEMAN_TRUE@findent.1: findent
 @MAKEMAN_TRUE@	: | ./findent -H > $@
 
-#findent.1:
-#	touch $@
-
 findent.o: parser.h
 
 vim_plugin.o: vim_fortran.inc vim_findent.inc vim_help.inc
@@ -799,8 +779,7 @@ emacs_plugin.o: emacs_findent.inc emacs_help.inc
 
 readme_plugin.o: readme.inc
 
-docs.o:   \
-	vim_fortran.inc vim_findent.inc vim_help.inc \
+docs.o:    vim_fortran.inc vim_findent.inc vim_help.inc \
 	   gedit_external.inc gedit_plugin.inc gedit_plugin_py.inc gedit_help.inc \
            emacs_findent.inc emacs_help.inc \
 	   readme.inc
