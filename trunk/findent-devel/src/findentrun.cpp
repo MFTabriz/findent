@@ -12,7 +12,8 @@ int Findent::run()
    if (input_format == UNKNOWN)
       input_format = determine_fix_or_free();
 
-   gl->global_format = input_format;
+   gl->global_format      = input_format;
+
    if (flags.only_fix_free)
    {
       switch(input_format)

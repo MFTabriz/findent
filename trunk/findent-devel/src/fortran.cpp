@@ -164,8 +164,6 @@ void Fortran::get_full_statement()
    while(!curlines.empty())
       curlines.pop_back();
 
-   // curlines.push_front(fortranline("_"));
-
    static int state = start;
 
    while(1)
@@ -173,7 +171,6 @@ void Fortran::get_full_statement()
       switch(state)
       {
 	 case start:
-	    ppp<<"START:"<<Curline<<endchar;
 	    if (fs_store.empty())
 	       full_statement = "";
 	    else
@@ -203,7 +200,6 @@ void Fortran::get_full_statement()
 	    curlines.push_back(Curline);
 	    full_statement = rtrim(remove_trailing_comment(Curline.rest()));
 	    Curline = Getnext(End_of_file);
-	    ppp<<"in_FFIX:"<<full_statement<<Curline<<endchar;
 	    state = start;
 	    return;
 
@@ -381,8 +377,8 @@ void Fortran::indent_and_output()
    {
       line_prep p(rest);
       propstruct props = parseline(p); 
-      labellength = props.label.size();
-      if (labellength > 0)
+      fi->labellength = props.label.size();
+      if (fi->labellength > 0)
 	 //
 	 // if there was a previous labeled do, handle it:
 	 //
@@ -618,7 +614,7 @@ void Fortran::output_line()
       output(curlines);
    else
       output_converted(curlines);
-   
+
 
 }           // end of output_line
 
@@ -651,7 +647,7 @@ void Fortran::handle_refactor()
 	 //
 	 //std::string s = curlines.back().trimmed_line();
 	 std::string s = it->trimmed_line();
-	 size_t startpos = s.find_first_not_of(' ',labellength);
+	 size_t startpos = s.find_first_not_of(' ',fi->labellength);
 	 size_t endpos   = s.length();
 	 for (size_t i=startpos; i<s.length(); i++)
 	 {

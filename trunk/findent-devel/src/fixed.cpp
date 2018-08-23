@@ -89,8 +89,7 @@ void Fixed::build_statement(Fortranline &line, bool &f_more, bool &pushback)
    full_statement = rtrim(remove_trailing_comment(full_statement));
    if(!f_more)
       f_more = wizard();   // look for more continuation lines
-   return;
-}           // end of build_
+}           // end of build_statement
 
 
 void Fixed::output(lines_t &lines,lines_t *freelines)
@@ -318,7 +317,7 @@ void Fixed::output_converted(lines_t &lines)
    Fortran *f = new Free(fi);
    f->output(freelines);
    delete f;
-   gl->global_format = FREE;
+   gl->global_format = FIXED;
 }    // end of output_converted
 
 
