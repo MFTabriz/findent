@@ -166,6 +166,7 @@ cat << eof > expect
 eof
 
 $doit "-Ia --start-indent=a" "-ifree" "for free input"
+
 $doit "-Ia --start-indent=a" "-ifixed" "for fixed input"
 
 rc=`expr $rc + $?`

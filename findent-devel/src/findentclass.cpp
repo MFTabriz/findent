@@ -265,7 +265,8 @@ Fortranline Findent::getnext(bool &eof, bool use_wb)
    {
       nbseen = !line.blank_or_comment() 
 	 && (line.getpregentype() == 0)
-	 && prevlastchar != '\\'; 
+	 && prevlastchar          != '\\'
+	 && line.lastchar()       != '\\'; 
 
       if (flags.auto_firstindent && nbseen)
       {
@@ -274,9 +275,8 @@ Fortranline Findent::getnext(bool &eof, bool use_wb)
 	 init_indent();
 	 indent_handled = 1;
       }
+      prevlastchar = line.lastchar();
    }
-
-   prevlastchar = line.lastchar();
 
    return line;
 }
