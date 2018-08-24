@@ -39,6 +39,8 @@ class Findent
 	 lines_read         = 0;
 	 output_format      = 0;
 	 reading_from_tty   = 0;
+	 // for getnext:
+	 prevlastchar       = 0;
       }
 
       ~Findent() { delete gl; }
@@ -83,11 +85,10 @@ class Findent
       int          what_to_return();
 
       // for handle_pre_light:
-
       int pregentype;
 
-
-
+      // for getnext:
+      char prevlastchar;
 };
 
 

@@ -263,7 +263,10 @@ Fortranline Findent::getnext(bool &eof, bool use_wb)
 
    if (!nbseen)
    {
-      nbseen = !line.blank_or_comment() && (line.getpregentype() == 0);
+      nbseen = !line.blank_or_comment() 
+	 && (line.getpregentype() == 0)
+	 && prevlastchar != '\\'; 
+
       if (flags.auto_firstindent && nbseen)
       {
 	 start_indent = guess_indent(line);
@@ -272,6 +275,8 @@ Fortranline Findent::getnext(bool &eof, bool use_wb)
 	 indent_handled = 1;
       }
    }
+
+   prevlastchar = line.lastchar();
 
    return line;
 }
