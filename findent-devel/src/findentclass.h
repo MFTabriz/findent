@@ -82,6 +82,10 @@ class Findent
       void         push_indent(int p);
       int          what_to_return();
 
+      // for handle_pre_light:
+
+      int pregentype;
+
 
 
 };

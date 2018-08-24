@@ -132,28 +132,13 @@ void Fortran::get_full_statement()
    //
    // if things get hairy: try a finite state machine
    //
-   enum {
-      start=1,
-      in_fortran, in_fortran_1,
-      in_pre, 
-      end_start, end_fortran, end_pre, 
-      in_ffix
-   };
+
+   // 
+   // see fortran.h for definitions of some variables
+   //
 
    full_statement = "";
    fi->indent_handled=0;
-
-   //
-   // 'pushback' and 'first_call' must be static in this version,
-   // for safety 'pretype' and 'f_more' and 'p_more' are also made static
-   //
-   static int pretype;     // 
-   static bool f_more = 0;
-   static bool p_more;
-   static bool pushback;
-   static bool first_call = 1;
-
-
 
    if (first_call)
    {
@@ -163,8 +148,6 @@ void Fortran::get_full_statement()
 
    while(!curlines.empty())
       curlines.pop_back();
-
-   static int state = start;
 
    while(1)
    {
@@ -207,6 +190,7 @@ void Fortran::get_full_statement()
 	    if(End_of_file) { state = end_fortran; break; }
 
 	    build_statement(Curline, f_more, pushback);
+
 	    if (f_more)
 	    {
 	       Curline = Getnext(End_of_file); if (End_of_file) { state = end_fortran; break; }
@@ -237,7 +221,7 @@ void Fortran::get_full_statement()
 	    return;
 
 	 case in_fortran_1:
-	    if (!pushback)                     // here is why pushback has to be static
+	    if (!pushback)
 	       Curline = Getnext(End_of_file);
 	    state = start;
 	    break;
@@ -289,8 +273,6 @@ bool Fortran::is_findentfix(Fortranline &line)
 void Fortran::handle_pre(Fortranline &line, const bool f_more, bool &p_more)
 {
    int ifelse;
-   static int pretype;
-   static int pregentype;
 
    pregentype = line.getpregentype();
    if(pregentype == CPP || pregentype == COCO)

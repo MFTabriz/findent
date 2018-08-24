@@ -16,16 +16,7 @@ int main(int argc, char*argv[])
    if (docs.print(todo))
       return 0;
 
-   Findent *findent ;
-   findent = new Findent(flags);
+   Findent findent(flags);
 
-   Fortran* a;
-   Fortran *b;
-   a = new Fixed(findent);
-   b = new Free(findent);
-
-   findent->run();
-   delete b;
-   delete a;
-   delete findent;
+   findent.run();
 }

@@ -245,9 +245,8 @@ void Free::output_converted(lines_t &lines)
 
    output(lines, &fixedlines);
    gl->global_format = FIXED;
-   Fortran *f = new Fixed(fi);
-   f->output(fixedlines);
-   delete f;
+   Fixed f(fi);
+   f.output(fixedlines);
    gl->global_format = FREE;
 }   // end of output_converted
 
