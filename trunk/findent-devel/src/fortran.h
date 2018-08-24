@@ -11,7 +11,7 @@
 class Fortran
 {
    public:
-      virtual ~Fortran(){}
+      virtual ~Fortran(){ delete curline; }
 
       Fortran(Findent *f)
       {
@@ -21,6 +21,11 @@ class Fortran
 	 curline            = new Fortranline(gl);
 	 prev_props         = empty_rprop;
 	 refactor_end_found = 0;
+
+	 // for get_full_statement:
+	 f_more             = 0;
+	 first_call         = 1;
+	 state              = start;
       }
 
       virtual void build_statement(Fortranline &line, bool &f_more, bool &pushback) = 0;
@@ -137,7 +142,25 @@ class Fortran
       bool        is_findentfix(Fortranline &line);
       bool        output_pre(lines_t &lines, lines_t *outlines);
       void        output_line();
-      void handle_refactor();
+      void        handle_refactor();
+
+   private:
+      // for get_full_statement and handle_pre:
+      bool first_call;
+      bool f_more;
+      bool p_more;
+      int  pretype;
+      int  pregentype;
+      bool pushback;
+      int  state;
+      enum {
+	 start=1,
+	 in_fortran, in_fortran_1,
+	 in_pre, 
+	 end_start, end_fortran, end_pre, 
+	 in_ffix
+      };
+      //
 
 };
 

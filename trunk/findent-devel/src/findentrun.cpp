@@ -68,13 +68,10 @@ int Findent::run()
       {
 	 if(flags.last_indent_only)
 	    std::cout << num_leading_spaces(mycout.get()) << endline;
+	 delete source;
 	 return what_to_return();
       }
    }
-
-   return what_to_return();
-   delete source;
-   return 0;
-
+   return what_to_return();  // never reached
 }
 

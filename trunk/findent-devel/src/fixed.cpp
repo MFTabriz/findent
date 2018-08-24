@@ -314,9 +314,8 @@ void Fixed::output_converted(lines_t &lines)
 
    output(lines, &freelines);
    gl->global_format = FREE;
-   Fortran *f = new Free(fi);
-   f->output(freelines);
-   delete f;
+   Free f(fi);
+   f.output(freelines);
    gl->global_format = FIXED;
 }    // end of output_converted
 

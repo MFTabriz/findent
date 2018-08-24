@@ -9,8 +9,6 @@
 
 #define optargcheck if (!optarg || strlen(optarg)==0) break;
 
-int Flags::default_indent;
-
 void Flags::set_defaults(void)
 {
    label_left_default  = 1;
@@ -100,7 +98,7 @@ int Flags::get_flags(int argc, char *argv[])
    }
 
 
-   static struct option longopts[] =
+   struct option longopts[] =
    {
       {"indent"             , required_argument, 0, DO_INDENT            },
 

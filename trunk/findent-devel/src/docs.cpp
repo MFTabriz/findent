@@ -164,7 +164,8 @@ void Docs::usage(const bool doman)
    }
    manout("-I<n>, --start_indent=<n>"       ,"starting  indent (default:0)"                                                 ,doman);
    manout("-Ia, --start_indent=a"           ,"determine starting indent from first line"                                    ,doman);
-   manout("-i<n>, --indent=<n>"             ,"all       indents except I,c,C,e (default: "+number2string(Flags::default_indent)+")",doman);
+   Flags f;
+   manout("-i<n>, --indent=<n>"             ,"all       indents except I,c,C,e (default: "+number2string(f.default_indent)+")",doman);
    manout("-a<n>, --indent_associate=<n>"   ,"ASSOCIATE    indent"                                                          ,doman);
    manout("-b<n>, --indent_block=<n>"       ,"BLOCK        indent"                                                          ,doman);
    manout("-d<n>, --indent_do=<n>"           ,"DO           indent"                                                          ,doman);
