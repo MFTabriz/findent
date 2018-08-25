@@ -58,7 +58,7 @@ inline char lastchar(const std::string &s)
    return s[l-1];
 }
 
-extern simpleostream mycout; 
+extern Simpleostream mycout; 
 
 template <typename T>
   std::string number2string ( T number )

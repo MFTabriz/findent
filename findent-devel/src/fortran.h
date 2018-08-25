@@ -57,7 +57,7 @@ class Fortran
       Globals*         gl;
       indent_store_t   indent_store;    // to store indent store
       nbseen_store_t   nbseen_store;    // to store nbseen
-      pre_analyzer     prea;
+      Pre_analyzer     prea;
       rprops_store_t   rprops_store;
       rprops_t         rprops;          // to store routines (module, subroutine ...)
       bool              refactor_end_found;

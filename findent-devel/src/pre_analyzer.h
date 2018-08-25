@@ -3,7 +3,7 @@
 
 #include <stack>
 
-class pre_analyzer
+class Pre_analyzer
 {
    std::stack<bool> ifelse_stack; // to note if there is an #else after #if
 

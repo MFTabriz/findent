@@ -4,14 +4,14 @@
 #include <iostream>
 #include <sstream>
 
-class simpleostream
+class Simpleostream
 {
    private:
 
       std::stringstream line;
       bool output;
    public:
-      simpleostream(void)
+      Simpleostream(void)
       {
 	 output = 1;
       }
@@ -20,7 +20,7 @@ class simpleostream
 	 line.str("");
       }
       template< typename T >
-	 simpleostream& operator<<( T val )
+	 Simpleostream& operator<<( T val )
 	 { 
 	    if (output)
 	       std::cout << val; 
