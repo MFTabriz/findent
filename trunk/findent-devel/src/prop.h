@@ -4,6 +4,8 @@
 #include <deque>
 #include <string>
 
+#include "line_prep.h"
+
 struct propstruct
 {
    int         kind;
@@ -14,7 +16,7 @@ struct propstruct
 
 const struct propstruct empty_rprop={0,"","",""};
 
-propstruct parseline(class line_prep p);
+propstruct parseline(Line_prep p);
 std::string whatrprop(struct propstruct p);
 
 typedef std::deque<struct propstruct> rprops_t;

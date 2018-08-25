@@ -1,3 +1,6 @@
+findent-2.8.4:
+	major restructuring of the code.
+
 findent-2.8.3:
 	parser.y, lexer.l: changed detection of do-constructs
 	     DO , 

@@ -1,3 +1,3 @@
 #include "simpleostream.h"
 
-simpleostream     mycout;
+Simpleostream     mycout;

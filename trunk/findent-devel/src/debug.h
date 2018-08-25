@@ -25,13 +25,13 @@
 
 extern  char endchar;
 
-class debugostream 
+class Debugostream 
 
 {
    private:
       bool output;
    public:
-      debugostream()
+      Debugostream()
       {
 	 output = 0;
       }
@@ -43,7 +43,7 @@ class debugostream
       {
 	 output = 1;
       }
-      template< typename T > debugostream& operator<<( T val )
+      template< typename T > Debugostream& operator<<( T val )
       { 
 	 if (output)
 	 {
@@ -62,5 +62,5 @@ class debugostream
       }
 };
 
-extern debugostream ppp;
+extern Debugostream ppp;
 #endif

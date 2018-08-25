@@ -58,7 +58,6 @@ void Fortran::handle_last_usable_only()
    int usable_line = 1;
    std::deque<int> usables;     // to store usable lines
    std::deque<int> prevs;       // to store prev-usable lines
-   pre_analyzer preb;
 
    fi->init_indent();
    while(1)
@@ -66,7 +65,7 @@ void Fortran::handle_last_usable_only()
       int prev         = fi->num_lines;
       bool usable      = 0;
       get_full_statement();
-      line_prep p(full_statement);
+      Line_prep p(full_statement);
       propstruct props = parseline(p);
       switch (props.kind)
       {
@@ -288,21 +287,21 @@ void Fortran::handle_pre(Fortranline &line, const bool f_more, bool &p_more)
 	    ifelse = prea.analyze(line.trimmed_line(), pretype);
 	    switch(ifelse)
 	    {
-	       case pre_analyzer::IF:
+	       case Pre_analyzer::IF:
 		  push_all();
 		  break;
 
-	       case pre_analyzer::ELIF:
+	       case Pre_analyzer::ELIF:
 		  top_all();
 		  break;
 
-	       case pre_analyzer::ELSE:
+	       case Pre_analyzer::ELSE:
 		  top_all();
-	       case pre_analyzer::ENDIF:
+	       case Pre_analyzer::ENDIF:
 		  pop_all();
 		  break;
 
-	       case pre_analyzer::ENDIFE:
+	       case Pre_analyzer::ENDIFE:
 		  break;
 
 	       default:
@@ -312,26 +311,26 @@ void Fortran::handle_pre(Fortranline &line, const bool f_more, bool &p_more)
 
 	    switch(ifelse) // full_statement needs apart treatment:
 	    {
-	       case pre_analyzer::IF:
+	       case Pre_analyzer::IF:
 		  fs_store.push_back(full_statement);
 		  break;
 
-	       case pre_analyzer::ELIF:
+	       case Pre_analyzer::ELIF:
 		  if(fs_store.empty())
 		     full_statement = "";
 		  else
 		     full_statement = fs_store.back();
 		  break;
 
-	       case pre_analyzer::ELSE:
+	       case Pre_analyzer::ELSE:
 		  if(fs_store.empty())
 		     full_statement = "";
 		  else
 		     full_statement = fs_store.back();
 		  break;
 
-	       case pre_analyzer::ENDIF:
-	       case pre_analyzer::ENDIFE:
+	       case Pre_analyzer::ENDIF:
+	       case Pre_analyzer::ENDIFE:
 		  if(!fs_store.empty())
 		     fs_store.pop_back();
 		  break;
@@ -357,7 +356,7 @@ void Fortran::indent_and_output()
    fi->indent_handled   = 0;
    while(1)
    {
-      line_prep p(rest);
+      Line_prep p(rest);
       propstruct props = parseline(p); 
       fi->labellength = props.label.size();
       if (fi->labellength > 0)

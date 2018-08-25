@@ -39,7 +39,7 @@
 //
 // The funcion returns NONE if none of above is found.
 //
-int pre_analyzer::analyze(const std::string s, const int pretype)
+int Pre_analyzer::analyze(const std::string s, const int pretype)
 {
    switch(pretype)
    {
@@ -53,26 +53,26 @@ int pre_analyzer::analyze(const std::string s, const int pretype)
    {
       case CPP_IF: case COCO_IF:
 	 this->ifelse_stack.push(0);
-	 return pre_analyzer::IF;
+	 return this->IF;
       case CPP_ELIF: case COCO_ELIF:
-	 return pre_analyzer::ELIF;
+	 return this->ELIF;
       case CPP_ELSE: case COCO_ELSE:
 	 if (!this->ifelse_stack.empty())
 	 {
 	    ifelse_stack.pop();
 	    ifelse_stack.push(1);
 	 }
-	 return pre_analyzer::ELSE;
+	 return this->ELSE;
       case CPP_ENDIF: case COCO_ENDIF:
-	 r = pre_analyzer::ENDIF; 
+	 r = this->ENDIF; 
 	 if (!ifelse_stack.empty())
 	 {
 	    if (ifelse_stack.top())
-	       r = pre_analyzer::ENDIFE;
+	       r = this->ENDIFE;
 	    ifelse_stack.pop();
 	 }
 	 return r;
     default:
-      return pre_analyzer::NONE;
+      return this->NONE;
    }
 }

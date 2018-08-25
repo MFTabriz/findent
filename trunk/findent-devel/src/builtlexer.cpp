@@ -2099,7 +2099,7 @@ std::string     lexer_name, lexer_stlabel, lexeri_number, lexer_rest;
 std::string     input_string;
 int             lrlevel;
 bool            lrreturn;
-class line_prep pline;
+Line_prep       pline;
 
 
 
@@ -3137,18 +3137,18 @@ YY_RULE_SETUP
 		   int type = pline.get_type(std::string(yytext));
                    D(O("found_special");O(type);O(pline.get_type_as_string(std::string(yytext)));Y;);
 		   D(O("encoded line");O(pline.get_line_encoded()););
-		    if (type == pline.type_string)
+		    if (type == pline.is_string)
 		    {
 		       D(O("QSTRING"););
 		       return QSTRING;
 		    }
-		    if (type == pline.type_stlabel)
+		    if (type == pline.is_stlabel)
 		    {
 		       lexer_stlabel = pline.get_value(std::string(yytext));
 		       D(O("STLABEL");O(lexer_stlabel);Y;);
 		       return STLABEL;
 		    }
-		    if (type == pline.type_dot_operator)
+		    if (type == pline.is_dotop)
 		    {
 		       D(O("DOTOPERATOR"););
 		       return DOTOPERATOR;
@@ -4239,7 +4239,7 @@ void yyfree (void * ptr )
 
 
 
-void lexer_set(class line_prep p, const int state)
+void lexer_set(Line_prep p, const int state)
 {
    input_string  = p.get_line_encoded()+'\n';
    pline         = p;
