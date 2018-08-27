@@ -16,7 +16,9 @@ class Findent
 
       Findent(Flags &f)
       {
+	 //
 	 // public
+	 //
 	 gl                 = new Globals;
 	 cur_indent         = 0;
 	 cur_rprop          = empty_rprop;
@@ -32,14 +34,18 @@ class Findent
 	 gl->global_line_length = flags.input_line_length;
 	 gl->global_gnu_format  = flags.input_format_gnu;;
 
+	 //
 	 // private
+	 //
 	 all_indent         = 0;
 	 endline_set        = 0;
 	 input_format       = flags.input_format;
 	 lines_read         = 0;
 	 output_format      = 0;
 	 reading_from_tty   = 0;
+	 //
 	 // for getnext:
+	 //
 	 prevlastchar       = 0;
       }
 
@@ -90,6 +96,5 @@ class Findent
       // for getnext:
       char prevlastchar;
 };
-
 
 #endif

@@ -74,4 +74,3 @@ int Findent::run()
    }
    return what_to_return();  // never reached
 }
-

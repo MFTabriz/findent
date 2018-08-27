@@ -4,7 +4,6 @@
 #include <unistd.h>
 #include "debug.h"
 
-
 int Findent::determine_fix_or_free()
 {
    int rc;
@@ -316,5 +315,3 @@ Fortranline Findent::mygetline(bool &eof, bool buffer)
 
    return Fortranline(gl,s);
 }              // end of mygetline
-
-

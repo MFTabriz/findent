@@ -17,9 +17,6 @@ void Fixed::build_statement(Fortranline &line, bool &f_more, bool &pushback)
    // f_more 1: more lines are to expected
    //        0: this line is complete
    //
-   // TODO: push back all trailing comments, an extra deque is needed for that
-   // in main. Has consequences for handle_refactor
-   // Implementation: ?
 
    pushback = 0;
 
@@ -414,4 +411,3 @@ std::string Fixed::add_amp(const std::string s,const char p)
    std::string slt = rtrim(remove_trailing_comment(s,p));
    return slt + "&" + s.substr(slt.length());
 }
-

@@ -21,6 +21,7 @@
 // ad-hoc debugging
 // turn on by  !findentfix:p-on
 // turn off by !findentfix:p-off
+// or in the code: ppp.on() or ppp.off()
 //
 
 extern  char endchar;

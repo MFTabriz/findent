@@ -1,5 +1,5 @@
-#ifndef NLINE_PREP_H
-#define NLINE_PREP_H
+#ifndef LINE_PREP_H
+#define LINE_PREP_H
 
 #include <iostream>
 #include <string>
@@ -108,4 +108,5 @@ class Line_prep
       }
 
 };
+
 #endif

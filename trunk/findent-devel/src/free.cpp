@@ -61,9 +61,6 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
    //
    // output lines input: free format, output: free format
    //
-   // TODO: but not urgent: it would be nicer to change the format
-   // of 'fixedlines' to fixed
-   //
 
    std::string endline = fi->endline;
    bool to_mycout = (fixedlines == 0);
