@@ -2,18 +2,94 @@
 #include <sstream>
 #include <string>
 
+#include "fixed.h"
 #include "debug.h"
-#include "fixed2fixed.h"
-#include "findent.h"
-#include "findent_functions.h"
 #include "findent_types.h"
+#include "free.h"
+#include "simpleostream.h"
 
-bool wizard(lines_t lines);
-std::string add_amp(const std::string s,const char prevquote);
+void Fixed::build_statement(Fortranline &line, bool &f_more, bool &pushback)
+{
+   //
+   // adds line to curlines
+   // adds line (stripped from comments, preprocessor stuff and 
+   //    continuation stuff)  to full_statement
+   // f_more 1: more lines are to expected
+   //        0: this line is complete
+   //
 
-size_t cindex = 0;
+   pushback = 0;
 
-void fixed2fixed(lines_t &lines,lines_t *freelines)
+   if (line.blank_or_comment())
+   {
+      curlines.push_back(line);
+
+      if (curlines.size() ==1)
+	 f_more = 0;   // do not expect continuation lines
+      else
+	 f_more = 1;   // but here we do
+      return;
+   }
+
+   //
+   // replace leading tabs by spaces
+   //
+
+   std::string s = line.str();
+
+   std::string sl = s.substr(0,5);
+   if (s.length() >6)
+      sl = sl+' '+s.substr(6);
+
+   //
+   // this is a line with code
+   //
+   if (curlines.empty())
+   {
+      //
+      // this is the first line
+      //
+      curlines.push_back(line);
+      full_statement += trim(sl);
+      full_statement = rtrim(remove_trailing_comment(full_statement));
+      if (!f_more)
+	 f_more = wizard();     // is there a continuation line in the future?
+      return;
+   }
+
+   // 
+   // special attention for garbage lines:
+   //
+   if(!cleanfive(s))
+   {
+      curlines.push_back(line);
+      return;
+   }
+   //
+   // this is possibly a continuation line
+   //
+   if (!line.fixedcontinuation())
+   {
+      //
+      // this is not a continuation line
+      // push it back, we will see it later
+      //
+      pushback = 1;
+      f_more   = 0;          // do not look for further continuation lines
+      return;
+   }
+   //
+   // this is a continuation line
+   //
+   curlines.push_back(line);
+   full_statement += rtrim((rtrim(sl)+"      ").substr(6));
+   full_statement = rtrim(remove_trailing_comment(full_statement));
+   if(!f_more)
+      f_more = wizard();   // look for more continuation lines
+}           // end of build_statement
+
+
+void Fixed::output(lines_t &lines,lines_t *freelines)
 {
    //
    // output lines input: fixed format, output: fixed format
@@ -30,6 +106,7 @@ void fixed2fixed(lines_t &lines,lines_t *freelines)
    char prevquote            = ' ';
 
    std::ostringstream os;
+   size_t cindex = 0;
 
    while(!lines.empty())
    {
@@ -47,10 +124,10 @@ void fixed2fixed(lines_t &lines,lines_t *freelines)
 	 // a completely blank line, that is simple:
 	 //
 	 if(to_mycout)
-	    mycout << endline;
+	    mycout << fi->endline;
 	 else
 	 {
-	    freelines->push_back(fortranline(""));
+	    freelines->push_back(F(""));
 	    os.str("");
 	 }
 	 lines.pop_front();
@@ -68,20 +145,20 @@ void fixed2fixed(lines_t &lines,lines_t *freelines)
 	       //
 	    {
 	       if(to_mycout)
-		  mycout << blanks(M(std::max(cur_indent+6,1)));
+		  mycout << blanks(M(std::max(fi->cur_indent+6,1)));
 	       else
 		  os << blanks(1);
 	    }
 	 }
 	 if(to_mycout)
-	    mycout << lines.front().trim() << endline;
+	    mycout << lines.front().trim() << fi->endline;
 	 else
 	 {
 	    int l = 1;
 	    if (toupper(lines.front().firstchar()) == 'D')
 	       l = 0;
 	    os << "!" << lines.front().trim().substr(l);
-	    freelines->push_back(os.str());
+	    freelines->push_back(F(os.str()));
 	    os.str("");
 	 }
 	 lines.pop_front();
@@ -106,11 +183,11 @@ void fixed2fixed(lines_t &lines,lines_t *freelines)
 	 // garbage in, garbage out
 	 //
 	 if(to_mycout)
-	    mycout << lines.front().rtrim() << endline;
+	    mycout << lines.front().rtrim() << fi->endline;
 	 else
 	 {
 	    os << lines.front().rtrim();
-	    freelines->push_back(os.str());
+	    freelines->push_back(F(os.str()));
 	    os.str("");
 	 }
 
@@ -125,9 +202,9 @@ void fixed2fixed(lines_t &lines,lines_t *freelines)
 	 {
 	    const std::string cc = "123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-	    if (flags.conchar != ' ')
+	    if (fi->flags.conchar != ' ')
 	    {
-	       if (flags.conchar == '0')
+	       if (fi->flags.conchar == '0')
 	       {
 		  s.at(5) = cc[cindex];
 		  cindex++;
@@ -135,7 +212,7 @@ void fixed2fixed(lines_t &lines,lines_t *freelines)
 		     cindex = 0;
 	       }
 	       else
-		  s.at(5) = flags.conchar;
+		  s.at(5) = fi->flags.conchar;
 	    }
 	 }
 	 //
@@ -175,7 +252,7 @@ void fixed2fixed(lines_t &lines,lines_t *freelines)
 	 {
 	    case ' ' :   // no dangling strings, output with indent
 	       if(to_mycout)
-		  mycout << blanks(M(std::max(adjust_indent+cur_indent,0))) 
+		  mycout << blanks(M(std::max(adjust_indent+fi->cur_indent,0))) 
 		     << trim(s.substr(6));
 	       else
 		  os << trim(s.substr(6));
@@ -192,7 +269,7 @@ void fixed2fixed(lines_t &lines,lines_t *freelines)
 	 //
 	 prevquote = fixedmissingquote(prevquote + s);
 	 if(to_mycout)
-	    mycout << endline;
+	    mycout << fi->endline;
 	 else
 	 {
 	    char c;
@@ -201,10 +278,10 @@ void fixed2fixed(lines_t &lines,lines_t *freelines)
 	       c = ' ';
 	       if(iscontinuation)
 		  c = prevquote;
-	       freelines->push_back(add_amp(os.str(),c));
+	       freelines->push_back(F(add_amp(os.str(),c)));
 	    }
 	    else
-	       freelines->push_back(os.str());
+	       freelines->push_back(F(os.str()));
 	    os.str("");
 	 }
 	 lines.pop_front();
@@ -214,21 +291,96 @@ void fixed2fixed(lines_t &lines,lines_t *freelines)
       // output a line that does not fulfill above conditions
       //
       if(to_mycout)
-	 mycout << s << endline;
+	 mycout << s << fi->endline;
       else
       {
 	 os << s;
 	 if (wizard(lines))       // more fortran lines follow
-	    freelines->push_back(add_amp(os.str(),prevquote));
+	    freelines->push_back(F(add_amp(os.str(),prevquote)));
 	 else
-	    freelines->push_back(os.str());
+	    freelines->push_back(F(os.str()));
 	 os.str("");
       }
       lines.pop_front();
    }
-}
+}     // end of output
 
-bool wizard(lines_t lines)
+void Fixed::output_converted(lines_t &lines)
+{
+   lines_t freelines;
+
+   output(lines, &freelines);
+   gl->global_format = FREE;
+   Free f(fi);
+   f.output(freelines);
+   gl->global_format = FIXED;
+}    // end of output_converted
+
+
+bool Fixed::wizard()
+{
+   //
+   // look ahead to see if the next format fortran line is a continuation
+   // return 1 if a continuation is found, 0 otherwize
+   // for free format, always return 0
+   //
+
+   // 
+   // TODO: wizard keeps no track of preprocessor statements, so it could be fooled
+   // like:
+   //       do
+   //     #ifdef X
+   //      1  i=1,10
+   //     #else
+   //      2  j=1,10
+   //     #endif
+   //       enddo
+
+   if (gl->global_format == FREE)
+      return 0;
+
+   Fortranline line(gl);
+   bool eof;
+
+   while(1)
+   {
+      line = fi->getnext(eof,0);
+      if (eof)
+	 return 0;
+
+      if (line.pre())
+      {
+	 bool p_more = 0;
+	 while(1)
+	 {
+	    fi->handle_pre_light(line,p_more);
+	    if (p_more)
+	    {
+	       line = fi->getnext(eof,0);
+	       if (eof)
+		  return 0;
+	    }
+	    else
+	       break;
+	 }
+	 if(eof)
+	    return 0;
+	 continue;
+      }
+
+      if (line.fortran() && cleanfive(line.str()))
+      {
+	 //
+	 // return 1 if this is a fixed fortran continuation line
+	 //
+	 return line.fixedcontinuation();
+      }
+   }
+   return 0;
+}     // end of wizard
+
+
+bool Fixed::wizard(lines_t lines)
 {
    // finds out if lines.front() gets a continuation line
 
@@ -246,7 +398,7 @@ bool wizard(lines_t lines)
    return 0;
 }
 
-std::string add_amp(const std::string s,const char p)
+std::string Fixed::add_amp(const std::string s,const char p)
 {
    //
    // examples:
@@ -259,4 +411,3 @@ std::string add_amp(const std::string s,const char p)
    std::string slt = rtrim(remove_trailing_comment(s,p));
    return slt + "&" + s.substr(slt.length());
 }
-

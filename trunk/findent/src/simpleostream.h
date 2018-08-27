@@ -4,23 +4,20 @@
 #include <iostream>
 #include <sstream>
 
-class simpleostream
+class Simpleostream
 {
    private:
 
       std::stringstream line;
       bool output;
+
    public:
-      simpleostream(void)
-      {
-	 output = 1;
-      }
-      void reset(void)
-      {
-	 line.str("");
-      }
+      Simpleostream(void) { output = 1; }
+
+      void reset(void) { line.str(""); }
+
       template< typename T >
-	 simpleostream& operator<<( T val )
+	 Simpleostream& operator<<( T val )
 	 { 
 	    if (output)
 	       std::cout << val; 
@@ -28,23 +25,18 @@ class simpleostream
 	       line << val;
 	    return *this; 
 	 }
-      void setoutput(const bool b)
-      {
-	 output = b;
-      }
-      bool getoutput(void)
-      {
-	 return output;
-      }
+
+      void setoutput(const bool b) { output = b; }
+
+      bool getoutput(void) { return output; }
+
       template< typename T> void set( T s )
 	 {
 	    reset();
 	    line << s;
 	 }
-      std::string get(void)
-      {
-	 return line.str();
-      }
-}
-;
+
+      std::string get(void) { return line.str(); }
+};
+
 #endif

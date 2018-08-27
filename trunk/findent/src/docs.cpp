@@ -1,15 +1,59 @@
 #include <iostream>
+#include "docs.h"
 #include "flags.h"
-#include "functions.h"
-#include "usage.h"
 #include "version.h"
+#include "functions.h"
 
-void manout(const std::string flag, const std::string txt, const bool doman);
-void replaceAll( std::string &s, const std::string &search, const std::string &replace );
-
-void usage(const bool doman)
+bool Docs::print(int todo)
 {
-   Flags flags;
+   switch(todo)
+   {
+      case Flags::DO_VERSION:
+	 std::cout << "findent version "<<VERSION<<std::endl;
+	 return 1;
+      case Flags::DO_USAGE:
+	 usage(0);
+	 return 1;
+      case Flags::DO_MANPAGE:
+	 usage(1);
+	 return 1;
+      case Flags::DO_VIM_HELP:
+	 vim_help();
+	 return 1;
+      case Flags::DO_VIM_FINDENT:
+	 vim_findent();
+	 return 1;
+      case Flags::DO_VIM_FORTRAN:
+	 vim_fortran();
+	 return 1;
+      case Flags::DO_GEDIT_HELP:
+	 gedit_help();
+	 return 1;
+      case Flags::DO_GEDIT_EXTERNAL:
+	 gedit_external();
+	 return 1;
+      case Flags::DO_GEDIT_PLUGIN:
+	 gedit_plugin();
+	 return 1;
+      case Flags::DO_GEDIT_PLUGIN_PY:
+	 gedit_plugin_py();
+	 return 1;
+      case Flags::DO_EMACS_HELP:
+	 emacs_help();
+	 return 1;
+      case Flags::DO_EMACS_FINDENT:
+	 emacs_findent();
+	 return 1;
+      case Flags::DO_README:
+	 readme();
+	 return 1;
+      default:
+	 return 0;
+   }
+}
+
+void Docs::usage(const bool doman)
+{
 
    if (doman)
    {
@@ -120,7 +164,8 @@ void usage(const bool doman)
    }
    manout("-I<n>, --start_indent=<n>"       ,"starting  indent (default:0)"                                                 ,doman);
    manout("-Ia, --start_indent=a"           ,"determine starting indent from first line"                                    ,doman);
-   manout("-i<n>, --indent=<n>"             ,"all       indents except I,c,C,e (default: "+number2string(flags.default_indent)+")",doman);
+   Flags f;
+   manout("-i<n>, --indent=<n>"             ,"all       indents except I,c,C,e (default: "+number2string(f.default_indent)+")",doman);
    manout("-a<n>, --indent_associate=<n>"   ,"ASSOCIATE    indent"                                                          ,doman);
    manout("-b<n>, --indent_block=<n>"       ,"BLOCK        indent"                                                          ,doman);
    manout("-d<n>, --indent_do=<n>"           ,"DO           indent"                                                          ,doman);
@@ -209,7 +254,7 @@ void usage(const bool doman)
    std::cout << "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE." <<std::endl;
 }
 
-void replaceAll( std::string &s, const std::string &search, const std::string &replace ) 
+void Docs::replaceAll( std::string &s, const std::string &search, const std::string &replace ) 
 {
    //
    // https://stackoverflow.com/questions/4643512/replace-substring-with-another-substring-c
@@ -234,7 +279,7 @@ void replaceAll( std::string &s, const std::string &search, const std::string &r
 //       otherwize : skip to new paragraph and use bold format
 // txt: Line to output
 //
-void manout(const std::string flag, const std::string txt, const bool doman)
+void Docs::manout(const std::string flag, const std::string txt, const bool doman)
 {
 
    if (doman)
@@ -258,4 +303,54 @@ void manout(const std::string flag, const std::string txt, const bool doman)
       else
 	 std::cout << flag << "\t" << ": " << txt << std::endl;
    }
+}
+
+void Docs::vim_help()
+{
+#include "vim_help.inc"
+}
+
+void Docs::vim_findent()
+{
+#include "vim_findent.inc"
+}
+
+void Docs::vim_fortran()
+{
+#include "vim_fortran.inc"
+}
+
+void Docs::gedit_help()
+{
+#include "gedit_help.inc"
+}
+
+void Docs::gedit_external()
+{
+#include "gedit_external.inc"
+}
+
+void Docs::gedit_plugin()
+{
+#include "gedit_plugin.inc"
+}
+
+void Docs::gedit_plugin_py()
+{
+#include "gedit_plugin_py.inc"
+}
+
+void Docs::emacs_help()
+{
+#include "emacs_help.inc"
+}
+
+void Docs::emacs_findent()
+{
+#include "emacs_findent.inc"
+}
+
+void Docs::readme()
+{
+#include "readme.inc"
 }

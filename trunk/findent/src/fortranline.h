@@ -1,15 +1,16 @@
-#ifndef FORTRANLINE_H
-#define FORTRANLINE_H
+#ifndef NFORTRANLINE_H
+#define NFORTRANLINE_H
 
-#include <iostream>
-#include <string>
+#include <deque>
+
 #include "functions.h"
-#include "parser.h"
 #include "lexer.h"
+#include "parser.h"
+#include "globals.h"
 
-class fortranline
+class Fortranline
 {
-
+   //
    // NOTE:
    // some functions assume that clean() is called
    //
@@ -23,19 +24,15 @@ class fortranline
    char firstchar_cache;    bool firstchar_cached;
    int scanfixpre_cache;    bool scanfixpre_cached;
 
-
-   static int global_format, global_line_length;
-   static bool global_gnu_format;
-
-   int  local_format;
-   bool local_gnu_format;
-   bool is_clean;
-
+   bool     is_clean;
+   Globals* gl;
+   int      local_format;
+   bool     local_gnu_format;
 
    void init()
    {
-      local_format        = global_format;
-      local_gnu_format    = global_gnu_format;
+      local_format      = gl->global_format;
+      local_gnu_format  = gl->global_gnu_format;
       ltrim_cached      = 0;
       trim_cached       = 0;
       firstchar_cached  = 0;
@@ -43,22 +40,28 @@ class fortranline
       scanfixpre_cached = 0;
    }
 
+   void init(Globals* g)
+   {
+      gl = g;
+      init();
+   }
+
    public:
 
    void print();
 
-   fortranline()
+   Fortranline(Globals* g)
    {
-      init();
+      init(g);
    }
 
-   fortranline(const std::string &s)
+   Fortranline(Globals*g, const std::string &s)
    {
-      init();
+      init(g);
       orig_line = s;
    }
 
-   static std::string g_format2txt()
+   std::string g_format2txt()
    {
       switch(g_format())
       {
@@ -73,36 +76,21 @@ class fortranline
       }
    }
 
-   static void g_format(const int what)
-   {
-      global_format = what;
-   }
-   static int g_format()
-   {
-      return global_format;
-   }
-   static void line_length(const int what)
-   {
-      global_line_length = what;
-   }
-   static int line_length()
-   {
-      return global_line_length;
-   }
-   static void gnu_format(bool what)
-   {
-      global_gnu_format = what;
-   }
-   static bool gnu_format()
-   {
-      return global_gnu_format;
-   }
-   std::string str() const
-   {
-      return orig_line;
-   }
+   void g_format(const int what)    { gl->global_format = what; }
 
-   friend std::ostream& operator <<(std::ostream &os,fortranline &obj);
+   int g_format()                   { return gl->global_format; }
+
+   void line_length(const int what) { gl->global_line_length=what; }
+
+   int line_length()                { return gl->global_line_length; }
+
+   void gnu_format(bool what)       { gl->global_gnu_format=what; }
+
+   bool gnu_format()                { return gl->global_gnu_format; }
+
+   std::string str() const          { return orig_line; }
+
+   friend std::ostream& operator <<(std::ostream &os,Fortranline &obj);
 
    void str(const std::string &s)
    {
@@ -113,7 +101,7 @@ class fortranline
    int format() const
    {
       if (local_format == UNKNOWN)
-	 return global_format;
+	 return gl->global_format;
       return local_format;
    }
 
@@ -169,10 +157,7 @@ class fortranline
       }
    }
 
-   std::string rtrim() const
-   {
-      return ::rtrim(orig_line);
-   }
+   std::string rtrim() const { return ::rtrim(orig_line); }
 
    std::string ltrim()
    {
@@ -225,10 +210,7 @@ class fortranline
 	 return 0;
    }
 
-   std::string first2chars() 
-   {
-      return ltrim().substr(0,2);
-   }
+   std::string first2chars() { return ltrim().substr(0,2); }
 
    int scanfixpre()
    {
@@ -252,10 +234,7 @@ class fortranline
 	 return "";
    }
 
-   bool blank() 
-   {
-      return (trim().length() == 0);
-   }
+   bool blank() { return (trim().length() == 0); }
 
    bool comment() 
    {
@@ -282,10 +261,7 @@ class fortranline
       return 0;
    }
 
-   bool blank_or_comment() 
-   {
-      return blank() || comment();
-   }
+   bool blank_or_comment() { return blank() || comment(); }
 
    int getpregentype() 
    {
@@ -303,30 +279,15 @@ class fortranline
       }
    }
 
-   bool precpp() 
-   {
-      return firstchar() == '#';
-   }
+   bool precpp() { return firstchar() == '#'; }
 
-   bool precoco() 
-   {
-      return first2chars() == "??";
-   }
+   bool precoco() { return first2chars() == "??"; }
 
-   bool pre() 
-   {
-      return precpp() || precoco();
-   }
+   bool pre() { return precpp() || precoco(); }
 
-   bool blank_or_comment_or_pre() 
-   {
-      return blank_or_comment() || pre();
-   }
+   bool blank_or_comment_or_pre() { return blank_or_comment() || pre(); }
 
-   bool fortran() 
-   {
-      return !blank_or_comment_or_pre();
-   }
+   bool fortran() { return !blank_or_comment_or_pre(); }
 
    bool fixedcontinuation() const
    {
@@ -339,5 +300,11 @@ class fortranline
    }
 
 };
-std::ostream& operator <<(std::ostream &os,fortranline &obj);
+
+std::ostream& operator <<(std::ostream &os,Fortranline &obj);
+
+typedef std::deque<Fortranline> lines_t;
+
+typedef std::deque<Fortranline> linebuffer_t;
+
 #endif

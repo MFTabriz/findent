@@ -13,8 +13,9 @@ case '5': case '6': case '7': case '8': case '9'
    wv.push_back(vstruct);        \
 }
 
-line_prep::line_prep(const std::string s)
+Line_prep::Line_prep(const std::string s)
 {
+
    enum states { maybe_stlabel, in_stlabel, in_code, in_qstring, 
       pre_hollerith, in_hollerith, in_dotop};
 

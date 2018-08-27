@@ -74,12 +74,18 @@ findent.o: parser.h
 
 vim_plugin.o: vim_fortran.inc vim_findent.inc vim_help.inc
 
+
 gedit_plugin.o: gedit_external.inc gedit_plugin.inc gedit_plugin_py.inc \
    gedit_help.inc
 
 emacs_plugin.o: emacs_findent.inc emacs_help.inc
 
 readme_plugin.o: readme.inc
+
+docs.o:    vim_fortran.inc vim_findent.inc vim_help.inc \
+	   gedit_external.inc gedit_plugin.inc gedit_plugin_py.inc gedit_help.inc \
+           emacs_findent.inc emacs_help.inc \
+	   readme.inc
 
 TOCPP     = $(top_srcdir)/src/tocpp.sh
 VIMDIR    = $(top_srcdir)/vim
@@ -119,24 +125,29 @@ readme.inc: $(READMEDIR)/README $(TOCPP)
 
 bin_PROGRAMS    = findent
 
-findent_SOURCES = findent.cpp findent.h \
-		  mylexer.cpp myparser.cpp lexer.h parser.h \
-		  line_prep.cpp pre_analyzer.cpp debug.cpp debug.h \
-		  functions.cpp functions.h \
-		  line_prep.h pre_analyzer.h version.h \
-		  simpleostream.h \
-		  vim_plugin.cpp vim_plugin.h \
-		  gedit_plugin.cpp gedit_plugin.h \
-		  emacs_plugin.cpp emacs_plugin.h \
-		  readme_plugin.cpp readme_plugin.h prop.h \
-		  flags.cpp flags.h usage.cpp usage.h \
-		  fortranline.cpp fortranline.h \
-		  free2free.cpp free2free.h \
-		  fixed2fixed.cpp fixed2fixed.h \
-		  fixed2free.cpp fixed2free.h \
-		  free2fixed.cpp free2fixed.h \
-		  findent_functions.cpp findent_functions.h \
-		  findent_types.h
+findent_SOURCES = \
+		  debug.cpp              debug.h           \
+		  docs.cpp               docs.h            \
+		  findent.cpp            findent.h         \
+		                         findent_types.h   \
+		  findentclass.cpp       findentclass.h    \
+		  findentrun.cpp         findentrun.h      \
+		  fixed.cpp              fixed.h           \
+		  flags.cpp              flags.h           \
+		  fortran.cpp            fortran.h         \
+		  fortranline.cpp        fortranline.h     \
+		  free.cpp               free.h            \
+		  functions.cpp          functions.h       \
+		  globals.cpp            globals.h         \
+		                         lexer.h           \
+		  line_prep.cpp          line_prep.h       \
+		  mylexer.cpp                              \
+		  myparser.cpp                             \
+		                         parser.h          \
+		  pre_analyzer.cpp       pre_analyzer.h    \
+		  prop.cpp               prop.h            \
+		  simpleostream.h        simpleostream.cpp \
+                  version.h
 
 
 BUILT_SOURCES = parser.cpp parser.h lexer.cpp

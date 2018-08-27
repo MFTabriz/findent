@@ -100,7 +100,8 @@ bool isfixedcmtp(const std::string &s)
       return 1;
    char c = firstchar(s);
    char cts = firstchar(trim(s));
-   return (cts == 0 || c == 'C' || c == 'c' || cts == '!' || c == '*' || cts == '#' || c == 'd' || c == 'D' || firstchars(trim(s),2) == "??"); 
+   return (cts == 0 || c == 'C' || c == 'c' || cts == '!' || c == '*' \
+	 || cts == '#' || c == 'd' || c == 'D' || firstchars(trim(s),2) == "??"); 
 }
 
 int num_leading_spaces(const std::string &s)

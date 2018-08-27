@@ -5,10 +5,7 @@
 #include <sstream>
 #include "simpleostream.h"
 
-inline std::string blanks(const size_t x)
-{
-   return std::string(x,' ');
-}
+inline std::string blanks(const size_t x) { return std::string(x,' '); }
 
 inline std::string ltrim(const std::string &str)
 {
@@ -58,7 +55,7 @@ inline char lastchar(const std::string &s)
    return s[l-1];
 }
 
-extern simpleostream mycout; 
+extern Simpleostream mycout; 
 
 template <typename T>
   std::string number2string ( T number )
@@ -77,17 +74,29 @@ template <typename T>
   }
 
 bool        cleanfive(const std::string &s);
+
 std::string firstchars(const std::string &s, const int n);
+
 char        firstchar(const std::string &s);
+
 char        fixedmissingquote(const std::string &s);
+
 bool        isalnumplus(const char c);
+
 bool        isfixedcmtp(const std::string &s);
+
 char        lastchar(const std::string &s);
+
 std::string ltab2sp(const std::string& s);
+
 int         num_leading_spaces(const std::string &s);
+
 std::string remove_blanks(const std::string &s);
+
 std::string remove_trailing_comment(const std::string &s, const char prevquote = ' ');
+
 std::string stolower(const std::string &s);
+
 std::string stoupper(const std::string &s);
 
 #endif
