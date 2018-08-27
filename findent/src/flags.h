@@ -7,6 +7,11 @@ class Flags
 
    public:
 
+   Flags()
+   {
+      set_defaults();
+   }
+
    int get_flags(int argc, char *argv[]);
 
    enum {
@@ -72,9 +77,5 @@ class Flags
    int start_indent;
    int type_indent;
    int where_indent;
-   Flags()
-   {
-      set_defaults();
-   }
 };
 #endif

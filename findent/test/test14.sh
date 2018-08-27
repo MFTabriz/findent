@@ -148,6 +148,27 @@ cat << eof > expect
 eof
 
 $doit "--continuation=9" "" "--continuation=9 for fixed input"
+
+cat << eof > prog
+#define W \
+      program
+       program p004
+	      continue
+	      end
+eof
+
+cat << eof > expect
+#define W \
+      program
+       program p004
+          continue
+       end
+eof
+
+$doit "-Ia --start-indent=a" "-ifree" "for free input"
+
+$doit "-Ia --start-indent=a" "-ifixed" "for fixed input"
+
 rc=`expr $rc + $?`
 . ../postlude
 exit $rc

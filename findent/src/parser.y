@@ -288,7 +288,7 @@ void resetprop()
    properties.dolabel = "";
 }
 
-propstruct parseline(class line_prep p)
+propstruct parseline(Line_prep p)
 {
    D(O("entering parseline"););
    lexer_set(p,IDENTIFIER);
@@ -311,4 +311,3 @@ extern "C" int yywrap()
   D(O("yywrap"););
   return 1;
 }
-

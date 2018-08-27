@@ -16,21 +16,23 @@
 #define D(x)
 #endif
 
+#define FL __func__<<__FILE__<<__LINE__<<':'
 //
 // ad-hoc debugging
 // turn on by  !findentfix:p-on
 // turn off by !findentfix:p-off
+// or in the code: ppp.on() or ppp.off()
 //
 
 extern  char endchar;
 
-class debugostream 
+class Debugostream 
 
 {
    private:
       bool output;
    public:
-      debugostream()
+      Debugostream()
       {
 	 output = 0;
       }
@@ -42,7 +44,7 @@ class debugostream
       {
 	 output = 1;
       }
-      template< typename T > debugostream& operator<<( T val )
+      template< typename T > Debugostream& operator<<( T val )
       { 
 	 if (output)
 	 {
@@ -61,4 +63,5 @@ class debugostream
       }
 };
 
+extern Debugostream ppp;
 #endif

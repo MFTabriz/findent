@@ -32,7 +32,6 @@ void Flags::set_defaults(void)
    start_indent        = 0;
    upcase_routine_type = 0;
 
-
    set_default_indents();
 }
 
@@ -97,8 +96,7 @@ int Flags::get_flags(int argc, char *argv[])
       allflags[nflags++] = argv[i];
    }
 
-
-   static struct option longopts[] =
+   struct option longopts[] =
    {
       {"indent"             , required_argument, 0, DO_INDENT            },
 
@@ -222,11 +220,13 @@ int Flags::get_flags(int argc, char *argv[])
 
       {0,0,0,0}
    };
-   int c;
-   opterr = 0;
-   int option_index = 0;
+
    std::string option_name;
-   int retval = DO_NOTHING;
+   int c;
+   int retval       = DO_NOTHING;
+   int option_index = 0;
+   opterr = 0;              // see man getopt_long
+
    while((c=getopt_long(nflags,allflags,"a:b:c:C:d:e:E:f:F:hHi:I:j:k:l:L:m:M:o:qQr:R:s:t:vw:x:",
 	       longopts, &option_index))!=-1)
    {

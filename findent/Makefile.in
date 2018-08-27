@@ -787,6 +787,7 @@ uninstall-am:
 
 maintainer-clean-local:
 	rm -rf bin share autom4te.cache
+
 @MAKEWIN_TRUE@all-local:
 @MAKEWIN_TRUE@	test -f src/findent && mv src/findent src/findent.exe
 

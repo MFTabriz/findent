@@ -1,5 +1,9 @@
 For installation instructions and usage, see README.1st and INSTALL
 
+This document is a not very well structured story about findent.
+You can skip this and use findent after reading the output of
+  findent -h.
+
 findent, what?
 ==============
 
@@ -17,7 +21,7 @@ findent, what?
       FORALL
       WHERE constructs
       FORALL constructs
-      etc. see findent.cpp for details
+      etc. see findentclass.cpp for details
 
    findent will remove trailing spaces and tabs, and convert
    tabs at the start of a line into spaces. By default, statement 
@@ -30,11 +34,11 @@ findent, what?
 
    will remain intact.
 
-   Optionally, findent will refactor optionally single 'end' statements:
+   Optionally, findent will refactor lines that end a subroutine etc.:
 
       SUBROUTINE SUB
       ...
-      END
+      END FUNCTION MYFUN
 
    will become:
 
@@ -67,7 +71,7 @@ findent, why?
         Fortran code and contains a macro processor.
         http://fortranwiki.org/fortran/show/f90ppr
    - fprettify: an indenter and beautifier, written in Python.
-	IMHO not mature at the time of this writing (june 2018).
+	IMHO not mature at the time of this writing (august 2018).
         https://github.com/pseewald/fprettify
 
    For me, the problem with these tools is, that 
@@ -86,7 +90,7 @@ findent, why?
    to try to build a Fortran indenter, based on flex and bison for
    readability.
    As programming language I chose C++, because of the availability
-   of string, queue, stack and deque.
+   of string and deque.
 
 
 findent, how?
@@ -100,8 +104,8 @@ findent, how?
     - determine the input format: free or fixed
     - glue together continuation lines removing comments
     - pre-process the assembled input line, to make it better processable 
-        by flex: remove whitespace, substitute strings, hollerith's, statement
-        label and operators like .EQ. by special tokens
+        by flex: remove white space, substitute strings, hollerith's, 
+	statement label and operators like .EQ. by special tokens
     - perform a two-stage parsing:
       - try if the line is an assignment
       - if it is not an assignment, parse the line using as tokens the
@@ -110,7 +114,8 @@ findent, how?
     - output the lines that were read in to compose the full line,
       trying to preserve the lay-out after the original leading white
       space, optionally converting from fixed-form to free-form.
-      Also optionally, lines with a single END are completed as in:
+      Also optionally, lines that end a subroutine, program etc.,
+      are completed (or even modified) as in:
         END subroutine mysub
       Preprocessor statements are accounted for to prevent that code like:
 
@@ -125,75 +130,124 @@ findent, how?
        constructs like:
 
            DO 10 I=1,20
-             X(I) = Y(I)
+	     DO 10 J=1,10
+		X(I) = Y(I)+J
         10 CONTINUE
 
+Findent, structure
+==================
 
-   The code consists of the following files:
+   In version 2.8.4, a major reorganizing has been done, trying to
+   make the source more readable and more object-oriented.
 
-    - findent.h         include file for some common functions and variables
-    - version.h         include file for the version number
-    - lexer.l:          the lexer, written for flex
-    - parser.y:         the parser, written for bison
-    - findent.cpp:      reads the input and produces the output
-    - line_prep.cpp:    converts a line Fortran code to something that
-                        can easily be digested by flex
-    - pre_analyzer.cpp: code to handle pre-processor statements
-    - functions.cpp:    some simple string functions
-    - functions.h:      include file for functions.cpp
-    - line_prep.h:      header file for line_prep.cpp
-    - simpleostream.h   wrapper for std::cout
-    - pre_analyzer.h    header file for pre_analyzer.cpp
-    - wfindent:         a sh script that calls findent to indent
-                        Fortran sources in-place
+   These are the classes (all starting with a capital):
 
-   lexer.l
-      
-      This file contains the rules to recognize parts of Fortran 
-      statements or identifiers. Also a state is defined that is
-      used during the determination if the input is fixed or free
-      form.
+   - Debugostream
 
-   parser.y
+      This class contains code for debugging.
 
-      This file contains the parser which recognizes assignments and
-      Fortran keywords important for indentation.
+   - Docs
 
-   findent.cpp
+      This class contains code (often generated) to output help-
+      texts (includeing this text) etcetera.
 
-      The main program, including a number of functions needed for 
-      glueing the continuation lines and constructing the output
-      file. 
+   - Findentclass
 
-   line_prep.cpp
+      Findentclass contains basic functions and variables that
+      are used throughout the program, such as:
 
-      Defines a class used to pre-parse the full input line. I did not
-      succeed in training flex to properly and timely recognize statement
-      labels, strings ("this is a string"), hollerith's (7hfortran) and 
-      (possibly user defined) operators (.eq. , .my_op.). Therefore I 
-      created a class that takes care of these things and produces a line
-      that can easily be processed by flex.
+      int determine_fix_or_free()
+         if the input format is not given (parameter -ifixed
+	 or -ifree), this function tries to find a proof that
+	 the program is free-format. If so, FREE is returned,
+	 else FIXED.
 
-   simpleostream.h
+      Fortranline mygetline()
+         Reads a line from STDIN.
+	 Optionally, the function builds a buffer to store the
+	 line just read, this option is used by determine_fixed_or_free().
 
-      Defines a wrapper for std::cout, with the possibility to
-      not perform output at all, but only store the things that
-      would have been output.
+      Fortranline Getline()
+         Uses the buffer from mygetline() or mygetline() to return
+	 a Fortranline. Optionally, maintains a buffer (wizardbuffer)
+	 to enable a look-ahead for the wizard functions.
+	
 
-   pre_analyzer.cpp pre_analyzer.h
+   - Fortranline
 
-      Findent does not evaluate preprocessor statements (#if etc.),
-      but does keep track of them, so that a construction like:
+      This class contains a line of fortran code, and has many
+      frequently used functions operating on that line.
 
-      #ifdef foo
-         do i=1,10
-      #elif defined bar
-         do i=1,20
-      #else
-         do i=1,30
-      #endif
+   - Fortran
 
-      is indented correctly.
+      This is an abstract class with functions and variables needed
+      to construct a 'full_statement': a string that is composed
+      of pure fortran code (stripped from comments, preprocessor
+      directives, ..) and a deque of lines that constructed the
+      full_statement, including comments and preprocessor statements. 
+
+      The pure virtual functions are filled in by class Fixed or
+      class Free, depending on the format of the input.
+
+      The indentation required is computed from full_statement
+      and the current indentation.
+
+      Special provisions are made for storing labelled do statements,
+      preprocessor statements and more.
+
+   - Free
+
+      This class is a child of Fortran, and contains functions to
+      indent and output the deque containing the continuation lines
+      of a free format fortran source.
+      Also, when conversion from free to fixed format is required, 
+      there is code to store the continuation lines in a fixed
+      (not properly indented) deque, and present this to Fixed to
+      output this in a properly indented format.
+
+   - Fixed
+
+      Basically the same as Free, but vice-versa. 
+      There is a special issue: to determine if there are continuation
+      lines, a wizard has been created that can look ahead, see
+      getnext() in Findentclass.
+
+   - Flags
+
+      This class implements a container for the flags (-ifree, -i4 ...)
+      and contains code to interpret the flags.
+
+   - Globals
+
+      This class implements a container for a few global variables.
+      Maybe, one would be tempted to make these static, but I tried 
+      not to use static variables in order to able to run more than
+      one Findent in one program, one reading from STDIN, the other
+      from a file for example. 
+
+   - Line_prep
+
+      This class contains code to pre-analyze a full_statement to
+      make the work easier for the lexer and parser.
+
+   - Pre_analyzer
+
+      This class contains code to see if a line is a preprocessor
+      statement or a findentfix: line.
+
+   - Simpleostream
+
+      This class implements a simple filter to std::cout.
+
+   The program starts in findent.cpp, and goes on in fortranrun.cpp.
+
+
+   The whole thing is somewhat more hairy than I would like to see.
+   I did not succeed to make the whole thing strictly hierarchical,
+   and solved this by giving classes access to the internals of
+   other classes using pointers. But, like in biology, in creating
+   a program, there is no law to keep it simple.
+
 
 findent, usage?
 ===============
@@ -286,17 +340,18 @@ findent, usage?
         free format respectively. In fact, indenting old fixed format
         sources will very likely result in lines longer than 72 columns.
         If you are lucky, the compiler will generate an error message,
-        but too long lines can result in changing the semantics of a program 
-        without notice.
+        but too long lines can result in changing the semantics of a 
+	program without notice.
         Advice: use a compiler flag that allows long lines:
 
           gfortran, free format:    -ffree-line-length-none  # unlimited
           gfortran, fixed formtat:  -ffixed-line-length-none # unlimited
           ifort, free format:       # no flag needed, default is unlimited
           ifort, fixed format:      -132  # max line length is 132
-          pgf90, free format:       # max line length is 264, error if longer
+          pgf90, free format:       # max line length is 264, 
+	                            # error if longer
           pgf90, fixed format:      -Mextend  # max line length is 132, 
-                                    no error if longer
+                                    #           no error if longer
 
    NOTE 4.1:
         Here a script to check for line length:
@@ -450,6 +505,7 @@ findent, failure, findentfix:
 #else
       print *,'without j-loop'
 #endif
+
    So, findent is missing an enddo for the j-loop.
 
    In this case, the solution would be to insert #else just before the
@@ -486,8 +542,8 @@ findent, installation:
 wfindent
 ========
 
-  wfindent, a bash shell script, indents Fortran source in-place, performing a
-  sanity check.
+  wfindent, a bash shell script, indents Fortran source in-place, 
+  performing a sanity check.
   It accepts all flags that findent accepts.
 
   Usage:
@@ -527,8 +583,9 @@ findent and vim
 ===============
 
    Findent is since version 2.7 very vim-aware. When using the vim scripts
-   mentioned in README.1st, findent is used as equalprg ( :help equalprg )
-   end indentexpr ( :help indentexpr )
+   (look at findent --vim-help), findent is used as equalprg 
+   ( :help equalprg )
+   and indentexpr ( :help indentexpr )
    This is possible because of the speed of findent: it indents about 
    50000 - 100000 lines per second.
 
@@ -553,7 +610,8 @@ findent and emacs
 Issues
 ======
    
-   Since findent parses line-by-line, there are situations that are ambiguous:
+   Since findent parses line-by-line, there are situations that are 
+   ambiguous:
 
      F(X) = X**2        An assignment or a statement function?
 
@@ -582,6 +640,34 @@ Issues
    MODULE PROCEDURE MYPROC  Is this an module PROCEDUREMYPROC or
                             an moduleprocedure MYPROC?
                             Findent assumes the last.
+
+Thanks to
+=========
+
+It would not be possible for me to create findent if I could not stand
+of the shoulders of other free software projects. In alphabetical order
+(and probably forgetting some):
+
+autoconf:      https://www.gnu.org/software/autoconf/autoconf.html
+bash:          https://www.gnu.org/software/bash/
+bison:         https://www.gnu.org/software/bison/
+debian:        https://www.debian.org/
+flex:          https://github.com/westes/flex
+g++:           https://gcc.gnu.org/
+gcc:           https://gcc.gnu.org/
+gfortran:      https://gcc.gnu.org/wiki/GFortran
+gnu software:  https://www.gnu.org/
+linux:         https://en.wikipedia.org/wiki/Linux
+make:          https://www.gnu.org/software/make/
+ubuntu:        https://www.ubuntu.com/
+vim:           https://www.vim.org/
+
+The website http://www.cplusplus.com/ helped me to find a way through C++.
+
+I like to thank the people who gave suggestions to improve the functionality
+of findent.
+
+=============================================================================
 
 I am happy to receive comments, error reports and suggestions for
 improvements.
