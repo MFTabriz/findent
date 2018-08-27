@@ -10,15 +10,12 @@ class Simpleostream
 
       std::stringstream line;
       bool output;
+
    public:
-      Simpleostream(void)
-      {
-	 output = 1;
-      }
-      void reset(void)
-      {
-	 line.str("");
-      }
+      Simpleostream(void) { output = 1; }
+
+      void reset(void) { line.str(""); }
+
       template< typename T >
 	 Simpleostream& operator<<( T val )
 	 { 
@@ -28,23 +25,18 @@ class Simpleostream
 	       line << val;
 	    return *this; 
 	 }
-      void setoutput(const bool b)
-      {
-	 output = b;
-      }
-      bool getoutput(void)
-      {
-	 return output;
-      }
+
+      void setoutput(const bool b) { output = b; }
+
+      bool getoutput(void) { return output; }
+
       template< typename T> void set( T s )
 	 {
 	    reset();
 	    line << s;
 	 }
-      std::string get(void)
-      {
-	 return line.str();
-      }
-}
-;
+
+      std::string get(void) { return line.str(); }
+};
+
 #endif

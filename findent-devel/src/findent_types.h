@@ -4,7 +4,6 @@
 #include <deque>
 #include <iostream>
 
-
 typedef std::deque<int>               dolabels_t;
 typedef std::deque<dolabels_t>        dolabels_store_t;
 typedef std::deque<int>               indent_t;
@@ -14,6 +13,9 @@ typedef std::deque<bool>              nbseen_store_t;
 
 template <class C> std::ostream& operator <<(std::ostream &os, std::deque<C> &obj)
 {
+   //
+   // to print a deque
+   //
    if (obj.empty())
    {
       os << ":empty"<<std::endl;

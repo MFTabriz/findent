@@ -309,39 +309,48 @@ void Docs::vim_help()
 {
 #include "vim_help.inc"
 }
+
 void Docs::vim_findent()
 {
 #include "vim_findent.inc"
 }
+
 void Docs::vim_fortran()
 {
 #include "vim_fortran.inc"
 }
-   void Docs::gedit_help()
+
+void Docs::gedit_help()
 {
 #include "gedit_help.inc"
 }
-   void Docs::gedit_external()
+
+void Docs::gedit_external()
 {
 #include "gedit_external.inc"
 }
-   void Docs::gedit_plugin()
+
+void Docs::gedit_plugin()
 {
 #include "gedit_plugin.inc"
 }
-   void Docs::gedit_plugin_py()
+
+void Docs::gedit_plugin_py()
 {
 #include "gedit_plugin_py.inc"
 }
-   void Docs::emacs_help()
+
+void Docs::emacs_help()
 {
 #include "emacs_help.inc"
 }
-   void Docs::emacs_findent()
+
+void Docs::emacs_findent()
 {
 #include "emacs_findent.inc"
 }
-   void Docs::readme()
+
+void Docs::readme()
 {
 #include "readme.inc"
 }

@@ -3,7 +3,6 @@
 
 #include <deque>
 
-class Findent;
 #include "functions.h"
 #include "lexer.h"
 #include "parser.h"
@@ -11,7 +10,7 @@ class Findent;
 
 class Fortranline
 {
-
+   //
    // NOTE:
    // some functions assume that clean() is called
    //
@@ -43,7 +42,7 @@ class Fortranline
 
    void init(Globals* g)
    {
-      gl                = g;
+      gl = g;
       init();
    }
 
@@ -77,34 +76,19 @@ class Fortranline
       }
    }
 
-   void g_format(const int what)
-   {
-      gl->global_format = what;
-   }
-   int g_format()
-   {
-      return gl->global_format;
-   }
-   void line_length(const int what)
-   {
-      gl->global_line_length=what;
-   }
-   int line_length()
-   {
-      return gl->global_line_length;
-   }
-   void gnu_format(bool what)
-   {
-      gl->global_gnu_format=what;
-   }
-   bool gnu_format()
-   {
-      return gl->global_gnu_format;
-   }
-   std::string str() const
-   {
-      return orig_line;
-   }
+   void g_format(const int what)    { gl->global_format = what; }
+
+   int g_format()                   { return gl->global_format; }
+
+   void line_length(const int what) { gl->global_line_length=what; }
+
+   int line_length()                { return gl->global_line_length; }
+
+   void gnu_format(bool what)       { gl->global_gnu_format=what; }
+
+   bool gnu_format()                { return gl->global_gnu_format; }
+
+   std::string str() const          { return orig_line; }
 
    friend std::ostream& operator <<(std::ostream &os,Fortranline &obj);
 
@@ -173,10 +157,7 @@ class Fortranline
       }
    }
 
-   std::string rtrim() const
-   {
-      return ::rtrim(orig_line);
-   }
+   std::string rtrim() const { return ::rtrim(orig_line); }
 
    std::string ltrim()
    {
@@ -229,10 +210,7 @@ class Fortranline
 	 return 0;
    }
 
-   std::string first2chars() 
-   {
-      return ltrim().substr(0,2);
-   }
+   std::string first2chars() { return ltrim().substr(0,2); }
 
    int scanfixpre()
    {
@@ -256,10 +234,7 @@ class Fortranline
 	 return "";
    }
 
-   bool blank() 
-   {
-      return (trim().length() == 0);
-   }
+   bool blank() { return (trim().length() == 0); }
 
    bool comment() 
    {
@@ -286,10 +261,7 @@ class Fortranline
       return 0;
    }
 
-   bool blank_or_comment() 
-   {
-      return blank() || comment();
-   }
+   bool blank_or_comment() { return blank() || comment(); }
 
    int getpregentype() 
    {
@@ -307,30 +279,15 @@ class Fortranline
       }
    }
 
-   bool precpp() 
-   {
-      return firstchar() == '#';
-   }
+   bool precpp() { return firstchar() == '#'; }
 
-   bool precoco() 
-   {
-      return first2chars() == "??";
-   }
+   bool precoco() { return first2chars() == "??"; }
 
-   bool pre() 
-   {
-      return precpp() || precoco();
-   }
+   bool pre() { return precpp() || precoco(); }
 
-   bool blank_or_comment_or_pre() 
-   {
-      return blank_or_comment() || pre();
-   }
+   bool blank_or_comment_or_pre() { return blank_or_comment() || pre(); }
 
-   bool fortran() 
-   {
-      return !blank_or_comment_or_pre();
-   }
+   bool fortran() { return !blank_or_comment_or_pre(); }
 
    bool fixedcontinuation() const
    {
@@ -347,6 +304,7 @@ class Fortranline
 std::ostream& operator <<(std::ostream &os,Fortranline &obj);
 
 typedef std::deque<Fortranline> lines_t;
+
 typedef std::deque<Fortranline> linebuffer_t;
 
 #endif

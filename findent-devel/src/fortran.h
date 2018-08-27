@@ -29,40 +29,35 @@ class Fortran
       }
 
       virtual void build_statement(Fortranline &line, bool &f_more, bool &pushback) = 0;
-      // replaces handle_free, handle_fixed
-      //
+
       virtual void output(lines_t &lines,lines_t *freelines = 0) = 0;
-      // replaces fixed2fixed/free2free
-      //
+
       virtual void output_converted(lines_t &lines) = 0;
-      // replaces fixed2free and free2fixed
-      //
-      void          handle_last_usable_only();
-      void          get_full_statement();
 
-      int get_num() { return fi->num_lines; }
+      void         get_full_statement();
+      int          get_num() { return fi->num_lines; }
+      void         handle_last_usable_only();
+      void         indent_and_output();
 
-
-      std::string      full_statement;
-      void        indent_and_output();
+      std::string  full_statement;
 
    protected:
 
-      lines_t          curlines;
-      struct propstruct prev_props;
-      dolabels_store_t dolabels_store;
-      dolabels_t       dolabels;        // to store labels, necessary for labelled do
-      Findent*         fi;
-      fs_store_t       fs_store;
-      Globals*         gl;
-      indent_store_t   indent_store;    // to store indent store
-      nbseen_store_t   nbseen_store;    // to store nbseen
-      Pre_analyzer     prea;
-      rprops_store_t   rprops_store;
-      rprops_t         rprops;          // to store routines (module, subroutine ...)
-      bool              refactor_end_found;
       struct propstruct cur_rprop;
-      Fortranline      *curline;
+      Fortranline*      curline;
+      lines_t           curlines;
+      dolabels_store_t  dolabels_store;
+      dolabels_t        dolabels;        // to store labels, necessary for labelled do
+      Findent*          fi;
+      fs_store_t        fs_store;
+      Globals*          gl;
+      indent_store_t    indent_store;    // to store indent store
+      nbseen_store_t    nbseen_store;    // to store nbseen
+      Pre_analyzer      prea;
+      struct propstruct prev_props;
+      bool              refactor_end_found;
+      rprops_store_t    rprops_store;
+      rprops_t          rprops;          // to store routines (module, subroutine ...)
 
       int M(const int k)
       {
@@ -77,30 +72,62 @@ class Fortran
 
       Fortranline F(const std::string &s) { return Fortranline(gl,s); }
 
-      std::string statement() { return full_statement; }
+      int pop_indent() 
+      { 
+	 if (fi->indent.empty()) 
+	    return 0; 
+	 fi->indent.pop_back(); 
+	 return top_indent(); 
+      }
 
-      lines_t lines() { return curlines; }
+      int top_indent() 
+      { 
+	 if (fi->indent.empty()) 
+	    return 0; 
+	 return fi->indent.back(); 
+      }
 
-      int pop_indent() { if (fi->indent.empty()) return 0; fi->indent.pop_back(); return top_indent(); }
+      int top_dolabel() 
+      { 
+	 if (dolabels.empty()) 
+	    return -1; 
+	 return dolabels.back(); 
+      } 
 
-      int top_indent() { if (fi->indent.empty()) return 0; return fi->indent.back(); }
-
-      int top_dolabel() { if (dolabels.empty()) return -1; return dolabels.back(); } 
-
-      int pop_dolabel() { if (dolabels.empty()) return -1; dolabels.pop_back(); return top_dolabel(); }
+      int pop_dolabel() 
+      { 
+	 if (dolabels.empty()) 
+	    return -1; 
+	 dolabels.pop_back(); 
+	 return top_dolabel(); 
+      }
 
       void push_indent(int p) { fi->indent.push_back(p); } 
 
-      void empty_dolabels() { while(!dolabels.empty()) dolabels.pop_back(); }
+      void empty_dolabels() 
+      { 
+	 while(!dolabels.empty()) 
+	    dolabels.pop_back(); 
+      }
 
       void push_rprops(struct propstruct p) { rprops.push_back(p); }
 
       void push_dolabel(int p) { dolabels.push_back(p); }
 
-      struct propstruct top_rprops() { if (rprops.empty()) return empty_rprop; return rprops.back(); }
-      struct propstruct pop_rprops() { if (rprops.empty()) return empty_rprop; rprops.pop_back(); return top_rprops(); }
+      struct propstruct top_rprops() 
+      { 
+	 if (rprops.empty()) 
+	    return empty_rprop; 
+	 return rprops.back();
+      }
 
-
+      struct propstruct pop_rprops() 
+      { 
+	 if (rprops.empty()) 
+	    return empty_rprop; 
+	 rprops.pop_back(); 
+	 return top_rprops(); 
+      }
 
       void push_all()
       {
@@ -138,14 +165,16 @@ class Fortran
 
       }        // end of pop_all
 
-      void        handle_pre(Fortranline &line, const bool f_more, bool &p_more);
-      bool        is_findentfix(Fortranline &line);
-      bool        output_pre(lines_t &lines, lines_t *outlines);
-      void        output_line();
-      void        handle_refactor();
+      void  handle_pre(Fortranline &line, const bool f_more, bool &p_more);
+      bool  is_findentfix(Fortranline &line);
+      bool  output_pre(lines_t &lines, lines_t *outlines);
+      void  output_line();
+      void  handle_refactor();
 
    private:
+      //
       // for get_full_statement and handle_pre:
+      //
       bool first_call;
       bool f_more;
       bool p_more;
@@ -161,7 +190,6 @@ class Fortran
 	 in_ffix
       };
       //
-
 };
 
 #endif

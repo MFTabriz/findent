@@ -641,6 +641,34 @@ Issues
                             an moduleprocedure MYPROC?
                             Findent assumes the last.
 
+Thanks to
+=========
+
+It would not be possible for me to create findent if I could not stand
+of the shoulders of other free software projects. In alphabetical order
+(and probably forgetting some):
+
+autoconf:      https://www.gnu.org/software/autoconf/autoconf.html
+bash:          https://www.gnu.org/software/bash/
+bison:         https://www.gnu.org/software/bison/
+debian:        https://www.debian.org/
+flex:          https://github.com/westes/flex
+g++:           https://gcc.gnu.org/
+gcc:           https://gcc.gnu.org/
+gfortran:      https://gcc.gnu.org/wiki/GFortran
+gnu software:  https://www.gnu.org/
+linux:         https://en.wikipedia.org/wiki/Linux
+make:          https://www.gnu.org/software/make/
+ubuntu:        https://www.ubuntu.com/
+vim:           https://www.vim.org/
+
+The website http://www.cplusplus.com/ helped me to find a way through C++.
+
+I like to thank the people who gave suggestions to improve the functionality
+of findent.
+
+=============================================================================
+
 I am happy to receive comments, error reports and suggestions for
 improvements.
 
