@@ -279,3 +279,8 @@ C FINDENTFIX: enddo
          continue
          enddo
          end subroutine testfix
+      subroutine testpointer
+      integer, pointer :: subroutinesub
+      integer, target :: i
+      subroutinesub=>i     ! must not be recognized as subroutine statement
+      end
