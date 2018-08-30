@@ -22,7 +22,7 @@ Line_prep       pline;
 %s state_identifier state_keyword
 
 %x state_lr state_lrb state_skip state_skipall state_skipnoop state_error
-%x state_findformat state_scanfixpre
+%x state_findformat state_scanfixpre state_scanompfixed state_scanompfree
 
 b [ \t]
 
@@ -216,6 +216,24 @@ where             { D(O("WHERE");Y;);             return WHERE;             }
 .*\n                          { D(O("UNSURE");Y;);   return UNSURE;   }
 }
 
+<state_scanompfixed>{
+^[c!\*]\$                      { D(O("FIXOMP");Y;);
+				//lexer_rest = "  " + input_string.substr(2);
+                                return OMP;
+                              }
+\n                            {  D(O("EOL"););   return EOL;        }
+.                             {  D(O("BLA");Y;); return yytext[0];  }
+}
+<state_scanompfree>{
+^{b}*!\$$ |
+^{b}*!\${b}                   { D(O("OMP");Y;);
+                                //lexer_rest = input_string.substr(0,yyleng-2) +
+				//"  " + input_string.substr(yyleng);
+				return OMP;
+                              }
+\n                            {  D(O("EOL"););   return EOL;        }
+.                             {  D(O("BLA");Y;); return yytext[0];  }
+}
 <state_scanfixpre>{
 {b}*\!{b}*findentfix:p-on   { D(O("FINDENTFIX P-ON");Y;); 
 				return P_ON;
@@ -356,13 +374,15 @@ void lexer_enable(const int k)
 {
    switch(k)
    {
-      case IDENTIFIER:  BEGIN(state_identifier);   break;
-      case SKIPALL:     BEGIN(state_skipall);      break;
-      case SKIP:        BEGIN(state_skip);         break;
-      case SKIPNOOP:    BEGIN(state_skipnoop);     break;
-      case KEYWORD:     BEGIN(state_keyword);      break;
-      case FINDFORMAT:  BEGIN(state_findformat);   break;
-      case SCANFIXPRE:  BEGIN(state_scanfixpre);   break;
+      case IDENTIFIER:    BEGIN(state_identifier);   break;
+      case SKIPALL:       BEGIN(state_skipall);      break;
+      case SKIP:          BEGIN(state_skip);         break;
+      case SKIPNOOP:      BEGIN(state_skipnoop);     break;
+      case KEYWORD:       BEGIN(state_keyword);      break;
+      case FINDFORMAT:    BEGIN(state_findformat);   break;
+      case SCANFIXPRE:    BEGIN(state_scanfixpre);   break;
+      case SCANOMPFIXED:  BEGIN(state_scanompfixed); break;
+      case SCANOMPFREE:   BEGIN(state_scanompfree);  break;
       default:
 	 D(O("invalid parameter in lexer_enable");O(k););
 	 BEGIN(state_error);
