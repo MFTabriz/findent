@@ -7,6 +7,7 @@
 #include "lexer.h"
 #include "parser.h"
 #include "globals.h"
+#include "debug.h"
 
 class Fortranline
 {
@@ -15,6 +16,7 @@ class Fortranline
    // some functions assume that clean() is called
    //
    std::string orig_line;
+   std::string orig_without_omp;
    //
    // I found that some functions are used repeatedly, the results are
    // cached here
@@ -90,6 +92,8 @@ class Fortranline
 
    std::string str() const          { return orig_line; }
 
+   std::string strnomp() const       { return orig_without_omp; }
+
    friend std::ostream& operator <<(std::ostream &os,Fortranline &obj);
 
    void str(const std::string &s)
@@ -128,6 +132,7 @@ class Fortranline
 		  orig_line = ltab2sp(orig_line).substr(0,line_length());
 	       else
 		  orig_line = ::rtrim(orig_line.substr(0,line_length()));
+	    // code to create orig_without_omp
 	    break;
 	 case FREE:
 	 default:
@@ -135,6 +140,36 @@ class Fortranline
 	       orig_line = ::rtrim(orig_line);
 	    else
 	       orig_line = ::rtrim(orig_line.substr(0,line_length()));
+	    // code to create orig_without_omp
+	    if (omp())
+	    {
+	       //
+	       // this is a line starting with [ ]*!$
+	       // there is a problem here: if this is the first
+	       // line then a space must follow. If it is not the
+	       // first line, then anything can follow.
+	       // To simplify things, the lexer only says it is a
+	       // omp conditional compilation line if blank space 
+	       // follows !$, or the line ends at !$
+	       //
+	       // orig_line will start with '!$ '
+	       // chop off
+	       //
+	       std::string sl = ltrim();
+	       switch(sl.length())
+	       {
+		  case 0:  // cannot happen
+		  case 1:  // cannot happen
+		  case 2:
+		     orig_without_omp = "";
+		     break;
+		  case 3:
+		     orig_without_omp = " ";
+		     break;
+		  default:
+		     orig_without_omp = sl.substr(3);
+	       }
+	    }
 	    break;
       }
       is_clean = 1;
@@ -226,6 +261,18 @@ class Fortranline
       return scanfixpre_cache;
    }
 
+   bool omp()
+   {
+      if (format() == FIXED)
+	 lexer_set(orig_line,SCANOMPFIXED);
+      else
+	 lexer_set(orig_line,SCANOMPFREE);
+      int rc = yylex();
+
+      ppp<<FL<<rc<<" "<<OMP<<endchar;
+      return rc == OMP;
+   }
+
    std::string rest() 
    {
       if(scanfixpre()==FINDENTFIX)
@@ -255,6 +302,11 @@ class Fortranline
 	    break;
 
 	 case FREE:
+	    if (omp())
+	    {
+	       ppp<<FL<<orig_line << endchar;
+	       return 0;
+	    }
 	    return firstchar() == '!';
 	    break;
       }
