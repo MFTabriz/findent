@@ -217,7 +217,10 @@ where             { D(O("WHERE");Y;);             return WHERE;             }
 }
 
 <state_scanompfixed>{
-^[c!\*]\$                      { D(O("FIXOMP");Y;);
+^[Cc!\*]\$[ 0-9]{3}[ 0]{0,1} |          /* a first line */
+^[Cc!\*]\$[ ]{3}[^ ^0]       |          /* a continuation line  */
+^[Cc!\*]\${b}*$               { D(O("FIXOMP");Y;);
+
 				//lexer_rest = "  " + input_string.substr(2);
                                 return OMP;
                               }

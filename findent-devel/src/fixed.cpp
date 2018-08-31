@@ -31,13 +31,9 @@ void Fixed::build_statement(Fortranline &line, bool &f_more, bool &pushback)
       return;
    }
 
-   //
-   // replace leading tabs by spaces
-   //
-
-   std::string s = line.str();
-
+   std::string s = line.strnomp();
    std::string sl = s.substr(0,5);
+
    if (s.length() >6)
       sl = sl+' '+s.substr(6);
 
@@ -97,9 +93,6 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
    // lines optionally start with comments and/or preprocessor lines
    // lines ends with a fortran line
    //
-   // TODO: but nor urgent: it would be neater to change the format 
-   // of 'freelines' to free
-   //
    bool to_mycout            = (freelines == 0);
    unsigned int old_indent   = 0;
    unsigned int first_indent = 0;
@@ -112,11 +105,19 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
    {
       mycout.reset();
 
-      // TODO but not urgent: combine output of pre and blank and comments
       if(output_pre(lines,freelines))
 	 continue;
       if (lines.empty())
 	 return;
+
+      bool is_omp = 0;
+      std::string ompstr;
+
+      if (lines.front().omp())
+      {
+	 is_omp = 1;
+	 ompstr = lines.front().str().substr(0,2);
+      }
 
       if (lines.front().blank())    
       {
@@ -124,9 +125,15 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	 // a completely blank line, that is simple:
 	 //
 	 if(to_mycout)
+	 {
+	    if(is_omp)
+	       mycout << ompstr;
 	    mycout << fi->endline;
+	 }
 	 else
 	 {
+	    if (is_omp)
+	       os << "!$ ";
 	    freelines->push_back(F(""));
 	    os.str("");
 	 }
@@ -136,6 +143,14 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 
       if (lines.front().comment())
       {
+	 ppp<<FL<<lines.front()<<endchar;
+	 if (is_omp)
+	 {
+	    if (to_mycout)
+	       mycout << ompstr;
+	    else
+	       os << "!$ ";
+	 }
 	 if (lines.front().firstchar() == '!')
 	 {
 	    if (lines.front()[0] != '!')
@@ -151,12 +166,21 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	    }
 	 }
 	 if(to_mycout)
+	 {
+	    if (is_omp)
+	       mycout << ompstr;
 	    mycout << lines.front().trim() << fi->endline;
+	 }
 	 else
 	 {
-	    int l = 1;
-	    if (toupper(lines.front().firstchar()) == 'D')
-	       l = 0;
+	    int l=1;
+	    if (is_omp)
+	       os << "!$ ";
+	    else
+	    {
+	       if (toupper(lines.front().firstchar()) == 'D')
+		  l = 0;
+	    }
 	    os << "!" << lines.front().trim().substr(l);
 	    freelines->push_back(F(os.str()));
 	    os.str("");
@@ -170,7 +194,7 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
       // possibly a continuation line
       //
 
-      std::string s = lines.front().str();
+      std::string s = lines.front().strnomp();
 
       //
       // if this is not the first line, and label field is not empty:
@@ -183,9 +207,15 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	 // garbage in, garbage out
 	 //
 	 if(to_mycout)
+	 {
+	    if(is_omp)
+	       mycout << ompstr;
 	    mycout << lines.front().rtrim() << fi->endline;
+	 }
 	 else
 	 {
+	    if(is_omp)
+	       os << "!$ ";
 	    os << lines.front().rtrim();
 	    freelines->push_back(F(os.str()));
 	    os.str("");
@@ -218,10 +248,21 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	 //
 	 // output label field including possible continuation character
 	 //
+	 ppp<<FL<<s<<endchar;
 	 if(to_mycout)
-	    mycout << s.substr(0,6);
+	 {
+	    if(is_omp)
+	       mycout << ompstr << s.substr(0,4);
+	    else
+	       mycout << s.substr(0,6);
+	 }
 	 else
-	    os << s.substr(0,5);
+	 {
+	    if(is_omp)
+	       os << "!$ " << s.substr(0,3);
+	    else
+	       os << s.substr(0,5);
+	 }
 
 	 //
 	 // try to honor current indentation
@@ -233,7 +274,11 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	    std::string s6 = s.substr(6)+'x';
 	    old_indent     = s6.find_first_not_of(' ');
 	    if (!to_mycout)
+	    {
+	       if (is_omp)
+		  os << "!$ ";
 	       os << "&";
+	    }
 	 }
 	 else
 	 {
