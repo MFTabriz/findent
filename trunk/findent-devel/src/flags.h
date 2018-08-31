@@ -37,6 +37,7 @@ class Flags
       DO_VIM_FINDENT,
       DO_VIM_FORTRAN,
       DO_VIM_HELP,
+      DO_OMP,
    };
 
    bool apply_indent        ; // 1: output indented line, else output original lines
@@ -54,6 +55,8 @@ class Flags
    bool refactor_routines   ; // 1: refactor routine-end statements
    bool return_format       ; // 1: return 2 if format==free, 4 if format==fixed
    bool upcase_routine_type ; // 1: use 'SUBROUTINE' etc in stead of 'subroutine'
+   bool honour_omp          ; // 1: treat openmp continuation lines as code,
+   //                            0: treat them as comment
    int all_indent;
    int associate_indent;
    int block_indent;

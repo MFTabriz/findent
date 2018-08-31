@@ -33,6 +33,7 @@ class Findent
 	 gl->global_format      = UNKNOWN;
 	 gl->global_line_length = flags.input_line_length;
 	 gl->global_gnu_format  = flags.input_format_gnu;;
+	 gl->global_omp         = flags.honour_omp;
 
 	 //
 	 // private

@@ -28,7 +28,6 @@ void Free::build_statement(Fortranline &line, bool &f_more, bool &pushback)
       //
 
       std::string sl = line.trimmed_line();
-      ppp<<FL<<line<<sl<<endchar;
 
       if(line.firstchar() == '&')
       {
@@ -53,7 +52,6 @@ void Free::build_statement(Fortranline &line, bool &f_more, bool &pushback)
 	 full_statement.erase(full_statement.length()-1);
 
    }
-   ppp<<FL<<full_statement<<endchar;
    curlines.push_back(line);
 }           // end of build_statement
 
@@ -114,7 +112,14 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
 
       if (lines.front().comment())
       {
-	 if (lines.front()[0] != '!')
+	 if (lines.front().omp())
+	 {
+	    if (to_mycout)
+	       mycout << "!$ ";
+	    else
+	       os << "!$ ";
+	 }
+	 if (lines.front()[0] != '!' || lines.front().omp())
 	 {
 	    //
 	    // take care of the situation that cur_indent == 0
@@ -127,7 +132,9 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
 	 }
 
 	 if(to_mycout)
+	 {
 	    mycout << lines.front().trim() << endline;
+	 }
 	 else
 	 {
 	    os << lines.front().trim();

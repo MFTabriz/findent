@@ -90,16 +90,20 @@ class Fortranline
 
    bool gnu_format()                { return gl->global_gnu_format; }
 
-   std::string str() const          { return orig_line; }
+   std::string str()           { return orig_line; }
 
-   std::string strnomp() const      { return orig_without_omp; }
+   std::string strnomp()      
+   {
+      clean();
+      return orig_without_omp; 
+   }
 
    friend std::ostream& operator <<(std::ostream &os,Fortranline &obj);
 
    void str(const std::string &s)
    {
-      init();
       orig_line = s;
+      init();
    }
 
    int format() const
@@ -109,10 +113,11 @@ class Fortranline
       return local_format;
    }
 
-   void clean()
+   void clean(const bool force = 0)
    {
-      if(is_clean)  // with fixed-format, lines are often read twice
-	 return;
+      if (!force)
+	 if(is_clean)  // with fixed-format, lines are often read twice
+	    return;
       init();
       switch(format())
       {
@@ -133,6 +138,12 @@ class Fortranline
 	       else
 		  orig_line = ::rtrim(orig_line.substr(0,line_length()));
 	    // code to create orig_without_omp
+	    if (omp())
+	    {
+	       orig_without_omp = "  " + orig_line.substr(2);
+	    }
+	    else
+	       orig_without_omp = orig_line;
 	    break;
 	 case FREE:
 	 default:
@@ -155,21 +166,27 @@ class Fortranline
 	       // orig_line will start with '!$ '
 	       // chop off
 	       //
-	       std::string sl = ltrim();
+	       std::string sl = ::ltrim(orig_line);
 	       switch(sl.length())
 	       {
 		  case 0:  // cannot happen
-		  case 1:  // cannot happen
-		  case 2:
 		     orig_without_omp = "";
 		     break;
-		  case 3:
+		  case 1:  // cannot happen
 		     orig_without_omp = " ";
+		     break;
+		  case 2:
+		     orig_without_omp = "  ";
+		     break;
+		  case 3:
+		     orig_without_omp = "   ";
 		     break;
 		  default:
 		     orig_without_omp = sl.substr(3);
 	       }
 	    }
+	    else
+	       orig_without_omp = orig_line;
 	    break;
       }
       is_clean = 1;
@@ -195,7 +212,13 @@ class Fortranline
       }
    }
 
-   std::string rtrim() const { return ::rtrim(orig_line); }
+   std::string rtrim() 
+   {
+      if (omp())
+	 return ::rtrim(orig_without_omp);
+      else
+	 return ::rtrim(orig_line);
+   }
 
    std::string ltrim()
    {
@@ -272,6 +295,8 @@ class Fortranline
 
    bool omp()
    {
+      if (!gl->global_omp)
+	 return 0;
       if (format() == FIXED)
 	 lexer_set(orig_line,SCANOMPFIXED);
       else
@@ -296,6 +321,10 @@ class Fortranline
       switch (format())
       {
 	 case FIXED:
+	    if (omp())
+	    {
+	       return firstchar() == '!';
+	    }
 	    switch(::firstchar(orig_line))
 	    {
 	       case 'd':
@@ -310,10 +339,6 @@ class Fortranline
 	    break;
 
 	 case FREE:
-	    if (omp())
-	    {
-	       return 0;
-	    }
 	    return firstchar() == '!';
 	    break;
       }
