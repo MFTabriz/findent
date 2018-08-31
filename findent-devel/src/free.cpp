@@ -28,6 +28,7 @@ void Free::build_statement(Fortranline &line, bool &f_more, bool &pushback)
       //
 
       std::string sl = line.trimmed_line();
+      ppp<<FL<<line<<sl<<endchar;
 
       if(line.firstchar() == '&')
       {
@@ -52,6 +53,7 @@ void Free::build_statement(Fortranline &line, bool &f_more, bool &pushback)
 	 full_statement.erase(full_statement.length()-1);
 
    }
+   ppp<<FL<<full_statement<<endchar;
    curlines.push_back(line);
 }           // end of build_statement
 
@@ -82,7 +84,6 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
    {
       mycout.reset();
 
-      // TODO (not urgent): combine output of pre and blank and comments
       if(output_pre(lines,fixedlines))
 	 continue;
       if (lines.empty())
@@ -94,10 +95,17 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
 	 // a completely blank line, that is simple:
 	 //
 	 if(to_mycout)
+	 {
+	    if (lines.front().omp())
+	       mycout << "!$";
 	    mycout << endline;
+	 }
 	 else
 	 {
-	    fixedlines->push_back(F(""));
+	    if (lines.front().omp())
+	       fixedlines->push_back(F("!$"));
+	    else
+	       fixedlines->push_back(F(""));
 	    os.str("");
 	 }
 	 lines.pop_front();
@@ -153,9 +161,15 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
 
 	    int l = M(std::max(fi->cur_indent - fi->labellength,1));  // put at least one space after label
 	    if(to_mycout)
+	    {
+	       if (lines.front().omp())
+		  mycout << "!$ ";
 	       mycout << label << blanks(l) << firstline << endline;
+	    }
 	    else
 	    {
+	       if (lines.front().omp())
+		  os << "!$";
 	       os << label << blanks(6) << firstline;
 	       fixedlines->push_back(F(rm_last_amp(os.str())));
 	       os.str("");
@@ -169,13 +183,22 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
 	 // (even if it starts with '&')
 	 //
 	 if(to_mycout)
-	    mycout << blanks(M(std::max(fi->cur_indent,0))) << lines.front().trim() << endline;
+	 {
+	    if (lines.front().omp())
+	       mycout << "!$ ";
+	    mycout << blanks(M(std::max(fi->cur_indent,0))) <<
+	       lines.front().trim() << endline;
+	 }
 	 else
 	 {
-	    if(lines.front().firstchar() == '&')
-	       os << blanks(5) << constring << lines.front().rtrim().substr(1);
+	    if (lines.front().omp())
+	       os << "!$" << blanks(3);
 	    else
-	       os << blanks(5) << ' ' <<lines.front().rtrim();
+	       os << blanks(5);
+	    if(lines.front().firstchar() == '&')
+	       os << constring << lines.front().rtrim().substr(1);
+	    else
+	       os << ' ' <<lines.front().rtrim();
 	    fixedlines->push_back(F(rm_last_amp(os.str())));
 	    os.str("");
 	 }
@@ -194,10 +217,19 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
       if (lines.front().firstchar() == '&')
       {
 	 if(to_mycout)
-	    mycout << blanks(M(std::max(fi->cur_indent,0))) << lines.front().trim() << endline;
+	 {
+	    if (lines.front().omp())
+	       mycout << "!$ ";
+	    mycout << blanks(M(std::max(fi->cur_indent,0))) <<
+	       lines.front().trim() << endline;
+	 }
 	 else
 	 {
-	    os << blanks(5) << constring << lines.front().trim().substr(1);
+	    if (lines.front().omp())
+	       os << "!$" << blanks(3);
+	    else
+	       os << blanks(5);
+	    os << constring << lines.front().trim().substr(1);
 	    fixedlines->push_back(F(rm_last_amp(os.str())));
 	    os.str("");
 	 }
@@ -209,10 +241,18 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
       {
 	 int l = M(std::max(fi->cur_indent+fi->flags.cont_indent,0));
 	 if(to_mycout)
+	 {
+	    if (lines.front().omp())
+	       mycout << "!$ ";
 	    mycout << blanks(l) << lines.front().trim() << endline;
+	 }
 	 else
 	 {
-	    os << blanks(5) << constring << lines.front().rtrim();
+	    if (lines.front().omp())
+	       os << "!$" << blanks(3);
+	    else
+	       os << blanks(5);
+	    os << constring << lines.front().rtrim();
 	    fixedlines->push_back(F(rm_last_amp(os.str())));
 	    os.str("");
 	 }
@@ -225,10 +265,18 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
       // continuation lines
       //
       if(to_mycout)
+      {
+	 if (lines.front().omp())
+	    mycout << "!$ ";
 	 mycout << lines.front().rtrim() << endline;
+      }
       else
       {
-	 os << blanks(5) << constring << lines.front().rtrim();
+	 if (lines.front().omp())
+	    os << "!$" << blanks(3);
+	 else
+	    os << blanks(5);
+	 os << constring << lines.front().rtrim();
 	 fixedlines->push_back(F(rm_last_amp(os.str())));
 	 os.str("");
       }

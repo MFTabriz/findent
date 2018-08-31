@@ -92,7 +92,7 @@ class Fortranline
 
    std::string str() const          { return orig_line; }
 
-   std::string strnomp() const       { return orig_without_omp; }
+   std::string strnomp() const      { return orig_without_omp; }
 
    friend std::ostream& operator <<(std::ostream &os,Fortranline &obj);
 
@@ -175,7 +175,7 @@ class Fortranline
       is_clean = 1;
    }
 
-   std::string trimmed_line() const
+   std::string trimmed_line()
    {
       //
       // result is different for FIXED or FREE, see below:
@@ -187,7 +187,10 @@ class Fortranline
 	    break;
 	 case FREE:
 	 default:
-	    return ::trim(orig_line);
+	    if (omp())
+	       return ::trim(orig_without_omp);
+	    else
+	       return ::trim(orig_line);
 	    break;
       }
    }
@@ -198,7 +201,10 @@ class Fortranline
    {
       if (!ltrim_cached)
       {
-	 ltrim_cache = ::ltrim(orig_line);
+	 if (omp())
+	    ltrim_cache = ::ltrim(orig_without_omp);
+	 else
+	    ltrim_cache = ::ltrim(orig_line);
 	 ltrim_cached = 1;
       }
       return ltrim_cache;
@@ -208,7 +214,10 @@ class Fortranline
    {
       if (!trim_cached)
       {
-	 trim_cache = ::trim(orig_line);
+	 if (omp())
+	    trim_cache = ::trim(orig_without_omp);
+	 else
+	    trim_cache = ::trim(orig_line);
 	 trim_cached = 1;
       }
       return trim_cache;
@@ -269,7 +278,6 @@ class Fortranline
 	 lexer_set(orig_line,SCANOMPFREE);
       int rc = yylex();
 
-      ppp<<FL<<rc<<" "<<OMP<<endchar;
       return rc == OMP;
    }
 
@@ -304,7 +312,6 @@ class Fortranline
 	 case FREE:
 	    if (omp())
 	    {
-	       ppp<<FL<<orig_line << endchar;
 	       return 0;
 	    }
 	    return firstchar() == '!';
