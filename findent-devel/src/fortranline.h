@@ -31,6 +31,7 @@ class Fortranline
    int      local_format;
    bool     local_gnu_format;
 
+
    void init()
    {
       local_format      = gl->global_format;
@@ -51,6 +52,7 @@ class Fortranline
    public:
 
    void print();
+   void clean(const bool force = 0);
 
    Fortranline(Globals* g)
    {
@@ -90,7 +92,7 @@ class Fortranline
 
    bool gnu_format()                { return gl->global_gnu_format; }
 
-   std::string str()           { return orig_line; }
+   std::string str()                { return orig_line; }
 
    std::string strnomp()      
    {
@@ -113,84 +115,6 @@ class Fortranline
       return local_format;
    }
 
-   void clean(const bool force = 0)
-   {
-      if (!force)
-	 if(is_clean)  // with fixed-format, lines are often read twice
-	    return;
-      init();
-      switch(format())
-      {
-	 case FIXED:
-	    if (line_length() == 0)
-	       orig_line = ltab2sp(orig_line);
-	    else
-	       //
-	       // With tabbed input there is a difference between
-	       // gfortran and other compilers with respect to the line length.
-	       // Other compilers simply count the number of characters.
-	       // gfortran always assumes that the
-	       // continuation character is in column 6,
-	       // so this needs extra attention:
-	       //
-	       if(gnu_format())
-		  orig_line = ltab2sp(orig_line).substr(0,line_length());
-	       else
-		  orig_line = ::rtrim(orig_line.substr(0,line_length()));
-	    // code to create orig_without_omp
-	    if (omp())
-	    {
-	       orig_without_omp = "  " + orig_line.substr(2);
-	    }
-	    else
-	       orig_without_omp = orig_line;
-	    break;
-	 case FREE:
-	 default:
-	    if (line_length() == 0)
-	       orig_line = ::rtrim(orig_line);
-	    else
-	       orig_line = ::rtrim(orig_line.substr(0,line_length()));
-	    // code to create orig_without_omp
-	    if (omp())
-	    {
-	       //
-	       // this is a line starting with [ ]*!$
-	       // there is a problem here: if this is the first
-	       // line then a space must follow. If it is not the
-	       // first line, then anything can follow.
-	       // To simplify things, the lexer only says it is a
-	       // omp conditional compilation line if blank space 
-	       // follows !$, or the line ends at !$
-	       //
-	       // orig_line will start with '!$ '
-	       // chop off
-	       //
-	       std::string sl = ::ltrim(orig_line);
-	       switch(sl.length())
-	       {
-		  case 0:  // cannot happen
-		     orig_without_omp = "";
-		     break;
-		  case 1:  // cannot happen
-		     orig_without_omp = " ";
-		     break;
-		  case 2:
-		     orig_without_omp = "  ";
-		     break;
-		  case 3:
-		     orig_without_omp = "   ";
-		     break;
-		  default:
-		     orig_without_omp = sl.substr(3);
-	       }
-	    }
-	    else
-	       orig_without_omp = orig_line;
-	    break;
-      }
-      is_clean = 1;
-   }
 
    std::string trimmed_line()
    {

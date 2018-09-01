@@ -67,20 +67,23 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
    std::ostringstream os;
    bool isfirst = 1;
    const char conchar = '&';
-   std::string constring;
-
-   if (!to_mycout)
-   {
-      if (fi->flags.indent_cont)
-	 constring = std::string(1,conchar)+blanks(fi->flags.cont_indent);
-      else
-	 constring = std::string(1,conchar);
-      constring = std::string(1,conchar);
-   }
 
    while (!lines.empty())
    {
       mycout.reset();
+
+      is_omp = lines.front().omp();
+
+      if(is_omp)
+      {
+	 ompstr = "!$ ";     // omp sentinel for free format
+	 cmpstr = "!$";      // omp sentinel for fixed format
+      }
+      else
+      {
+	 ompstr = "";
+	 cmpstr = "";
+      }
 
       if(output_pre(lines,fixedlines))
 	 continue;
@@ -93,15 +96,11 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
 	 // a completely blank line, that is simple:
 	 //
 	 if(to_mycout)
-	 {
-	    if (lines.front().omp())
-	       mycout << "!$";
-	    mycout << endline;
-	 }
+	    mycout << ompstr << endline;
 	 else
 	 {
 	    if (lines.front().omp())
-	       fixedlines->push_back(F("!$"));
+	       fixedlines->push_back(F(cmpstr));
 	    else
 	       fixedlines->push_back(F(""));
 	    os.str("");
@@ -110,15 +109,11 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
 	 continue;
       }
 
+      //
+      // handle comment lines:
+      //
       if (lines.front().comment())
       {
-	 if (lines.front().omp())
-	 {
-	    if (to_mycout)
-	       mycout << "!$ ";
-	    else
-	       os << "!$ ";
-	 }
 	 if (lines.front()[0] != '!' || lines.front().omp())
 	 {
 	    //
@@ -126,9 +121,9 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
 	    // but the comment does not start in column 1
 	    //
 	    if(to_mycout)
-	       mycout << blanks(M(std::max(fi->cur_indent,1)));
+	       mycout << insert_omp(blanks(M(std::max(fi->cur_indent,1))));
 	    else
-	       os << blanks(std::max(fi->cur_indent,1));
+	       os << cmpstr << blanks(std::max(fi->cur_indent,1));
 	 }
 
 	 if(to_mycout)
@@ -170,15 +165,13 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
 	    if(to_mycout)
 	    {
 	       if (lines.front().omp())
-		  mycout << "!$ ";
-	       mycout << label << blanks(l) << firstline << endline;
+		  l = M(std::max((int)(l-ompstr.length()),1));
+	       mycout << ompstr << label << blanks(l) << firstline << endline;
 	    }
 	    else
 	    {
-	       if (lines.front().omp())
-		  os << "!$";
-	       os << label << blanks(6) << firstline;
-	       fixedlines->push_back(F(rm_last_amp(os.str())));
+	       os << cmpstr << label << blanks(6) << rm_last_amp(firstline);
+	       fixedlines->push_back(F(os.str()));
 	       os.str("");
 	    }
 
@@ -191,22 +184,17 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
 	 //
 	 if(to_mycout)
 	 {
-	    if (lines.front().omp())
-	       mycout << "!$ ";
-	    mycout << blanks(M(std::max(fi->cur_indent,0))) <<
+	    mycout << insert_omp(blanks(M(std::max(fi->cur_indent,0)))) <<
 	       lines.front().trim() << endline;
 	 }
 	 else
 	 {
-	    if (lines.front().omp())
-	       os << "!$" << blanks(3);
-	    else
-	       os << blanks(5);
+	    os << insert_cmp(blanks(5));
 	    if(lines.front().firstchar() == '&')
-	       os << constring << lines.front().rtrim().substr(1);
+	       os << conchar << rm_last_amp(ltrim(lines.front().trim().substr(1)));
 	    else
-	       os << ' ' <<lines.front().rtrim();
-	    fixedlines->push_back(F(rm_last_amp(os.str())));
+	       os << ' ' << rm_last_amp(lines.front().rtrim());
+	    fixedlines->push_back(F(os.str()));
 	    os.str("");
 	 }
 	 lines.pop_front();
@@ -221,46 +209,37 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
       // else use current indentation + flags.cont_indent 
       //
 
-      if (lines.front().firstchar() == '&')
+      if (lines.front().firstchar() == '&')  // continuation line starting with '&'
       {
 	 if(to_mycout)
-	 {
-	    if (lines.front().omp())
-	       mycout << "!$ ";
-	    mycout << blanks(M(std::max(fi->cur_indent,0))) <<
+	    mycout << insert_omp(blanks(M(std::max(fi->cur_indent,0)))) <<
 	       lines.front().trim() << endline;
-	 }
 	 else
 	 {
-	    if (lines.front().omp())
-	       os << "!$" << blanks(3);
-	    else
-	       os << blanks(5);
-	    os << constring << lines.front().trim().substr(1);
-	    fixedlines->push_back(F(rm_last_amp(os.str())));
+	    os << insert_cmp(blanks(5)) << conchar << rm_last_amp(lines.front().trim().substr(1));
+	    fixedlines->push_back(F(os.str()));
 	    os.str("");
 	 }
 	 lines.pop_front();
 	 continue;
       }
 
+      //
+      // continutation not starting with '&'
+      //
       if (fi->flags.indent_cont)    // indentation of continuation lines is requested
       {
 	 int l = M(std::max(fi->cur_indent+fi->flags.cont_indent,0));
 	 if(to_mycout)
-	 {
-	    if (lines.front().omp())
-	       mycout << "!$ ";
-	    mycout << blanks(l) << lines.front().trim() << endline;
-	 }
+	    mycout << insert_omp(blanks(l)) << lines.front().trim() << endline;
 	 else
 	 {
 	    if (lines.front().omp())
 	       os << "!$" << blanks(3);
 	    else
 	       os << blanks(5);
-	    os << constring << lines.front().rtrim();
-	    fixedlines->push_back(F(rm_last_amp(os.str())));
+	    os << conchar << rm_last_amp(lines.front().rtrim());
+	    fixedlines->push_back(F(os.str()));
 	    os.str("");
 	 }
 	 lines.pop_front();
@@ -272,19 +251,15 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
       // continuation lines
       //
       if(to_mycout)
-      {
-	 if (lines.front().omp())
-	    mycout << "!$ ";
-	 mycout << lines.front().rtrim() << endline;
-      }
+	 mycout << insert_omp(lines.front().rtrim()) << endline;
       else
       {
 	 if (lines.front().omp())
 	    os << "!$" << blanks(3);
 	 else
 	    os << blanks(5);
-	 os << constring << lines.front().rtrim();
-	 fixedlines->push_back(F(rm_last_amp(os.str())));
+	 os << conchar << rm_last_amp(lines.front().rtrim());
+	 fixedlines->push_back(F(os.str()));
 	 os.str("");
       }
       lines.pop_front();
@@ -296,10 +271,25 @@ void Free::output_converted(lines_t &lines)
    lines_t fixedlines;
 
    output(lines, &fixedlines);
-   gl->global_format = FIXED;
+
+   Globals oldgl = *gl;
+   gl->global_format      = FIXED;
+   gl->global_line_length = 0;
+
    Fixed f(fi);
+   
+   lines_t::iterator it = fixedlines.begin();
+   //
+   // clean all fixedlines:
+   //
+   while(it != fixedlines.end()) 
+   {
+      it->clean(1);
+      it++;
+   }
    f.output(fixedlines);
-   gl->global_format = FREE;
+   (*gl) = oldgl;
+
 }   // end of output_converted
 
 std::string Free::rm_last_amp(const std::string &s)
@@ -312,6 +302,7 @@ std::string Free::rm_last_amp(const std::string &s)
 
    std::string slt = rtrim(remove_trailing_comment(s));
    std::string so = rtrim(slt);
+   ppp<<FL<<so<<endchar;
    if (*so.rbegin() == '&')
       return  rtrim(so.erase(so.length() -1)+s.substr(slt.length()));
    else
