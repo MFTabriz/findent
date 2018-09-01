@@ -217,11 +217,9 @@ where             { D(O("WHERE");Y;);             return WHERE;             }
 }
 
 <state_scanompfixed>{
-^[Cc!\*]\$[ 0-9]{3}[ 0]{0,1} |          /* a first line */
-^[Cc!\*]\$[ ]{3}[^ ^0]       |          /* a continuation line  */
-^[Cc!\*]\${b}*$               { D(O("FIXOMP");Y;);
-
-				//lexer_rest = "  " + input_string.substr(2);
+^[c!\*]\$[ 0-9]{3}[ 0]{0,1} |          /* a first line */
+^[c!\*]\$[ ]{3}[^ ^0]       |          /* a continuation line  */
+^[c!\*]\${b}*                 { D(O("FIXOMP");Y;);
                                 return OMP;
                               }
 \n                            {  D(O("EOL"););   return EOL;        }
@@ -230,8 +228,6 @@ where             { D(O("WHERE");Y;);             return WHERE;             }
 <state_scanompfree>{
 ^{b}*!\$$ |
 ^{b}*!\${b}                   { D(O("OMP");Y;);
-                                //lexer_rest = input_string.substr(0,yyleng-2) +
-				//"  " + input_string.substr(yyleng);
 				return OMP;
                               }
 \n                            {  D(O("EOL"););   return EOL;        }

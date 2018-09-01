@@ -302,7 +302,6 @@ class Fortranline
       else
 	 lexer_set(orig_line,SCANOMPFREE);
       int rc = yylex();
-
       return rc == OMP;
    }
 

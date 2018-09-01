@@ -110,14 +110,12 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
       if (lines.empty())
 	 return;
 
-      bool is_omp = 0;
-      std::string ompstr;
+      is_omp  = lines.front().omp();
 
-      if (lines.front().omp())
-      {
-	 is_omp = 1;
+      if(is_omp)
 	 ompstr = lines.front().str().substr(0,2);
-      }
+      else
+	 ompstr = "";
 
       if (lines.front().blank())    
       {
@@ -125,11 +123,7 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	 // a completely blank line, that is simple:
 	 //
 	 if(to_mycout)
-	 {
-	    if(is_omp)
-	       mycout << ompstr;
-	    mycout << fi->endline;
-	 }
+	    mycout << ompstr << fi->endline;
 	 else
 	 {
 	    if (is_omp)
@@ -143,44 +137,40 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 
       if (lines.front().comment())
       {
-	 ppp<<FL<<lines.front()<<endchar;
 	 if (is_omp)
 	 {
 	    if (to_mycout)
-	       mycout << ompstr;
+	    {}
 	    else
 	       os << "!$ ";
 	 }
+	 //
+	 // output indentation blanks:
+	 //
 	 if (lines.front().firstchar() == '!')
 	 {
-	    if (lines.front()[0] != '!')
+	    if (lines.front()[0] != '!' || is_omp)
 	       //
 	       // take care of the situation that cur_indent == 0
 	       // but the comment does not start in column 1
 	       //
 	    {
 	       if(to_mycout)
-		  mycout << blanks(M(std::max(fi->cur_indent+6,1)));
+		  mycout << insert_omp(blanks(M(std::max(fi->cur_indent+6,1))));
 	       else
 		  os << blanks(1);
 	    }
 	 }
+	 //
+	 // output comment:
+	 //
 	 if(to_mycout)
-	 {
-	    if (is_omp)
-	       mycout << ompstr;
 	    mycout << lines.front().trim() << fi->endline;
-	 }
 	 else
 	 {
 	    int l=1;
-	    if (is_omp)
-	       os << "!$ ";
-	    else
-	    {
-	       if (toupper(lines.front().firstchar()) == 'D')
-		  l = 0;
-	    }
+	    if (toupper(lines.front().firstchar()) == 'D')
+	       l = 0;
 	    os << "!" << lines.front().trim().substr(l);
 	    freelines->push_back(F(os.str()));
 	    os.str("");
@@ -207,11 +197,7 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	 // garbage in, garbage out
 	 //
 	 if(to_mycout)
-	 {
-	    if(is_omp)
-	       mycout << ompstr;
-	    mycout << lines.front().rtrim() << fi->endline;
-	 }
+	    mycout << insert_omp(lines.front().rtrim()) << fi->endline;
 	 else
 	 {
 	    if(is_omp)
@@ -225,7 +211,10 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	 continue;
       }
 
-      if(s.length() > 6)
+      //
+      // this should be a normal line with code, maybe preceded with a label
+      //
+      if(s.length() > 6)   // line is [label][c]statement
       {
 	 bool iscontinuation = lines.front().fixedcontinuation();
 	 if (iscontinuation)
@@ -248,14 +237,8 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	 //
 	 // output label field including possible continuation character
 	 //
-	 ppp<<FL<<s<<endchar;
 	 if(to_mycout)
-	 {
-	    if(is_omp)
-	       mycout << ompstr << s.substr(0,4);
-	    else
-	       mycout << s.substr(0,6);
-	 }
+	    mycout << insert_omp(s.substr(0,6));
 	 else
 	 {
 	    if(is_omp)
@@ -265,7 +248,7 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	 }
 
 	 //
-	 // try to honor current indentation
+	 // try to honour current indentation
 	 // if this is a continuation line, count the number
 	 // of spaces after column 6.
 	 //
@@ -336,7 +319,7 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
       // output a line that does not fulfill above conditions
       //
       if(to_mycout)
-	 mycout << s << fi->endline;
+	 mycout << insert_omp(s) << fi->endline;
       else
       {
 	 os << s;
@@ -349,6 +332,7 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
       lines.pop_front();
    }
 }     // end of output
+
 
 void Fixed::output_converted(lines_t &lines)
 {

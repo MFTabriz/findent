@@ -15,6 +15,15 @@ class Fixed : public Fortran
       bool wizard();
       bool wizard(lines_t lines);
       std::string add_amp(const std::string s,const char prevquote);
+      std::string insert_omp(const std::string s)
+      {
+	 std::string sl = s;
+	 sl = sl + blanks(ompstr.length() - sl.length());
+	 return sl.replace(0,ompstr.length(),ompstr);
+      }
+
+      bool        is_omp;
+      std::string ompstr;
 };
 
 #endif
