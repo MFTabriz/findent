@@ -5,7 +5,13 @@
 #include <sstream>
 #include "simpleostream.h"
 
-inline std::string blanks(const size_t x) { return std::string(x,' '); }
+inline std::string blanks(const int x) 
+{ 
+   if (x > 0)
+      return std::string((size_t) x ,' '); 
+   else
+      return "";
+}
 
 inline std::string ltrim(const std::string &str)
 {
