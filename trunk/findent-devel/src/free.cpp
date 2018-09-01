@@ -121,7 +121,7 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
 	    // but the comment does not start in column 1
 	    //
 	    if(to_mycout)
-	       mycout << insert_omp(blanks(M(std::max(fi->cur_indent,1))));
+	       mycout << insert_omp(blanks(M(std::max(fi->cur_indent,1))),ompstr);
 	    else
 	       os << cmpstr << blanks(std::max(fi->cur_indent,1));
 	 }
@@ -170,7 +170,7 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
 	    }
 	    else
 	    {
-	       os << cmpstr << label << blanks(6) << rm_last_amp(firstline);
+	       os << insert_omp(label,cmpstr) << blanks(6) << rm_last_amp(firstline);
 	       fixedlines->push_back(F(os.str()));
 	       os.str("");
 	    }
@@ -184,12 +184,12 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
 	 //
 	 if(to_mycout)
 	 {
-	    mycout << insert_omp(blanks(M(std::max(fi->cur_indent,0)))) <<
+	    mycout << insert_omp(blanks(M(std::max(fi->cur_indent,0))),ompstr) <<
 	       lines.front().trim() << endline;
 	 }
 	 else
 	 {
-	    os << insert_cmp(blanks(5));
+	    os << insert_omp(blanks(5),cmpstr);
 	    if(lines.front().firstchar() == '&')
 	       os << conchar << rm_last_amp(ltrim(lines.front().trim().substr(1)));
 	    else
@@ -212,11 +212,11 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
       if (lines.front().firstchar() == '&')  // continuation line starting with '&'
       {
 	 if(to_mycout)
-	    mycout << insert_omp(blanks(M(std::max(fi->cur_indent,0)))) <<
+	    mycout << insert_omp(blanks(M(std::max(fi->cur_indent,0))),ompstr) <<
 	       lines.front().trim() << endline;
 	 else
 	 {
-	    os << insert_cmp(blanks(5)) << conchar << rm_last_amp(lines.front().trim().substr(1));
+	    os << insert_omp(blanks(5),cmpstr) << conchar << rm_last_amp(lines.front().trim().substr(1));
 	    fixedlines->push_back(F(os.str()));
 	    os.str("");
 	 }
@@ -231,14 +231,10 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
       {
 	 int l = M(std::max(fi->cur_indent+fi->flags.cont_indent,0));
 	 if(to_mycout)
-	    mycout << insert_omp(blanks(l)) << lines.front().trim() << endline;
+	    mycout << insert_omp(blanks(l),ompstr) << lines.front().trim() << endline;
 	 else
 	 {
-	    if (lines.front().omp())
-	       os << "!$" << blanks(3);
-	    else
-	       os << blanks(5);
-	    os << conchar << rm_last_amp(lines.front().rtrim());
+	    os << insert_omp(blanks(5),cmpstr) << conchar << rm_last_amp(lines.front().rtrim());
 	    fixedlines->push_back(F(os.str()));
 	    os.str("");
 	 }
@@ -251,14 +247,10 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
       // continuation lines
       //
       if(to_mycout)
-	 mycout << insert_omp(lines.front().rtrim()) << endline;
+	 mycout << insert_omp(lines.front().rtrim(),ompstr) << endline;
       else
       {
-	 if (lines.front().omp())
-	    os << "!$" << blanks(3);
-	 else
-	    os << blanks(5);
-	 os << conchar << rm_last_amp(lines.front().rtrim());
+	 os << insert_omp(blanks(5),cmpstr) << conchar << rm_last_amp(lines.front().rtrim());
 	 fixedlines->push_back(F(os.str()));
 	 os.str("");
       }
