@@ -18,26 +18,14 @@ class Free : public Fortran
    private:
       std::string rm_last_amp(const std::string &s);
 
-      std::string insert_omp(const std::string s)
+      std::string insert_omp(const std::string s, std::string somp)
       {
 	 if(is_omp)
 	 {
 	    std::string sl = s;
-	    int l          = ompstr.length() - (sl+"x").find_first_not_of(' ');
+	    int l          = somp.length() - (sl+"x").find_first_not_of(' ');
 	    sl             = blanks(l) + sl;
-	    return sl.replace(0,ompstr.length(),ompstr);
-	 }
-	 else
-	    return s;
-      }
-      std::string insert_cmp(const std::string s)
-      {
-	 if(is_omp)
-	 {
-	    std::string sl = s;
-	    int l          = cmpstr.length() - (sl+"x").find_first_not_of(' ');
-	    sl             = blanks(l) + sl;
-	    return sl.replace(0,cmpstr.length(),cmpstr);
+	    return sl.replace(0,somp.length(),somp);
 	 }
 	 else
 	    return s;
