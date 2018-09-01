@@ -2,11 +2,12 @@
 #define FREE_H
 
 #include "fortran.h"
+#include "debug.h"
 
 class Free : public Fortran
 {
    public:
-      Free(Findent *f) : Fortran(f) {}
+      Free(Findent *f) : Fortran(f) { }
 
       void build_statement(Fortranline &line, bool &f_more, bool &pushback);
 
@@ -16,6 +17,35 @@ class Free : public Fortran
 
    private:
       std::string rm_last_amp(const std::string &s);
+
+      std::string insert_omp(const std::string s)
+      {
+	 if(is_omp)
+	 {
+	    std::string sl = s;
+	    int l          = ompstr.length() - (sl+"x").find_first_not_of(' ');
+	    sl             = blanks(l) + sl;
+	    return sl.replace(0,ompstr.length(),ompstr);
+	 }
+	 else
+	    return s;
+      }
+      std::string insert_cmp(const std::string s)
+      {
+	 if(is_omp)
+	 {
+	    std::string sl = s;
+	    int l          = cmpstr.length() - (sl+"x").find_first_not_of(' ');
+	    sl             = blanks(l) + sl;
+	    return sl.replace(0,cmpstr.length(),cmpstr);
+	 }
+	 else
+	    return s;
+      }
+
+      bool        is_omp;
+      std::string ompstr;
+      std::string cmpstr;
 
 };
 
