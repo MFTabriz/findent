@@ -251,3 +251,15 @@ defined(q)
            x=x+4
         enddo
    end
+
+   subroutine omp
+        integer i,j,k
+!$      integer m,n&
+!$      &o,p
+        print *,i,j,k
+!$      print*, m,n,o,p
+!$      do 100 i=1,20
+!$         do 100 j=1,i
+!$            continue
+!$ 100  continue
+   end

@@ -62,11 +62,14 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
    // output lines input: free format, output: free format
    //
 
-   std::string endline = fi->endline;
-   bool to_mycout = (fixedlines == 0);
    std::ostringstream os;
-   bool isfirst = 1;
-   const char conchar = '&';
+   std::string endline = fi->endline;
+   bool to_mycout      = (fixedlines == 0);
+   bool isfirst        = 1;
+   const char conchar  = '&';
+
+   bool expect_continuation = 0;
+   bool prev_expect_continuation;
 
    while (!lines.empty())
    {
@@ -144,6 +147,22 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
       // this is a line with (part of) a fortran statement
       // possibly a continuation line
       //
+
+      //
+      // If the line ends with a '&', the next line with fortran code
+      // is a real continuation line. 
+      // If this line does not end with '&', the next line with fortran code
+      // is not a real continuation line: possibly this line is garbage.
+      // 
+      // Important because of indenting real continuation lines.
+      //
+
+      prev_expect_continuation = expect_continuation;
+      //
+      // TODO: not bulletproof with regard to unfinished strings
+      //
+      expect_continuation = 
+	 (lastchar(lines.front().remove_trailing_comment()) == '&');
 
       if(isfirst)
       {
@@ -229,7 +248,12 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
       //
       if (fi->flags.indent_cont)    // indentation of continuation lines is requested
       {
-	 int l = M(std::max(fi->cur_indent+fi->flags.cont_indent,0));
+	 int l;
+	 if (prev_expect_continuation)
+	    l = M(std::max(fi->cur_indent+fi->flags.cont_indent,0));
+	 else
+	    l = M(std::max(fi->cur_indent,0));
+
 	 if(to_mycout)
 	    mycout << insert_omp(blanks(l),ompstr) << lines.front().trim() << endline;
 	 else
@@ -269,7 +293,7 @@ void Free::output_converted(lines_t &lines)
    gl->global_line_length = 0;
 
    Fixed f(fi);
-   
+
    lines_t::iterator it = fixedlines.begin();
    //
    // clean all fixedlines:
@@ -294,7 +318,6 @@ std::string Free::rm_last_amp(const std::string &s)
 
    std::string slt = rtrim(remove_trailing_comment(s));
    std::string so = rtrim(slt);
-   ppp<<FL<<so<<endchar;
    if (*so.rbegin() == '&')
       return  rtrim(so.erase(so.length() -1)+s.substr(slt.length()));
    else

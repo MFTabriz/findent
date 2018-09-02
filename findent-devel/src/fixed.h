@@ -30,6 +30,7 @@ class Fixed : public Fortran
 
       bool        is_omp;
       std::string ompstr;
+      std::string cmpstr;
 };
 
 #endif

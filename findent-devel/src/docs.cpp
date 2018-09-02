@@ -83,7 +83,7 @@ void Docs::usage(const bool doman)
    {
       std::cout << "findent [options]"                                                        << std::endl;
       std::cout << "   Format fortran source."                                                << std::endl;
-      std::cout << "   Findent eads from STDIN, writes to STDOUT."                            << std::endl;
+      std::cout << "   Findent reads from STDIN, writes to STDOUT."                            << std::endl;
       std::cout << "   Findent uses various kinds of indentations, see OPTIONS."              << std::endl;
       std::cout << "   Findent can convert from fixed form to free form and vice versa and"   << std::endl;
       std::cout << "   can supplement END statements, see 'Refactor' below."                  << std::endl;
@@ -137,6 +137,8 @@ void Docs::usage(const bool doman)
    manout("-ofixed, --output_format=fixed"   ,"force fixed format output"                                  ,doman);
    manout("-ofree, --output_format=free"     ,"force free format output"                                   ,doman);
    manout("-osame, --output_format=same"     ,"output format same is input format"                         ,doman);
+   manout("--openmp=<n>"                     ," 0: do not indent openmp sentinels"                         ,doman);
+   manout(" "," 1: indent openmp sentinels (default)"                                                      ,doman);
    manout("-Rr, --refactor_procedures"       ,"refactor procedures and modules: the END line"              ,doman);
    manout(" "," of a subroutine, program etc. is, if possible, replaced by"                                ,doman);
    manout(" "," 'end subroutine <name>' or"                                                                ,doman);

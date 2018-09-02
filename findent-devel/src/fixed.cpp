@@ -34,6 +34,16 @@ void Fixed::build_statement(Fortranline &line, bool &f_more, bool &pushback)
    std::string s = line.strnomp();
    std::string sl = s.substr(0,5);
 
+   // 
+   // special attention for garbage lines:
+   //
+   if(!cleanfive(s))
+   {
+      curlines.push_back(line);
+      f_more = 1;
+      return;
+   }
+
    if (s.length() >6)
       sl = sl+' '+s.substr(6);
 
@@ -53,14 +63,6 @@ void Fixed::build_statement(Fortranline &line, bool &f_more, bool &pushback)
       return;
    }
 
-   // 
-   // special attention for garbage lines:
-   //
-   if(!cleanfive(s))
-   {
-      curlines.push_back(line);
-      return;
-   }
    //
    // this is possibly a continuation line
    //
@@ -93,6 +95,10 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
    // lines optionally start with comments and/or preprocessor lines
    // lines ends with a fortran line
    //
+   const std::string continuations = 
+      "123456789" 
+      "abcdefghijklmnopqrstuvwxyz" 
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
    bool to_mycout            = (freelines == 0);
    unsigned int old_indent   = 0;
    unsigned int first_indent = 0;
@@ -113,9 +119,15 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
       is_omp  = lines.front().omp();
 
       if(is_omp)
+      {
 	 ompstr = lines.front().str().substr(0,2);
+	 cmpstr = "!$ ";
+      }
       else
+      {
 	 ompstr = "";
+	 cmpstr = "";
+      }
 
       if (lines.front().blank())    
       {
@@ -126,9 +138,8 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	    mycout << ompstr << fi->endline;
 	 else
 	 {
-	    if (is_omp)
-	       os << "!$ ";
-	    freelines->push_back(F(""));
+	    os << cmpstr;
+	    freelines->push_back(F(os.str()));
 	    os.str("");
 	 }
 	 lines.pop_front();
@@ -137,13 +148,6 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 
       if (lines.front().comment())
       {
-	 if (is_omp)
-	 {
-	    if (to_mycout)
-	    {}
-	    else
-	       os << "!$ ";
-	 }
 	 //
 	 // output indentation blanks:
 	 //
@@ -158,7 +162,7 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	       if(to_mycout)
 		  mycout << insert_omp(blanks(M(std::max(fi->cur_indent+6,1))));
 	       else
-		  os << blanks(1);
+		  os << cmpstr << ' ';
 	    }
 	 }
 	 //
@@ -169,7 +173,7 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	 else
 	 {
 	    int l=1;
-	    if (toupper(lines.front().firstchar()) == 'D')
+	    if (!is_omp && toupper(lines.front().firstchar()) == 'D')
 	       l = 0;
 	    os << "!" << lines.front().trim().substr(l);
 	    freelines->push_back(F(os.str()));
@@ -200,9 +204,7 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	    mycout << insert_omp(lines.front().rtrim()) << fi->endline;
 	 else
 	 {
-	    if(is_omp)
-	       os << "!$ ";
-	    os << lines.front().rtrim();
+	    os << cmpstr << lines.front().rtrim();
 	    freelines->push_back(F(os.str()));
 	    os.str("");
 	 }
@@ -219,15 +221,13 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	 bool iscontinuation = lines.front().fixedcontinuation();
 	 if (iscontinuation)
 	 {
-	    const std::string cc = "123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
 	    if (fi->flags.conchar != ' ')
 	    {
 	       if (fi->flags.conchar == '0')
 	       {
-		  s.at(5) = cc[cindex];
+		  s.at(5) = continuations[cindex];
 		  cindex++;
-		  if (cindex >= cc.length())
+		  if (cindex >= continuations.length())
 		     cindex = 0;
 	       }
 	       else
@@ -240,12 +240,7 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	 if(to_mycout)
 	    mycout << insert_omp(s.substr(0,6));
 	 else
-	 {
-	    if(is_omp)
-	       os << "!$ " << s.substr(0,3);
-	    else
-	       os << s.substr(0,5);
-	 }
+	    os << cmpstr << s.substr(0,5);
 
 	 //
 	 // try to honour current indentation
@@ -257,11 +252,7 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	    std::string s6 = s.substr(6)+'x';
 	    old_indent     = s6.find_first_not_of(' ');
 	    if (!to_mycout)
-	    {
-	       if (is_omp)
-		  os << "!$ ";
-	       os << "&";
-	    }
+	       os << '&';
 	 }
 	 else
 	 {
@@ -306,7 +297,10 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	       c = ' ';
 	       if(iscontinuation)
 		  c = prevquote;
-	       freelines->push_back(F(add_amp(os.str(),c)));
+	       if (is_omp) // an hack
+		  freelines->push_back(F('!'+add_amp(os.str().substr(1),c)));
+	       else
+		  freelines->push_back(F(add_amp(os.str(),c)));
 	    }
 	    else
 	       freelines->push_back(F(os.str()));
@@ -322,9 +316,14 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	 mycout << insert_omp(s) << fi->endline;
       else
       {
-	 os << s;
+	 os << cmpstr << s;
 	 if (wizard(lines))       // more fortran lines follow
-	    freelines->push_back(F(add_amp(os.str(),prevquote)));
+	 {
+	    if (is_omp) // an hack
+	       freelines->push_back(F('!'+add_amp(os.str().substr(1),prevquote)));
+	    else
+	       freelines->push_back(F(add_amp(os.str(),prevquote)));
+	 }
 	 else
 	    freelines->push_back(F(os.str()));
 	 os.str("");
@@ -339,19 +338,32 @@ void Fixed::output_converted(lines_t &lines)
    lines_t freelines;
 
    output(lines, &freelines);
+
+   Globals oldgl = *gl;
    gl->global_format = FREE;
+   gl->global_line_length = 0;
+
    Free f(fi);
+   lines_t::iterator it = freelines.begin();
+   //
+   // clean all freelines:
+   //
+   while(it != freelines.end()) 
+   {
+      it->clean(1);
+      it++;
+   }
    f.output(freelines);
-   gl->global_format = FIXED;
+   (*gl) = oldgl;
 }    // end of output_converted
 
 
 bool Fixed::wizard()
 {
    //
-   // look ahead to see if the next format fortran line is a continuation
-   // return 1 if a continuation is found, 0 otherwize
-   // for free format, always return 0
+   // Look ahead to see if the next fixed-format fortran line is a continuation
+   // return 1 if a continuation is found, 0 otherwize.
+   // For free format, always return 0.
    //
 
    // 
@@ -397,7 +409,7 @@ bool Fixed::wizard()
 	 continue;
       }
 
-      if (line.fortran() && cleanfive(line.str()))
+      if (line.fortran() && cleanfive(line.strnomp()))
       {
 	 //
 	 // return 1 if this is a fixed fortran continuation line
@@ -420,7 +432,7 @@ bool Fixed::wizard(lines_t lines)
    it++;
    while(it != lines.end())
    {
-      if (it-> fortran())
+      if (it-> fortran() && cleanfive(it->strnomp()))
 	 return it->fixedcontinuation();
       it++;
    }

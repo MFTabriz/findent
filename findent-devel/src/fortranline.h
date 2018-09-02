@@ -306,6 +306,11 @@ class Fortranline
       return c.find((*this)[5]) == std::string::npos;
    }
 
+   std::string remove_trailing_comment(const char prevquote = ' ')
+   {
+      return ::rtrim(::remove_trailing_comment(orig_without_omp,prevquote));
+   }
+
 };
 
 std::ostream& operator <<(std::ostream &os,Fortranline &obj);
