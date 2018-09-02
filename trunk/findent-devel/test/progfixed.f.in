@@ -284,3 +284,18 @@ C FINDENTFIX: enddo
       integer, target :: i
       subroutinesub=>i     ! must not be recognized as subroutine statement
       end
+
+                 subroutine omp
+              integer i,j,k
+C$            integer m,n 
+c$  ! comment in omp sentinel
+! normal comment
+*$
+*$   1         o,p
+              print *,i,j,k
+!$           print*, m,n,o,p
+!$             do 100 i=1,20
+!$                  do 100 j=1,i
+c$              continue
+c$100          continue
+              end
