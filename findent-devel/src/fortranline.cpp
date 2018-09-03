@@ -24,11 +24,8 @@ std::ostream& operator <<(std::ostream &os,Fortranline &obj)
 }
 
 
-void Fortranline::clean(const bool force)
+void Fortranline::do_clean()
 {
-   if (!force)
-      if(is_clean)  // with fixed-format, lines are often read twice
-	 return;
    init();
    switch(format())
    {
@@ -101,4 +98,16 @@ void Fortranline::clean(const bool force)
 	 break;
    }
    is_clean = 1;
+}
+
+bool Fortranline::do_omp()
+{
+      if (!gl->global_omp)
+	 return 0;
+      if (format() == FIXED)
+	 lexer_set(orig_line,SCANOMPFIXED);
+      else
+	 lexer_set(orig_line,SCANOMPFREE);
+      int rc = yylex();
+      return rc == OMP;
 }

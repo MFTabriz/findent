@@ -9,7 +9,7 @@ class Docs
    bool print(int todo);
    private:
    void version();
-   void usage(bool i);
+   void usage(bool man);
    void vim_help();
    void vim_findent();
    void vim_fortran();
@@ -21,8 +21,10 @@ class Docs
    void emacs_findent();
    void readme();
 
-   void manout(const std::string flag, const std::string txt, const bool doman);
+   void manout(const std::string flag, const std::string txt);
    void replaceAll( std::string &s, const std::string &search, const std::string &replace );
+
+   bool doman;
 };
 
 #endif

@@ -414,3 +414,14 @@ end subroutine nok
          continue
          enddo
          end subroutine testfix
+
+  subroutine omp
+ integer i,j,k
+!$ integer m,n, &
+!$ o,p
+print *,i,j,k
+!$ print*, m,n,o,p
+!$ do i=1,20
+continue
+!$ enddo
+end

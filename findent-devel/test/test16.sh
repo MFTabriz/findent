@@ -7,12 +7,12 @@ fi
 rc=0
 doit=../doit
 cat << eof > prog
-      program main
+      program main01
       continue
       end
 eof
 cat << eof > expect
-           program main
+           program main01
               continue
            end
 eof
@@ -21,12 +21,12 @@ $doit "-I5 --start_indent=5" -i3 "for fixed input"
 rc=`expr $rc + $?`
 
 cat << eof > prog
-      program main
+      program main02
  continue
       end
 eof
 cat << eof > expect
-     program main
+     program main02
         continue
      end
 eof
@@ -34,12 +34,12 @@ $doit "-I5 --start_indent=5" -i3 "for free input"
 rc=`expr $rc + $?`
 
 cat << eof > prog
-        program main
+        program main03
       continue
       end
 eof
 cat << eof > expect
-        program main
+        program main03
            continue
         end
 eof
@@ -47,7 +47,7 @@ $doit "-Ia --start_indent=a" "-I0 -i3" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
- program main
+ program main04
 continue
 do i=1,10
 do j=1,20
@@ -58,7 +58,7 @@ end
 eof
 
 cat << eof > expect
-program main
+program main04
      continue
      do i=1,10
           do j=1,20
@@ -72,7 +72,7 @@ rc=`expr $rc + $?`
 
 
 cat << eof > prog
-      program main
+      program main06
 associate( z => sin(theta))
 print *,z
 end associate
@@ -80,7 +80,7 @@ end associate
 eof
 
 cat << eof > expect
-program main
+program main06
    associate( z => sin(theta))
         print *,z
    end associate
@@ -91,14 +91,14 @@ $doit "-a5 --indent_associate=5" "-i3 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
-program main
+program main07
 block
 continue
 end block
 end
 eof
 cat << eof > expect
-program main
+program main07
    block
         continue
    end block
@@ -109,7 +109,7 @@ $doit "-b5 --indent_block=5" "-i3 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
-        program main
+        program main08
 do i=1,10
 do j=1,5
    print *,i,j
@@ -119,7 +119,7 @@ enddo
 eof
 
 cat << eof > expect
-program main
+program main08
    do i=1,10
         do j=1,5
              print *,i,j
@@ -132,7 +132,7 @@ $doit "-d5 --indent_do=5" "-i3 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
-  program main
+  program main09
 if (i .eq. 7) then
    print *,'foo'
    continue
@@ -143,7 +143,7 @@ endif
 eof
 
 cat << eof > expect
-program main
+program main09
    if (i .eq. 7) then
         print *,'foo'
         continue
@@ -157,7 +157,7 @@ $doit "-f5 --indent_if=5" "-i3 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
-  program main
+  program main10
 enum, bind(c)
 enumerator :: red = 1, blue black = 5
 enumerator yellow
@@ -166,7 +166,7 @@ end enum
 eof
 
 cat << eof > expect
-program main
+program main10
    enum, bind(c)
         enumerator :: red = 1, blue black = 5
         enumerator yellow
@@ -178,7 +178,7 @@ $doit "-E5 --indent_enum=5" "-i3 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
-   program main
+   program main11
 forall(k=1:1000)
 x(k) = 23
 y(k) = 67
@@ -187,7 +187,7 @@ end
 eof
 
 cat << eof > expect
-program main
+program main11
    forall(k=1:1000)
         x(k) = 23
         y(k) = 67
@@ -199,7 +199,7 @@ $doit "-F5 --indent_forall=5" "-i3 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
-program main
+program main12
 interface myinterface
 subroutine mysub(x)
 real x
@@ -209,7 +209,7 @@ end
 eof
 
 cat << eof > expect
-program main
+program main12
    interface myinterface
         subroutine mysub(x)
            real x
@@ -222,7 +222,7 @@ $doit "-j5 --indent_interface=5" "-i3 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
-   module mymodule
+   module mymodule01
 integer x
 contains
 subroutine mysub
@@ -232,7 +232,7 @@ end module
 eof
 
 cat << eof > expect
-module mymodule
+module mymodule01
      integer x
   contains
      subroutine mysub
@@ -245,7 +245,7 @@ $doit "-m5 --indent_module=5" "-i3 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
-   subroutine mysub
+   subroutine mysub01
 continue
 end subroutine
 function myfun(x)
@@ -254,7 +254,7 @@ end function
 eof
 
 cat << eof > expect
-subroutine mysub
+subroutine mysub01
      continue
 end subroutine
 function myfun(x)
@@ -266,7 +266,7 @@ $doit "-r5 --indent_procedure=5" "-i3 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
-program main
+program main13
       continue
 select case(i)
    case(1)
@@ -279,7 +279,7 @@ select case(i)
 eof
 
 cat << eof > expect
-program main
+program main13
    continue
    select case(i)
       case(1)
@@ -294,7 +294,7 @@ $doit "-s5 --indent_select=5" "-i3 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
-program main
+program main14
 type mytype
 integer :: i
 real x,y
@@ -302,7 +302,7 @@ end type mytype
 end program
 eof
 cat << eof > expect
-program main
+program main14
    type mytype
         integer :: i
         real x,y
@@ -313,7 +313,7 @@ $doit "-t5 --indent_type=5" "-i3 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
-program main
+program main15
 where(x>21)
 y=10
 z=11
@@ -321,7 +321,7 @@ end where
 end program
 eof
 cat << eof > expect
-program main
+program main15
    where(x>21)
         y=10
         z=11
@@ -332,7 +332,7 @@ $doit "-w5 --indent_where=5" "-i3 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
-program main
+program main16
 continue
 critical
 x=10
@@ -341,7 +341,7 @@ end critical
 end program
 eof
 cat << eof > expect
-program main
+program main16
    continue
    critical
         x=10
@@ -353,7 +353,7 @@ $doit "-x5 --indent_critical=5" "-i3 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
-program main
+program main17
 continue
 contains
 subroutine mysub
@@ -362,7 +362,7 @@ end subroutine mysub
 end program
 eof
 cat << eof > expect
-program main
+program main17
    continue
 contains
 subroutine mysub
@@ -374,7 +374,7 @@ $doit "-C- --indent_contains=restart" "-i3 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
-program main
+program main18
 continue
 x = x + &
 & 10
@@ -383,7 +383,7 @@ y = y + &
 end program
 eof
 cat << eof > expect
-program main
+program main18
    continue
    x = x + &
    & 10
@@ -395,7 +395,7 @@ $doit "-k- --indent_continuation=none" "-i3 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
-program main
+program main19
 continue
 select case(i)
    case(3)
@@ -407,7 +407,7 @@ select case(i)
 end program
 eof
 cat << eof > expect
-program main
+program main19
       continue
       select case(i)
         case(3)
@@ -422,7 +422,7 @@ $doit "-c4 --indent_case=4" "-i6 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
-program main
+program main20
 continue
 contains
 function foo(bar)
@@ -432,7 +432,7 @@ end function
 end program
 eof
 cat << eof > expect
-program main
+program main20
       continue
   contains
       function foo(bar)
@@ -445,20 +445,58 @@ $doit "-C4 --indent_contains=4" "-i6 -I0" ""
 rc=`expr $rc + $?`
 
 cat << eof > prog
-subroutine mysub
+subroutine mysub02
 continue
 entry myentry
 continue
 end subroutine
 eof
 cat << eof > expect
-subroutine mysub
+subroutine mysub02
       continue
   entry myentry
       continue
 end subroutine
 eof
 $doit "-e4 --indent_entry=4" "-i6 -I0" ""
+rc=`expr $rc + $?`
+
+cat << eof > prog
+subroutine mysub03
+do i=1,20
+continue
+!$ continue
+enddo
+end subroutine
+eof
+cat << eof > expect
+subroutine mysub03
+   do i=1,20
+      continue
+!$ continue
+   enddo
+end subroutine
+eof
+$doit "--openmp=0" "-i3 -I0" ""
+rc=`expr $rc + $?`
+
+cat << eof > prog
+         subroutine mysub04
+         do i=1,20
+               continue
+!$       continue
+            enddo
+            end subroutine
+eof
+cat << eof > expect
+      subroutine mysub04
+         do i=1,20
+            continue
+!$       continue
+         enddo
+      end subroutine
+eof
+$doit "--openmp=0" "-i3 -I0" ""
 rc=`expr $rc + $?`
 
 . ../postlude

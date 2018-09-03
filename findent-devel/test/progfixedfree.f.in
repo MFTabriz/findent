@@ -254,7 +254,10 @@ defined(q)
 
                  subroutine omp
               integer i,j,k
-C$            integer m,n 
+C$            integer m,n, 
+c$
+c$ !comment
+c$
 *$   1         o,p
               print *,i,j,k
 !$           print*, m,n,o,p

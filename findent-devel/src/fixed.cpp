@@ -103,6 +103,7 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
    unsigned int old_indent   = 0;
    unsigned int first_indent = 0;
    char prevquote            = ' ';
+   bool had_first            = 0;
 
    std::ostringstream os;
    size_t cindex = 0;
@@ -139,6 +140,9 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	 else
 	 {
 	    os << cmpstr;
+	    ppp<<FL<<had_first<<" "<<is_omp<<endchar;
+	    if(had_first && is_omp)
+	       os << " & &";   // to keep gfortran and ifort happy
 	    freelines->push_back(F(os.str()));
 	    os.str("");
 	 }
@@ -162,7 +166,11 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	       if(to_mycout)
 		  mycout << insert_omp(blanks(M(std::max(fi->cur_indent+6,1))));
 	       else
+	       {
 		  os << cmpstr << ' ';
+		  if(had_first && is_omp)
+		     os << " & &";   // to keep gfortran and ifort happy
+	       }
 	    }
 	 }
 	 //
@@ -191,8 +199,7 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
       std::string s = lines.front().strnomp();
 
       //
-      // if this is not the first line, and label field is not empty:
-      // garbage in, garbage out
+      // garbage in, garbage out:
       //
 
       if(!cleanfive(s))
@@ -216,6 +223,7 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
       //
       // this should be a normal line with code, maybe preceded with a label
       //
+
       if(s.length() > 6)   // line is [label][c]statement
       {
 	 bool iscontinuation = lines.front().fixedcontinuation();
@@ -307,6 +315,7 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	    os.str("");
 	 }
 	 lines.pop_front();
+	 had_first = 1;     // here, the 1st line of a statement has been processed
 	 continue;
       }
       //
@@ -329,6 +338,7 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	 os.str("");
       }
       lines.pop_front();
+      had_first = 1;     // here, the 1st line of a statement has been processed
    }
 }     // end of output
 
