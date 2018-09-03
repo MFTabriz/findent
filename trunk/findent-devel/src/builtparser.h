@@ -151,7 +151,10 @@ extern int yydebug;
     I_NUMBER = 361,
     UNCLASSIFIED = 362,
     ERROR = 363,
-    LAST_TOKEN = 364
+    OMP = 364,
+    SCANOMPFIXED = 365,
+    SCANOMPFREE = 366,
+    LAST_TOKEN = 367
   };
 #endif
 

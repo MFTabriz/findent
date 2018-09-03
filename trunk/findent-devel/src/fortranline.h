@@ -21,10 +21,11 @@ class Fortranline
    // I found that some functions are used repeatedly, the results are
    // cached here
    //
-   std::string ltrim_cache; bool ltrim_cached;
-   std::string trim_cache;  bool trim_cached;
-   char firstchar_cache;    bool firstchar_cached;
-   int scanfixpre_cache;    bool scanfixpre_cached;
+   char        firstchar_cache;    bool firstchar_cached;
+   std::string ltrim_cache;        bool ltrim_cached;
+   bool        omp_cache;          bool omp_cached;
+   int         scanfixpre_cache;   bool scanfixpre_cached;
+   std::string trim_cache;         bool trim_cached;
 
    bool     is_clean;
    Globals* gl;
@@ -36,11 +37,14 @@ class Fortranline
    {
       local_format      = gl->global_format;
       local_gnu_format  = gl->global_gnu_format;
-      ltrim_cached      = 0;
-      trim_cached       = 0;
-      firstchar_cached  = 0;
+
       is_clean          = 0;
+
+      firstchar_cached  = 0;
+      ltrim_cached      = 0;
+      omp_cached        = 0;
       scanfixpre_cached = 0;
+      trim_cached       = 0;
    }
 
    void init(Globals* g)
@@ -49,10 +53,28 @@ class Fortranline
       init();
    }
 
+   void do_clean();
+   bool do_omp();
+
    public:
 
    void print();
-   void clean(const bool force = 0);
+
+   void clean()
+   {
+      if (is_clean)
+	 return;
+      else
+	 do_clean();
+   }
+
+   void clean(bool force)
+   {
+      if (force)
+	 do_clean();
+      else
+	 clean();
+   }
 
    Fortranline(Globals* g)
    {
@@ -219,14 +241,12 @@ class Fortranline
 
    bool omp()
    {
-      if (!gl->global_omp)
-	 return 0;
-      if (format() == FIXED)
-	 lexer_set(orig_line,SCANOMPFIXED);
-      else
-	 lexer_set(orig_line,SCANOMPFREE);
-      int rc = yylex();
-      return rc == OMP;
+      if (!omp_cached)
+      {
+	 omp_cache = do_omp();
+	 omp_cached = 1;
+      }
+      return omp_cache;
    }
 
    std::string rest() 
