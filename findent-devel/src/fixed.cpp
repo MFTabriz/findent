@@ -140,7 +140,6 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	 else
 	 {
 	    os << cmpstr;
-	    ppp<<FL<<had_first<<" "<<is_omp<<endchar;
 	    if(had_first && is_omp)
 	       os << " & &";   // to keep gfortran and ifort happy
 	    freelines->push_back(F(os.str()));

@@ -192,7 +192,8 @@ void Fortran::get_full_statement()
 
 	    if (f_more)
 	    {
-	       Curline = Getnext(End_of_file); if (End_of_file) { state = end_fortran; break; }
+	       Curline = Getnext(End_of_file); 
+	       if (End_of_file) { state = end_fortran; break; }
 	       pretype = Curline.getpregentype();
 	       if (pretype == CPP || pretype == COCO)
 	       {
@@ -203,7 +204,8 @@ void Fortran::get_full_statement()
 		     curlines.push_back(Curline);
 		     if(p_more)
 		     {
-			Curline = Getnext(End_of_file); if (End_of_file) { state = end_fortran; break; }
+			Curline = Getnext(End_of_file); 
+			if (End_of_file) { state = end_fortran; break; }
 		     }
 		     else
 			break;
@@ -233,7 +235,8 @@ void Fortran::get_full_statement()
 	       curlines.push_back(Curline);
 	       if(p_more)
 	       {
-		  Curline = Getnext(End_of_file); if (End_of_file) { state = end_pre; break; }
+		  Curline = Getnext(End_of_file); 
+		  if (End_of_file) { state = end_pre; break; }
 	       }
 	       else
 		  break;
