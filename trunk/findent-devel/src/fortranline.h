@@ -1,5 +1,5 @@
-#ifndef NFORTRANLINE_H
-#define NFORTRANLINE_H
+#ifndef FORTRANLINE_H
+#define FORTRANLINE_H
 
 #include <deque>
 
@@ -18,7 +18,7 @@ class Fortranline
    std::string orig_line;
    std::string orig_without_omp;
    //
-   // I found that some functions are used repeatedly, the results are
+   // Some functions are used repeatedly, the results are
    // cached here
    //
    char        firstchar_cache;    bool firstchar_cached;

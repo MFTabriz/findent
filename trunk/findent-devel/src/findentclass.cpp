@@ -14,6 +14,7 @@ int Findent::determine_fix_or_free()
    bool eof;
    bool p_more = 0;
    bool skip = 0;
+
    while ( n < nmax)
    {
       n++;
@@ -154,10 +155,6 @@ void Findent::init_indent()
 
 }             // end of init_indent
 
-void Findent::push_indent(int p)
-{
-   indent.push_back(p);
-}
 
 std::string Findent::handle_dos(const std::string &s)
 {

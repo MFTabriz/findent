@@ -23,7 +23,6 @@ std::ostream& operator <<(std::ostream &os,Fortranline &obj)
    return os;
 }
 
-
 void Fortranline::do_clean()
 {
    init();

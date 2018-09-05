@@ -9,9 +9,9 @@
 struct propstruct
 {
    int         kind;
-   std::string name;
-   std::string label;
    std::string dolabel;
+   std::string label;
+   std::string name;
 } ;
 
 const struct propstruct empty_rprop={0,"","",""};
