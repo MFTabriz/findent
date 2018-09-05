@@ -1,5 +1,5 @@
-#ifndef NFORTRANLINE_H
-#define NFORTRANLINE_H
+#ifndef FORTRANLINE_H
+#define FORTRANLINE_H
 
 #include <deque>
 
@@ -7,6 +7,7 @@
 #include "lexer.h"
 #include "parser.h"
 #include "globals.h"
+#include "debug.h"
 
 class Fortranline
 {
@@ -15,29 +16,35 @@ class Fortranline
    // some functions assume that clean() is called
    //
    std::string orig_line;
+   std::string orig_without_omp;
    //
-   // I found that some functions are used repeatedly, the results are
+   // Some functions are used repeatedly, the results are
    // cached here
    //
-   std::string ltrim_cache; bool ltrim_cached;
-   std::string trim_cache;  bool trim_cached;
-   char firstchar_cache;    bool firstchar_cached;
-   int scanfixpre_cache;    bool scanfixpre_cached;
+   char        firstchar_cache;    bool firstchar_cached;
+   std::string ltrim_cache;        bool ltrim_cached;
+   bool        omp_cache;          bool omp_cached;
+   int         scanfixpre_cache;   bool scanfixpre_cached;
+   std::string trim_cache;         bool trim_cached;
 
    bool     is_clean;
    Globals* gl;
    int      local_format;
    bool     local_gnu_format;
 
+
    void init()
    {
       local_format      = gl->global_format;
       local_gnu_format  = gl->global_gnu_format;
-      ltrim_cached      = 0;
-      trim_cached       = 0;
-      firstchar_cached  = 0;
+
       is_clean          = 0;
+
+      firstchar_cached  = 0;
+      ltrim_cached      = 0;
+      omp_cached        = 0;
       scanfixpre_cached = 0;
+      trim_cached       = 0;
    }
 
    void init(Globals* g)
@@ -46,9 +53,28 @@ class Fortranline
       init();
    }
 
+   void do_clean();
+   bool do_omp();
+
    public:
 
    void print();
+
+   void clean()
+   {
+      if (is_clean)
+	 return;
+      else
+	 do_clean();
+   }
+
+   void clean(bool force)
+   {
+      if (force)
+	 do_clean();
+      else
+	 clean();
+   }
 
    Fortranline(Globals* g)
    {
@@ -88,14 +114,20 @@ class Fortranline
 
    bool gnu_format()                { return gl->global_gnu_format; }
 
-   std::string str() const          { return orig_line; }
+   std::string str()                { return orig_line; }
+
+   std::string strnomp()      
+   {
+      clean();
+      return orig_without_omp; 
+   }
 
    friend std::ostream& operator <<(std::ostream &os,Fortranline &obj);
 
    void str(const std::string &s)
    {
-      init();
       orig_line = s;
+      init();
    }
 
    int format() const
@@ -105,42 +137,8 @@ class Fortranline
       return local_format;
    }
 
-   void clean()
-   {
-      if(is_clean)  // with fixed-format, lines are often read twice
-	 return;
-      init();
-      switch(format())
-      {
-	 case FIXED:
-	    if (line_length() == 0)
-	       orig_line = ltab2sp(orig_line);
-	    else
-	       //
-	       // With tabbed input there is a difference between
-	       // gfortran and other compilers with respect to the line length.
-	       // Other compilers simply count the number of characters.
-	       // gfortran always assumes that the
-	       // continuation character is in column 6,
-	       // so this needs extra attention:
-	       //
-	       if(gnu_format())
-		  orig_line = ltab2sp(orig_line).substr(0,line_length());
-	       else
-		  orig_line = ::rtrim(orig_line.substr(0,line_length()));
-	    break;
-	 case FREE:
-	 default:
-	    if (line_length() == 0)
-	       orig_line = ::rtrim(orig_line);
-	    else
-	       orig_line = ::rtrim(orig_line.substr(0,line_length()));
-	    break;
-      }
-      is_clean = 1;
-   }
 
-   std::string trimmed_line() const
+   std::string trimmed_line()
    {
       //
       // result is different for FIXED or FREE, see below:
@@ -152,18 +150,30 @@ class Fortranline
 	    break;
 	 case FREE:
 	 default:
-	    return ::trim(orig_line);
+	    if (omp())
+	       return ::trim(orig_without_omp);
+	    else
+	       return ::trim(orig_line);
 	    break;
       }
    }
 
-   std::string rtrim() const { return ::rtrim(orig_line); }
+   std::string rtrim() 
+   {
+      if (omp())
+	 return ::rtrim(orig_without_omp);
+      else
+	 return ::rtrim(orig_line);
+   }
 
    std::string ltrim()
    {
       if (!ltrim_cached)
       {
-	 ltrim_cache = ::ltrim(orig_line);
+	 if (omp())
+	    ltrim_cache = ::ltrim(orig_without_omp);
+	 else
+	    ltrim_cache = ::ltrim(orig_line);
 	 ltrim_cached = 1;
       }
       return ltrim_cache;
@@ -173,7 +183,10 @@ class Fortranline
    {
       if (!trim_cached)
       {
-	 trim_cache = ::trim(orig_line);
+	 if (omp())
+	    trim_cache = ::trim(orig_without_omp);
+	 else
+	    trim_cache = ::trim(orig_line);
 	 trim_cached = 1;
       }
       return trim_cache;
@@ -226,6 +239,16 @@ class Fortranline
       return scanfixpre_cache;
    }
 
+   bool omp()
+   {
+      if (!omp_cached)
+      {
+	 omp_cache = do_omp();
+	 omp_cached = 1;
+      }
+      return omp_cache;
+   }
+
    std::string rest() 
    {
       if(scanfixpre()==FINDENTFIX)
@@ -241,6 +264,10 @@ class Fortranline
       switch (format())
       {
 	 case FIXED:
+	    if (omp())
+	    {
+	       return firstchar() == '!';
+	    }
 	    switch(::firstchar(orig_line))
 	    {
 	       case 'd':
@@ -297,6 +324,11 @@ class Fortranline
       //
       const std::string c = " 0";
       return c.find((*this)[5]) == std::string::npos;
+   }
+
+   std::string remove_trailing_comment(const char prevquote = ' ')
+   {
+      return ::rtrim(::remove_trailing_comment(orig_without_omp,prevquote));
    }
 
 };

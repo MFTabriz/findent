@@ -143,10 +143,8 @@ class Fortran
 	 if (!dolabels_store.empty())
 	    dolabels = dolabels_store.back();
 	 if (!indent_store.empty())
-	    //indent = indent_store.back();
 	    fi->indent=indent_store.back();
 	 if (!nbseen_store.empty())
-	    //nbseen = nbseen_store.back();
 	    fi->nbseen=nbseen_store.back();
 	 if (!rprops_store.empty())
 	    rprops = rprops_store.back();

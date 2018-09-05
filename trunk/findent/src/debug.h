@@ -23,6 +23,9 @@
 // turn off by !findentfix:p-off
 // or in the code: ppp.on() or ppp.off()
 //
+// a typical debug line would be:
+// ppp<<FL<<full_statement<<endchar;
+//
 
 extern  char endchar;
 

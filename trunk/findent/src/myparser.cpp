@@ -1,5 +1,8 @@
 #include "parser.cpp"
-#include "debug.h"  // to generate dependencies
+//
+// to generate dependencies:
+//
+#include "debug.h"
 #include "lexer.h"
 #include "line_prep.h"
 #include "prop.h"
