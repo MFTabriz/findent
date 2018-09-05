@@ -30,9 +30,11 @@ class Findent
 	 nbseen             = 0;
 	 num_lines          = 0;
 	 start_indent       = 0;
+
 	 gl->global_format      = UNKNOWN;
-	 gl->global_line_length = flags.input_line_length;
 	 gl->global_gnu_format  = flags.input_format_gnu;;
+	 gl->global_line_length = flags.input_line_length;
+	 gl->global_omp         = flags.honour_omp;
 
 	 //
 	 // private
@@ -87,8 +89,9 @@ class Findent
       int          guess_indent(Fortranline line);
       std::string  handle_dos(const std::string &s);
       void         handle_reading_from_tty();
-      void         push_indent(int p);
       int          what_to_return();
+
+      void push_indent(int p) { indent.push_back(p); }
 
       // for handle_pre_light:
       int pregentype;

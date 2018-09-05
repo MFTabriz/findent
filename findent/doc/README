@@ -657,9 +657,11 @@ g++:           https://gcc.gnu.org/
 gcc:           https://gcc.gnu.org/
 gfortran:      https://gcc.gnu.org/wiki/GFortran
 gnu software:  https://www.gnu.org/
+kcachegrind:   https://kcachegrind.github.io/html/Home.html
 linux:         https://en.wikipedia.org/wiki/Linux
 make:          https://www.gnu.org/software/make/
 ubuntu:        https://www.ubuntu.com/
+valgrind:      http://valgrind.org/
 vim:           https://www.vim.org/
 
 The website http://www.cplusplus.com/ helped me to find a way through C++.

@@ -47,6 +47,7 @@ struct propstruct properties;
 %token I_NUMBER 
 %token UNCLASSIFIED
 %token ERROR
+%token OMP SCANOMPFIXED SCANOMPFREE
 %token LAST_TOKEN
 
 %left '%'
@@ -202,7 +203,7 @@ gidentifier:         IDENTIFIER
 	   |         TIDENTIFIER 
 	   ;
 
-assignment:          lvalue '=' skipnoop
+assignment:          lvalue '=' skipnoop  /* this includes '=>' */
 	  |          ASSIGN I_NUMBER TO enable_identifier gidentifier EOL 
 	  ;
 

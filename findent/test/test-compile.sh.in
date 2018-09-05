@@ -19,9 +19,9 @@ case "$bprog" in
       ;;
 esac
 
-$gfortran -fcoarray=single -cpp $format -o prog $prog >/dev/null 2>&1
+$gfortran -fcoarray=single -cpp -fopenmp $format -o prog $prog >/dev/null 2>&1
 if [ $? -ne 0 ] ; then
-   echo -n " original program does not compile using: -fcoarray=single -cpp $format -o prog $prog "
+   echo -n " original program does not compile using: -fcoarray=single -cpp -fopenmp $format -o prog $prog "
    rc=1
 fi
 
@@ -58,9 +58,9 @@ case "$bprog" in
       format="-ffixed-form -ffixed-line-length-none -fd-lines-as-comments"
       ;;
 esac
-$gfortran -fcoarray=single -cpp $format -o prog $bprog.try.f >/dev/null 2>&1
+$gfortran -fcoarray=single -cpp -fopenmp $format -o prog $bprog.try.f >/dev/null 2>&1
 if [ $? -ne 0 ] ; then
-   echo "        converted program does not compile using: -fcoarray=single -cpp $format -o prog $bprog.try.f "
+   echo "        converted program does not compile using: -fcoarray=single -cpp -fopenmp $format -o prog $bprog.try.f "
    rc=1
 fi
 

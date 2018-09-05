@@ -1,4 +1,5 @@
 #!/bin/sh
+# test wfindent
 if test -e prelude ; then
    . ./prelude
 else

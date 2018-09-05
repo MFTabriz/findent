@@ -279,3 +279,29 @@ C FINDENTFIX: enddo
          continue
          enddo
          end subroutine testfix
+      subroutine testpointer
+      integer, pointer :: subroutinesub
+      integer, target :: i
+      subroutinesub=>i     ! must not be recognized as subroutine statement
+      end
+
+                 subroutine omp
+              integer i,j,k
+C$            integer m,n, 
+c$  ! comment in omp sentinel
+! normal comment
+*$
+*$   1         o,p
+              print *,i,j,k
+!$           print*, m,n,o,p
+!$           do 100 i=1,20
+!$           do 100 j=1,i
+c$           continue
+c$100        continue
+c$omp parallel
+c$omp do
+       do i=1,20
+       continue
+       enddo
+c$omp end parallel
+              end

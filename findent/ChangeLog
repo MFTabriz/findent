@@ -1,3 +1,6 @@
+findent-2.8.5:
+	implemented openmp awareness
+
 findent-2.8.4:
 	major restructuring of the code.
 
