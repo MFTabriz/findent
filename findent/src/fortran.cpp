@@ -356,7 +356,6 @@ void Fortran::indent_and_output()
 {
    std::string rest = full_statement;
    bool first_time  = 1;
-   fi->indent_handled   = 0;
    while(1)
    {
       Line_prep p(rest);
