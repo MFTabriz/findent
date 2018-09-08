@@ -34,7 +34,7 @@ SUBMODULE (ancestor) descendant
   CONTAINS              
     MODULE SUBROUTINE sub1(arg1) 
 
-      INTEGER :: arg 1
+      INTEGER :: arg1
       arg1 = 1
       i = 2                     
       j = 3                    
