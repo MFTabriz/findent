@@ -177,7 +177,12 @@ endfunction
 function! Findent_use_wb_toggle()
    if b:use_findent_indentexpr
       let b:findent_use_whole_buffer = !b:findent_use_whole_buffer
-      echomsg "toggled 'use whole buffer'"
+      if b:findent_use_whole_buffer 
+	 let p = "ON"
+      else
+	 let p = "OFF"
+      endif
+      echomsg "use whole buffer = ".p
    else
       echomsg "not using findent for indentexpr"
    endif
