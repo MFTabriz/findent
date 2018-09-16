@@ -534,7 +534,12 @@ findent, installation:
    Linux:
          $ ./configure --prefix=/usr/local
          $ make
-         $ sudo make install
+	 On systems with sudo (Debian, Ubuntu, Mint, ...):
+	    $ sudo make install
+	 On systems without sudo (Redhat, Scientific Linux, ...):
+	    $ su root
+	    $ make install
+	    $ exit
 
    Windows:
       copy findent.exe C:\WINDOWS
@@ -559,7 +564,12 @@ wfindent
       If you installed findent with the ./configure, make, make install 
       method, wfindent is installed as well.
       Otherwise:
-      $ sudo install scripts/wfindent /usr/local/bin
+      On systems with sudo (Debian, Ubuntu, Mint, ...):
+	 $ sudo install scripts/wfindent /usr/local/bin
+      On systems without sudo (Redhat, Scientific Linux, ...):
+	 $ su root
+	 $ install scripts/wfindent /usr/local/bin
+	 $ exit
 
 
 wfindent.bat

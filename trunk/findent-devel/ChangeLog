@@ -1,6 +1,7 @@
 findent-2.8.6:
-	fix bug: wrong lastindent when last line is endif,end etc.
-	this bug was introduced in version 2.8.3
+	fix bug: wrong lastindent when last line is ENDIF,END etc.
+	   this bug was introduced in version 2.8.3
+	adapt documentation for systems without sudo
 
 findent-2.8.5:
 	implemented openmp awareness
