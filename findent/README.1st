@@ -22,12 +22,16 @@ Unix-Linux users:
 	     $ ./configure --prefix=<Your installation directory, default /usr/local>
 	     $ make clean
              $ make
+	     On systems with sudo (Debian, Ubuntu, Linux Mint, ...):
 	     $ sudo make install
-		if bison or flex are found, they will
-		be used to regenerate the parser and lexer
-		sources. See ./configure --help
+	     On systems without sudo (Redhat, Scientific Linux, ...):
+	     $ su -c 'make install'
+	     if bison or flex are found, they will
+	     be used to regenerate the parser and lexer
+	     sources. See ./configure --help
 
-    You can create an Windows executable (requires package mingw32):
+    You can create an Windows executable 
+       (requires Ubuntu package g++-mingw-w64-i686):
 	     $ ./configure --with-windows
              $ make clean
 	     $ make
