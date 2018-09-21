@@ -22,6 +22,7 @@ struct propstruct properties;
 %token BLOCKDATA ENDBLOCKDATA
 %token ASSOCIATE ENDASSOCIATE
 %token CRITICAL ENDCRITICAL
+%token CHANGETEAM ENDTEAM
 %token ENUM ENDENUM
 %token ASSIGNMENT
 %token ASSIGN TO
@@ -70,6 +71,7 @@ line:
     |                blockdata                { properties.kind = BLOCKDATA;         }
     |                case                     { properties.kind = CASE;              }
     |                casedefault              { properties.kind = CASEDEFAULT;       }
+    |                changeteam               { properties.kind = CHANGETEAM;        }
     |                classdefault             { properties.kind = CLASSDEFAULT;      }
     |                classis                  { properties.kind = CLASSIS;           }
     |                contains                 { properties.kind = CONTAINS;          }
@@ -94,6 +96,7 @@ line:
     |                endselect                { properties.kind = ENDSELECT;         }
     |                endsubmodule             { properties.kind = ENDSUBMODULE;      }
     |                endsubroutine            { properties.kind = ENDSUBROUTINE;     }
+    |                endteam                  { properties.kind = ENDTEAM;           }
     |                endtype                  { properties.kind = ENDTYPE;           }
     |                endwhere                 { properties.kind = ENDWHERE;          }
     |                entry                    { properties.kind = ENTRY;             }
@@ -196,6 +199,8 @@ endprogram:          ENDPROGRAM    construct_name EOL ;
 endselect:           ENDSELECT     skipall            ;
 endsubmodule:        ENDSUBMODULE  construct_name EOL ;
 endsubroutine:       ENDSUBROUTINE construct_name EOL ;
+endteam:             ENDTEAM       EOL                ;
+endteam:             ENDTEAM       LR EOL             ;
 endtype:             ENDTYPE       construct_name EOL ;
 endwhere:            ENDWHERE      construct_name EOL ;
 simple_end:          END                          EOL ;
@@ -239,11 +244,13 @@ classdefault:        CLASSDEFAULT      skipall ;
 classis:             CLASSIS       LR  skipall ;
 typeis:              TYPEIS        LR  skipall ;
 
+changeteam:          CHANGETEAM    LR  EOL ;
 
 block:               BLOCK                    EOL ;
 blockdata:           BLOCKDATA construct_name EOL ;
 associate:           ASSOCIATE LR             EOL ;
 critical:            CRITICAL                 EOL ;
+critical:            CRITICAL  LR             EOL ;
 enum:                ENUM ','             skipall ;
 
 type:                type1 ','  skipall
