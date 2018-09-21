@@ -440,6 +440,10 @@ void Fortran::indent_and_output()
 	    Cur_indent = top_indent();
 	    push_indent(Cur_indent + FLAGS.block_indent);
 	    break;
+	 case CHANGETEAM:
+	    Cur_indent = top_indent();
+	    push_indent(Cur_indent + FLAGS.changeteam_indent);
+	    break;
 	 case CRITICAL:
 	    Cur_indent = top_indent();
 	    push_indent(Cur_indent + FLAGS.critical_indent);
@@ -496,6 +500,7 @@ void Fortran::indent_and_output()
 	 case ENDINTERFACE:
 	 case ENDSELECT:
 	 case ENDSUBMODULE:
+	 case ENDTEAM:
 	 case ENDTYPE:
 	 case ENDWHERE:
 	    if (!fi->indent_handled)

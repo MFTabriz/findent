@@ -41,6 +41,7 @@ void Flags::set_default_indents()
    associate_indent    = all_indent;              // -a
    block_indent        = all_indent;              // -b
    case_indent         = all_indent-all_indent/2; // -c
+   changeteam_indent   = all_indent;
    cont_indent         = all_indent;              // -k
    contains_indent     = all_indent;              // -C
    critical_indent     = all_indent;              // -x
@@ -189,6 +190,9 @@ int Flags::get_flags(int argc, char *argv[])
 
       {"indent_critical"    , required_argument, 0, 'x'                  },
       {"indent-critical"    , required_argument, 0, 'x'                  },
+
+      {"indent_changeteam"  , required_argument, 0, DO_CHANGETEAM        },
+      {"indent-changeteam"  , required_argument, 0, DO_CHANGETEAM        },
 
       {"vim_help"           , no_argument      , 0, DO_VIM_HELP          },
       {"vim-help"           , no_argument      , 0, DO_VIM_HELP          },
@@ -411,6 +415,10 @@ int Flags::get_flags(int argc, char *argv[])
 	 case 'x' :
 	    optargcheck;
 	    critical_indent   = atoi(optarg);       // --indent_critical=nn
+	    break;
+	 case DO_CHANGETEAM:
+	    optargcheck;
+	    changeteam_indent = atoi(optarg);       // --indent_changeteam=nn
 	    break;
 	 case DO_CONCHAR:
 	    optargcheck;

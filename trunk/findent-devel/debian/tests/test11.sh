@@ -1,4 +1,5 @@
 #!/bin/sh
+# vim: indentexpr=none
 if test -e prelude ; then
    . ./prelude
 else
@@ -25,6 +26,26 @@ cat << eof > expect
 eof
 
 ../doit "-lastindent --last_indent" "-ifree -Ia -i3"
+rc=`expr $rc + $?`
+
+# test 2018 critical(stat = istat)
+cat << eof > prog 
+program pcritical
+critical(stat=istat)
+continue
+end critical
+end
+eof
+
+cat << eof > expect
+program pcritical
+   critical(stat=istat)
+       continue
+   end critical
+end
+eof
+
+../doit "--indent-critical=4 -x4" "-ifree"
 rc=`expr $rc + $?`
 
 . ../postlude

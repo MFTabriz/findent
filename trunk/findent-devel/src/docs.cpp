@@ -185,6 +185,7 @@ void Docs::usage(bool man)
    manout("-t<n>, --indent_type=<n>"        ,"TYPE         indent");
    manout("-w<n>, --indent_where=<n>"       ,"WHERE        indent");
    manout("-x<n>, --indent_critical=<n>"    ,"CRITICAL     indent");
+   manout("--indent_changeteam=<n>     "    ,"CHANGE TEAM  indent");
    manout("-C-, --indent_contains=restart, ","restart indent after CONTAINS");
    manout("-k<n>, --indent_continuation=<n>","continuation indent except   " );
    manout(" ","  for lines starting with '&'");
