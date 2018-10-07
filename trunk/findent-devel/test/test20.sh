@@ -710,6 +710,120 @@ eof
 
 ../doit "-b5 --indent-block=5 --indent_block=5 " "-ifree -Ia"
 rc=`expr $rc + $?`
+
+cat << eof > prog
+! Derived-type definitions  pp 173-177
+
+     module p_type
+
+     type,public :: mytype
+     integer a(10)
+     end type mytype
+
+     type :: atype
+     integer a(10)
+     end type 
+
+     type :: btype
+     integer a(10)
+     end type btype
+
+        type anothertype
+     integer x(10)
+        end type
+
+     end
+eof
+cat << eof > expect
+! Derived-type definitions  pp 173-177
+
+     module p_type
+
+        type,public :: mytype
+             integer a(10)
+        end type mytype
+
+        type :: atype
+             integer a(10)
+        end type
+
+        type :: btype
+             integer a(10)
+        end type btype
+
+        type anothertype
+             integer x(10)
+        end type
+
+     end
+eof
+
+../doit "-t5 --indent-type=5 --indent_type=5 " "-ifree -Ia"
+rc=`expr $rc + $?`
+
+cat << eof > prog
+! Advanced type parameter features
+     program p_advancedtype
+
+     type mytype(k,l)
+     integer, kind :: k
+     integer, len  :: l
+     real(k) :: a(l)
+     end type mytype
+
+     type(mytype(selected_real_kind(6),10)) :: x
+     x%a(2) = 9
+
+     end
+eof
+cat << eof > expect
+! Advanced type parameter features
+     program p_advancedtype
+
+        type mytype(k,l)
+             integer, kind :: k
+             integer, len  :: l
+             real(k) :: a(l)
+        end type mytype
+
+        type(mytype(selected_real_kind(6),10)) :: x
+        x%a(2) = 9
+
+     end
+eof
+
+../doit "-t5 --indent-type=5 --indent_type=5 " "-ifree -Ia"
+rc=`expr $rc + $?`
+
+cat << eof > prog
+! Abstract interfaces  pp 285-287
+
+      program p_abstractinterfaces
+
+      abstract interface
+      integer function f(x,y)
+      integer x,y
+      end function
+      end interface
+
+end
+eof
+cat << eof > expect
+! Abstract interfaces  pp 285-287
+
+      program p_abstractinterfaces
+
+         abstract interface
+              integer function f(x,y)
+                 integer x,y
+              end function
+         end interface
+
+      end
+eof
+
+../doit "-j5 --indent-interface=5 --indent_interface=5 " "-ifree -Ia"
+rc=`expr $rc + $?`
 . ../postlude
 
 exit $rc
