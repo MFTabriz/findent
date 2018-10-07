@@ -179,8 +179,8 @@ void Docs::usage(bool man)
    manout("-F<n>, --indent_forall=<n>"      ,"FORALL       indent");
    manout("-j<n>, --indent_interface=<n>"   ,"INTERFACE    indent");
    manout("-m<n>, --indent_module=<n>"      ,"MODULE       indent");
-   manout("-r<n>, --indent_procedure=<n>"   ,"FUNCTION and");
-   manout(" ",  " SUBROUTINE  indent");
+   manout("-r<n>, --indent_procedure=<n>"   ,"FUNCTION,");
+   manout(" ",  " SUBROUTINE and PROGRAM indent");
    manout("-s<n>, --indent_select=<n>"      ,"SELECT       indent");
    manout("-t<n>, --indent_type=<n>"        ,"TYPE         indent");
    manout("-w<n>, --indent_where=<n>"       ,"WHERE        indent");

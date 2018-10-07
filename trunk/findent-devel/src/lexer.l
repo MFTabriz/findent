@@ -27,7 +27,7 @@ Line_prep       pline;
 b [ \t]
 
   //  following are keywords starting with c
-ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguous|critical|complex
+ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguous|critical|complex|changeteam
 %%
 
 <state_error>.  {  D(O("ERROR");Y;); return ERROR; }
