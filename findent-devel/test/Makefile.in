@@ -460,7 +460,7 @@ TESTS = \
 	 test1.sh  test2.sh  test3.sh  test4.sh  test5.sh  test6.sh  \
          test7.sh  test8.sh  test9.sh  test10.sh test11.sh test12.sh \
 	 test13.sh test14.sh test15.sh test16.sh test17.sh test18.sh \
-	 test19.sh
+	 test19.sh test20.sh
 
 EXTRA_DIST = $(TESTS)
 all: all-am
@@ -841,6 +841,13 @@ test18.sh.log: test18.sh
 test19.sh.log: test19.sh
 	@p='test19.sh'; \
 	b='test19.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+test20.sh.log: test20.sh
+	@p='test20.sh'; \
+	b='test20.sh'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
