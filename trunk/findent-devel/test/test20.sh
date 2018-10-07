@@ -608,6 +608,108 @@ eof
 
 ../doit "-w5 --indent-where=5 --indent_where=5 " "-ifree -Ia"
 rc=`expr $rc + $?`
+
+cat << eof > prog
+! Impure elemental procedures pp 128-129
+   program p_impure
+   contains
+   impure elemental integer function myfunc(x)
+   integer, intent(in) :: x
+   myfunc = x+1
+   end function
+   end program
+eof
+cat << eof > expect
+! Impure elemental procedures pp 128-129
+   program p_impure
+     contains
+        impure elemental integer function myfunc(x)
+             integer, intent(in) :: x
+             myfunc = x+1
+        end function
+   end program
+eof
+
+../doit "-r5 --indent-procedure=5 --indent_procedure=5 " "-ifree -Ia"
+rc=`expr $rc + $?`
+
+cat << eof > prog
+! The do concurrent construct
+       program p_doconcurrent
+       real:: a(10)
+       do concurrent(i=1:10)
+       a(i) = 8
+       enddo
+
+       l1: do concurrent(i=1:10)
+       a(i) = 8
+       enddo l1
+
+       do, concurrent(i=1:10)
+       a(i) = 8
+       enddo
+
+       l2: do, concurrent(i=1:10)
+       a(i) = 8
+       enddo l2
+       end
+eof
+cat << eof > expect
+! The do concurrent construct
+       program p_doconcurrent
+          real:: a(10)
+          do concurrent(i=1:10)
+               a(i) = 8
+          enddo
+
+          l1: do concurrent(i=1:10)
+               a(i) = 8
+          enddo l1
+
+          do, concurrent(i=1:10)
+               a(i) = 8
+          enddo
+
+          l2: do, concurrent(i=1:10)
+               a(i) = 8
+          enddo l2
+       end
+eof
+
+../doit "-d5 --indent-do=5 --indent_do=5 " "-ifree -Ia"
+rc=`expr $rc + $?`
+
+cat << eof > prog
+! The block construct  pp 168-170
+        program p_block
+
+	block
+	continue
+	end block
+
+	l1:block
+	continue
+	end block l1
+
+	end
+eof
+cat << eof > expect
+! The block construct  pp 168-170
+        program p_block
+
+           block
+                continue
+           end block
+
+           l1:block
+                continue
+           end block l1
+
+        end
+eof
+
+../doit "-b5 --indent-block=5 --indent_block=5 " "-ifree -Ia"
+rc=`expr $rc + $?`
 . ../postlude
 
 exit $rc
