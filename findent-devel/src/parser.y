@@ -238,9 +238,9 @@ selecttype:          SELECTTYPE LR skipall ;
 case:                CASE enable_identifier LR EOL                /* case (3)            */
     |                CASE enable_identifier LR IDENTIFIER EOL;    /* case (3) name       */
 casedefault:         CASEDEFAULT       construct_name EOL    ;    /* case default [name] */
-classdefault:        CLASSDEFAULT      skipall ;
-classis:             CLASSIS       LR  skipall ;
-typeis:              TYPEIS        LR  skipall ;
+classdefault:        CLASSDEFAULT      construct_name EOL ;
+classis:             CLASSIS       LR  construct_name EOL ;
+typeis:              TYPEIS        LR  construct_name EOL ;
 
 changeteam:          CHANGETEAM    LR  EOL ;
 
