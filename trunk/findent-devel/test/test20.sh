@@ -824,6 +824,222 @@ eof
 
 ../doit "-j5 --indent-interface=5 --indent_interface=5 " "-ifree -Ia"
 rc=`expr $rc + $?`
+
+cat << eof > prog
+! Type extension  pp 291-293
+
+    program p_typeextension
+
+    type x
+    integer a
+    end type x
+
+    type, extends(x) :: y
+    integer b
+    end type y
+
+    end
+eof
+cat << eof > expect
+! Type extension  pp 291-293
+
+    program p_typeextension
+
+       type x
+            integer a
+       end type x
+
+       type, extends(x) :: y
+            integer b
+       end type y
+
+    end
+eof
+
+../doit "-t5 --indent-type=5 --indent_type=5 " "-ifree -Ia"
+rc=`expr $rc + $?`
+
+cat << eof > prog
+! The associate construct  pp 300-301
+    program p_associate
+    implicit none
+
+    type atype
+    real x
+    end type atype
+
+    type(atype) :: a
+
+    associate(x => a%x)
+    x=10
+    end associate
+
+    l1: associate(x => a%x)
+    x=10
+    end associate l1
+
+    end
+eof
+cat << eof > expect
+! The associate construct  pp 300-301
+    program p_associate
+       implicit none
+
+       type atype
+          real x
+       end type atype
+
+       type(atype) :: a
+
+       associate(x => a%x)
+            x=10
+       end associate
+
+       l1: associate(x => a%x)
+            x=10
+       end associate l1
+
+    end
+eof
+
+../doit "-a5 --indent-associate=5 --indent_associate=5 " "-ifree -Ia"
+rc=`expr $rc + $?`
+
+cat << eof > prog
+! The select type construct
+
+    module mymod
+   implicit none
+  type t
+  real x
+  end type
+
+  type u
+  integer i
+  end type
+
+  type, extends(u) :: w
+  integer j
+  end type
+
+  end module mymod
+
+  program p_selecttype
+   use mymod
+   implicit none
+
+  type(t), target :: a
+  type(u), target :: b
+  type(w), target :: c
+  class(*), pointer :: h
+
+a%x = 11
+b%i = -10
+c%i = 120
+  h => a
+  call doit(h)
+  h => b
+  call doit(h)
+  h => c
+  call doit(h)
+
+contains 
+subroutine doit(h)
+class(*), pointer :: h
+  select type(h)
+  type is (t)
+  print *,h%x
+  type is(u)
+  print *,h%i
+  class is (w)
+  print *,h%i
+  class default
+  print *,'ai!'
+  end select
+
+  l1: select type(h)
+  type is (t) l1
+  print *,h%x
+  type is(u) l1
+  print *,h%i
+  class is (w) l1
+  print *,h%i
+  class default l1
+  print *,'ai!'
+  end select l1
+  end
+
+  end
+eof
+cat << eof > expect
+! The select type construct
+
+    module mymod
+       implicit none
+       type t
+          real x
+       end type
+
+       type u
+          integer i
+       end type
+
+       type, extends(u) :: w
+          integer j
+       end type
+
+    end module mymod
+
+    program p_selecttype
+       use mymod
+       implicit none
+
+       type(t), target :: a
+       type(u), target :: b
+       type(w), target :: c
+       class(*), pointer :: h
+
+       a%x = 11
+       b%i = -10
+       c%i = 120
+       h => a
+       call doit(h)
+       h => b
+       call doit(h)
+       h => c
+       call doit(h)
+
+    contains
+       subroutine doit(h)
+          class(*), pointer :: h
+          select type(h)
+             type is (t)
+               print *,h%x
+             type is(u)
+               print *,h%i
+             class is (w)
+               print *,h%i
+             class default
+               print *,'ai!'
+          end select
+
+          l1: select type(h)
+             type is (t) l1
+               print *,h%x
+             type is(u) l1
+               print *,h%i
+             class is (w) l1
+               print *,h%i
+             class default l1
+               print *,'ai!'
+          end select l1
+       end
+
+    end
+eof
+
+../doit "-s5 --indent-select=5 --indent_select=5 " "-ifree -Ia"
+rc=`expr $rc + $?`
 . ../postlude
 
 exit $rc
