@@ -3,6 +3,9 @@ findent-2.9.0:
 	   CRITICAL [(...)]
 	   CHANGE TEAM (...)
 	   END TEAM [(...)]
+	fortran.cpp:
+	   add CHANGETEAM for detection of moduleprocedure
+	   add CLASSIS etc to not usables for flag -lastusable
 
 findent-2.8.6:
 	fix bug: wrong lastindent when last line is ENDIF,END etc.

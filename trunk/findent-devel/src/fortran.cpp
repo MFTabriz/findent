@@ -71,11 +71,15 @@ void Fortran::handle_last_usable_only()
       {
 	 case BLANK:
 	 case CASE:
+	 case CASEDEFAULT:
+	 case CLASSIS:
+	 case CLASSDEFAULT:
 	 case CONTAINS:
 	 case ENTRY:
 	 case ELSE:
 	 case ELSEIF:
 	 case ELSEWHERE:
+	 case TYPEIS:
 	    break;
 	 default: 
 	    usable = 1;

@@ -1040,6 +1040,518 @@ eof
 
 ../doit "-s5 --indent-select=5 --indent_select=5 " "-ifree -Ia"
 rc=`expr $rc + $?`
+
+cat << eof > prog
+! Type and contains  p 316
+      module mymod
+      type mytype
+      integer i
+      contains
+	 procedure sub
+      end type mytype
+   contains
+      subroutine sub(this)
+	 class(mytype) :: this
+	 continue
+      end
+   end module mymod
+   program p_typecontains
+      use mymod
+      type(mytype) t
+   end
+eof
+cat << eof > expect
+! Type and contains  p 316
+      module mymod
+         type mytype
+              integer i
+          contains
+              procedure sub
+         end type mytype
+     contains
+         subroutine sub(this)
+            class(mytype) :: this
+            continue
+         end
+      end module mymod
+      program p_typecontains
+         use mymod
+         type(mytype) t
+      end
+eof
+
+../doit "-t5 --indent-type=5 --indent_type=5 " "-C4 -ifree -Ia"
+rc=`expr $rc + $?`
+
+cat << eof > prog
+! Deferred bindings and abstract types  pp 312-313
+    module mymod
+     integer i
+     type, abstract :: mytype
+     contains
+     procedure (sub), deferred, pass :: x
+     end type mytype
+     abstract interface
+     subroutine sub(p)
+     import mytype
+     class(mytype) :: p
+     end
+     end interface
+     type, abstract :: mt
+     contains
+     procedure(op), deferred :: plus
+     generic :: operator(+) => plus
+     end type mt
+     abstract interface
+     function op(a,b) result(r)
+     import mt
+     class(mt), intent(in) :: a,b
+     class (mt), allocatable :: r
+     end function
+     end interface
+     end module
+eof
+cat << eof > expect
+! Deferred bindings and abstract types  pp 312-313
+    module mymod
+       integer i
+       type, abstract :: mytype
+         contains
+            procedure (sub), deferred, pass :: x
+       end type mytype
+       abstract interface
+          subroutine sub(p)
+             import mytype
+             class(mytype) :: p
+          end
+       end interface
+       type, abstract :: mt
+         contains
+            procedure(op), deferred :: plus
+            generic :: operator(+) => plus
+       end type mt
+       abstract interface
+          function op(a,b) result(r)
+             import mt
+             class(mt), intent(in) :: a,b
+             class (mt), allocatable :: r
+          end function
+       end interface
+    end module
+eof
+
+../doit "-t5 --indent-type=5 --indent_type=5 " "-ifree -Ia"
+rc=`expr $rc + $?`
+
+cat << eof > prog
+! Finalization pp 313-314
+	 module mymod
+	 type mytype
+	 integer i
+	 contains
+	 final :: doit
+	 end type mytype
+	 contains
+	 subroutine doit(x)
+	 type(mytype) :: x
+	 end subroutine doit
+	 end module
+eof
+cat << eof > expect
+! Finalization pp 313-314
+         module mymod
+            type mytype
+                 integer i
+              contains
+                 final :: doit
+            end type mytype
+         contains
+            subroutine doit(x)
+               type(mytype) :: x
+            end subroutine doit
+         end module
+eof
+
+../doit "-t5 --indent-type=5 --indent_type=5 " "-ifree -Ia"
+rc=`expr $rc + $?`
+
+cat << eof > prog
+! Submodules pp 322-324
+            module base
+  integer i
+  interface
+  integer module function square(i)
+  integer i
+  end function square
+  end interface
+  end module base
+  submodule (base) deriv
+  contains
+  module procedure square
+  square = i*i
+  end procedure square
+  end submodule deriv
+eof
+cat << eof > expect
+! Submodules pp 322-324
+            module base
+                 integer i
+                 interface
+                    integer module function square(i)
+                       integer i
+                    end function square
+                 end interface
+            end module base
+            submodule (base) deriv
+              contains
+                 module procedure square
+                    square = i*i
+                 end procedure square
+            end submodule deriv
+eof
+
+../doit "-m5 --indent-module=5 --indent_module=5 " "-ifree -Ia"
+rc=`expr $rc + $?`
+
+cat << eof > prog
+! Critical sections pp 340-341
+    program p_critical
+    critical
+    continue
+    end critical
+    l1: critical
+    continue
+    end critical l1
+    end
+eof
+cat << eof > expect
+! Critical sections pp 340-341
+    program p_critical
+       critical
+            continue
+       end critical
+       l1: critical
+            continue
+       end critical l1
+    end
+eof
+
+../doit "-x5 --indent-critical=5 --indent_critical=5 " "-ifree -Ia"
+rc=`expr $rc + $?`
+
+cat << eof > prog
+! Interoperability with C pp 367-381
+       module mymod
+       type, bind(c) :: mytype
+       integer i
+       end type
+       enum, bind(c)
+       enumerator a=1, b=2
+       enumerator c
+       end enum
+       contains
+       function f() bind(c)
+       continue
+       end function f
+       su broutine sub bind(c)
+       continue
+       end
+       subroutine sub1() bind(c)
+       continue
+       end
+       end module
+eof
+cat << eof > expect
+! Interoperability with C pp 367-381
+       module mymod
+            type, bind(c) :: mytype
+               integer i
+            end type
+            enum, bind(c)
+               enumerator a=1, b=2
+               enumerator c
+            end enum
+         contains
+            function f() bind(c)
+               continue
+            end function f
+            su broutine sub bind(c)
+               continue
+            end
+            subroutine sub1() bind(c)
+               continue
+            end
+       end module
+eof
+
+../doit "-m5 --indent-module=5 --indent_module=5 " "-ifree -Ia"
+rc=`expr $rc + $?`
+
+cat << eof > prog
+! Change team construct pp 385-388
+! not compiled
+   program p_team
+   use iso_fortran_env
+   type(team_type) myteam
+   change team(myteam)
+   continue
+   end team
+   l1: change team(myteam)
+   continue
+   end team (stat=i)l1
+   critical
+   continue
+   end critical
+   critical (stat=i)
+   continue
+   end critical
+   l2:critical (stat=i)
+   continue
+   end critical l2
+   end
+eof
+cat << eof > expect
+! Change team construct pp 385-388
+! not compiled
+   program p_team
+        use iso_fortran_env
+        type(team_type) myteam
+        change team(myteam)
+           continue
+        end team
+        l1: change team(myteam)
+           continue
+        end team (stat=i)l1
+        critical
+           continue
+        end critical
+        critical (stat=i)
+           continue
+        end critical
+        l2:critical (stat=i)
+           continue
+        end critical l2
+   end
+eof
+
+../doit "-r5--indent-procedure=5 --indent_procedure=5 " "-ifree -Ia"
+rc=`expr $rc + $?`
+
+cat << eof > prog
+! The do while statement
+    program p_dowhile
+    logical l
+    do while (l)
+    continue
+    end do
+    l1: do while(l)
+    continue
+    enddo l1
+    do 10 while(l)
+    continue
+    10 continue
+    do 20, while(l)
+    continue
+    20 continue
+    end
+eof
+cat << eof > expect
+! The do while statement
+    program p_dowhile
+         logical l
+         do while (l)
+            continue
+         end do
+         l1: do while(l)
+            continue
+         enddo l1
+         do 10 while(l)
+            continue
+10       continue
+         do 20, while(l)
+            continue
+20       continue
+    end
+eof
+
+../doit "-r5--indent-procedure=5 --indent_procedure=5 " "-ifree -Ia"
+rc=`expr $rc + $?`
+
+cat << eof > prog
+! Character length specification with * p 458
+  character*10 function f()
+  continue
+f='abc'
+end
+eof
+cat << eof > expect
+! Character length specification with * p 458
+  character*10 function f()
+       continue
+       f='abc'
+  end
+eof
+
+../doit "-r5--indent-procedure=5 --indent_procedure=5 " "-ifree -Ia"
+rc=`expr $rc + $?`
+
+cat << eof > prog
+! Entry statement pp 462-463
+   subroutine sub
+  integer i
+  continue
+  entry sub1
+  continue
+  end
+eof
+cat << eof > expect
+! Entry statement pp 462-463
+   subroutine sub
+      integer i
+      continue
+ entry sub1
+      continue
+   end
+eof
+
+../doit "-e5 --indent-entry=5 --indent_entry=5 " "-ifree -Ia"
+rc=`expr $rc + $?`
+
+cat << eof > prog
+! Forall statement and construct pp 463-466
+ program p_forall
+ integer a(20)
+ forall(i=1:20) a(i) = 3*i ! statement
+ forall(i=1:20)  ! construct
+ a(i) = 4*i
+ end forall
+ end
+eof
+cat << eof > expect
+! Forall statement and construct pp 463-466
+ program p_forall
+    integer a(20)
+    forall(i=1:20) a(i) = 3*i ! statement
+    forall(i=1:20)  ! construct
+         a(i) = 4*i
+    end forall
+ end
+eof
+
+../doit "-F5 --indent-forall=5 --indent_forall=5 " "-ifree -Ia"
+rc=`expr $rc + $?`
+
+cat << eof > prog
+! The block data program unit
+ block data
+common // i
+data i /1/
+end block data
+eof
+cat << eof > expect
+! The block data program unit
+ block data
+      common // i
+      data i /1/
+ end block data
+eof
+
+../doit "-r5 --indent-procedure=5 --indent_procedure=5 " "-ifree -Ia"
+rc=`expr $rc + $?`
+
+cat << eof > prog
+! The labelled do construct
+    program p_dolabel
+    do 10 i=1,5
+    continue
+    10 enddo
+    do 20 i=1,5
+    continue
+    do 15 j=1,5
+    continue
+    15 continue
+    20 continue
+    do 50 i=1,5
+    do 50 j=1,5
+    continue
+    50 continue
+    end
+eof
+cat << eof > expect
+! The labelled do construct
+    program p_dolabel
+       do 10 i=1,5
+            continue
+10     enddo
+       do 20 i=1,5
+            continue
+            do 15 j=1,5
+                 continue
+15          continue
+20     continue
+       do 50 i=1,5
+            do 50 j=1,5
+                 continue
+50     continue
+    end
+eof
+
+../doit "-d5 --indent-do=5 --indent_do=5 " "-ifree -Ia"
+rc=`expr $rc + $?`
+
+cat << eof > prog
+! Arithmetic if statement
+  program p_aritif
+  i = 2
+  if(i) 10,20,30
+  10 continue
+  20 continue
+  30 continue
+  end
+eof
+cat << eof > expect
+! Arithmetic if statement
+  program p_aritif
+     i = 2
+     if(i) 10,20,30
+10   continue
+20   continue
+30   continue
+  end
+eof
+
+../doit "-d5 --indent-do=5 --indent_do=5 " "-ifree -Ia"
+rc=`expr $rc + $?`
+
+cat << eof > prog
+! Shared do-loop termination
+   program p_shdolote
+   do 20, i=1,8
+   do 20 ,j=1,6
+   continue
+   20 print *,i*j
+   do 30, i=1,8
+   do 30, j=1,6
+   continue
+   30 continue
+   end
+eof
+cat << eof > expect
+! Shared do-loop termination
+   program p_shdolote
+      do 20, i=1,8
+           do 20 ,j=1,6
+                continue
+20    print *,i*j
+      do 30, i=1,8
+           do 30, j=1,6
+                continue
+30    continue
+   end
+eof
+
+../doit "-d5 --indent-do=5 --indent_do=5 " "-ifree -Ia"
+rc=`expr $rc + $?`
 . ../postlude
 
 exit $rc
