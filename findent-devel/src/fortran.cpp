@@ -387,6 +387,7 @@ void Fortran::indent_and_output()
 	    case ASSIGNMENT:
 	    case UNCLASSIFIED:
 	    case BLOCK:
+	    case CHANGETEAM:
 	    case CONTAINS:
 	    case CRITICAL:
 	    case DO:
