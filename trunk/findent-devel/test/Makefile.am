@@ -7,6 +7,8 @@ TESTS = \
 EXTRA_DIST = $(TESTS)
 
 export SRCDIR = $(top_srcdir)
+export FC
+
 if MAKEWIN
    export WINDOWS = yes
 else

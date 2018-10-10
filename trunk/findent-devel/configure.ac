@@ -67,6 +67,15 @@ AS_IF( [test "x$with_flex" = "xuse-flex-if-available"],
 
 AM_CONDITIONAL([USEFLEX],[test "x$useflex" = "xyes"])
 
+# test for working gfortran (only used in make check):
+
+FC=gfortran
+AC_FC_FREEFORM(,[FC=""])
+AS_IF( [test "x$FC" = "xgfortran"],
+      [AC_MSG_NOTICE([gfortran will be used to compile test sources in 'make check'])],
+      [AC_MSG_NOTICE([No gfortran compiler found. 'make check' will not try to compile test sources])])
+
+
 AC_CONFIG_FILES([test/prelude])
 AC_CONFIG_FILES([test/postlude])
 AC_CONFIG_FILES([test/test-compile.sh],[chmod +x test/test-compile.sh])

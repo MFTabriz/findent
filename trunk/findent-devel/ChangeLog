@@ -6,6 +6,10 @@ findent-2.9.0:
 	fortran.cpp:
 	   add CHANGETEAM for detection of moduleprocedure
 	   add CLASSIS etc to not usables for flag -lastusable
+	test/Makefile.am test/test-compile.sh.in configure.ac:
+	   test for working gfortran:
+	     yes: 'make check' will compile sources
+	     no:  'make check' will not compile sources
 
 findent-2.8.6:
 	fix bug: wrong lastindent when last line is ENDIF,END etc.

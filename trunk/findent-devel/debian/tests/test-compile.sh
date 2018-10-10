@@ -2,8 +2,13 @@
 export FINDENT_FLAGS="$TEST_FINDENT_FLAGS"
 prog="$1"
 echo "$0: $prog"
-gfortran=gfortran
-$gfortran -v > /dev/null 2>&1  || { echo "Cannot compile: gfortran not installed" ; gfortran=: ; }
+if test "x$FC" = x ; then
+   gfortran=:
+   echo "will not try to compile fortran sources"
+else
+   gfortran="$FC"
+   echo "will try to compile fortran sources using $gfortran"
+fi
 rc=0
 exe=${FINDENT:-../src/findent}
 $exe -v
