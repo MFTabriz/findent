@@ -1,34 +1,36 @@
 findent: indents/beautifies/converts Fortran sources
 
- - findent supports Fortran-2008
+ - findent supports Fortran-66 up to Fortran-2018
  - findent can convert from fixed form to free form and vice-versa
- - findent honours OpenMP conditionals (since version 2.8.5)
+ - findent honours cpp and coco preprocess statements
+ - findent is validated against all constructs in 
+   'Modern Fortran explained, Incorporating Fortran 2018, Metcalf e.a.'
+ - findent honours OpenMP conditionals
  - binaries for Unix and Windows (findent and findent.exe respectively)
  - high speed: 50K - 100K lines per second
- - since version 2.7.0, findent is very vim-aware an can be used
    in equalprg and indentexpr
  - wrapper for processing one or more files in one call available
       for Unix and Windows (wfindent and wfindent.bat respectively)
- - vim, gedit, emacs users: findent optionally emits configuration files
+ - vim, gedit, emacs: findent optionally emits configuration files
    for these editors to use findent as a plugin.
  - gui frontent available in a separate package: jfindent
 
 Unix-Linux users: 
     prerequisites: gnumake, g++
     make findent and wfindent:    
-             download findent-x.y.tgz
+               download findent-x.y.tgz
              $ tar xf findent-x.y.z.tgz
              $ cd findent-x.y
 	     $ ./configure --prefix=<Your installation directory, default /usr/local>
 	     $ make clean
              $ make
-	     On systems with sudo (Debian, Ubuntu, Linux Mint, ...):
+	       On systems with sudo (Debian, Ubuntu, Linux Mint, ...):
 	     $ sudo make install
-	     On systems without sudo (Redhat, Scientific Linux, ...):
+	       On systems without sudo (Redhat, Scientific Linux, ...):
 	     $ su -c 'make install'
-	     if bison or flex are found, they will
-	     be used to regenerate the parser and lexer
-	     sources. See ./configure --help
+	       if bison or flex are found, they will
+	       be used to regenerate the parser and lexer
+	       sources. See ./configure --help
 
     You can create an Windows executable 
        (requires Ubuntu package g++-mingw-w64-i686):
