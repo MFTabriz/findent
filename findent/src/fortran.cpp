@@ -71,11 +71,15 @@ void Fortran::handle_last_usable_only()
       {
 	 case BLANK:
 	 case CASE:
+	 case CASEDEFAULT:
+	 case CLASSIS:
+	 case CLASSDEFAULT:
 	 case CONTAINS:
 	 case ENTRY:
 	 case ELSE:
 	 case ELSEIF:
 	 case ELSEWHERE:
+	 case TYPEIS:
 	    break;
 	 default: 
 	    usable = 1;
@@ -387,6 +391,7 @@ void Fortran::indent_and_output()
 	    case ASSIGNMENT:
 	    case UNCLASSIFIED:
 	    case BLOCK:
+	    case CHANGETEAM:
 	    case CONTAINS:
 	    case CRITICAL:
 	    case DO:
@@ -439,6 +444,10 @@ void Fortran::indent_and_output()
 	 case BLOCK:
 	    Cur_indent = top_indent();
 	    push_indent(Cur_indent + FLAGS.block_indent);
+	    break;
+	 case CHANGETEAM:
+	    Cur_indent = top_indent();
+	    push_indent(Cur_indent + FLAGS.changeteam_indent);
 	    break;
 	 case CRITICAL:
 	    Cur_indent = top_indent();
@@ -496,6 +505,7 @@ void Fortran::indent_and_output()
 	 case ENDINTERFACE:
 	 case ENDSELECT:
 	 case ENDSUBMODULE:
+	 case ENDTEAM:
 	 case ENDTYPE:
 	 case ENDWHERE:
 	    if (!fi->indent_handled)

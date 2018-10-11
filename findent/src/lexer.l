@@ -27,7 +27,7 @@ Line_prep       pline;
 b [ \t]
 
   //  following are keywords starting with c
-ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguous|critical|complex
+ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguous|critical|complex|changeteam
 %%
 
 <state_error>.  {  D(O("ERROR");Y;); return ERROR; }
@@ -133,6 +133,7 @@ casedefault       { D(O("CASEDEFAULT");Y);        return CASEDEFAULT;       }
 case              { D(O("CASE");Y);               return CASE;              }
 character         { D(O("CHARACTER");Y;);         return BASICTYPE;         }
 classdefault      { D(O("CLASSDEFAULT");Y);       return CLASSDEFAULT;      }
+changeteam        { D(O("CHANGETEAM");Y);         return CHANGETEAM;        }
 class             { D(O("CLASS");Y;);             return CLASS;             }
 classis           { D(O("CLASSIS");Y);            return CLASSIS;           }
 complex           { D(O("COMPLEX");Y;);           return BASICTYPE;         }
@@ -167,6 +168,7 @@ endprogram        { D(O("ENDPROGRAM");Y;);        return ENDPROGRAM;        }
 endselect         { D(O("ENDSELECT");Y);          return ENDSELECT;         }
 endsubroutine     { D(O("ENDSUBROUTINE");Y;);     return ENDSUBROUTINE;     }
 endsubmodule      { D(O("ENDSUBMODULE");Y;);      return ENDSUBMODULE;      }
+endteam           { D(O("ENDTEAM"):Y);            return ENDTEAM;           }
 endtype           { D(O("ENDTYPE");Y;);           return ENDTYPE;           }
 endwhere          { D(O("ENDWHERE");Y;);          return ENDWHERE;          }
 entry             { D(O("ENTRY");Y);              return ENTRY;             }
