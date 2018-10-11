@@ -16,6 +16,7 @@ class Flags
 
    enum {
       DO_NOTHING = 1000,
+      DO_CHANGETEAM,
       DO_CONCHAR,
       DO_EMACS_FINDENT,
       DO_EMACS_HELP,
@@ -61,6 +62,7 @@ class Flags
    int associate_indent;
    int block_indent;
    int case_indent;
+   int changeteam_indent;
    int cont_indent;
    int contains_indent;
    int critical_indent;

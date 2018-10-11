@@ -22,6 +22,7 @@ struct propstruct properties;
 %token BLOCKDATA ENDBLOCKDATA
 %token ASSOCIATE ENDASSOCIATE
 %token CRITICAL ENDCRITICAL
+%token CHANGETEAM ENDTEAM
 %token ENUM ENDENUM
 %token ASSIGNMENT
 %token ASSIGN TO
@@ -70,6 +71,7 @@ line:
     |                blockdata                { properties.kind = BLOCKDATA;         }
     |                case                     { properties.kind = CASE;              }
     |                casedefault              { properties.kind = CASEDEFAULT;       }
+    |                changeteam               { properties.kind = CHANGETEAM;        }
     |                classdefault             { properties.kind = CLASSDEFAULT;      }
     |                classis                  { properties.kind = CLASSIS;           }
     |                contains                 { properties.kind = CONTAINS;          }
@@ -94,6 +96,7 @@ line:
     |                endselect                { properties.kind = ENDSELECT;         }
     |                endsubmodule             { properties.kind = ENDSUBMODULE;      }
     |                endsubroutine            { properties.kind = ENDSUBROUTINE;     }
+    |                endteam                  { properties.kind = ENDTEAM;           }
     |                endtype                  { properties.kind = ENDTYPE;           }
     |                endwhere                 { properties.kind = ENDWHERE;          }
     |                entry                    { properties.kind = ENTRY;             }
@@ -124,7 +127,7 @@ module:              MODULE enable_identifier IDENTIFIER getname EOL ;
 
 abstractinterface:   ABSTRACTINTERFACE  EOL     ;
 contains:            CONTAINS           EOL     ;
-interface:           INTERFACE          skipall ;
+interface:           INTERFACE          skipall ;   /* interface [name, operator(*), assignment(=) */
 moduleprocedure:     MODULEPROCEDURE    enable_identifier IDENTIFIER getname EOL ;
 procedure:           PROCEDURE          enable_identifier IDENTIFIER getname EOL ;
 
@@ -189,13 +192,14 @@ endenum:             ENDENUM       EOL                ;
 endforall:           ENDFORALL     construct_name EOL ;
 endfunction:         ENDFUNCTION   construct_name EOL ;
 endif:               ENDIF         construct_name EOL ;
-endinterface:        ENDINTERFACE  skipall            ;
+endinterface:        ENDINTERFACE  skipall            ;   /* end interface [name, operator(*), assignment(=)] */
 endmodule:           ENDMODULE     construct_name EOL ;
 endprocedure:        ENDPROCEDURE  construct_name EOL ;
 endprogram:          ENDPROGRAM    construct_name EOL ;
-endselect:           ENDSELECT     skipall            ;
+endselect:           ENDSELECT     construct_name EOL ;
 endsubmodule:        ENDSUBMODULE  construct_name EOL ;
 endsubroutine:       ENDSUBROUTINE construct_name EOL ;
+endteam:             ENDTEAM       lr_construct_name EOL ;
 endtype:             ENDTYPE       construct_name EOL ;
 endwhere:            ENDWHERE      construct_name EOL ;
 simple_end:          END                          EOL ;
@@ -209,9 +213,7 @@ assignment:          lvalue '=' skipnoop  /* this includes '=>' */
 
 else:                ELSE           construct_name EOL ;
 elseif:              ELSEIF LR THEN construct_name EOL ;
-elsewhere:           ELSEWHERE LR   construct_name EOL
-	 |           ELSEWHERE      construct_name EOL 
-	 ;
+elsewhere:           ELSEWHERE      lr_construct_name EOL ;
 
 if_construct:        IF     LR THEN EOL ;
 where_construct:     WHERE  LR EOL ;
@@ -233,17 +235,20 @@ docomma:             DOCOMMA enable_identifier ;
 selectcase:          SELECTCASE LR EOL     ;
 selecttype:          SELECTTYPE LR skipall ;
 
-case:                CASE          LR  skipall ;
-casedefault:         CASEDEFAULT       skipall ;
-classdefault:        CLASSDEFAULT      skipall ;
-classis:             CLASSIS       LR  skipall ;
-typeis:              TYPEIS        LR  skipall ;
+case:                CASE enable_identifier LR EOL                /* case (3)            */
+    |                CASE enable_identifier LR IDENTIFIER EOL;    /* case (3) name       */
+casedefault:         CASEDEFAULT       construct_name EOL    ;    /* case default [name] */
+classdefault:        CLASSDEFAULT      construct_name EOL ;
+classis:             CLASSIS       LR  construct_name EOL ;
+typeis:              TYPEIS        LR  construct_name EOL ;
 
+changeteam:          CHANGETEAM    LR  EOL ;
 
 block:               BLOCK                    EOL ;
 blockdata:           BLOCKDATA construct_name EOL ;
 associate:           ASSOCIATE LR             EOL ;
-critical:            CRITICAL                 EOL ;
+critical:            CRITICAL                 EOL
+        |            CRITICAL  LR             EOL ;
 enum:                ENUM ','             skipall ;
 
 type:                type1 ','  skipall
@@ -256,9 +261,14 @@ lvalue:              gidentifier
       |              gidentifier LR
       |              lvalue '%' lvalue
       ;
-construct_name:      enable_identifier empty
-	      |      enable_identifier IDENTIFIER getname
+construct_name:      enable_identifier empty                             /*           */
+	      |      enable_identifier IDENTIFIER getname                /* name      */
 	      ;
+lr_construct_name:   enable_identifier empty                             /*           */
+		 |   enable_identifier LR                                /* (..)      */
+		 |   enable_identifier IDENTIFIER getname                /* name      */
+		 |   enable_identifier LR IDENTIFIER getname             /* (..) name */
+		 ;
 skipall:             enable_skipall SKIPALL
        ;
 skipnoop:            enable_skipnoop SKIPNOOP

@@ -378,6 +378,8 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
+FC = @FC@
+FCFLAGS = @FCFLAGS@
 GREP = @GREP@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -417,6 +419,7 @@ abs_top_builddir = @abs_top_builddir@
 abs_top_srcdir = @abs_top_srcdir@
 ac_ct_CC = @ac_ct_CC@
 ac_ct_CXX = @ac_ct_CXX@
+ac_ct_FC = @ac_ct_FC@
 am__include = @am__include@
 am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
@@ -460,7 +463,7 @@ TESTS = \
 	 test1.sh  test2.sh  test3.sh  test4.sh  test5.sh  test6.sh  \
          test7.sh  test8.sh  test9.sh  test10.sh test11.sh test12.sh \
 	 test13.sh test14.sh test15.sh test16.sh test17.sh test18.sh \
-	 test19.sh
+	 test19.sh test20.sh
 
 EXTRA_DIST = $(TESTS)
 all: all-am
@@ -845,6 +848,13 @@ test19.sh.log: test19.sh
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+test20.sh.log: test20.sh
+	@p='test20.sh'; \
+	b='test20.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 .test.log:
 	@p='$<'; \
 	$(am__set_b); \
@@ -1012,6 +1022,8 @@ uninstall-am:
 
 
 export SRCDIR = $(top_srcdir)
+export FC
+
 @MAKEWIN_TRUE@   export WINDOWS = yes
 @MAKEWIN_FALSE@   export WINDOWS = no
 clean-local:
