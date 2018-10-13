@@ -18,6 +18,7 @@ void Flags::set_defaults(void)
    apply_indent        = 1;
    auto_firstindent    = 0;
    conchar             = ' ';
+   deps                = 0;
    honour_omp          = 1;
    input_format        = UNKNOWN;
    input_format_gnu    = 0;
@@ -225,6 +226,8 @@ int Flags::get_flags(int argc, char *argv[])
 
       {"openmp"             , required_argument, 0, DO_OMP               },
 
+      {"deps"               , no_argument,       0, DO_DEPS              },
+
       {0,0,0,0}
    };
 
@@ -426,6 +429,9 @@ int Flags::get_flags(int argc, char *argv[])
 	       conchar=optarg[0];
 	    if (allowed_conchars.find(conchar) == std::string::npos)
 	       conchar = '&';
+	    break;
+	 case DO_DEPS:
+	    deps = 1;
 	    break;
 	 case DO_INDENT_CONTAINS:
 	    optargcheck;

@@ -11,7 +11,7 @@
 
 #define YY_DECL extern "C" int yylex()
 std::stack<int> start_stack;
-std::string     lexer_name, lexer_stlabel, lexeri_number, lexer_rest;
+std::string     lexer_name, lexer_stlabel, lexeri_number, lexer_rest, lexer_string;
 std::string     input_string;
 int             lrlevel;
 bool            lrreturn;
@@ -23,6 +23,7 @@ Line_prep       pline;
 
 %x state_lr state_lrb state_skip state_skipall state_skipnoop state_error
 %x state_findformat state_scanfixpre state_scanompfixed state_scanompfree
+%x state_incfilename
 
 b [ \t]
 
@@ -123,6 +124,10 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 [[:alpha:]][[:alnum:]_$%]* { D(O("TIDENTIFIER");Y;); lexer_name = yytext; return TIDENTIFIER; }
 }
 
+<state_incfilename>{  /* to be used in '#include <file>' */
+[^>]*                      { D(O("INCFILENAME");Y;); lexer_string = yytext; return INCFILENAME; }
+}
+
 <state_keyword>{
 abstractinterface { D(O("ABSTRACTINTERFACE");Y;); return ABSTRACTINTERFACE; }
 associate         { D(O("ASSOCIATE");Y;);         return ASSOCIATE;         }
@@ -168,7 +173,7 @@ endprogram        { D(O("ENDPROGRAM");Y;);        return ENDPROGRAM;        }
 endselect         { D(O("ENDSELECT");Y);          return ENDSELECT;         }
 endsubroutine     { D(O("ENDSUBROUTINE");Y;);     return ENDSUBROUTINE;     }
 endsubmodule      { D(O("ENDSUBMODULE");Y;);      return ENDSUBMODULE;      }
-endteam           { D(O("ENDTEAM"):Y);            return ENDTEAM;           }
+endteam           { D(O("ENDTEAM");Y);            return ENDTEAM;           }
 endtype           { D(O("ENDTYPE");Y;);           return ENDTYPE;           }
 endwhere          { D(O("ENDWHERE");Y;);          return ENDWHERE;          }
 entry             { D(O("ENTRY");Y);              return ENTRY;             }
@@ -177,6 +182,8 @@ forall            { D(O("FORALL");Y;);            return FORALL;            }
 function          { D(O("FUNCTION");Y;);          return FUNCTION;          }
 if                { D(O("IF");Y;);                return IF;                }
 impure            { D(O("IMPURE");Y;);            return IMPURE;            }
+include           { D(O("INCLUDE");Y;);           return INCLUDE;           }
+#include          { D(O("INCLUDE_CPP");Y;);       return INCLUDE_CPP;       }
 integer           { D(O("INTEGER");Y;);           return BASICTYPE;         }
 interface         { D(O("INTERFACE");Y;);         return INTERFACE;         }
 logical           { D(O("LOGICAL");Y;);           return BASICTYPE;         }
@@ -261,18 +268,21 @@ where             { D(O("WHERE");Y;);             return WHERE;             }
 ^{b}*#                        { D(O("CPP");Y;);
                                 return CPP;
                               }
-^{b}*#if                      { D(O("CPP_IF");Y;);
+^{b}*#{b}*if                  { D(O("CPP_IF");Y;);
                                 return CPP_IF;
 			      }
-^{b}*#endif                   { D(O("CPP_ENDIF");Y;);
+^{b}*#{b}*endif               { D(O("CPP_ENDIF");Y;);
                                 return CPP_ENDIF;
 			      }
-^{b}*#else                    { D(O("CPP_ELSE");Y;);
+^{b}*#{b}*else                { D(O("CPP_ELSE");Y;);
                                 return CPP_ELSE;
 			      }
-^{b}*#elif                    { D(O("CPP_ELIF");Y;);
+^{b}*#{b}*elif                { D(O("CPP_ELIF");Y;);
                                 return CPP_ELIF;
 			      }
+^{b}*#{b}*include             { D(O("INCLUDE_CPP");Y;);
+                                return INCLUDE_CPP;
+		              }
 
 ^{b}*\?\?                     { D(O("COCO");Y;);
                                 return COCO;
@@ -300,7 +310,8 @@ where             { D(O("WHERE");Y;);             return WHERE;             }
 		   D(O("encoded line");O(pline.get_line_encoded()););
 		    if (type == pline.is_string)
 		    {
-		       D(O("QSTRING"););
+		       lexer_string = pline.get_value(std::string(yytext));
+		       D(O("QSTRING");O(lexer_string);Y;);
 		       return QSTRING;
 		    }
 		    if (type == pline.is_stlabel)
@@ -329,6 +340,7 @@ where             { D(O("WHERE");Y;);             return WHERE;             }
 			    lexeri_number = yytext;
                             return I_NUMBER;
                          }
+
 
 "("                      {  D(O("LPAREN");Y;);
                             start_stack.push(YY_START);
@@ -376,6 +388,7 @@ void lexer_enable(const int k)
    switch(k)
    {
       case IDENTIFIER:    BEGIN(state_identifier);   break;
+      case INCFILENAME:   BEGIN(state_incfilename);  break;
       case SKIPALL:       BEGIN(state_skipall);      break;
       case SKIP:          BEGIN(state_skip);         break;
       case SKIPNOOP:      BEGIN(state_skipnoop);     break;
@@ -407,6 +420,11 @@ std::string lexer_geti_number()
 std::string lexer_getrest()
 {
    return lexer_rest;
+}
+std::string lexer_getstring()
+{
+   D(O("lexer_string");O(lexer_string););
+   return lexer_string;
 }
 
 #if 0

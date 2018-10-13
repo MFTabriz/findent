@@ -18,6 +18,7 @@ class Flags
       DO_NOTHING = 1000,
       DO_CHANGETEAM,
       DO_CONCHAR,
+      DO_DEPS,
       DO_EMACS_FINDENT,
       DO_EMACS_HELP,
       DO_GEDIT_EXTERNAL,
@@ -31,6 +32,7 @@ class Flags
       DO_LAST_INDENT,
       DO_LAST_USABLE,
       DO_MANPAGE,
+      DO_OMP,
       DO_README,
       DO_REFACTOR_PROCEDURE,
       DO_USAGE,
@@ -38,12 +40,12 @@ class Flags
       DO_VIM_FINDENT,
       DO_VIM_FORTRAN,
       DO_VIM_HELP,
-      DO_OMP,
    };
 
    bool apply_indent        ; // 1: output indented line, else output original lines
    bool auto_firstindent;
    char conchar             ; // continuation character output by fixed2fixed, see manpage
+   bool deps                ; // output dependencies only
    bool indent_cont;
    bool indent_contain;
    bool input_format_gnu;

@@ -34,6 +34,7 @@ struct propstruct properties;
 %token SCANFIXPRE
 %token CPP_IF CPP_ENDIF CPP_ELSE CPP_ELIF CPP
 %token COCO_IF COCO_ENDIF COCO_ELSE COCO_ELIF COCO
+%token INCLUDE INCLUDE_CPP INCFILENAME
 
 %token IDENTIFIER SKIP SKIPALL SKIPNOOP KEYWORD
 
@@ -103,6 +104,8 @@ line:
     |                enum                     { properties.kind = ENUM;              }
     |                forall_construct         { properties.kind = FORALL;            }
     |                if_construct             { properties.kind = IF;                }
+    |                include                  { properties.kind = INCLUDE;           }
+    |                include_cpp              { properties.kind = INCLUDE_CPP;       }
     |                interface                { properties.kind = INTERFACE;         }
     |                module                   { properties.kind = MODULE;            }
     |                moduleprocedure          { properties.kind = PROCEDURE;         }
@@ -124,6 +127,11 @@ stlabel:             STLABEL getstlabel ;
 named_label:         NAMED_LABEL        ;
 
 module:              MODULE enable_identifier IDENTIFIER getname EOL ;
+
+include:             INCLUDE QSTRING getstring skipall {D(O("include"););} ;
+include_cpp:         INCLUDE_CPP QSTRING getstring skipall {D(O("include_cpp"););} 
+	   |         INCLUDE_CPP '<' enable_incfilename INCFILENAME enable_skipall getstring skipall {D(O("include_cpp <>"););}
+	   /* TODO: add closing '>' */
 
 abstractinterface:   ABSTRACTINTERFACE  EOL     ;
 contains:            CONTAINS           EOL     ;
@@ -281,12 +289,16 @@ enable_skipall:      {lexer_enable(SKIPALL);}
 	      ;
 enable_skipnoop:     {lexer_enable(SKIPNOOP);}
 	       ;
+enable_incfilename:  {lexer_enable(INCFILENAME);}
+	       ;
 getname:             {properties.name=lexer_getname();}
        ;
 getstlabel:          {properties.label=lexer_getstlabel();}
           ;
 getdolabel:          {properties.dolabel=lexer_geti_number();}
           ;
+getstring:           {properties.stringvalue=lexer_getstring();}
+
 empty:               /* empty */
      ;
 %%

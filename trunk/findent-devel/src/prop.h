@@ -12,6 +12,7 @@ struct propstruct
    std::string dolabel;
    std::string label;
    std::string name;
+   std::string stringvalue;
 } ;
 
 const struct propstruct empty_rprop={0,"","",""};

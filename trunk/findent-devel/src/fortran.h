@@ -187,7 +187,7 @@ class Fortran
 	 end_start, end_fortran, end_pre, 
 	 in_ffix
       };
-      //
+
 };
 
 #endif
