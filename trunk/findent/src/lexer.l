@@ -261,16 +261,16 @@ where             { D(O("WHERE");Y;);             return WHERE;             }
 ^{b}*#                        { D(O("CPP");Y;);
                                 return CPP;
                               }
-^{b}*#if                      { D(O("CPP_IF");Y;);
+^{b}*#{b}*if                  { D(O("CPP_IF");Y;);
                                 return CPP_IF;
 			      }
-^{b}*#endif                   { D(O("CPP_ENDIF");Y;);
+^{b}*#{b}*endif               { D(O("CPP_ENDIF");Y;);
                                 return CPP_ENDIF;
 			      }
-^{b}*#else                    { D(O("CPP_ELSE");Y;);
+^{b}*#{b}*else                { D(O("CPP_ELSE");Y;);
                                 return CPP_ELSE;
 			      }
-^{b}*#elif                    { D(O("CPP_ELIF");Y;);
+^{b}*#{b}*elif                { D(O("CPP_ELIF");Y;);
                                 return CPP_ELIF;
 			      }
 
