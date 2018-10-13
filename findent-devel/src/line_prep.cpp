@@ -57,11 +57,11 @@ Line_prep::Line_prep(const std::string s)
    //
    //  The types are defined as member constants:
    //
-   //    type_invalid
-   //    type_none
-   //    type_string
-   //    type_stlabel
-   //    type_dotop
+   //    is_invalid
+   //    is_none
+   //    is_string
+   //    is_stlabel
+   //    is_dotop
    //     
 
    line = s;

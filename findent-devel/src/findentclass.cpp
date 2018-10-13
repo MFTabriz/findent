@@ -1,7 +1,7 @@
-#include "findentclass.h"
-#include "fortranline.h"
 #include <stdio.h>
 #include <unistd.h>
+#include "findentclass.h"
+#include "fortranline.h"
 #include "debug.h"
 
 int Findent::determine_fix_or_free()
@@ -312,3 +312,14 @@ Fortranline Findent::mygetline(bool &eof, bool buffer)
 
    return Fortranline(gl,s);
 }              // end of mygetline
+
+void Findent::output_deps()
+{
+   std::cout << "f_include:" ;
+   while (! f_includes.empty())
+   {
+      std::cout << " "+f_includes.top();
+      f_includes.pop();
+   }
+   std::cout << endline;
+}

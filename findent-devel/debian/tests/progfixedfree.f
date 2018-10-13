@@ -21,16 +21,16 @@
      8        efgh"
        return
        end function
-#ifdef usempi
+#  ifdef usempi
            function f1(x,m)
                 real x,m
-#elif defined(useopenmp)
+#  elif defined(useopenmp)
            function f1(x,m,n)
                 real x,m,n
-#else
+#  else
            function f1(x)
                 real x
-#endif
+#  endif
                 continue
            end function f1
        end module

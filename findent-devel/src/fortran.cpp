@@ -560,6 +560,17 @@ void Fortran::indent_and_output()
 	    Cur_indent = top_indent();
 	    push_indent(Cur_indent + FLAGS.forall_indent);
 	    break;
+	 case INCLUDE:
+	    Cur_indent = fi->start_indent;
+	    D(O("INCLUDE");O(props.stringvalue);O(FLAGS.deps););
+	    if (FLAGS.deps)
+	       fi->f_includes.push(props.stringvalue);
+	    break;
+	 case INCLUDE_CPP:
+	    D(O("INCLUDE_CPP");O(props.stringvalue);O(FLAGS.deps););
+	    if (FLAGS.deps)
+	       fi->f_includes.push(props.stringvalue);
+	    break;
 	 default:
 	    Cur_indent = top_indent();
       }
