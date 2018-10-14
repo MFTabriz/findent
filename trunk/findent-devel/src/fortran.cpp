@@ -417,181 +417,193 @@ void Fortran::indent_and_output()
       // for every corresponding end-entity (e.g. endsubroutine) we will
       // pop the rprops stack
       // 
-      switch(props.kind)
-      {
-	 case SUBROUTINE:
-	 case FUNCTION:
-	 case PROGRAM:
-	 case BLOCKDATA:
-	    Cur_indent = top_indent();
-	    push_indent(Cur_indent + FLAGS.routine_indent);
-	    empty_dolabels();
-	    push_rprops(props);
-	    break;
-	 case MODULE:
-	 case SUBMODULE:
-	    Cur_indent = top_indent();
-	    push_indent(Cur_indent + FLAGS.module_indent);
-	    empty_dolabels();
-	    push_rprops(props);
-	    break;
-	 case BLOCK:
-	    Cur_indent = top_indent();
-	    push_indent(Cur_indent + FLAGS.block_indent);
-	    break;
-	 case CHANGETEAM:
-	    Cur_indent = top_indent();
-	    push_indent(Cur_indent + FLAGS.changeteam_indent);
-	    break;
-	 case CRITICAL:
-	    Cur_indent = top_indent();
-	    push_indent(Cur_indent + FLAGS.critical_indent);
-	    break;
-	 case ENUM:
-	    Cur_indent = top_indent();
-	    push_indent(Cur_indent + FLAGS.enum_indent);
-	    empty_dolabels();
-	    break;
-	 case ABSTRACTINTERFACE:
-	 case INTERFACE:
-	    Cur_indent = top_indent();
-	    push_indent(Cur_indent + FLAGS.interface_indent);
-	    empty_dolabels();
-	    break;
-	 case DO:
-	    Cur_indent = top_indent();
-	    push_indent(Cur_indent + FLAGS.do_indent);
-	    if (props.dolabel != "")
-	       push_dolabel(string2number<int>(props.dolabel));
-	    break;
-	 case SELECTCASE:
-	 case SELECTTYPE:
-	    Cur_indent = top_indent();
-	    push_indent(Cur_indent + FLAGS.select_indent);
-	    break;
-	 case CASE:
-	 case CASEDEFAULT:
-	 case CLASSDEFAULT:
-	 case CLASSIS:
-	 case TYPEIS:
-	    Cur_indent -= FLAGS.case_indent;
-	    break;
-	 case END:
-	 case ENDBLOCKDATA:
-	 case ENDFUNCTION:
-	 case ENDMODULE:
-	 case ENDPROCEDURE:
-	 case ENDPROGRAM:
-	 case ENDSUBROUTINE:
-	    refactor_end_found = 1;
-	    if (!fi->indent_handled)
-	       Cur_indent = pop_indent();
-	    cur_rprop = top_rprops();
-	    pop_rprops();
-	    break;
-	 case ENDASSOCIATE:
-	 case ENDBLOCK:
-	 case ENDCRITICAL:
-	 case ENDDO:
-	 case ENDENUM:
-	 case ENDFORALL:
-	 case ENDIF:
-	 case ENDINTERFACE:
-	 case ENDSELECT:
-	 case ENDSUBMODULE:
-	 case ENDTEAM:
-	 case ENDTYPE:
-	 case ENDWHERE:
-	    if (!fi->indent_handled)
-	       Cur_indent = pop_indent();
-	    break;
-	 case PROCEDURE:  // in fact: moduleprocedure
-	    //
-	    // depending on what follows this will be 
-	    // recognized as a module procedure with content
-	    // or only a moduleprocedure specification
-	    //
-	    break;
-	 case CONTAINS:
-	    if (FLAGS.indent_contain)
-	       Cur_indent -= FLAGS.contains_indent;
-	    else
-	    {
-	       Cur_indent = fi->start_indent;
-	       pop_indent();
-	       push_indent(Cur_indent);
-	    }
-	    break;
-	 case IF:
-	    Cur_indent = top_indent();
-	    push_indent(Cur_indent + FLAGS.if_indent);
-	    break;
-	 case ELSE:
-	    Cur_indent -= FLAGS.if_indent;
-	    break;
-	 case ELSEIF:
-	    Cur_indent -= FLAGS.if_indent;
-	    break;
-	 case ELSEWHERE:
-	    Cur_indent -= FLAGS.where_indent;
-	    break;
-	 case ENTRY:
-	    Cur_indent -= FLAGS.entry_indent;
-	    break;
-	 case WHERE:
-	    Cur_indent = top_indent();
-	    push_indent(Cur_indent + FLAGS.where_indent);
-	    break;
-	 case ASSOCIATE:
-	    Cur_indent = top_indent();
-	    push_indent(Cur_indent + FLAGS.associate_indent);
-	    break;
-	 case TYPE:
-	    Cur_indent = top_indent();
-	    push_indent(Cur_indent + FLAGS.type_indent);
-	    break;
-	 case FORALL:
-	    Cur_indent = top_indent();
-	    push_indent(Cur_indent + FLAGS.forall_indent);
-	    break;
-	 case INCLUDE:
-	    if (FLAGS.include_left)
-	       Cur_indent = fi->start_indent;
-	    else
-	       Cur_indent = top_indent();
-	    D(O("INCLUDE");O(props.stringvalue);O(FLAGS.deps);O(FLAGS.include_left);O(fi->start_indent);O(top_indent()););
-	    if (FLAGS.deps)
+      if (FLAGS.deps)
+	 switch(props.kind)  /* handle includes etc */
+	 {
+	    case INCLUDE:
+	       D(O("INCLUDE");O(props.stringvalue);O(FLAGS.deps);O(FLAGS.include_left);O(fi->start_indent);O(top_indent()););
 	       fi->includes.push((struct twostrings){"inc",props.stringvalue});
-	    break;
-	 case INCLUDE_CPP:
-	    D(O("INCLUDE_CPP");O(props.stringvalue);O(FLAGS.deps););
-	    if (FLAGS.deps)
+	       break;
+	    case INCLUDE_CPP:
+	       D(O("INCLUDE_CPP");O(props.stringvalue);O(FLAGS.deps););
 	       fi->includes.push((struct twostrings){"cpp",props.stringvalue});
-	    break;
-	 case INCLUDE_CPP_STD:
-	    D(O("INCLUDE_CPP_STD");O(props.stringvalue);O(FLAGS.deps););
-	    if (FLAGS.deps)
+	       break;
+	    case INCLUDE_CPP_STD:
+	       D(O("INCLUDE_CPP_STD");O(props.stringvalue);O(FLAGS.deps););
 	       fi->includes.push((struct twostrings){"std",props.stringvalue});
-	    break;
-	 case INCLUDE_COCO:
-	    D(O("INCLUDE_COCO");O(props.stringvalue);O(FLAGS.deps););
-	    if (FLAGS.deps)
+	       break;
+	    case INCLUDE_COCO:
+	       D(O("INCLUDE_COCO");O(props.stringvalue);O(FLAGS.deps););
 	       fi->includes.push((struct twostrings){"coco",props.stringvalue});
-	    break;
-	 default:
-	    Cur_indent = top_indent();
-      }
-      switch(props.kind)
+	       break;
+	    case USE:
+	       D(O("USE");O(props.name);O(FLAGS.deps););
+	       fi->includes.push((struct twostrings){"use",props.name});
+	       break;
+	    case MODULE:
+	       fi->includes.push((struct twostrings){"module",props.name});
+	       break;
+	 }
+      else
       {
-	 case BLANK:
-	    break;
-	 default:
-	    prev_props = props;
-      }
-      if(first_time)  // check to handle multi-statement line like x=1;y=3
-      {
-	 output_line();
-	 first_time = 0;
+	 switch(props.kind)   //determine indent, refactor
+	 {
+	    case SUBROUTINE:
+	    case FUNCTION:
+	    case PROGRAM:
+	    case BLOCKDATA:
+	       Cur_indent = top_indent();
+	       push_indent(Cur_indent + FLAGS.routine_indent);
+	       empty_dolabels();
+	       push_rprops(props);
+	       break;
+	    case MODULE:
+	    case SUBMODULE:
+	       Cur_indent = top_indent();
+	       push_indent(Cur_indent + FLAGS.module_indent);
+	       empty_dolabels();
+	       push_rprops(props);
+	       break;
+	    case BLOCK:
+	       Cur_indent = top_indent();
+	       push_indent(Cur_indent + FLAGS.block_indent);
+	       break;
+	    case CHANGETEAM:
+	       Cur_indent = top_indent();
+	       push_indent(Cur_indent + FLAGS.changeteam_indent);
+	       break;
+	    case CRITICAL:
+	       Cur_indent = top_indent();
+	       push_indent(Cur_indent + FLAGS.critical_indent);
+	       break;
+	    case ENUM:
+	       Cur_indent = top_indent();
+	       push_indent(Cur_indent + FLAGS.enum_indent);
+	       empty_dolabels();
+	       break;
+	    case ABSTRACTINTERFACE:
+	    case INTERFACE:
+	       Cur_indent = top_indent();
+	       push_indent(Cur_indent + FLAGS.interface_indent);
+	       empty_dolabels();
+	       break;
+	    case DO:
+	       Cur_indent = top_indent();
+	       push_indent(Cur_indent + FLAGS.do_indent);
+	       if (props.dolabel != "")
+		  push_dolabel(string2number<int>(props.dolabel));
+	       break;
+	    case SELECTCASE:
+	    case SELECTTYPE:
+	       Cur_indent = top_indent();
+	       push_indent(Cur_indent + FLAGS.select_indent);
+	       break;
+	    case CASE:
+	    case CASEDEFAULT:
+	    case CLASSDEFAULT:
+	    case CLASSIS:
+	    case TYPEIS:
+	       Cur_indent -= FLAGS.case_indent;
+	       break;
+	    case END:
+	    case ENDBLOCKDATA:
+	    case ENDFUNCTION:
+	    case ENDMODULE:
+	    case ENDPROCEDURE:
+	    case ENDPROGRAM:
+	    case ENDSUBROUTINE:
+	       refactor_end_found = 1;
+	       if (!fi->indent_handled)
+		  Cur_indent = pop_indent();
+	       cur_rprop = top_rprops();
+	       pop_rprops();
+	       break;
+	    case ENDASSOCIATE:
+	    case ENDBLOCK:
+	    case ENDCRITICAL:
+	    case ENDDO:
+	    case ENDENUM:
+	    case ENDFORALL:
+	    case ENDIF:
+	    case ENDINTERFACE:
+	    case ENDSELECT:
+	    case ENDSUBMODULE:
+	    case ENDTEAM:
+	    case ENDTYPE:
+	    case ENDWHERE:
+	       if (!fi->indent_handled)
+		  Cur_indent = pop_indent();
+	       break;
+	    case PROCEDURE:  // in fact: moduleprocedure
+	       //
+	       // depending on what follows this will be 
+	       // recognized as a module procedure with content
+	       // or only a moduleprocedure specification
+	       //
+	       break;
+	    case CONTAINS:
+	       if (FLAGS.indent_contain)
+		  Cur_indent -= FLAGS.contains_indent;
+	       else
+	       {
+		  Cur_indent = fi->start_indent;
+		  pop_indent();
+		  push_indent(Cur_indent);
+	       }
+	       break;
+	    case IF:
+	       Cur_indent = top_indent();
+	       push_indent(Cur_indent + FLAGS.if_indent);
+	       break;
+	    case ELSE:
+	       Cur_indent -= FLAGS.if_indent;
+	       break;
+	    case ELSEIF:
+	       Cur_indent -= FLAGS.if_indent;
+	       break;
+	    case ELSEWHERE:
+	       Cur_indent -= FLAGS.where_indent;
+	       break;
+	    case ENTRY:
+	       Cur_indent -= FLAGS.entry_indent;
+	       break;
+	    case WHERE:
+	       Cur_indent = top_indent();
+	       push_indent(Cur_indent + FLAGS.where_indent);
+	       break;
+	    case ASSOCIATE:
+	       Cur_indent = top_indent();
+	       push_indent(Cur_indent + FLAGS.associate_indent);
+	       break;
+	    case TYPE:
+	       Cur_indent = top_indent();
+	       push_indent(Cur_indent + FLAGS.type_indent);
+	       break;
+	    case FORALL:
+	       Cur_indent = top_indent();
+	       push_indent(Cur_indent + FLAGS.forall_indent);
+	       break;
+	    case INCLUDE:
+	       if (FLAGS.include_left)
+		  Cur_indent = fi->start_indent;
+	       else
+		  Cur_indent = top_indent();
+	    default:
+	       Cur_indent = top_indent();
+	 } // end determine indent and refactor
+
+	 switch(props.kind)
+	 {
+	    case BLANK:
+	       break;
+	    default:
+	       prev_props = props;
+	 }
+	 if(first_time)  // check to handle multi-statement line like x=1;y=3
+	 {
+	    output_line();
+	    first_time = 0;
+	 }
       }
       rest = p.get_line_rest();
       if (rest == "")

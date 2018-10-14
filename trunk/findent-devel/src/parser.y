@@ -35,6 +35,7 @@ struct propstruct properties;
 %token CPP_IF CPP_ENDIF CPP_ELSE CPP_ELIF CPP
 %token COCO_IF COCO_ENDIF COCO_ELSE COCO_ELIF COCO
 %token INCLUDE INCLUDE_CPP INCLUDE_CPP_STD INCLUDE_COCO INCFILENAME
+%token USE
 
 %token IDENTIFIER SKIP SKIPALL SKIPNOOP KEYWORD
 
@@ -121,6 +122,7 @@ line:
     |                submodule                { properties.kind = SUBMODULE;         }
     |                type                     { properties.kind = TYPE;              }
     |                typeis                   { properties.kind = TYPEIS;            }
+    |                use                      { properties.kind = USE;               }
     |                where_construct          { properties.kind = WHERE;             }
     ;
 blank:               BLANK ;
@@ -129,6 +131,8 @@ stlabel:             STLABEL getstlabel ;
 named_label:         NAMED_LABEL        ;
 
 module:              MODULE enable_identifier IDENTIFIER getname EOL ;
+
+use:                 USE    enable_identifier IDENTIFIER getname enable_skipall SKIPALL ;
 
 include:             INCLUDE     QSTRING getstring EOL {D(O("include"););} ; /* include "file.inc" */
 include_cpp:         INCLUDE_CPP QSTRING getstring EOL {D(O("include_cpp"););} ;  /* #include "file.inc" */

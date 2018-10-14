@@ -212,6 +212,7 @@ then              { D(O("THEN");Y;);              return THEN;              }
 type              { D(O("TYPE");Y;);              return TYPE;              }
 type/\(           { D(O("TYPEC");Y;);             return TYPEC;             }
 typeis            { D(O("TYPEIS");Y);             return TYPEIS;            }
+use               { D(O("USE");Y);                return USE;               }
 where             { D(O("WHERE");Y;);             return WHERE;             }
 }
 
