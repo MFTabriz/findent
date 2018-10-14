@@ -228,6 +228,7 @@ Fortranline Findent::getnext(bool &eof, bool use_wb)
    if (use_wb && !wizardbuffer.empty())
    {
       line = wizardbuffer.front();
+      num_lines++;
       wizardbuffer.pop_front();
       if (reading_from_tty && line.str() == ".")
 	 eof = 1;
@@ -255,7 +256,10 @@ Fortranline Findent::getnext(bool &eof, bool use_wb)
    line.clean();
 
    if(!use_wb && !eof)
+   {
+      num_lines--;
       wizardbuffer.push_back(line);
+   }
 
    if (!nbseen)
    {
@@ -315,11 +319,9 @@ Fortranline Findent::mygetline(bool &eof, bool buffer)
 
 void Findent::output_deps()
 {
-   std::cout << "f_include:" ;
-   while (! f_includes.empty())
+   while (! includes.empty())
    {
-      std::cout << " "+f_includes.top();
-      f_includes.pop();
+      std::cout << includes.top().type << ": " << includes.top().element << endline;
+      includes.pop();
    }
-   std::cout << endline;
 }

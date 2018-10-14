@@ -23,7 +23,7 @@ Line_prep       pline;
 
 %x state_lr state_lrb state_skip state_skipall state_skipnoop state_error
 %x state_findformat state_scanfixpre state_scanompfixed state_scanompfree
-%x state_incfilename
+%x state_incfilename state_char
 
 b [ \t]
 
@@ -125,7 +125,13 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 }
 
 <state_incfilename>{  /* to be used in '#include <file>' */
-[^>]*                      { D(O("INCFILENAME");Y;); lexer_string = yytext; return INCFILENAME; }
+[^>]+                      { D(O("INCFILENAME");Y;); lexer_string = yytext; 
+                             BEGIN state_char; return INCFILENAME; }
+}
+
+<state_char>{
+\n                            {  D(O("EOL"););   return EOL;        }
+.                             {  D(O("BLA");Y;); return yytext[0];  }
 }
 
 <state_keyword>{
@@ -184,6 +190,7 @@ if                { D(O("IF");Y;);                return IF;                }
 impure            { D(O("IMPURE");Y;);            return IMPURE;            }
 include           { D(O("INCLUDE");Y;);           return INCLUDE;           }
 #include          { D(O("INCLUDE_CPP");Y;);       return INCLUDE_CPP;       }
+\?\?include       { D(O("INCLUDE_COCO");Y);       return INCLUDE_COCO;      }
 integer           { D(O("INTEGER");Y;);           return BASICTYPE;         }
 interface         { D(O("INTERFACE");Y;);         return INTERFACE;         }
 logical           { D(O("LOGICAL");Y;);           return BASICTYPE;         }
@@ -299,6 +306,13 @@ where             { D(O("WHERE");Y;);             return WHERE;             }
 ^{b}*\?\?{b}*e{b}*l{b}*s{b}*e{b}*i{b}*f { D(O("COCO_ELIF");Y;);
                                 return COCO_ELIF;
 			      }
+^{b}*\?\?{b}*i{b}*n{b}*c{b}*l{b}*u{b}*d{b}*e          { D(O("INCLUDE_COCO");Y;);
+                              /* coco statements must start with '??' in column 1.
+			         However, for this code that is somewhat inconvenient,
+				 so we allow white space before '??' */
+                                return INCLUDE_COCO;
+		              }
+
 
 \n                       {  D(O("EOL"););   return EOL;        }
 .                        {  D(O("BLA");Y;); return yytext[0];  }
