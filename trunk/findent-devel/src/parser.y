@@ -34,7 +34,7 @@ struct propstruct properties;
 %token SCANFIXPRE
 %token CPP_IF CPP_ENDIF CPP_ELSE CPP_ELIF CPP
 %token COCO_IF COCO_ENDIF COCO_ELSE COCO_ELIF COCO
-%token INCLUDE INCLUDE_CPP INCFILENAME
+%token INCLUDE INCLUDE_CPP INCLUDE_CPP_STD INCLUDE_COCO INCFILENAME
 
 %token IDENTIFIER SKIP SKIPALL SKIPNOOP KEYWORD
 
@@ -106,6 +106,8 @@ line:
     |                if_construct             { properties.kind = IF;                }
     |                include                  { properties.kind = INCLUDE;           }
     |                include_cpp              { properties.kind = INCLUDE_CPP;       }
+    |                include_cpp_std          { properties.kind = INCLUDE_CPP_STD;   }
+    |                include_coco             { properties.kind = INCLUDE_COCO;   }
     |                interface                { properties.kind = INTERFACE;         }
     |                module                   { properties.kind = MODULE;            }
     |                moduleprocedure          { properties.kind = PROCEDURE;         }
@@ -128,10 +130,11 @@ named_label:         NAMED_LABEL        ;
 
 module:              MODULE enable_identifier IDENTIFIER getname EOL ;
 
-include:             INCLUDE QSTRING getstring skipall {D(O("include"););} ;
-include_cpp:         INCLUDE_CPP QSTRING getstring skipall {D(O("include_cpp"););} 
-	   |         INCLUDE_CPP '<' enable_incfilename INCFILENAME enable_skipall getstring skipall {D(O("include_cpp <>"););}
-	   /* TODO: add closing '>' */
+include:             INCLUDE     QSTRING getstring EOL {D(O("include"););} ; /* include "file.inc" */
+include_cpp:         INCLUDE_CPP QSTRING getstring EOL {D(O("include_cpp"););} ;  /* #include "file.inc" */
+include_cpp_std:     INCLUDE_CPP '<' enable_incfilename INCFILENAME getstring '>' EOL {D(O("include_cpp <>"););}; /* #include <file.inc> */
+include_coco:        INCLUDE_COCO QSTRING getstring EOL {D(O("include_coco"););} ;  /* ??include "file.inc" */
+
 
 abstractinterface:   ABSTRACTINTERFACE  EOL     ;
 contains:            CONTAINS           EOL     ;

@@ -118,6 +118,7 @@ void Docs::usage(bool man)
    manout(" "," '0': create numbered continuation characters");
    manout(" "," other: use that continuation character");
    manout(" "," default for conversion from free to fixed is '&'");
+   manout("--include_left=<n>"               ,"(0/1) 1: indent include statements to starting indent (default:1)");
    manout("-l<n>, --label_left=<n>"          ,"(0/1) 1: move statement labels to start of line (default:1)");
    manout(" ","      (only for free format)");
    manout("-lastindent, --last_indent"       ,"prints computed indentation of last line");

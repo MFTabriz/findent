@@ -6,15 +6,19 @@ else
 fi
 rc=0
 cat << eof > prog
-   program prog
-  continue
-  !comment
+        program prog
+
+          continue
+!  comment
 eof
 cat << eof > expect
-2
+3
 eof
 
 ../doit "-lastusable --last_usable" "-ifree -Ia" "" 
+rc=`expr $rc + $?`
+
+../doit "-lastusable --last_usable" "-ifixed -Ia" "" 
 rc=`expr $rc + $?`
 
 . ../postlude

@@ -77,12 +77,7 @@ class Findent
       int          output_format;
       int          start_indent;
 
-      std::stack <std::string> coco_includes;
-      std::stack <std::string> cpp_includes;
-      std::stack <std::string> f_includes;
-      std::stack <std::string> submodule_includes;
-      std::stack <std::string> use_includes;
-
+      std::stack <struct twostrings> includes;
 
    private:
 

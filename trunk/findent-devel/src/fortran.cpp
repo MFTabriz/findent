@@ -2,7 +2,6 @@
 #include "pre_analyzer.h"
 #include "line_prep.h"
 
-
 #define Cur_indent   fi->cur_indent
 #define FLAGS        fi->flags
 #define Endline      fi->endline
@@ -56,14 +55,11 @@ void Fortran::handle_last_usable_only()
    // using findent.
    //
    int usable_line = 1;
-   std::deque<int> usables;     // to store usable lines
-   std::deque<int> prevs;       // to store prev-usable lines
 
    fi->init_indent();
    while(1)
    {
       int prev         = fi->num_lines;
-      bool usable      = 0;
       get_full_statement();
       Line_prep p(full_statement);
       propstruct props = parseline(p);
@@ -82,11 +78,9 @@ void Fortran::handle_last_usable_only()
 	 case TYPEIS:
 	    break;
 	 default: 
-	    usable = 1;
+	    usable_line = prev+1;
 	    break;
       }
-      if (usable)
-	 usable_line = prev+1;
       if (End_of_file)
       {
 	 std::cout << usable_line << Endline;
@@ -561,15 +555,28 @@ void Fortran::indent_and_output()
 	    push_indent(Cur_indent + FLAGS.forall_indent);
 	    break;
 	 case INCLUDE:
-	    Cur_indent = fi->start_indent;
-	    D(O("INCLUDE");O(props.stringvalue);O(FLAGS.deps););
+	    if (FLAGS.include_left)
+	       Cur_indent = fi->start_indent;
+	    else
+	       Cur_indent = top_indent();
+	    D(O("INCLUDE");O(props.stringvalue);O(FLAGS.deps);O(FLAGS.include_left);O(fi->start_indent);O(top_indent()););
 	    if (FLAGS.deps)
-	       fi->f_includes.push(props.stringvalue);
+	       fi->includes.push((struct twostrings){"inc",props.stringvalue});
 	    break;
 	 case INCLUDE_CPP:
 	    D(O("INCLUDE_CPP");O(props.stringvalue);O(FLAGS.deps););
 	    if (FLAGS.deps)
-	       fi->f_includes.push(props.stringvalue);
+	       fi->includes.push((struct twostrings){"cpp",props.stringvalue});
+	    break;
+	 case INCLUDE_CPP_STD:
+	    D(O("INCLUDE_CPP_STD");O(props.stringvalue);O(FLAGS.deps););
+	    if (FLAGS.deps)
+	       fi->includes.push((struct twostrings){"std",props.stringvalue});
+	    break;
+	 case INCLUDE_COCO:
+	    D(O("INCLUDE_COCO");O(props.stringvalue);O(FLAGS.deps););
+	    if (FLAGS.deps)
+	       fi->includes.push((struct twostrings){"coco",props.stringvalue});
 	    break;
 	 default:
 	    Cur_indent = top_indent();
