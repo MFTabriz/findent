@@ -11,7 +11,7 @@
 
 #define YY_DECL extern "C" int yylex()
 std::stack<int> start_stack;
-std::string     lexer_name, lexer_stlabel, lexeri_number, lexer_rest, lexer_string;
+std::string     lexer_name, lexer_stlabel, lexeri_number, lexer_rest, lexer_string, lexer_lr;
 std::string     input_string;
 int             lrlevel;
 bool            lrreturn;
@@ -34,9 +34,11 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 <state_error>.  {  D(O("ERROR");Y;); return ERROR; }
 
 <state_lr>{
-"("             { D(O("lr+");O(lrlevel);Y;); lrlevel++; }
+"("             { D(O("lrplus");O(lrlevel);Y;); 
+                   lrlevel++;
+		}
 
-")"             { D(O("lr-");O(lrlevel);Y;); 
+")"             { D(O("lrmin");O(lrlevel);Y;); 
                   lrlevel--;
 		  if(lrlevel == 0)
 		  {
@@ -50,7 +52,9 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 		  }
 		}
 
-.               { D(O("lrbla");O(lrlevel);Y;); } 
+.               { D(O("lrbla");O(lrlevel);Y;); 
+                    lexer_lr += yytext;
+		} 
 \n              { D(O("lreol");O(lrlevel);Y;); yyless(0); BEGIN(start_stack.top()); }
 
 }
@@ -89,6 +93,7 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 		start_stack.push(YY_START);
 		lrlevel  = 1;
 		lrreturn = 0;
+		lexer_lr = "";
 		BEGIN(state_lr);
 	     }
 
@@ -126,7 +131,8 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 
 <state_incfilename>{  /* to be used in '#include <file>' */
 [^>]+                      { D(O("INCFILENAME");Y;); lexer_string = yytext; 
-                             BEGIN state_char; return INCFILENAME; }
+                             BEGIN state_char; 
+			     return INCFILENAME; }
 }
 
 <state_char>{
@@ -361,6 +367,7 @@ where             { D(O("WHERE");Y;);             return WHERE;             }
                             start_stack.push(YY_START);
 			    lrlevel  = 1;
 			    lrreturn = 1;
+			    lexer_lr = "";
 			    BEGIN(state_lr);
 			 }
 
@@ -402,6 +409,7 @@ void lexer_enable(const int k)
 {
    switch(k)
    {
+      case CHAR:          BEGIN(state_char);         break;
       case IDENTIFIER:    BEGIN(state_identifier);   break;
       case INCFILENAME:   BEGIN(state_incfilename);  break;
       case SKIPALL:       BEGIN(state_skipall);      break;
@@ -440,6 +448,11 @@ std::string lexer_getstring()
 {
    D(O("lexer_string");O(lexer_string););
    return lexer_string;
+}
+std::string lexer_getlr()
+{
+   D(O("lexer_lr");O(lexer_lr););
+   return lexer_lr;
 }
 
 #if 0

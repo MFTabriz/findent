@@ -28,7 +28,7 @@ struct propstruct properties;
 %token ASSIGN TO
 %token MODULEPROCEDURE PROCEDURE ENDPROCEDURE
 %token TIDENTIFIER
-%token BLANK
+%token BLANK CHAR
 %token FINDFORMAT UNKNOWN FREE FIXED UNSURE PROBFREE FINDENTFIX FIXFINDENTFIX
 %token P_ON P_OFF
 %token SCANFIXPRE
@@ -136,7 +136,7 @@ use:                 USE    enable_identifier IDENTIFIER getname enable_skipall 
 
 include:             INCLUDE     QSTRING getstring EOL {D(O("include"););} ; /* include "file.inc" */
 include_cpp:         INCLUDE_CPP QSTRING getstring EOL {D(O("include_cpp"););} ;  /* #include "file.inc" */
-include_cpp_std:     INCLUDE_CPP '<' enable_incfilename INCFILENAME getstring '>' EOL {D(O("include_cpp <>"););}; /* #include <file.inc> */
+include_cpp_std:     INCLUDE_CPP '<' enable_incfilename INCFILENAME getstring enable_char '>' EOL {D(O("include_cpp <>"););}; /* #include <file.inc> */
 include_coco:        INCLUDE_COCO QSTRING getstring EOL {D(O("include_coco"););} ;  /* ??include "file.inc" */
 
 
@@ -186,7 +186,7 @@ function_spec:          FUNCTION
 	            ;
 functionname:           enable_identifier IDENTIFIER getname ;
 
-submodule:           SUBMODULE LR enable_identifier IDENTIFIER getname EOL ;
+submodule:           SUBMODULE LR getlr enable_identifier IDENTIFIER getname EOL ;
 
 intrinsic_type_spec: BASICTYPE
 		   | BASICTYPE kind_selector 
@@ -288,6 +288,8 @@ skipall:             enable_skipall SKIPALL
        ;
 skipnoop:            enable_skipnoop SKIPNOOP
         ;
+enable_char:         {lexer_enable(CHAR);}
+	   ;
 enable_identifier:   {lexer_enable(IDENTIFIER);}
 	         ;
 enable_skip:         {lexer_enable(SKIP);}
@@ -305,6 +307,9 @@ getstlabel:          {properties.label=lexer_getstlabel();}
 getdolabel:          {properties.dolabel=lexer_geti_number();}
           ;
 getstring:           {properties.stringvalue=lexer_getstring();}
+	 ;
+getlr:               {properties.lrvalue=lexer_getlr();}
+     ;
 
 empty:               /* empty */
      ;

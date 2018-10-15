@@ -23,4 +23,6 @@ std::string lexer_getrest(void);
 
 std::string lexer_getstring(void);
 
+std::string lexer_getlr(void);
+
 #endif

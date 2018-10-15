@@ -443,6 +443,9 @@ void Fortran::indent_and_output()
 	    case MODULE:
 	       fi->includes.push((struct twostrings){"module",props.name});
 	       break;
+	    case SUBMODULE:
+	       fi->includes.push((struct twostrings){"submodule",props.name});
+	       fi->includes.push((struct twostrings){"test",props.lrvalue});
 	 }
       else
       {
