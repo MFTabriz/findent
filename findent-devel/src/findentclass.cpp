@@ -317,11 +317,30 @@ Fortranline Findent::mygetline(bool &eof, bool buffer)
    return Fortranline(gl,s);
 }              // end of mygetline
 
+std::string Findent::type2str(const int t)
+{
+   switch (t)
+   {
+      case USE:             return "use";
+      case INCLUDE:         return "include";
+      case INCLUDE_CPP:     return "include_cpp";
+      case INCLUDE_CPP_STD: return "include_cpp_std";
+      case INCLUDE_COCO:    return "include_coco";
+      case MODULE:          return "module";
+      case SUBMODULE:       return "submodule";
+   }
+   return "";
+}
+
 void Findent::output_deps()
 {
-   while (! includes.empty())
+   std::set<std::pair<int,std::string> >:: iterator it;
+   for (it = includes.begin(); it != includes.end(); ++it)
    {
-      std::cout << includes.top().type << ": " << includes.top().element << endline;
-      includes.pop();
+      // eliminate use if corresponding module is made
+      if (it->first == USE)
+	 if (includes.find(make_pair(MODULE,it->second)) != includes.end())
+	    continue;
+      std::cout << type2str(it->first) << ": " << it->second << endline;
    }
 }

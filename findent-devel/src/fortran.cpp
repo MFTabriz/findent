@@ -1,12 +1,14 @@
 #include "fortran.h"
 #include "pre_analyzer.h"
 #include "line_prep.h"
+#include "functions.h"
 
 #define Cur_indent   fi->cur_indent
 #define FLAGS        fi->flags
 #define Endline      fi->endline
 #define End_of_file  fi->end_of_file
 #define Getnext      fi->getnext
+#define Includes     fi->includes
 #define Curline      (*curline)
 
 bool Fortran::output_pre(lines_t &lines, lines_t *outlines)
@@ -418,35 +420,39 @@ void Fortran::indent_and_output()
       // pop the rprops stack
       // 
       if (FLAGS.deps)
+      {
 	 switch(props.kind)  /* handle includes etc */
 	 {
 	    case INCLUDE:
 	       D(O("INCLUDE");O(props.stringvalue);O(FLAGS.deps);O(FLAGS.include_left);O(fi->start_indent);O(top_indent()););
-	       fi->includes.push((struct twostrings){"inc",props.stringvalue});
+	       Includes.insert(std::make_pair(INCLUDE,trim(props.stringvalue)));
 	       break;
 	    case INCLUDE_CPP:
 	       D(O("INCLUDE_CPP");O(props.stringvalue);O(FLAGS.deps););
-	       fi->includes.push((struct twostrings){"cpp",props.stringvalue});
+	       Includes.insert(std::make_pair(INCLUDE_CPP,trim(props.stringvalue)));
 	       break;
 	    case INCLUDE_CPP_STD:
 	       D(O("INCLUDE_CPP_STD");O(props.stringvalue);O(FLAGS.deps););
-	       fi->includes.push((struct twostrings){"std",props.stringvalue});
+	       Includes.insert(std::make_pair(INCLUDE_CPP_STD,trim(props.stringvalue)));
 	       break;
 	    case INCLUDE_COCO:
 	       D(O("INCLUDE_COCO");O(props.stringvalue);O(FLAGS.deps););
-	       fi->includes.push((struct twostrings){"coco",props.stringvalue});
+	       Includes.insert(std::make_pair(INCLUDE_COCO,trim(props.stringvalue)));
 	       break;
 	    case USE:
 	       D(O("USE");O(props.name);O(FLAGS.deps););
-	       fi->includes.push((struct twostrings){"use",props.name});
+	       Includes.insert(std::make_pair(USE,trim(stolower(props.name))));
 	       break;
 	    case MODULE:
-	       fi->includes.push((struct twostrings){"module",props.name});
+	       D(O("MODULE");O(props.name);O(FLAGS.deps););
+	       Includes.insert(std::make_pair(MODULE,trim(stolower(props.name))));
 	       break;
 	    case SUBMODULE:
-	       fi->includes.push((struct twostrings){"submodule",props.name});
-	       fi->includes.push((struct twostrings){"test",props.lrvalue});
+	       D(O("MODULE");O(props.lrvalue+":"+props.name);O(FLAGS.deps););
+	       Includes.insert(std::make_pair(SUBMODULE,trim(stolower(props.lrvalue+":"+props.name))));
+	       Includes.insert(std::make_pair(USE,trim(stolower(props.lrvalue))));
 	 }
+      }
       else
       {
 	 switch(props.kind)   //determine indent, refactor
@@ -720,3 +726,4 @@ void Fortran::handle_refactor()
 #undef End_of_file
 #undef Getnext
 #undef Curline
+#undef Includes

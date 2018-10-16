@@ -12,8 +12,6 @@ typedef std::deque<indent_t>          indent_store_t;
 typedef std::deque<std::string>       fs_store_t;
 typedef std::deque<bool>              nbseen_store_t;
 
-struct twostrings{std::string type; std::string element;};
-
 template <class C> std::ostream& operator <<(std::ostream &os, std::deque<C> &obj)
 {
    //
