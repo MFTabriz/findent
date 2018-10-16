@@ -1,7 +1,8 @@
 #ifndef FINDENTCLASS_H
 #define FINDENTCLASS_H
 
-#include <stack>
+#include <set>
+#include <utility>  // pair
 #include <string>
 
 #include "flags.h"
@@ -77,7 +78,7 @@ class Findent
       int          output_format;
       int          start_indent;
 
-      std::stack <struct twostrings> includes;
+      std::set <std::pair<int,std::string> > includes;
 
    private:
 
@@ -95,6 +96,7 @@ class Findent
       std::string  handle_dos(const std::string &s);
       void         handle_reading_from_tty();
       void         output_deps();
+      std::string  type2str(const int t);
       int          what_to_return();
 
       void push_indent(int p) { indent.push_back(p); }
