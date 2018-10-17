@@ -1,6 +1,7 @@
 #!/bin/bash
 # parameter all: produce debs for i386-wheezy, amd64=wheezy, amd64-sid
 curdir=$PWD
+unset CXXFLAGS
 version=`./getversion`
 echo "version = $version"
 tar=$PWD/../versions/findent-$version.tar.gz

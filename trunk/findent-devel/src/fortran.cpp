@@ -424,32 +424,21 @@ void Fortran::indent_and_output()
 	 switch(props.kind)  /* handle includes etc */
 	 {
 	    case INCLUDE:
-	       D(O("INCLUDE");O(props.stringvalue);O(FLAGS.deps);O(FLAGS.include_left);O(fi->start_indent);O(top_indent()););
-	       Includes.insert(std::make_pair(INCLUDE,trim(props.stringvalue)));
-	       break;
 	    case INCLUDE_CPP:
-	       D(O("INCLUDE_CPP");O(props.stringvalue);O(FLAGS.deps););
-	       Includes.insert(std::make_pair(INCLUDE_CPP,trim(props.stringvalue)));
-	       break;
 	    case INCLUDE_CPP_STD:
-	       D(O("INCLUDE_CPP_STD");O(props.stringvalue);O(FLAGS.deps););
-	       Includes.insert(std::make_pair(INCLUDE_CPP_STD,trim(props.stringvalue)));
-	       break;
 	    case INCLUDE_COCO:
-	       D(O("INCLUDE_COCO");O(props.stringvalue);O(FLAGS.deps););
-	       Includes.insert(std::make_pair(INCLUDE_COCO,trim(props.stringvalue)));
+	       D(O("INCLUDE");O(props.stringvalue);O(FLAGS.deps););
+	       Includes.insert(std::make_pair(props.kind,trim(props.stringvalue)));
 	       break;
 	    case USE:
-	       D(O("USE");O(props.name);O(FLAGS.deps););
-	       Includes.insert(std::make_pair(USE,trim(stolower(props.name))));
-	       break;
 	    case MODULE:
-	       D(O("MODULE");O(props.name);O(FLAGS.deps););
-	       Includes.insert(std::make_pair(MODULE,trim(stolower(props.name))));
+	       D(O("USE/MODULE");O(props.name);O(FLAGS.deps););
+	       Includes.insert(std::make_pair(props.kind,trim(stolower(props.name))));
 	       break;
 	    case SUBMODULE:
-	       D(O("MODULE");O(props.lrvalue+":"+props.name);O(FLAGS.deps););
-	       Includes.insert(std::make_pair(SUBMODULE,trim(stolower(props.lrvalue+":"+props.name))));
+	       D(O("SUBMODULE");O(props.lrvalue+":"+props.name);O(FLAGS.deps););
+	       Includes.insert(std::make_pair(MODULE,trim(stolower(props.lrvalue))+":"
+			+trim(stolower(props.name))));
 	       Includes.insert(std::make_pair(USE,trim(stolower(props.lrvalue))));
 	 }
       }
@@ -593,10 +582,12 @@ void Fortran::indent_and_output()
 	       push_indent(Cur_indent + FLAGS.forall_indent);
 	       break;
 	    case INCLUDE:
+	       D(O("INCLUDE");O(FLAGS.include_left);O(fi->start_indent););
 	       if (FLAGS.include_left)
 		  Cur_indent = fi->start_indent;
 	       else
 		  Cur_indent = top_indent();
+	       break;
 	    default:
 	       Cur_indent = top_indent();
 	 } // end determine indent and refactor
