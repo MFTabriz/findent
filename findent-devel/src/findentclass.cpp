@@ -341,6 +341,6 @@ void Findent::output_deps()
       if (it->first == USE)
 	 if (includes.find(make_pair(MODULE,it->second)) != includes.end())
 	    continue;
-      std::cout << type2str(it->first) << ": " << it->second << endline;
+      std::cout << type2str(it->first) << ": " << it->second << std::endl;
    }
 }
