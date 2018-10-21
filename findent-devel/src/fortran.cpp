@@ -437,7 +437,7 @@ void Fortran::indent_and_output()
 	       break;
 	    case SUBMODULE:
 	       D(O("SUBMODULE");O(props.lrvalue+":"+props.name);O(FLAGS.deps););
-	       Includes.insert(std::make_pair(MODULE,trim(stolower(props.lrvalue))+":"
+	       Includes.insert(std::make_pair(props.kind,trim(stolower(props.lrvalue))+":"
 			+trim(stolower(props.name))));
 	       Includes.insert(std::make_pair(USE,trim(stolower(props.lrvalue))));
 	 }

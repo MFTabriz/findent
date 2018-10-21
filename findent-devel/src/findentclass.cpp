@@ -322,12 +322,12 @@ std::string Findent::type2str(const int t)
    switch (t)
    {
       case USE:             return "use";
-      case INCLUDE:         return "include";
-      case INCLUDE_CPP:     return "include_cpp";
-      case INCLUDE_CPP_STD: return "include_cpp_std";
-      case INCLUDE_COCO:    return "include_coco";
-      case MODULE:          return "module";
-      case SUBMODULE:       return "submodule";
+      case INCLUDE:         return "inc";
+      case INCLUDE_CPP:     return "cpp";
+      case INCLUDE_CPP_STD: return "std";
+      case INCLUDE_COCO:    return "coc";
+      case MODULE:          return "mod";
+      case SUBMODULE:       return "sub";
    }
    return "";
 }
@@ -337,10 +337,14 @@ void Findent::output_deps()
    std::set<std::pair<int,std::string> >:: iterator it;
    for (it = includes.begin(); it != includes.end(); ++it)
    {
-      // eliminate use if corresponding module is made
+      // eliminate use if corresponding (sub)module is made
       if (it->first == USE)
+      {
 	 if (includes.find(make_pair(MODULE,it->second)) != includes.end())
 	    continue;
-      std::cout << type2str(it->first) << ": " << it->second << std::endl;
+	 if (includes.find(make_pair(SUBMODULE,it->second)) != includes.end())
+	    continue;
+      }
+      std::cout << type2str(it->first) << " " << it->second << std::endl;
    }
 }
