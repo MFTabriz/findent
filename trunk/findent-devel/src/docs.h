@@ -15,6 +15,7 @@ class Docs
    void gedit_help();
    void gedit_plugin();
    void gedit_plugin_py();
+   void makefdeps();
    void readme();
    void usage(bool man);
    void version();
