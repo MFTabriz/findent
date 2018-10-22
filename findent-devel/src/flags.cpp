@@ -228,6 +228,8 @@ int Flags::get_flags(int argc, char *argv[])
 
       {"readme"             , no_argument      , 0, DO_README            },
 
+      {"makefdeps"          , no_argument      , 0, DO_MAKEFDEPS         },
+
       {"openmp"             , required_argument, 0, DO_OMP               },
 
       {"deps"               , no_argument,       0, DO_DEPS              },
@@ -493,16 +495,17 @@ int Flags::get_flags(int argc, char *argv[])
 	    else
 	       honour_omp = 1;
 	    break;
-	 case DO_VIM_HELP:
-	 case DO_VIM_FINDENT:
-	 case DO_VIM_FORTRAN:
-	 case DO_GEDIT_HELP:
+	 case DO_EMACS_FINDENT:
+	 case DO_EMACS_HELP:
 	 case DO_GEDIT_EXTERNAL:
+	 case DO_GEDIT_HELP:
 	 case DO_GEDIT_PLUGIN:
 	 case DO_GEDIT_PLUGIN_PY:
-	 case DO_EMACS_HELP:
-	 case DO_EMACS_FINDENT:
+	 case DO_MAKEFDEPS:
 	 case DO_README:
+	 case DO_VIM_FINDENT:
+	 case DO_VIM_FORTRAN:
+	 case DO_VIM_HELP:
 	    retval = c;
 	    break;
       }

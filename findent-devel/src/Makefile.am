@@ -85,13 +85,14 @@ readme_plugin.o: readme.inc
 docs.o:    vim_fortran.inc vim_findent.inc vim_help.inc \
 	   gedit_external.inc gedit_plugin.inc gedit_plugin_py.inc gedit_help.inc \
            emacs_findent.inc emacs_help.inc \
-	   readme.inc
+	   readme.inc makefdeps.inc
 
+DEPSDIR   = $(top_srcdir)/deps
+EMACSDIR  = $(top_srcdir)/emacs
+GEDITDIR  = $(top_srcdir)/gedit
+READMEDIR = $(top_srcdir)/doc
 TOCPP     = $(top_srcdir)/src/tocpp.sh
 VIMDIR    = $(top_srcdir)/vim
-GEDITDIR  = $(top_srcdir)/gedit
-EMACSDIR  = $(top_srcdir)/emacs
-READMEDIR = $(top_srcdir)/doc
 
 vim_fortran.inc: $(VIMDIR)/fortran.vim $(TOCPP)
 	$(TOCPP) < $(VIMDIR)/fortran.vim > $@
@@ -122,6 +123,10 @@ emacs_help.inc: $(EMACSDIR)/README $(TOCPP)
 
 readme.inc: $(READMEDIR)/README $(TOCPP)
 	$(TOCPP) < $(READMEDIR)/README > $@
+
+makefdeps.inc: $(DEPSDIR)/makefdeps $(TOCPP)
+	$(TOCPP) < $(DEPSDIR)/makefdeps > $@
+
 
 bin_PROGRAMS    = findent
 

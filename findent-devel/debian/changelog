@@ -1,9 +1,9 @@
-findent (2.9.2~pre1-1) unstable; urgency=low
+findent (2.9.3~pre1-1) unstable; urgency=low
 
   * New upstream release
   * Changed Standards-Version: 4.2.0
 
- -- Willem Vermin <wvermin@gmail.com>  Wed, 17 Oct 2018 10:22:09 +0200
+ -- Willem Vermin <wvermin@gmail.com>  Mon, 22 Oct 2018 15:50:20 +0200
 
 findent (2.8.2-1) unstable; urgency=low
 

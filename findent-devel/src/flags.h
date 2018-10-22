@@ -32,6 +32,7 @@ class Flags
       DO_LABEL_LEFT,
       DO_LAST_INDENT,
       DO_LAST_USABLE,
+      DO_MAKEFDEPS,
       DO_MANPAGE,
       DO_OMP,
       DO_README,
