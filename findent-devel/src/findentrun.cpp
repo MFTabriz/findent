@@ -62,8 +62,9 @@ int Findent::run()
    while(1)
    {
       source->full_statement = "";
+      D(O("full_statement1");O(source->full_statement););
       source->get_full_statement();
-      D(O("full_statement");O(source->full_statement););
+      D(O("full_statement2");O(source->full_statement););
       source->indent_and_output();
       if (end_of_file)
       {

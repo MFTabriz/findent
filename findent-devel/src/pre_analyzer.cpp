@@ -44,7 +44,8 @@ int Pre_analyzer::analyze(const std::string s, const int pretype)
    switch(pretype)
    {
       case CPP_IF:  case CPP_ENDIF:  case CPP_ELSE:  case CPP_ELIF:
-      case COCO_IF: case COCO_ENDIF: case COCO_ELSE: case COCO_ELIF: break;
+      case COCO_IF: case COCO_ENDIF: case COCO_ELSE: case COCO_ELIF: 
+      case INCLUDE_CPP: case INCLUDE_COCO: break;
       default: return this->NONE;
    }
 

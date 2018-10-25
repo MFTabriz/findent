@@ -301,6 +301,9 @@ class Fortranline
 	 case COCO_IF: case COCO_ENDIF: case COCO_ELSE: case COCO_ELIF: case COCO: 
 	    return COCO;
 	    break;
+	 case INCLUDE_CPP: case INCLUDE_CPP_STD: case INCLUDE_COCO:
+	    return pretype;
+	    break;
 	 default:
 	    return 0;
       }

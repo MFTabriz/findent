@@ -8,10 +8,29 @@
 # prog.o: file1.inc file2.inc
 # Example:
 # makefdeps *.f90 > deps
+usage()
+{
+   echo "usage:"
+   echo "$0 [-s objectsuffix] fortansources ..."
+   echo "objectsuffix: default '.o'"
+   echo "depending on your make system, '.lo' can be the correct one"
+   exit 1
+}
+p=$( getopt -o s: -- "$@" ) || usage
+eval set -- "$p"
+
+O='.o'
+while [ "$1" != "--" ]; do
+   case "$1" in
+      '-s') shift; O="$1" ;;
+   esac
+   shift
+done
+shift
 
 declare -A module use include
 for i in $@ ; do
-   j=${i%.*}.o
+   j=${i%.*}$O
    while read a b ; do
       case $a in
 	 use)

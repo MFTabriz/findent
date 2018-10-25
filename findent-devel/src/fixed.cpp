@@ -39,6 +39,7 @@ void Fixed::build_statement(Fortranline &line, bool &f_more, bool &pushback)
    //
    if(!cleanfive(s))
    {
+      D(O("not clean");O(line););
       curlines.push_back(line);
       f_more = 1;
       return;
