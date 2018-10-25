@@ -169,6 +169,16 @@ void Fortran::get_full_statement()
 	       state = in_pre;
 	       break;
 	    }
+
+	    if (FLAGS.deps)
+	    {
+	       switch(pretype)
+	       {
+		  case INCLUDE_CPP: case INCLUDE_CPP_STD: case INCLUDE_COCO:
+		     Includes.insert(std::make_pair(pretype,lexer_getinclude()));
+	       }
+	    }
+
 	    if (is_findentfix(Curline))
 	    {
 	       state = in_ffix;

@@ -19,10 +19,14 @@ std::string lexer_getstlabel(void);
 
 std::string lexer_geti_number(void);
 
+std::string lexer_getinclude(void);
+
 std::string lexer_getrest(void);
 
 std::string lexer_getstring(void);
 
 std::string lexer_getlr(void);
+
+void extract_include(void); 
 
 #endif

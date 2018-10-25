@@ -12,6 +12,7 @@
 #define YY_DECL extern "C" int yylex()
 std::stack<int> start_stack;
 std::string     lexer_name, lexer_stlabel, lexeri_number, lexer_rest, lexer_string, lexer_lr;
+std::string     lexer_include;
 std::string     input_string;
 int             lrlevel;
 bool            lrreturn;
@@ -195,8 +196,6 @@ function          { D(O("FUNCTION");Y;);          return FUNCTION;          }
 if                { D(O("IF");Y;);                return IF;                }
 impure            { D(O("IMPURE");Y;);            return IMPURE;            }
 include           { D(O("INCLUDE");Y;);           return INCLUDE;           }
-#include          { D(O("INCLUDE_CPP");Y;);       return INCLUDE_CPP;       }
-\?\?include       { D(O("INCLUDE_COCO");Y);       return INCLUDE_COCO;      }
 integer           { D(O("INTEGER");Y;);           return BASICTYPE;         }
 interface         { D(O("INTERFACE");Y;);         return INTERFACE;         }
 logical           { D(O("LOGICAL");Y;);           return BASICTYPE;         }
@@ -294,9 +293,15 @@ where             { D(O("WHERE");Y;);             return WHERE;             }
 ^{b}*#{b}*elif                { D(O("CPP_ELIF");Y;);
                                 return CPP_ELIF;
 			      }
-^{b}*#{b}*include             { D(O("INCLUDE_CPP");Y;);
+^{b}*#{b}*include{b}*/\"[^\n]*\"{b}*\n  { D(O("INCLUDE_CPP");Y;);
+                                extract_include();
                                 return INCLUDE_CPP;
 		              }
+^{b}*#{b}*include{b}*/<[^\n]*>{b}*\n  { D(O("INCLUDE_CPP_STD");Y;);
+                                extract_include();
+                                return INCLUDE_CPP_STD;
+		              }
+
 
 ^{b}*\?\?                     { D(O("COCO");Y;);
                                 return COCO;
@@ -313,10 +318,18 @@ where             { D(O("WHERE");Y;);             return WHERE;             }
 ^{b}*\?\?{b}*e{b}*l{b}*s{b}*e{b}*i{b}*f { D(O("COCO_ELIF");Y;);
                                 return COCO_ELIF;
 			      }
-^{b}*\?\?{b}*i{b}*n{b}*c{b}*l{b}*u{b}*d{b}*e          { D(O("INCLUDE_COCO");Y;);
+^{b}*\?\?{b}*i{b}*n{b}*c{b}*l{b}*u{b}*d{b}*e{b}*/\'[^\n]+\'{b}*\n          { D(O("INCLUDE_COCO");Y;);
                               /* coco statements must start with '??' in column 1.
 			         However, for this code that is somewhat inconvenient,
 				 so we allow white space before '??' */
+                                extract_include();
+                                return INCLUDE_COCO;
+		              }
+^{b}*\?\?{b}*i{b}*n{b}*c{b}*l{b}*u{b}*d{b}*e{b}*/\"[^\n]+\"{b}*\n          { D(O("INCLUDE_COCO");Y;);
+                              /* coco statements must start with '??' in column 1.
+			         However, for this code that is somewhat inconvenient,
+				 so we allow white space before '??' */
+                                extract_include();
                                 return INCLUDE_COCO;
 		              }
 
@@ -453,6 +466,29 @@ std::string lexer_getlr()
 {
    D(O("lexer_lr");O(lexer_lr););
    return lexer_lr;
+}
+std::string lexer_getinclude()
+{
+   D(O("lexer_getinclude");O(lexer_include););
+   return lexer_include;
+}
+
+void extract_include()
+{
+// removes first and last character of rest of input line
+// example: 
+// #include "file.inc"
+// after scanning of '#include ', the string "file.inc",
+// without quotes is put in lexer_include
+
+   size_t l = input_string.length()-yyleng-1;
+   lexer_include = input_string.substr(yyleng,l);
+   if (lexer_include.size() > 1)
+   {
+      lexer_include.erase(lexer_include.end()-1);
+      lexer_include.erase(lexer_include.begin());
+   }
+   D(O("lexer_include");O(lexer_include););
 }
 
 #if 0

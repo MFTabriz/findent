@@ -106,9 +106,6 @@ line:
     |                forall_construct         { properties.kind = FORALL;            }
     |                if_construct             { properties.kind = IF;                }
     |                include                  { properties.kind = INCLUDE;           }
-    |                include_cpp              { properties.kind = INCLUDE_CPP;       }
-    |                include_cpp_std          { properties.kind = INCLUDE_CPP_STD;   }
-    |                include_coco             { properties.kind = INCLUDE_COCO;   }
     |                interface                { properties.kind = INTERFACE;         }
     |                module                   { properties.kind = MODULE;            }
     |                moduleprocedure          { properties.kind = PROCEDURE;         }
@@ -135,10 +132,6 @@ module:              MODULE enable_identifier IDENTIFIER getname EOL ;
 use:                 USE    enable_identifier IDENTIFIER getname enable_skipall SKIPALL ;
 
 include:             INCLUDE     QSTRING getstring EOL {D(O("include"););} ; /* include "file.inc" */
-include_cpp:         INCLUDE_CPP QSTRING getstring EOL {D(O("include_cpp"););} ;  /* #include "file.inc" */
-include_cpp_std:     INCLUDE_CPP '<' enable_incfilename INCFILENAME getstring enable_char '>' EOL {D(O("include_cpp <>"););}; /* #include <file.inc> */
-include_coco:        INCLUDE_COCO QSTRING getstring EOL {D(O("include_coco"););} ;  /* ??include "file.inc" */
-
 
 abstractinterface:   ABSTRACTINTERFACE  EOL     ;
 contains:            CONTAINS           EOL     ;
@@ -288,8 +281,6 @@ skipall:             enable_skipall SKIPALL
        ;
 skipnoop:            enable_skipnoop SKIPNOOP
         ;
-enable_char:         {lexer_enable(CHAR);}
-	   ;
 enable_identifier:   {lexer_enable(IDENTIFIER);}
 	         ;
 enable_skip:         {lexer_enable(SKIP);}
@@ -297,8 +288,6 @@ enable_skip:         {lexer_enable(SKIP);}
 enable_skipall:      {lexer_enable(SKIPALL);}
 	      ;
 enable_skipnoop:     {lexer_enable(SKIPNOOP);}
-	       ;
-enable_incfilename:  {lexer_enable(INCFILENAME);}
 	       ;
 getname:             {properties.name=lexer_getname();}
        ;
