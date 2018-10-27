@@ -175,7 +175,7 @@ void Fortran::get_full_statement()
 	       switch(pretype)
 	       {
 		  case INCLUDE_CPP: case INCLUDE_CPP_STD: case INCLUDE_COCO:
-		     Includes.insert(std::make_pair(pretype,lexer_getinclude()));
+		     Includes.insert(std::make_pair(pretype,Curline.getinclude()));
 	       }
 	    }
 
@@ -221,6 +221,14 @@ void Fortran::get_full_statement()
 			break;
 		  }
 		  Curline = Getnext(End_of_file);
+	       }
+	       if (FLAGS.deps)
+	       {
+		  switch(pretype)
+		  {
+		     case INCLUDE_CPP: case INCLUDE_CPP_STD: case INCLUDE_COCO:
+			Includes.insert(std::make_pair(pretype,Curline.getinclude()));
+		  }
 	       }
 	       state = in_fortran;
 	       break;
