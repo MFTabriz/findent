@@ -27,7 +27,7 @@ cat << eof > prog
   include 'b.inc'
 ?? include 'c.inc'
 ??include "d.inc"
-#include "e.inc"
+  #include "e.inc"
 # include <f.inc>
     end
 eof
@@ -41,6 +41,28 @@ coc d.inc
 eof
 
 ../doit "--deps" "-ifree" ""
+rc=`expr $rc + $?`
+
+cat << eof > prog
+      program prog
+      include "a.inc"
+      include 'b.inc'
+?? include 'c.inc'
+??include "d.inc"
+  #include "e.inc"
+# include <f.inc>
+        end
+eof
+cat << eof > expect
+inc a.inc
+inc b.inc
+cpp e.inc
+std f.inc
+coc c.inc
+coc d.inc
+eof
+
+../doit "--deps" "-ifixed" ""
 rc=`expr $rc + $?`
 
 . ../postlude
