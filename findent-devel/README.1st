@@ -1,4 +1,9 @@
-findent: indents/beautifies/converts Fortran sources
+findent: Indents/beautifies/converts Fortran sources.
+         Prints dependencies based on:
+	  - definitions and uses of modules and submodules
+	  - include, #include and ??include statements
+	 Findent can emit a script that uses findent to
+	 create a dependencies file for use in an Makefile.
 
  - findent supports Fortran-66 up to Fortran-2018
  - findent can convert from fixed form to free form and vice-versa
@@ -6,9 +11,8 @@ findent: indents/beautifies/converts Fortran sources
  - findent is validated against all constructs in 
    'Modern Fortran explained, Incorporating Fortran 2018, Metcalf e.a.'
  - findent honours OpenMP conditionals
- - binaries for Unix and Windows (findent and findent.exe respectively)
+ - findent runs in Unix and Windows
  - high speed: 50K - 100K lines per second
-   in equalprg and indentexpr
  - wrapper for processing one or more files in one call available
       for Unix and Windows (wfindent and wfindent.bat respectively)
  - vim, gedit, emacs: findent optionally emits configuration files
@@ -55,6 +59,17 @@ Usage:    $ findent -h
 Examples: $ findent < in.f90 > out.f90
           $ findent -i4 -Rr < in.f > out.f90
           $ wfindent -i4 -Rr *.f
+
+Usage with Make:
+
+          $ findent --makefdeps > makefdeps
+	  $ chmod +x makefdeps
+	  use something like the following in your Makefile:
+	    include deps
+	    dep deps:
+	    	   ./makefdeps *.f90 > deps
+	   Of course, if makefdeps is not adequate for you, you 
+	   can create your own script, possibly inspired by makefdeps.
 
 (g)vim users:
    Install findent, the following command shows instructions

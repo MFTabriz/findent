@@ -415,6 +415,7 @@ void Fortran::indent_and_output()
 	    case ENUM:
 	    case FORALL:
 	    case IF:
+	    case INCLUDE:
 	    case SELECTCASE:
 	    case SELECTTYPE:
 	    case TYPE:

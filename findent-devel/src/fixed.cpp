@@ -376,17 +376,6 @@ bool Fixed::wizard()
    // For free format, always return 0.
    //
 
-   // 
-   // TODO: wizard keeps no track of preprocessor statements, so it could be fooled
-   // like:
-   //       do
-   //     #ifdef X
-   //      1  i=1,10
-   //     #else
-   //      2  j=1,10
-   //     #endif
-   //       enddo
-
    if (gl->global_format == FREE)
       return 0;
 
