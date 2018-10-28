@@ -16,6 +16,7 @@ usage()
    echo "depending on your make system, '.lo' can be the correct one"
    exit 1
 }
+FINDENTPROG=${FINDENT:-findent}
 p=$( getopt -o s: -- "$@" ) || usage
 eval set -- "$p"
 
@@ -40,7 +41,7 @@ for i in $@ ; do
 	 inc|cpp|coc|std)
 	    include[$j]="${include[$j]} $b" ;;
       esac
-   done < <( findent --deps < $i )
+   done < <( $FINDENTPROG --deps < $i )
 done
 for k in ${!use[@]}; do
    m=""
