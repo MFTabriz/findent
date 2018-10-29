@@ -54,7 +54,7 @@ int Findent::run()
       return what_to_return();
    }
 
-   if (flags.last_indent_only)
+   if (flags.last_indent_only || flags.deps)
       mycout.setoutput(0);
 
    cur_indent = start_indent;
@@ -62,12 +62,16 @@ int Findent::run()
    while(1)
    {
       source->full_statement = "";
+      D(O("full_statement1");O(source->full_statement););
       source->get_full_statement();
+      D(O("full_statement2");O(source->full_statement););
       source->indent_and_output();
       if (end_of_file)
       {
 	 if(flags.last_indent_only)
 	    std::cout << num_leading_spaces(mycout.get()) << endline;
+	 if(flags.deps)
+	    output_deps();
 	 delete source;
 	 return what_to_return();
       }

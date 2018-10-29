@@ -1,0 +1,57 @@
+#!/bin/bash
+# - makefdeps -
+# Creates make-dependencies for fortran sources, based on
+# analysis by findent of (sub)modules that are needed or created and
+# include files. Include files are not further analyzed.
+# Dependencies will be like:
+# prog.o: sub1.o sub2.o
+# prog.o: file1.inc file2.inc
+# Example:
+# makefdeps *.f90 > deps
+usage()
+{
+   echo "usage:"
+   echo "$0 [-s objectsuffix] fortansources ..."
+   echo "objectsuffix: default '.o'"
+   echo "depending on your make system, '.lo' can be the correct one"
+   exit 1
+}
+FINDENTPROG=${FINDENT:-findent}
+p=$( getopt -o s: -- "$@" ) || usage
+eval set -- "$p"
+
+O='.o'
+while [ "$1" != "--" ]; do
+   case "$1" in
+      '-s') shift; O="$1" ;;
+   esac
+   shift
+done
+shift
+
+declare -A module use include
+for i in $@ ; do
+   j=${i%.*}$O
+   while read a b ; do
+      case $a in
+	 use)
+	    use[$j]="${use[$j]} $b" ;;
+	 mod|sub)
+	    [ "$b" ] && module[$b]=$j ;;
+	 inc|cpp|coc|std)
+	    include[$j]="${include[$j]} $b" ;;
+      esac
+   done < <( $FINDENTPROG --deps < $i )
+done
+for k in ${!use[@]}; do
+   m=""
+   for l in ${use[$k]}; do
+      m="$m ${module[$l]}"
+   done
+   if [ -n "${m// }" ] ; then
+      echo $k: $m
+   fi
+done
+for k in ${!include[@]}; do
+   echo $k: ${include[$k]}
+done

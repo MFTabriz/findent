@@ -26,6 +26,7 @@ class Fortranline
    bool        omp_cache;          bool omp_cached;
    int         scanfixpre_cache;   bool scanfixpre_cached;
    std::string trim_cache;         bool trim_cached;
+   std::string incfile_cache;
 
    bool     is_clean;
    Globals* gl;
@@ -231,12 +232,21 @@ class Fortranline
       {
 	 lexer_set(trim(),SCANFIXPRE);
 	 scanfixpre_cache = yylex();
+	 incfile_cache    = lexer_getinclude();
 	 if (format() == FIXED)
 	    if(scanfixpre_cache == FIXFINDENTFIX)
 	       scanfixpre_cache = FINDENTFIX;
 	 scanfixpre_cached = 1;
       }
       return scanfixpre_cache;
+   }
+
+   std::string getinclude()
+   {
+      if(scanfixpre_cache)
+	 return incfile_cache;
+      else
+	 return "";
    }
 
    bool omp()
@@ -300,6 +310,9 @@ class Fortranline
 	    break;
 	 case COCO_IF: case COCO_ENDIF: case COCO_ELSE: case COCO_ELIF: case COCO: 
 	    return COCO;
+	    break;
+	 case INCLUDE_CPP: case INCLUDE_CPP_STD: case INCLUDE_COCO:
+	    return pretype;
 	    break;
 	 default:
 	    return 0;

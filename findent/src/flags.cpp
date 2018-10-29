@@ -11,27 +11,29 @@
 
 void Flags::set_defaults(void)
 {
-   label_left_default  = 1;
-   default_indent      = 3;
-   all_indent          = default_indent;
+   include_left_default = 1;
+   default_indent       = 3;
+   all_indent           = default_indent;
 
-   apply_indent        = 1;
-   auto_firstindent    = 0;
-   conchar             = ' ';
-   honour_omp          = 1;
-   input_format        = UNKNOWN;
-   input_format_gnu    = 0;
-   input_line_length   = 0;
-   label_left          = label_left_default;
-   last_indent_only    = 0;
-   last_usable_only    = 0;
-   max_indent          = 100;
-   only_fix_free       = 0;
-   output_format       = 0;
-   refactor_routines   = 0;
-   return_format       = 0;
-   start_indent        = 0;
-   upcase_routine_type = 0;
+   apply_indent         = 1;
+   auto_firstindent     = 0;
+   conchar              = ' ';
+   deps                 = 0;
+   honour_omp           = 1;
+   include_left         = include_left_default;
+   input_format         = UNKNOWN;
+   input_format_gnu     = 0;
+   input_line_length    = 0;
+   label_left           = 1;
+   last_indent_only     = 0;
+   last_usable_only     = 0;
+   max_indent           = 100;
+   only_fix_free        = 0;
+   output_format        = 0;
+   refactor_routines    = 0;
+   return_format        = 0;
+   start_indent         = 0;
+   upcase_routine_type  = 0;
 
    set_default_indents();
 }
@@ -141,6 +143,9 @@ int Flags::get_flags(int argc, char *argv[])
       {"start_indent"       , required_argument, 0, 'I'                  },
       {"start-indent"       , required_argument, 0, 'I'                  },
 
+      {"include_left"       , required_argument, 0, DO_INCLUDE_LEFT      },
+      {"include-left"       , required_argument, 0, DO_INCLUDE_LEFT      },
+
       {"indent_interface"   , required_argument, 0, 'j'                  },
       {"indent-interface"   , required_argument, 0, 'j'                  },
 
@@ -223,7 +228,11 @@ int Flags::get_flags(int argc, char *argv[])
 
       {"readme"             , no_argument      , 0, DO_README            },
 
+      {"makefdeps"          , no_argument      , 0, DO_MAKEFDEPS         },
+
       {"openmp"             , required_argument, 0, DO_OMP               },
+
+      {"deps"               , no_argument,       0, DO_DEPS              },
 
       {0,0,0,0}
    };
@@ -427,6 +436,13 @@ int Flags::get_flags(int argc, char *argv[])
 	    if (allowed_conchars.find(conchar) == std::string::npos)
 	       conchar = '&';
 	    break;
+	 case DO_DEPS:
+	    deps = 1;
+	    break;
+	 case DO_INCLUDE_LEFT:
+	    optargcheck;
+	    include_left       = (atoi(optarg) != 0);     // --include_left=0/1
+	    break;
 	 case DO_INDENT_CONTAINS:
 	    optargcheck;
 	    if (!strcmp(optarg,"restart"))
@@ -479,16 +495,17 @@ int Flags::get_flags(int argc, char *argv[])
 	    else
 	       honour_omp = 1;
 	    break;
-	 case DO_VIM_HELP:
-	 case DO_VIM_FINDENT:
-	 case DO_VIM_FORTRAN:
-	 case DO_GEDIT_HELP:
+	 case DO_EMACS_FINDENT:
+	 case DO_EMACS_HELP:
 	 case DO_GEDIT_EXTERNAL:
+	 case DO_GEDIT_HELP:
 	 case DO_GEDIT_PLUGIN:
 	 case DO_GEDIT_PLUGIN_PY:
-	 case DO_EMACS_HELP:
-	 case DO_EMACS_FINDENT:
+	 case DO_MAKEFDEPS:
 	 case DO_README:
+	 case DO_VIM_FINDENT:
+	 case DO_VIM_FORTRAN:
+	 case DO_VIM_HELP:
 	    retval = c;
 	    break;
       }

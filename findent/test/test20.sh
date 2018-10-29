@@ -1338,7 +1338,89 @@ eof
 rc=`expr $rc + $?`
 
 cat << eof > prog
-! The do while statement
+! The include line p 447
+   program p_include
+   do i=1,10
+   include 'file.inc'
+   include "file2.inc"
+   continue
+   enddo
+   end
+eof
+cat << eof > expect
+! The include line p 447
+   program p_include
+      do i=1,10
+   include 'file.inc'
+   include "file2.inc"
+         continue
+      enddo
+   end
+eof
+
+../doit "-ifree" "-ifree -Ia"
+rc=`expr $rc + $?`
+
+../doit "--include_left=1 --include-left=1" "-ifree -Ia"
+rc=`expr $rc + $?`
+
+cat << eof > expect
+! The include line p 447
+   program p_include
+      do i=1,10
+         include 'file.inc'
+         include "file2.inc"
+         continue
+      enddo
+   end
+eof
+
+../doit "--include_left=0 --include-left=0" "-ifree -Ia"
+rc=`expr $rc + $?`
+
+cat << eof > prog
+! The include line p 447
+      program p_include
+      do i=1,10
+      include 'file.inc'
+      include "file2.inc"
+      continue
+      enddo
+      end
+eof
+cat << eof > expect
+! The include line p 447
+      program p_include
+         do i=1,10
+      include 'file.inc'
+      include "file2.inc"
+            continue
+         enddo
+      end
+eof
+
+../doit "-ifixed" "-ifixed -Ia"
+rc=`expr $rc + $?`
+
+../doit "--include_left=1 --include-left=1" "-ifixed -Ia"
+rc=`expr $rc + $?`
+
+cat << eof > expect
+! The include line p 447
+      program p_include
+         do i=1,10
+            include 'file.inc'
+            include "file2.inc"
+            continue
+         enddo
+      end
+eof
+
+../doit "--include_left=0 --include-left=0" "-ifixed -Ia"
+rc=`expr $rc + $?`
+
+cat << eof > prog
+! The do while statement pp 447-448
     program p_dowhile
     logical l
     do while (l)
@@ -1356,7 +1438,7 @@ cat << eof > prog
     end
 eof
 cat << eof > expect
-! The do while statement
+! The do while statement pp 447-448
     program p_dowhile
          logical l
          do while (l)

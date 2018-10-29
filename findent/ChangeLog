@@ -1,3 +1,9 @@
+findent-3.0.0:
+	add generation of dependencies (flags --deps and --makefdeps)
+	corrected a few minor bugs
+findent-2.9.2:
+	fortran.cpp, findentclass.cpp: fixed error in -ifixed -lastusable
+	   by taking in account the wizardbuffer 
 findent-2.9.1:
 	lexer.l: allow space after '#' in cpp preprocessor directive
 findent-2.9.0:

@@ -1,6 +1,6 @@
 AUTOMAKE_OPTIONS = gnu
 
-SUBDIRS = src scripts test vim gedit emacs doc
+SUBDIRS = src scripts test vim gedit emacs doc deps
 
 MAINTAINERCLEANFILES = config.h.in~
 

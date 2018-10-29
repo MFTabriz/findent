@@ -28,12 +28,14 @@ struct propstruct properties;
 %token ASSIGN TO
 %token MODULEPROCEDURE PROCEDURE ENDPROCEDURE
 %token TIDENTIFIER
-%token BLANK
+%token BLANK CHAR
 %token FINDFORMAT UNKNOWN FREE FIXED UNSURE PROBFREE FINDENTFIX FIXFINDENTFIX
 %token P_ON P_OFF
 %token SCANFIXPRE
 %token CPP_IF CPP_ENDIF CPP_ELSE CPP_ELIF CPP
 %token COCO_IF COCO_ENDIF COCO_ELSE COCO_ELIF COCO
+%token INCLUDE INCLUDE_CPP INCLUDE_CPP_STD INCLUDE_COCO INCFILENAME
+%token USE
 
 %token IDENTIFIER SKIP SKIPALL SKIPNOOP KEYWORD
 
@@ -103,6 +105,7 @@ line:
     |                enum                     { properties.kind = ENUM;              }
     |                forall_construct         { properties.kind = FORALL;            }
     |                if_construct             { properties.kind = IF;                }
+    |                include                  { properties.kind = INCLUDE;           }
     |                interface                { properties.kind = INTERFACE;         }
     |                module                   { properties.kind = MODULE;            }
     |                moduleprocedure          { properties.kind = PROCEDURE;         }
@@ -116,6 +119,7 @@ line:
     |                submodule                { properties.kind = SUBMODULE;         }
     |                type                     { properties.kind = TYPE;              }
     |                typeis                   { properties.kind = TYPEIS;            }
+    |                use                      { properties.kind = USE;               }
     |                where_construct          { properties.kind = WHERE;             }
     ;
 blank:               BLANK ;
@@ -124,6 +128,10 @@ stlabel:             STLABEL getstlabel ;
 named_label:         NAMED_LABEL        ;
 
 module:              MODULE enable_identifier IDENTIFIER getname EOL ;
+
+use:                 USE    enable_identifier IDENTIFIER getname enable_skipall SKIPALL ;
+
+include:             INCLUDE     QSTRING getstring EOL {D(O("include"););} ; /* include "file.inc" */
 
 abstractinterface:   ABSTRACTINTERFACE  EOL     ;
 contains:            CONTAINS           EOL     ;
@@ -171,7 +179,7 @@ function_spec:          FUNCTION
 	            ;
 functionname:           enable_identifier IDENTIFIER getname ;
 
-submodule:           SUBMODULE LR enable_identifier IDENTIFIER getname EOL ;
+submodule:           SUBMODULE LR getlr enable_identifier IDENTIFIER getname EOL ;
 
 intrinsic_type_spec: BASICTYPE
 		   | BASICTYPE kind_selector 
@@ -287,6 +295,11 @@ getstlabel:          {properties.label=lexer_getstlabel();}
           ;
 getdolabel:          {properties.dolabel=lexer_geti_number();}
           ;
+getstring:           {properties.stringvalue=lexer_getstring();}
+	 ;
+getlr:               {properties.lrvalue=lexer_getlr();}
+     ;
+
 empty:               /* empty */
      ;
 %%

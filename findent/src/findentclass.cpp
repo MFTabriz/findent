@@ -1,7 +1,7 @@
-#include "findentclass.h"
-#include "fortranline.h"
 #include <stdio.h>
 #include <unistd.h>
+#include "findentclass.h"
+#include "fortranline.h"
 #include "debug.h"
 
 int Findent::determine_fix_or_free()
@@ -228,6 +228,7 @@ Fortranline Findent::getnext(bool &eof, bool use_wb)
    if (use_wb && !wizardbuffer.empty())
    {
       line = wizardbuffer.front();
+      num_lines++;
       wizardbuffer.pop_front();
       if (reading_from_tty && line.str() == ".")
 	 eof = 1;
@@ -255,7 +256,10 @@ Fortranline Findent::getnext(bool &eof, bool use_wb)
    line.clean();
 
    if(!use_wb && !eof)
+   {
+      num_lines--;
       wizardbuffer.push_back(line);
+   }
 
    if (!nbseen)
    {
@@ -312,3 +316,35 @@ Fortranline Findent::mygetline(bool &eof, bool buffer)
 
    return Fortranline(gl,s);
 }              // end of mygetline
+
+std::string Findent::type2str(const int t)
+{
+   switch (t)
+   {
+      case USE:             return "use";
+      case INCLUDE:         return "inc";
+      case INCLUDE_CPP:     return "cpp";
+      case INCLUDE_CPP_STD: return "std";
+      case INCLUDE_COCO:    return "coc";
+      case MODULE:          return "mod";
+      case SUBMODULE:       return "sub";
+   }
+   return "";
+}
+
+void Findent::output_deps()
+{
+   std::set<std::pair<int,std::string> >:: iterator it;
+   for (it = includes.begin(); it != includes.end(); ++it)
+   {
+      // eliminate use if corresponding (sub)module is made
+      if (it->first == USE)
+      {
+	 if (includes.find(make_pair(MODULE,it->second)) != includes.end())
+	    continue;
+	 if (includes.find(make_pair(SUBMODULE,it->second)) != includes.end())
+	    continue;
+      }
+      std::cout << type2str(it->first) << " " << it->second << std::endl;
+   }
+}

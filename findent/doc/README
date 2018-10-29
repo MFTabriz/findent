@@ -9,6 +9,9 @@ findent, what?
 
    findent is an indenter for Fortran programs, fixed and free format.
    findent can also translate fixed format to free format and vice versa.
+   Since version 3.0.0, findent can generate dependencies based on USE,
+   MODULE, SUBMODULE, INCLUDE, #include, ??include  and emit a bash script
+   that, using findent, creates a dependency file to be used in a Makefile.
 
    findent will take care of:
 
@@ -358,6 +361,7 @@ findent, usage?
 
 >>>> snip ---------- checklength ---------------------------------------
 
+
 #!/bin/bash
 # checks file line lengths
 # Usage:
@@ -526,6 +530,96 @@ findent, failure, findentfix:
      ! findentfix: continue
 
 
+findent, creating a dependency file for use in an Makefile.
+===========================================================
+
+      findent --deps < prog.f90
+
+   prints the dependencies found in prog.f90, based on USE,
+   MODULE, SUBMODULE, INCLUDE, #include and ??include.
+
+   This is used by the bash script makefdeps to create a dependency
+   file for use in an Makefile. 
+   Creation of the makefdeps script:
+
+      findent --makefdeps > makefdeps
+      chmod +x makefdeps
+
+   The command:
+
+      ./makefdeps *.f90
+
+   will output a dependency file, to be used in an Makefile.
+   The dependencies are based on .o files, for example:
+
+      main.o: sub1.o sub2.o
+      sub1.o: sub1.inc
+
+   Example Makefile and fortran sources to create 'program' from 
+   main.f90 sub1.f90 sub2.f90 sub.inc:
+
+
+>>>> snip ---------- Makefile ---------------------------------------
+SRCS = main.f90 sub1.f90 sub2.f90
+OBJS = $(SRCS:.f90=.o)
+%.o: %.f90
+	gfortran -c -o $@ $<
+program: $(OBJS)
+	gfortran -o $@ $(OBJS)
+include deps
+dep deps:
+	findent --makefdeps < /dev/null > makefdeps.sh
+	@if [ "`head -n 1 makefdeps.sh`" != "#!/bin/bash" ] ; then \
+	   findent -v 1>&2; \
+	   echo "Use findent version >= 3.0.0" 1>&2 ; exit 1 ; fi
+	chmod +x makefdeps.sh
+	./makefdeps.sh $(SRCS) > deps
+clean: 
+	rm -f *.o *.mod *.smod program deps
+<<<< snip ---------- Makefile ---------------------------------------
+
+>>>> snip ---------- main.f90 ---------------------------------------
+   program main
+      use mymod1
+      use mymod
+      call sub1
+      call sub
+   end
+<<<< snip ---------- main.f90 ---------------------------------------
+
+>>>> snip ---------- sub1.f90 ---------------------------------------
+   module mymod1
+   contains
+      subroutine sub1
+         print *,'this is sub1'
+      end
+   end
+   module mymod
+      interface
+         module subroutine sub
+         end subroutine
+      end interface
+   end module
+<<<< snip ---------- sub1.f90 ---------------------------------------
+
+>>>> snip ---------- sub2.f90 ---------------------------------------
+   submodule (mymod) mymod2
+   contains
+      module procedure sub
+   include 'sub.inc'
+      end procedure
+   end submodule
+<<<< snip ---------- sub2.f90 ---------------------------------------
+
+>>>> snip ---------- sub.inc ---------------------------------------
+print *,'this is sub'
+<<<< snip ---------- sub.inc ---------------------------------------
+
+   The fortran sources will be compiled in correct order, you can even
+   use parallel make (make -j). BTW: this example uses the SUBMODULE
+   statement: you need to have gfortran >= 6 to compile.
+
+
 findent, installation:
 ======================
 
@@ -679,5 +773,5 @@ of findent.
 I am happy to receive comments, error reports and suggestions for
 improvements.
 
-August 2018, Willem Vermin, wvermin@gmail.com
+October 2018, Willem Vermin, wvermin@gmail.com
 
