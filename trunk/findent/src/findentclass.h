@@ -1,6 +1,10 @@
 #ifndef FINDENTCLASS_H
 #define FINDENTCLASS_H
 
+#include <set>
+#include <utility>  // pair
+#include <string>
+
 #include "flags.h"
 #include "prop.h"
 #include "findent_types.h"
@@ -74,6 +78,8 @@ class Findent
       int          output_format;
       int          start_indent;
 
+      std::set <std::pair<int,std::string> > includes;
+
    private:
 
       int          all_indent;
@@ -89,6 +95,8 @@ class Findent
       int          guess_indent(Fortranline line);
       std::string  handle_dos(const std::string &s);
       void         handle_reading_from_tty();
+      void         output_deps();
+      std::string  type2str(const int t);
       int          what_to_return();
 
       void push_indent(int p) { indent.push_back(p); }
@@ -98,6 +106,7 @@ class Findent
 
       // for getnext:
       char prevlastchar;
+
 };
 
 #endif

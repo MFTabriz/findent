@@ -8,29 +8,17 @@ bool Docs::print(int todo)
 {
    switch(todo)
    {
-      case Flags::DO_VERSION:
-	 std::cout << "findent version "<<VERSION<<std::endl;
+      case Flags::DO_EMACS_FINDENT:
+	 emacs_findent();
 	 return 1;
-      case Flags::DO_USAGE:
-	 usage(0);
-	 return 1;
-      case Flags::DO_MANPAGE:
-	 usage(1);
-	 return 1;
-      case Flags::DO_VIM_HELP:
-	 vim_help();
-	 return 1;
-      case Flags::DO_VIM_FINDENT:
-	 vim_findent();
-	 return 1;
-      case Flags::DO_VIM_FORTRAN:
-	 vim_fortran();
-	 return 1;
-      case Flags::DO_GEDIT_HELP:
-	 gedit_help();
+      case Flags::DO_EMACS_HELP:
+	 emacs_help();
 	 return 1;
       case Flags::DO_GEDIT_EXTERNAL:
 	 gedit_external();
+	 return 1;
+      case Flags::DO_GEDIT_HELP:
+	 gedit_help();
 	 return 1;
       case Flags::DO_GEDIT_PLUGIN:
 	 gedit_plugin();
@@ -38,14 +26,29 @@ bool Docs::print(int todo)
       case Flags::DO_GEDIT_PLUGIN_PY:
 	 gedit_plugin_py();
 	 return 1;
-      case Flags::DO_EMACS_HELP:
-	 emacs_help();
+      case Flags::DO_MAKEFDEPS:
+	 makefdeps();
 	 return 1;
-      case Flags::DO_EMACS_FINDENT:
-	 emacs_findent();
+      case Flags::DO_MANPAGE:
+	 usage(1);
 	 return 1;
       case Flags::DO_README:
 	 readme();
+	 return 1;
+      case Flags::DO_USAGE:
+	 usage(0);
+	 return 1;
+      case Flags::DO_VERSION:
+	 std::cout << "findent version "<<VERSION<<std::endl;
+	 return 1;
+      case Flags::DO_VIM_FINDENT:
+	 vim_findent();
+	 return 1;
+      case Flags::DO_VIM_FORTRAN:
+	 vim_fortran();
+	 return 1;
+      case Flags::DO_VIM_HELP:
+	 vim_help();
 	 return 1;
       default:
 	 return 0;
@@ -118,6 +121,7 @@ void Docs::usage(bool man)
    manout(" "," '0': create numbered continuation characters");
    manout(" "," other: use that continuation character");
    manout(" "," default for conversion from free to fixed is '&'");
+   manout("--include_left=<n>"               ,"(0/1) 1: indent include statements to starting indent (default:1)");
    manout("-l<n>, --label_left=<n>"          ,"(0/1) 1: move statement labels to start of line (default:1)");
    manout(" ","      (only for free format)");
    manout("-lastindent, --last_indent"       ,"prints computed indentation of last line");
@@ -200,11 +204,31 @@ void Docs::usage(bool man)
    manout(" "," ");
    if(doman)
    {
+      std::cout << ".PP" << std::endl << ".SS" << std::endl;
+   }
+   std::cout << "Dependencies:"                << std::endl;
+   manout("--deps","output dependency information only, other flags are ignored.");
+   manout(" ","This can be used to generate a dependencies file for usage with make(1).");
+   manout(" "," The format of this information:");
+   manout(" "," Fortran source     ->        findent output");
+   manout(" ","  include \"file1\"   ->        inc file1");
+   manout(" ","  #include \"file2\"  ->        cpp file2");
+   manout(" ","  #include <file3>  ->        std file3");
+   manout(" ","  ??inclue 'file4'  ->        coc file4");
+   manout(" ","  use module1       ->        use module1");
+   manout(" ","  submodule(m) subm ->        use m");
+   manout(" ","                              mod m:subm");
+   manout(" ","  module module2    ->        mod module2");
+   manout("--makefdeps","outputs a bash(1) script that serves as a an example");
+   manout(" "," to generate dependencies for use in make(1).");
+   manout(" "," ");
+   if(doman)
+   {
       std::cout << ".PP" << std::endl << ".SS \"Usage with vim:" << std::endl;
    }
    else
    {
-      std::cout << "  Usage with vim:" << std::endl;
+      std::cout << "Usage with vim:" << std::endl;
    }
    manout("--vim_help"     ,"outputs directions to use findent in (g)vim");
    manout("--vim_fortran"  ,"outputs file 'fortran.vim', see --vim_help");
@@ -216,7 +240,7 @@ void Docs::usage(bool man)
    }
    else
    {
-      std::cout << "  Usage with gedit:" << std::endl;
+      std::cout << "Usage with gedit:" << std::endl;
    }
    manout("--gedit_help"      ,"outputs directions to use findent in gedit");
    manout("--gedit_external"  ,"outputs script 'findent-gedit', see --gedit_help");
@@ -359,4 +383,9 @@ void Docs::emacs_findent()
 void Docs::readme()
 {
 #include "readme.inc"
+}
+
+void Docs::makefdeps()
+{
+#include "makefdeps.inc"
 }

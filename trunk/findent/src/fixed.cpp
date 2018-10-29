@@ -39,6 +39,7 @@ void Fixed::build_statement(Fortranline &line, bool &f_more, bool &pushback)
    //
    if(!cleanfive(s))
    {
+      D(O("not clean");O(line););
       curlines.push_back(line);
       f_more = 1;
       return;
@@ -374,17 +375,6 @@ bool Fixed::wizard()
    // return 1 if a continuation is found, 0 otherwize.
    // For free format, always return 0.
    //
-
-   // 
-   // TODO: wizard keeps no track of preprocessor statements, so it could be fooled
-   // like:
-   //       do
-   //     #ifdef X
-   //      1  i=1,10
-   //     #else
-   //      2  j=1,10
-   //     #endif
-   //       enddo
 
    if (gl->global_format == FREE)
       return 0;

@@ -306,7 +306,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = gnu
-SUBDIRS = src scripts test vim gedit emacs doc
+SUBDIRS = src scripts test vim gedit emacs doc deps
 MAINTAINERCLEANFILES = config.h.in~
 EXTRA_DIST = bootstrap getversion LICENCE README.1st README.windows  \
 	     maketar makezip makedeb makesid README.2nd debian \

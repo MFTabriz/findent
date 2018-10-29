@@ -11,7 +11,8 @@
 
 #define YY_DECL extern "C" int yylex()
 std::stack<int> start_stack;
-std::string     lexer_name, lexer_stlabel, lexeri_number, lexer_rest;
+std::string     lexer_name, lexer_stlabel, lexeri_number, lexer_rest, lexer_string, lexer_lr;
+std::string     lexer_include;
 std::string     input_string;
 int             lrlevel;
 bool            lrreturn;
@@ -23,6 +24,7 @@ Line_prep       pline;
 
 %x state_lr state_lrb state_skip state_skipall state_skipnoop state_error
 %x state_findformat state_scanfixpre state_scanompfixed state_scanompfree
+%x state_incfilename state_char
 
 b [ \t]
 
@@ -33,9 +35,11 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 <state_error>.  {  D(O("ERROR");Y;); return ERROR; }
 
 <state_lr>{
-"("             { D(O("lr+");O(lrlevel);Y;); lrlevel++; }
+"("             { D(O("lrplus");O(lrlevel);Y;); 
+                   lrlevel++;
+		}
 
-")"             { D(O("lr-");O(lrlevel);Y;); 
+")"             { D(O("lrmin");O(lrlevel);Y;); 
                   lrlevel--;
 		  if(lrlevel == 0)
 		  {
@@ -49,7 +53,9 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 		  }
 		}
 
-.               { D(O("lrbla");O(lrlevel);Y;); } 
+.               { D(O("lrbla");O(lrlevel);Y;); 
+                    lexer_lr += yytext;
+		} 
 \n              { D(O("lreol");O(lrlevel);Y;); yyless(0); BEGIN(start_stack.top()); }
 
 }
@@ -88,6 +94,7 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 		start_stack.push(YY_START);
 		lrlevel  = 1;
 		lrreturn = 0;
+		lexer_lr = "";
 		BEGIN(state_lr);
 	     }
 
@@ -121,6 +128,17 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 <state_identifier>{
 [[:alpha:]][[:alnum:]_$]*  { D(O("IDENTIFIER");Y;);  lexer_name = yytext; return IDENTIFIER;  }
 [[:alpha:]][[:alnum:]_$%]* { D(O("TIDENTIFIER");Y;); lexer_name = yytext; return TIDENTIFIER; }
+}
+
+<state_incfilename>{  /* to be used in '#include <file>' */
+[^>]+                      { D(O("INCFILENAME");Y;); lexer_string = yytext; 
+                             BEGIN state_char; 
+			     return INCFILENAME; }
+}
+
+<state_char>{
+\n                            {  D(O("EOL"););   return EOL;        }
+.                             {  D(O("BLA");Y;); return yytext[0];  }
 }
 
 <state_keyword>{
@@ -168,7 +186,7 @@ endprogram        { D(O("ENDPROGRAM");Y;);        return ENDPROGRAM;        }
 endselect         { D(O("ENDSELECT");Y);          return ENDSELECT;         }
 endsubroutine     { D(O("ENDSUBROUTINE");Y;);     return ENDSUBROUTINE;     }
 endsubmodule      { D(O("ENDSUBMODULE");Y;);      return ENDSUBMODULE;      }
-endteam           { D(O("ENDTEAM"):Y);            return ENDTEAM;           }
+endteam           { D(O("ENDTEAM");Y);            return ENDTEAM;           }
 endtype           { D(O("ENDTYPE");Y;);           return ENDTYPE;           }
 endwhere          { D(O("ENDWHERE");Y;);          return ENDWHERE;          }
 entry             { D(O("ENTRY");Y);              return ENTRY;             }
@@ -177,6 +195,7 @@ forall            { D(O("FORALL");Y;);            return FORALL;            }
 function          { D(O("FUNCTION");Y;);          return FUNCTION;          }
 if                { D(O("IF");Y;);                return IF;                }
 impure            { D(O("IMPURE");Y;);            return IMPURE;            }
+include           { D(O("INCLUDE");Y;);           return INCLUDE;           }
 integer           { D(O("INTEGER");Y;);           return BASICTYPE;         }
 interface         { D(O("INTERFACE");Y;);         return INTERFACE;         }
 logical           { D(O("LOGICAL");Y;);           return BASICTYPE;         }
@@ -198,6 +217,7 @@ then              { D(O("THEN");Y;);              return THEN;              }
 type              { D(O("TYPE");Y;);              return TYPE;              }
 type/\(           { D(O("TYPEC");Y;);             return TYPEC;             }
 typeis            { D(O("TYPEIS");Y);             return TYPEIS;            }
+use               { D(O("USE");Y);                return USE;               }
 where             { D(O("WHERE");Y;);             return WHERE;             }
 }
 
@@ -273,6 +293,15 @@ where             { D(O("WHERE");Y;);             return WHERE;             }
 ^{b}*#{b}*elif                { D(O("CPP_ELIF");Y;);
                                 return CPP_ELIF;
 			      }
+^{b}*#{b}*include{b}*/\"[^\n]*\"{b}*\n  { D(O("INCLUDE_CPP");Y;);
+                                extract_include();
+                                return INCLUDE_CPP;
+		              }
+^{b}*#{b}*include{b}*/<[^\n]*>{b}*\n  { D(O("INCLUDE_CPP_STD");Y;);
+                                extract_include();
+                                return INCLUDE_CPP_STD;
+		              }
+
 
 ^{b}*\?\?                     { D(O("COCO");Y;);
                                 return COCO;
@@ -289,6 +318,21 @@ where             { D(O("WHERE");Y;);             return WHERE;             }
 ^{b}*\?\?{b}*e{b}*l{b}*s{b}*e{b}*i{b}*f { D(O("COCO_ELIF");Y;);
                                 return COCO_ELIF;
 			      }
+^{b}*\?\?{b}*i{b}*n{b}*c{b}*l{b}*u{b}*d{b}*e{b}*/\'[^\n]+\'{b}*\n          { D(O("INCLUDE_COCO");Y;);
+                              /* coco statements must start with '??' in column 1.
+			         However, for this code that is somewhat inconvenient,
+				 so we allow white space before '??' */
+                                extract_include();
+                                return INCLUDE_COCO;
+		              }
+^{b}*\?\?{b}*i{b}*n{b}*c{b}*l{b}*u{b}*d{b}*e{b}*/\"[^\n]+\"{b}*\n          { D(O("INCLUDE_COCO");Y;);
+                              /* coco statements must start with '??' in column 1.
+			         However, for this code that is somewhat inconvenient,
+				 so we allow white space before '??' */
+                                extract_include();
+                                return INCLUDE_COCO;
+		              }
+
 
 \n                       {  D(O("EOL"););   return EOL;        }
 .                        {  D(O("BLA");Y;); return yytext[0];  }
@@ -300,7 +344,8 @@ where             { D(O("WHERE");Y;);             return WHERE;             }
 		   D(O("encoded line");O(pline.get_line_encoded()););
 		    if (type == pline.is_string)
 		    {
-		       D(O("QSTRING"););
+		       lexer_string = pline.get_value(std::string(yytext));
+		       D(O("QSTRING");O(lexer_string);Y;);
 		       return QSTRING;
 		    }
 		    if (type == pline.is_stlabel)
@@ -330,10 +375,12 @@ where             { D(O("WHERE");Y;);             return WHERE;             }
                             return I_NUMBER;
                          }
 
+
 "("                      {  D(O("LPAREN");Y;);
                             start_stack.push(YY_START);
 			    lrlevel  = 1;
 			    lrreturn = 1;
+			    lexer_lr = "";
 			    BEGIN(state_lr);
 			 }
 
@@ -375,7 +422,9 @@ void lexer_enable(const int k)
 {
    switch(k)
    {
+      case CHAR:          BEGIN(state_char);         break;
       case IDENTIFIER:    BEGIN(state_identifier);   break;
+      case INCFILENAME:   BEGIN(state_incfilename);  break;
       case SKIPALL:       BEGIN(state_skipall);      break;
       case SKIP:          BEGIN(state_skip);         break;
       case SKIPNOOP:      BEGIN(state_skipnoop);     break;
@@ -407,6 +456,39 @@ std::string lexer_geti_number()
 std::string lexer_getrest()
 {
    return lexer_rest;
+}
+std::string lexer_getstring()
+{
+   D(O("lexer_string");O(lexer_string););
+   return lexer_string;
+}
+std::string lexer_getlr()
+{
+   D(O("lexer_lr");O(lexer_lr););
+   return lexer_lr;
+}
+std::string lexer_getinclude()
+{
+   D(O("lexer_getinclude");O(lexer_include););
+   return lexer_include;
+}
+
+void extract_include()
+{
+// removes first and last character of rest of input line
+// example: 
+// #include "file.inc"
+// after scanning of '#include ', the string "file.inc",
+// without quotes is put in lexer_include
+
+   size_t l = input_string.length()-yyleng-1;
+   lexer_include = input_string.substr(yyleng,l);
+   if (lexer_include.size() > 1)
+   {
+      lexer_include.erase(lexer_include.end()-1);
+      lexer_include.erase(lexer_include.begin());
+   }
+   D(O("lexer_include");O(lexer_include););
 }
 
 #if 0

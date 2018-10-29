@@ -3,6 +3,7 @@
 
 #include <deque>
 #include <iostream>
+#include <string>
 
 typedef std::deque<int>               dolabels_t;
 typedef std::deque<dolabels_t>        dolabels_store_t;
