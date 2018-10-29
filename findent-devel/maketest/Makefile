@@ -6,6 +6,11 @@ program: $(OBJS)
 	gfortran -o $@ $(OBJS)
 include deps
 dep deps:
-	bash -c "bash <( findent --makefdeps ) $(SRCS)" > deps
+	findent --makefdeps < /dev/null > makefdeps.sh
+	@if [ "`head -n 1 makefdeps.sh`" != "#!/bin/bash" ] ; then \
+	   findent -v 1>&2; \
+	   echo "Use findent version >= 3.0.0" 1>&2 ; exit 1 ; fi
+	chmod +x makefdeps.sh
+	./makefdeps.sh $(SRCS) > deps
 clean: 
 	rm -f *.o *.mod *.smod program deps
