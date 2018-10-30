@@ -3,4 +3,4 @@
       use mymod
       call sub1
       call sub
-   end
+   end program
