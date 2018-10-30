@@ -98,7 +98,7 @@ findent, why?
    After more or less finishing the indenting part, I realized that
    findent should be able to play a role in determining the dependencies
    based on (sub)modules and various kinds of include's. So I added some
-   lines and to accomplish this. Together with an simple script 
+   lines to accomplish this. Together with an simple script 
    dependencies are easily created. See 'man findent' under '--deps' for
    details. 
 
@@ -113,6 +113,9 @@ findent, why?
         does not seem to work properly.
    - fortdepend: see https://github.com/ZedThree/fort_depend.py
         Does not work with submodules and is picky about end statements.
+
+   I did not investigate if these tools can cope with split MODULE and
+   USE lines and fixed-format space-independent source code.
 
 
 findent, how?
