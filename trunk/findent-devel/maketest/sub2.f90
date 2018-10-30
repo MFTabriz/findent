@@ -2,5 +2,5 @@
    contains
       module procedure sub
    include 'sub.inc'
-      end procedure
-   end submodule
+      end procedure sub
+   end submodule mymod2
