@@ -11,7 +11,7 @@
 
 void Flags::set_defaults(void)
 {
-   include_left_default = 1;
+   include_left_default = 0;
    default_indent       = 3;
    all_indent           = default_indent;
 
