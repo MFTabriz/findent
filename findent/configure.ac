@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(findent, 3.0.0, wvermin@gmail.com)
+AC_INIT(findent, 3.0.1, wvermin@gmail.com)
 AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
 AC_CONFIG_SRCDIR([src/findent.cpp])
@@ -20,7 +20,8 @@ AS_IF( [test "x$MINGW32" = xnone],
 AS_IF( [test "x$with_windows" = xyes],
        [CXX=$MINGW32
         AC_MSG_NOTICE([mingw c++ compiler: $MINGW32])
-        AC_MSG_NOTICE([Will create WINDOWS executable findent.exe])])
+        AC_MSG_NOTICE([Will create WINDOWS executable findent.exe])
+	AC_SUBST([EXEEXT],[.exe])])
 
 AM_CONDITIONAL([MAKEMAN],[test "x$with_windows" != "xyes"])
 AM_CONDITIONAL([MAKEWIN],[test "x$with_windows" = "xyes"])

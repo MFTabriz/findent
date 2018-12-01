@@ -1351,8 +1351,8 @@ cat << eof > expect
 ! The include line p 447
    program p_include
       do i=1,10
-   include 'file.inc'
-   include "file2.inc"
+         include 'file.inc'
+         include "file2.inc"
          continue
       enddo
    end
@@ -1361,21 +1361,21 @@ eof
 ../doit "-ifree" "-ifree -Ia"
 rc=`expr $rc + $?`
 
-../doit "--include_left=1 --include-left=1" "-ifree -Ia"
+../doit "--include_left=0 --include-left=0" "-ifree -Ia"
 rc=`expr $rc + $?`
 
 cat << eof > expect
 ! The include line p 447
    program p_include
       do i=1,10
-         include 'file.inc'
-         include "file2.inc"
+   include 'file.inc'
+   include "file2.inc"
          continue
       enddo
    end
 eof
 
-../doit "--include_left=0 --include-left=0" "-ifree -Ia"
+../doit "--include_left=1 --include-left=1" "-ifree -Ia"
 rc=`expr $rc + $?`
 
 cat << eof > prog
@@ -1392,8 +1392,8 @@ cat << eof > expect
 ! The include line p 447
       program p_include
          do i=1,10
-      include 'file.inc'
-      include "file2.inc"
+            include 'file.inc'
+            include "file2.inc"
             continue
          enddo
       end
@@ -1402,21 +1402,21 @@ eof
 ../doit "-ifixed" "-ifixed -Ia"
 rc=`expr $rc + $?`
 
-../doit "--include_left=1 --include-left=1" "-ifixed -Ia"
+../doit "--include_left=0 --include-left=0" "-ifixed -Ia"
 rc=`expr $rc + $?`
 
 cat << eof > expect
 ! The include line p 447
       program p_include
          do i=1,10
-            include 'file.inc'
-            include "file2.inc"
+      include 'file.inc'
+      include "file2.inc"
             continue
          enddo
       end
 eof
 
-../doit "--include_left=0 --include-left=0" "-ifixed -Ia"
+../doit "--include_left=1 --include-left=1" "-ifixed -Ia"
 rc=`expr $rc + $?`
 
 cat << eof > prog
