@@ -1,4 +1,4 @@
-findent (3.0.0~pre2-1) unstable; urgency=low
+findent (3.0.1-1) unstable; urgency=low
 
   * New upstream release
   * Changed Standards-Version: 4.2.0

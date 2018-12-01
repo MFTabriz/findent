@@ -651,7 +651,6 @@ am__quote
 am__include
 DEPDIR
 OBJEXT
-EXEEXT
 ac_ct_CC
 CPPFLAGS
 LDFLAGS
@@ -669,6 +668,7 @@ MAKEWIN_FALSE
 MAKEWIN_TRUE
 MAKEMAN_FALSE
 MAKEMAN_TRUE
+EXEEXT
 MINGW32
 make_include
 MAINT
@@ -2923,6 +2923,8 @@ if test "x$with_windows" = xyes; then :
 $as_echo "$as_me: mingw c++ compiler: $MINGW32" >&6;}
         { $as_echo "$as_me:${as_lineno-$LINENO}: Will create WINDOWS executable findent.exe" >&5
 $as_echo "$as_me: Will create WINDOWS executable findent.exe" >&6;}
+	EXEEXT=.exe
+
 fi
 
  if test "x$with_windows" != "xyes"; then

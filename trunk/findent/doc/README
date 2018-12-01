@@ -95,6 +95,28 @@ findent, why?
    As programming language I chose C++, because of the availability
    of string and deque.
 
+   After more or less finishing the indenting part, I realized that
+   findent should be able to play a role in determining the dependencies
+   based on (sub)modules and various kinds of include's. So I added some
+   lines to accomplish this. Together with an simple script 
+   dependencies are easily created. See 'man findent' under '--deps' for
+   details. 
+
+   There are some tools that can generate dependencies for Fortran
+   projects:
+
+   - makedepf90: see https://github.com/outpaddling/makedepf90, also
+        in debian and ubuntu. It seems that there is no support for
+	submodules, but apart from that it seems to work well.
+   - f90_mod_deps.py: see 
+     http://lagrange.mechse.illinois.edu/f90_mod_deps/f90_mod_deps.py
+        does not seem to work properly.
+   - fortdepend: see https://github.com/ZedThree/fort_depend.py
+        Does not work with submodules and is picky about end statements.
+
+   I did not investigate if these tools can cope with split MODULE and
+   USE lines and fixed-format space-independent source code.
+
 
 findent, how?
 =============
