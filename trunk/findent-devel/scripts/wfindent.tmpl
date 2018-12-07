@@ -7,7 +7,7 @@
 # 
 # A check is made if the output file has the same number of lines
 # as the input file.
-# Only if this check succeeds, the file is overwritten, 
+# If this check succeeds, the file is overwritten, 
 # otherwize an error message is printed.
 #
 
@@ -21,34 +21,51 @@ if ! "$FINDENT" -v >/dev/null 2>&1 ; then
    fi
 fi
 echo "$0 using: "`"$FINDENT" -v`
-parms=$( getopt -o a:b:c:C:d:e:E:f:F:hHi:I:j:k:l:L:m:o:qr:R:s:t:vw:x: \
-   -l version                                     \
-   -l help                                        \
-   -l manpage                                     \
-   -l indent:                                     \
-   -l indent_associate:,indent-associate:         \
-   -l indent_block:,indent-block:                 \
-   -l indent_case:,indent-case:                   \
-   -l indent_contains:,indent-contains:           \
-   -l indent_do:,indent-do:                       \
-   -l indent_entry:,indent-entry:                 \
-   -l indent_enum:,indent-enum:                   \
-   -l indent_if:,indent-if:                       \
-   -l indent_forall:,indent-forall:               \
-   -l indent_interface:,indent-interface:         \
-   -l indent_continuation:,indent-continuation:   \
-   -l indent_procedure:,indent-procedure:         \
-   -l indent_select:,indent-select:               \
-   -l indent_type:,indent-type:                   \
-   -l indent_where:,indent-where:                 \
-   -l indent_critical:,indent-critical:           \
-   -l input_format:,input-format:                 \
-   -l start_indent:,start-indent:                 \
-   -l label_left:,label-left:                     \
-   -l input_line_length:,input-line-length:       \
-   -l indent_module:,indent-module                \
-   -l output_format:,output-format:               \
-   -l refactor_procedures::,refactor-procedures:: \
+# left-outs are: -q, -lastindent, -lastusable, --deps
+parms=$( getopt -o a:b:c:C:d:e:E:f:F:hHi:I:j:k:l:L:m:M:o:r:R:s:t:vw:x: \
+   -l help                                                \
+   -l manpage                                             \
+   -l readme                                              \
+   -l version                                             \
+   -l makefdeps                                           \
+   -l vim_help               -l vim-help                  \
+   -l vim_fortran            -l vim-fortran               \
+   -l vim_findent            -l vim-findent               \
+   -l gedit_help             -l gedit-help                \
+   -l gedit_external         -l gedit-external            \
+   -l gedit_plugin           -l gedit-plugin              \
+   -l gedit_plugin_py        -l gedit-plugin-py           \
+   -l emacs_help             -l emacs-help                \
+   -l emacs_findent          -l emacs-findent             \
+   -l continuation:                                       \
+   -l include_left:          -l include-left:             \
+   -l label_left:            -l label-left:               \
+   -l input_format:          -l input-format:             \
+   -l indent:                                             \
+   -l input_line_length:     -l input-line-length:        \
+   -l max_indent:            -l max-indent:               \
+   -l output_format:         -l output-format:            \
+   -l openmp:                                             \
+   -l refactor_procedures::  -l refactor-procedures::     \
+   -l start_indent:          -l start-indent:             \
+   -l indent_associate:      -l indent-associate:         \
+   -l indent_block:          -l indent-block:             \
+   -l indent_do:             -l indent-do:                \
+   -l indent_if:             -l indent-if:                \
+   -l indent_enum:           -l indent-enum:              \
+   -l indent_forall:         -l indent-forall:            \
+   -l indent_interface:      -l indent-interface:         \
+   -l indent_module:         -l indent-module:            \
+   -l indent_procedure:      -l indent-procedure:         \
+   -l indent_select:         -l indent-select:            \
+   -l indent_type:           -l indent-type:              \
+   -l indent_where:          -l indent-where:             \
+   -l indent_critical:       -l indent-critical:          \
+   -l indent_changeteam:     -l indent-changeteam:        \
+   -l indent_contains:       -l indent-contains:          \
+   -l indent_continuation:   -l indent-continuation:      \
+   -l indent_case:           -l indent-case:              \
+   -l indent_entry:          -l indent-entry:             \
    -- "$@" )
 
 if [ $? -ne 0 ] ; then
@@ -68,10 +85,26 @@ while [ "$1" ] ; do
 	 exit $?
 	 ;;
       "-h"|"-H"|"--help"|"--manpage") 
+	 echo "wfindent - Indents and optionally converts Fortran program sources"
+	 echo
+	 echo "wfindent [OPTION]... [FILE]..."
+	 echo "examples:"
+	 echo "$ wfindent -i4 -Rr *.f90"
+	 echo "$ wfindent -i3 prog.f90 sub.f"
+	 echo
+	 echo "see below for possible options"
+	 echo "Note: these options can only be used with findent (not wfindent):"
+         echo "   -q, --query_fix_free, -lastindent, --last_indent"
+	 echo "   -lastusable, --last_usable, --deps"
+	 echo
 	 "$FINDENT" "$1"
 	 exit $?
 	 ;;
-      --refactor*)
+      --readme|--makefdeps|--vim*|--gedit*|--emacs*)
+	 "$FINDENT" "$1"
+	 exit $?
+	 ;;
+      --refactor*)    # special: optional argument must be preceded with '='
 	 fparms="$fparms $1" 
 	 shift
 	 if [ "$1" ] ; then

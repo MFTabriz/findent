@@ -7,7 +7,8 @@ MAINTAINERCLEANFILES = config.h.in~
 EXTRA_DIST = bootstrap getversion LICENCE README.1st README.windows  \
 	     maketar makezip makedeb makesid README.2nd debian \
 	     makeupload pbuilderscript \
-	     debian.xenial debian.wheezy debian.sid
+	     debian.xenial debian.wheezy debian.sid \
+	     simplemake.sh
 
 maintainer-clean-local:
 	rm -rf bin share autom4te.cache

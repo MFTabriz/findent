@@ -19,7 +19,7 @@ findent: Indents/beautifies/converts Fortran sources.
    for these editors to use findent as a plugin.
  - gui frontent available in a separate package: jfindent
 
-Unix-Linux users: 
+Unix-Linux users with a 'decent' shell and make: 
     prerequisites: gnumake, g++
     make findent and wfindent:    
                download findent-x.y.tgz
@@ -46,6 +46,26 @@ Unix-Linux users:
 	   findent.exe will be available in src/
 	   wfindent.bat is available in scripts/
 
+Unix-Linux users for whom above recipe does not work:
+    prerequisites: a Bourne shell (sh, bash), C++ compiler
+    make findent:    
+               download findent-x.y.tgz
+             $ tar xf findent-x.y.z.tgz
+             $ cd findent-x.y
+	     edit simplemake.sh to fill in the correct values of
+	        the name of the C++ compiler, default: g++
+		the compile flags, default: -O2
+		the name of the program to create, default: findent
+	     $ sh simplemake.sh
+	     copy the generated program to the desired location
+	     ( e.g. $HOME/bin).
+    make wfindent:
+             in the directory 'scripts' you find a template
+	     for wfindent: wfindent.tmpl
+	     edit wfindent.tmpl: change findent-location into
+	     the path to findent.
+	     Copy wfindent.tmpl to the desired location, e.g.:
+	     $ cp wfindent.tmpl $HOME/bin/wfindent
 
 Windows users: download findent-x.y.zip
                $ unzip findent-x.y.zip

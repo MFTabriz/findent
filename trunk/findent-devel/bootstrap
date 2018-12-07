@@ -18,5 +18,6 @@ for f in debian/tests/test?.sh debian/tests/test??.sh ; do
    echo "     `basename $f`" >> debian/tests/control       || exit 1
 done
 make builtparser builtlexer                         || exit 1
+make -C src includes                                || exit 1
 make distclean                                      || exit 1
 echo "bootstrap done"
