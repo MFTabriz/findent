@@ -1,8 +1,8 @@
-findent (3.0.1~pre2-1) unstable; urgency=low
+findent (3.1.0~pre1-1) unstable; urgency=low
 
   * New upstream release
 
- -- Willem Vermin <wvermin@gmail.com>  Sat, 01 Dec 2018 13:18:56 +0100
+ -- Willem Vermin <wvermin@gmail.com>  Fri, 07 Dec 2018 17:12:40 +0100
 
 findent (2.8.2-1) unstable; urgency=low
 
