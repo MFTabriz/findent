@@ -62,8 +62,8 @@ Unix-Linux users for whom above recipe does not work:
     make wfindent:
              in the directory 'scripts' you find a template
 	     for wfindent: wfindent.tmpl
-	     edit wfindent.tmpl: change findent-location into
-	     the path to findent.
+	     edit wfindent.tmpl: change 'findent-location' into
+	     the path to findent e.g. /usr/local/bin/findent.
 	     Copy wfindent.tmpl to the desired location, e.g.:
 	     $ cp wfindent.tmpl $HOME/bin/wfindent
 
