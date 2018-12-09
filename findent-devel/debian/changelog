@@ -3,7 +3,7 @@ findent (3.1.0~pre1-1) unstable; urgency=low
   * New upstream release
   * Changed Standards-Version: 4.2.0
 
- -- Willem Vermin <wvermin@gmail.com>  Sat, 08 Dec 2018 12:53:50 +0100
+ -- Willem Vermin <wvermin@gmail.com>  Sun, 09 Dec 2018 06:50:19 +0100
 
 findent (2.8.2-1) unstable; urgency=low
 
