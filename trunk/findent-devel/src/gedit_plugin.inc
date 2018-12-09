@@ -1,0 +1,10 @@
+  std::cout << "[Plugin]" << std::endl;
+  std::cout << "Loader=python3" << std::endl;
+  std::cout << "Module=findent" << std::endl;
+  std::cout << "IAge=3" << std::endl;
+  std::cout << "Name=findent" << std::endl;
+  std::cout << "Description=Indent Fortran source" << std::endl;
+  std::cout << "Authors=Willem Vermin" << std::endl;
+  std::cout << "Copyright=Copyright @ 2017 Willem Vermin" << std::endl;
+  std::cout << "Website=http://www.gedit.org" << std::endl;
+  std::cout << "Version=0.1" << std::endl;
