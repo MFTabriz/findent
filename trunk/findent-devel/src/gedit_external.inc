@@ -27,7 +27,7 @@
   std::cout << "   exit" << std::endl;
   std::cout << "}" << std::endl;
   std::cout << "cat > $fin                    # copy input to $fin" << std::endl;
-  std::cout << "# gedit veresion 2 has some troubles keeping stdout and " << std::endl;
+  std::cout << "# gedit version 2 has some troubles keeping stdout and " << std::endl;
   std::cout << "#  stderr separate when stdout does not end with newline." << std::endl;
   std::cout << "# add newline if input file does not end with newline:" << std::endl;
   std::cout << "lastchar=\"$(tail -c1 $fin | od -a -An | tr -d ' ')\"" << std::endl;
