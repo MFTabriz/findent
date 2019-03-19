@@ -1,9 +1,10 @@
-findent (3.0.1-1) unstable; urgency=low
+findent (3.1.0~pre1-1) unstable; urgency=low
 
   * New upstream release
   * Changed Standards-Version: 4.2.0
+  * Removed Build Dependency gfortran
 
- -- Willem Vermin <wvermin@gmail.com>  Sat, 01 Dec 2018 13:22:24 +0100
+ -- Willem Vermin <wvermin@gmail.com>  Tue, 19 Mar 2019 14:52:09 +0100
 
 findent (2.8.2-1) unstable; urgency=low
 

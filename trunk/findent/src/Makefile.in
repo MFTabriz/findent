@@ -316,7 +316,7 @@ AM_LDFLAGS =
 @MAKEWIN_TRUE@AM_CXXFLAGS = -static
 MOSTLYCLEANFILES = 
 CLEANFILES = findent findent.exe findent.1 \
-	     parser.cpp.h parser.hpp parser_report.txt *.inc \
+	     parser.cpp.h parser.hpp parser_report.txt \
 	     parser.cpp parser.h lexer.cpp
 
 MAINTAINERCLEANFILES = builtparser.cpp builtparser.h builtlexer.cpp
@@ -327,6 +327,9 @@ GEDITDIR = $(top_srcdir)/gedit
 READMEDIR = $(top_srcdir)/doc
 TOCPP = $(top_srcdir)/src/tocpp.sh
 VIMDIR = $(top_srcdir)/vim
+INCS = vim_fortran.inc vim_findent.inc vim_help.inc gedit_external.inc gedit_plugin.inc \
+       gedit_plugin_py.inc gedit_help.inc emacs_findent.inc emacs_help.inc readme.inc makefdeps.inc
+
 findent_SOURCES = \
 		  debug.cpp              debug.h           \
 		  docs.cpp               docs.h            \
@@ -353,7 +356,7 @@ findent_SOURCES = \
 
 BUILT_SOURCES = parser.cpp parser.h lexer.cpp
 EXTRA_DIST = lexer.l parser.y tocpp.sh builtparser.cpp \
-	      builtparser.h builtlexer.cpp
+	      builtparser.h builtlexer.cpp $(INCS)
 
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -820,6 +823,8 @@ readme.inc: $(READMEDIR)/README $(TOCPP)
 
 makefdeps.inc: $(DEPSDIR)/makefdeps $(TOCPP)
 	$(TOCPP) < $(DEPSDIR)/makefdeps > $@
+
+includes: $(INCS)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
