@@ -55,7 +55,7 @@ endif
 MOSTLYCLEANFILES =
 
 CLEANFILES = findent findent.exe findent.1 \
-	     parser.cpp.h parser.hpp parser_report.txt *.inc \
+	     parser.cpp.h parser.hpp parser_report.txt \
 	     parser.cpp parser.h lexer.cpp
 
 
@@ -127,6 +127,10 @@ readme.inc: $(READMEDIR)/README $(TOCPP)
 makefdeps.inc: $(DEPSDIR)/makefdeps $(TOCPP)
 	$(TOCPP) < $(DEPSDIR)/makefdeps > $@
 
+INCS = vim_fortran.inc vim_findent.inc vim_help.inc gedit_external.inc gedit_plugin.inc \
+       gedit_plugin_py.inc gedit_help.inc emacs_findent.inc emacs_help.inc readme.inc makefdeps.inc
+
+includes: $(INCS)
 
 bin_PROGRAMS    = findent
 
@@ -158,4 +162,4 @@ findent_SOURCES = \
 BUILT_SOURCES = parser.cpp parser.h lexer.cpp
 
 EXTRA_DIST  = lexer.l parser.y tocpp.sh builtparser.cpp \
-	      builtparser.h builtlexer.cpp
+	      builtparser.h builtlexer.cpp $(INCS)
