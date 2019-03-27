@@ -57,6 +57,9 @@ void Flags::set_default_indents()
    interface_indent    = all_indent;              // -j
    module_indent       = all_indent;              // -m
    routine_indent      = all_indent;              // -r
+#ifdef USEESOPE
+   segment_indent      = all_indent;
+#endif
    select_indent       = all_indent;              // -s
    type_indent         = all_indent;              // -w
    where_indent        = all_indent;              // -w
@@ -182,6 +185,10 @@ int Flags::get_flags(int argc, char *argv[])
       {"refactor_procedures", optional_argument, 0, DO_REFACTOR_PROCEDURE},
       {"refactor-procedures", optional_argument, 0, DO_REFACTOR_PROCEDURE},
 
+#ifdef USEESOPE
+      {"indent_segment"     , required_argument, 0, DO_SEGMENT           },
+      {"indent-segment"     , required_argument, 0, DO_SEGMENT           },
+#endif
       {"indent_select"      , required_argument, 0, 's'                  },
       {"indent-select"      , required_argument, 0, 's'                  },
 
@@ -488,6 +495,12 @@ int Flags::get_flags(int argc, char *argv[])
 		  upcase_routine_type = 1;
 	    }
 	    break;
+#ifdef USEESOPE
+	 case DO_SEGMENT:
+	    optargcheck;
+	    segment_indent      = atoi(optarg);       // --indent_segment=nn
+	    break;
+#endif
 	 case DO_OMP:
 	    optargcheck;
 	    if (atoi(optarg) == 0)

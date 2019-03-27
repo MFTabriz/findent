@@ -36,6 +36,7 @@ struct propstruct properties;
 %token COCO_IF COCO_ENDIF COCO_ELSE COCO_ELIF COCO
 %token INCLUDE INCLUDE_CPP INCLUDE_CPP_STD INCLUDE_COCO INCFILENAME
 %token USE
+%token SEGMENT ENDSEGMENT
 
 %token IDENTIFIER SKIP SKIPALL SKIPNOOP KEYWORD
 
@@ -121,6 +122,8 @@ line:
     |                typeis                   { properties.kind = TYPEIS;            }
     |                use                      { properties.kind = USE;               }
     |                where_construct          { properties.kind = WHERE;             }
+    |                segment                  { properties.kind = SEGMENT;           }
+    |                endsegment               { properties.kind = ENDSEGMENT;        }
     ;
 blank:               BLANK ;
 
@@ -209,6 +212,7 @@ endsubmodule:        ENDSUBMODULE  construct_name EOL ;
 endsubroutine:       ENDSUBROUTINE construct_name EOL ;
 endteam:             ENDTEAM       lr_construct_name EOL ;
 endtype:             ENDTYPE       construct_name EOL ;
+endsegment:          ENDSEGMENT    EOL ;
 endwhere:            ENDWHERE      construct_name EOL ;
 simple_end:          END                          EOL ;
 gidentifier:         IDENTIFIER
@@ -264,6 +268,11 @@ type:                type1 ','  skipall
     |                type1 IDENTIFIER  skipall 
     ;
 type1:               TYPE enable_identifier ;
+
+segment:             segment1 IDENTIFIER skipall
+       |             segment1 ',' skipall
+       ;
+segment1:            SEGMENT enable_identifier ;
 
 lvalue:              gidentifier
       |              gidentifier LR

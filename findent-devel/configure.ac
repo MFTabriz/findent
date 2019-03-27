@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(findent, 3.1.0~pre1, wvermin@gmail.com)
+AC_INIT(findent, 3.1.1~pre1, wvermin@gmail.com)
 AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
 AC_CONFIG_SRCDIR([src/findent.cpp])
@@ -25,6 +25,9 @@ AS_IF( [test "x$with_windows" = xyes],
 
 AM_CONDITIONAL([MAKEMAN],[test "x$with_windows" != "xyes"])
 AM_CONDITIONAL([MAKEWIN],[test "x$with_windows" = "xyes"])
+
+AC_ARG_WITH(esope, [AS_HELP_STRING([--with-esope],[Build with esope support @<:@default=no@:>@])],[],[with_esope=no])
+AM_CONDITIONAL([USEESOPE],[test "x$with_esope" = "xyes"])
 
 # test if bison available etc...
 
@@ -67,6 +70,7 @@ AS_IF( [test "x$with_flex" = "xuse-flex-if-available"],
 	[useflex="no"])])
 
 AM_CONDITIONAL([USEFLEX],[test "x$useflex" = "xyes"])
+
 
 # test for working gfortran (only used in make check):
 
