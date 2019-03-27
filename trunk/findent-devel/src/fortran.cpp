@@ -607,6 +607,16 @@ void Fortran::indent_and_output()
 	       else
 		  Cur_indent = top_indent();
 	       break;
+#ifdef USEESOPE
+	    case SEGMENT:
+	       Cur_indent = top_indent();
+	       push_indent(Cur_indent + FLAGS.segment_indent);
+	       break;
+	    case ENDSEGMENT:
+	       if (!fi->indent_handled)
+		  Cur_indent = pop_indent();
+	       break;
+#endif
 	    default:
 	       Cur_indent = top_indent();
 	 } // end determine indent and refactor

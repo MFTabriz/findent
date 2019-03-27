@@ -6,6 +6,10 @@ else
 AM_CXXFLAGS = -fPIC
 endif
 
+if USEESOPE
+AM_CXXFLAGS += -DUSEESOPE
+endif
+
 if USEBISON
 parser.cpp: parser.y
 	$(YACC) -o parser.cpp -d $<

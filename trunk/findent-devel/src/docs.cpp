@@ -185,6 +185,9 @@ void Docs::usage(bool man)
    manout("-m<n>, --indent_module=<n>"      ,"MODULE       indent");
    manout("-r<n>, --indent_procedure=<n>"   ,"FUNCTION,");
    manout(" ",  " SUBROUTINE and PROGRAM indent");
+#ifdef USEESOPE
+   manout("--indent_segment=<n>"            ,"SEGMENT      indent");
+#endif
    manout("-s<n>, --indent_select=<n>"      ,"SELECT       indent");
    manout("-t<n>, --indent_type=<n>"        ,"TYPE         indent");
    manout("-w<n>, --indent_where=<n>"       ,"WHERE        indent");

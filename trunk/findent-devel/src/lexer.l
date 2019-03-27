@@ -221,6 +221,11 @@ use               { D(O("USE");Y);                return USE;               }
 where             { D(O("WHERE");Y;);             return WHERE;             }
 }
 
+<state_keyword>{
+segment           { D(O("SEGMENT");Y;);           return SEGMENT;           }
+endsegment        { D(O("ENDSEGMENT");Y;);        return ENDSEGMENT;        }
+}
+
 <state_findformat>{
 ^\?\?.*\n                     { D(O("UNSURE");Y;);   return UNSURE;   }
 ^[^dDcC#!* 0-9].*\n           { D(O("FREE");Y;);     return FREE;     }
