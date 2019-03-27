@@ -20,7 +20,7 @@ Line_prep       pline;
 
 %}
 
-%s state_identifier state_keyword
+%s state_identifier state_keyword state_esope
 
 %x state_lr state_lrb state_skip state_skipall state_skipnoop state_error
 %x state_findformat state_scanfixpre state_scanompfixed state_scanompfree
@@ -141,7 +141,7 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 .                             {  D(O("BLA");Y;); return yytext[0];  }
 }
 
-<state_keyword>{
+<state_esope,state_keyword>{
 abstractinterface { D(O("ABSTRACTINTERFACE");Y;); return ABSTRACTINTERFACE; }
 associate         { D(O("ASSOCIATE");Y;);         return ASSOCIATE;         }
 assign            { D(O("ASSIGN");Y;);            return ASSIGN;            }
@@ -221,7 +221,7 @@ use               { D(O("USE");Y);                return USE;               }
 where             { D(O("WHERE");Y;);             return WHERE;             }
 }
 
-<state_keyword>{
+<state_esope>{
 segment           { D(O("SEGMENT");Y;);           return SEGMENT;           }
 endsegment        { D(O("ENDSEGMENT");Y;);        return ENDSEGMENT;        }
 }
@@ -434,6 +434,7 @@ void lexer_enable(const int k)
       case SKIP:          BEGIN(state_skip);         break;
       case SKIPNOOP:      BEGIN(state_skipnoop);     break;
       case KEYWORD:       BEGIN(state_keyword);      break;
+      case ESOPE:         BEGIN(state_esope);        break;
       case FINDFORMAT:    BEGIN(state_findformat);   break;
       case SCANFIXPRE:    BEGIN(state_scanfixpre);   break;
       case SCANOMPFIXED:  BEGIN(state_scanompfixed); break;

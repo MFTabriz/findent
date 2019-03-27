@@ -36,7 +36,7 @@ struct propstruct properties;
 %token COCO_IF COCO_ENDIF COCO_ELSE COCO_ELIF COCO
 %token INCLUDE INCLUDE_CPP INCLUDE_CPP_STD INCLUDE_COCO INCFILENAME
 %token USE
-%token SEGMENT ENDSEGMENT
+%token SEGMENT ENDSEGMENT ESOPE
 
 %token IDENTIFIER SKIP SKIPALL SKIPNOOP KEYWORD
 
@@ -329,7 +329,11 @@ propstruct parseline(Line_prep p)
    yyparse();
    if (properties.kind != UNCLASSIFIED)
       return properties;
-   lexer_set(p,KEYWORD);
+#ifdef USEESOPE
+   lexer_set(p,ESOPE);    // enables KEYWORD+ESOPE
+#else
+   lexer_set(p,KEYWORD);  // enables KEYWORD
+#endif
    yyparse();
    return properties;
 }
