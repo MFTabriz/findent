@@ -223,6 +223,7 @@ where             { D(O("WHERE");Y;);             return WHERE;             }
 
 <state_esope>{
 segment           { D(O("SEGMENT");Y;);           return SEGMENT;           }
+segment,          { D(O("SEGMENT,");Y;);          return SEGMENT;           }
 endsegment        { D(O("ENDSEGMENT");Y;);        return ENDSEGMENT;        }
 }
 

@@ -269,10 +269,8 @@ type:                type1 ','  skipall
     ;
 type1:               TYPE enable_identifier ;
 
-segment:             segment1 IDENTIFIER skipall
-       |             segment1 ',' skipall
+segment:             SEGMENT enable_identifier IDENTIFIER skipall
        ;
-segment1:            SEGMENT enable_identifier ;
 
 lvalue:              gidentifier
       |              gidentifier LR
@@ -330,7 +328,7 @@ propstruct parseline(Line_prep p)
    if (properties.kind != UNCLASSIFIED)
       return properties;
 #ifdef USEESOPE
-   lexer_set(p,ESOPE);    // enables KEYWORD+ESOPE
+   lexer_set(p,ESOPE);    // enables KEYWORD+ESOPE (SEGMENT, ENDSEGMENT)
 #else
    lexer_set(p,KEYWORD);  // enables KEYWORD
 #endif
