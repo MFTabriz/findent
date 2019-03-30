@@ -1,0 +1,80 @@
+https://docs.oracle.com/cd/E19957-01/805-4939/6j4m0vn79/index.html
+arithmetic if:
+   if(expr) 10,20,30
+   if(expr) 10,20       ! non standard
+
+goto:
+   goto 10
+
+computed goto:
+   goto (10,20,30,40) expr
+   goto (10,20,30,40),expr
+
+assign:
+   assign 10 to n
+
+assigned goto:
+   goto n (10,20,30,40)
+   goto n,(10,20,30,40)
+
+do:
+   do 10
+   do 10 i=...
+   do 10, i=...
+
+do while:
+   do 10 while(...)
+   do 10,while(...)
+
+print:
+   print 10,...
+
+read:
+   read(unit,10,...)[,] ...
+   read...,fmt=10,...)[,] ...
+   read(...,err=10,...)[,] ...
+   read(...,end=10,...)[,] ...
+   read(...,eor=10,...)[,] ...
+   read 10 
+   read 10,...
+
+write:
+   write(unit,10,...) [,] ...
+   write...,fmt=10,...) [,] ...
+   write(...,err=10,...)[,] ...
+
+backspace:
+   backspace(...,err = 10,...)
+
+close:
+close(...,err = 10)
+
+encode:
+   encode(length,10,...,err= 20,...) ...  ! non standard
+
+decode:
+   decode(length,10,...,err= 20,...)  ! non standard
+
+end file:
+   endfile(...,err = 10,...)
+
+inquire:
+   inquire(...,err = 10,...)
+
+rewind:
+   rewind(...,err=10,...)
+
+flush:
+   flush(...,err=10,...)
+
+wait:
+   wait(...,end=10,...)
+   wait(...,eor=10,...)
+   wait(...,err=10,...)
+
+open:
+   open(...,err=10,...)
+
+call:
+   call subr(...,*10,...)
+   call subr(...,&10,...) ! non standard
