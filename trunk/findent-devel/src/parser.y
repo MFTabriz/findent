@@ -269,7 +269,7 @@ type:                type1 ','  skipall
     ;
 type1:               TYPE enable_identifier ;
 
-segment:             SEGMENT enable_identifier IDENTIFIER skipall
+segment:             SEGMENT enable_identifier IDENTIFIER EOL
        ;
 
 lvalue:              gidentifier

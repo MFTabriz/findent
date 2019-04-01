@@ -425,3 +425,12 @@ print *,i,j,k
 continue
 !$ enddo
 end
+
+subroutine label_excercise
+   do 010&
+   &0 i=1,10
+      continue
+01&
+&00 continue
+continue
+end

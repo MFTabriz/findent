@@ -305,3 +305,12 @@ c$omp do
        enddo
 c$omp end parallel
               end
+      subroutine label_excercise
+      do 10
+     x 0 i=1,10
+      continue
+01 00  continue
+      do 02 0 i=1,10
+         continue
+   20   continue
+      end
