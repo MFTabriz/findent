@@ -130,8 +130,6 @@ Line_prep::Line_prep(const std::string s)
 	       v  += c;
 	       break;
 	    }
-#ifdef REQUIRE_BLANK_AFTER_LABEL
-	    // I used to think that this would be sane, but now I am thinking different
 	    if (isblank(c))
 	    {
 	       //
@@ -166,16 +164,6 @@ Line_prep::Line_prep(const std::string s)
 	    getnextc = 0;
 	    state    = in_code;
 	    break;
-#else
-	    // we do not require a blank after a label
-	    if(isblank(c))
-	       break;
-	    HANDLE_END_STLABEL;
-	    sl += ' ';
-	    state = in_code;
-	    break;
-
-#endif
 	 case in_code:
 	    D(O("in_code:");O(c););
 	    if(isblank(c))

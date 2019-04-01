@@ -433,4 +433,7 @@ defined(q)
 01&
        &00 continue
        continue
+120    do i=1,10
+          continue
+       enddo
   end subroutine label_excercise
