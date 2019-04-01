@@ -30,10 +30,7 @@ void Free::build_statement(Fortranline &line, bool &f_more, bool &pushback)
       std::string sl = line.trimmed_line();
 
       if(line.firstchar() == '&')
-      {
 	 sl.erase(0,1);
-	 sl = ltrim(sl);
-      }
 
       full_statement = full_statement + sl;
 
@@ -176,22 +173,48 @@ void Free::output(lines_t &lines, lines_t *fixedlines)
 	    //
 	    // put label at start of line
 	    //
-	    std::string firstline = lines.front().trim();
-	    std::string label     = firstline.substr(0,fi->labellength);
-	    firstline             = trim(firstline.substr(fi->labellength));
 
-	    int l = M(std::max(fi->cur_indent - fi->labellength,1));  // put at least one space after label
-	    if(to_mycout)
+	    std::string firstline = lines.front().trim();
+
+	    // it is possible, that the statement label is split across more lines.
+	    // as in:  123&
+	    //      :   &4   continue
+	    // or the label is directly followed by an &:
+	    // as in:  123&
+	    //      :    &  continue
+	    // In that case the actual value of labellength is not usable here, we
+	    // will handle it separately.
+	    //
+	    if (fi->labellength > (int)firstline.size() && lastchar(firstline) == '&')
 	    {
-	       if (lines.front().omp())
-		  l = M(std::max((int)(l-ompstr.length()),1));
-	       mycout << ompstr << label << blanks(l) << firstline << endline;
+	       if(to_mycout)
+		  mycout << firstline << endline;
+	       else
+	       {
+		  os << rm_last_amp(firstline) << blanks(6); // this is likely to create havoc
+		  fixedlines->push_back(F(os.str()));
+		  os.str("");
+	       }
 	    }
 	    else
 	    {
-	       os << insert_omp(label,cmpstr) << blanks(6) << rm_last_amp(firstline);
-	       fixedlines->push_back(F(os.str()));
-	       os.str("");
+
+	       std::string label     = firstline.substr(0,fi->labellength);
+	       firstline             = trim(firstline.substr(fi->labellength));
+
+	       int l = M(std::max(fi->cur_indent - fi->labellength,1));  // put at least one space after label
+	       if(to_mycout)
+	       {
+		  if (lines.front().omp())
+		     l = M(std::max((int)(l-ompstr.length()),1));
+		  mycout << ompstr << label << blanks(l) << firstline << endline;
+	       }
+	       else
+	       {
+		  os << insert_omp(label,cmpstr) << blanks(6) << rm_last_amp(firstline);
+		  fixedlines->push_back(F(os.str()));
+		  os.str("");
+	       }
 	    }
 
 	    lines.pop_front();
