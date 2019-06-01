@@ -2,6 +2,8 @@ findent-3.1.1:
 	added support for ESOPE (SEGMENT, ENDSEGMENT) as configuration
 	parameter
 	free-format: statement label can now contain an &
+	bug fix: fortran.cp: preprocessor line with continuations where not
+	         handled properly
 findent-3.1.0:
 	added simplemake.sh: compiles findent without 
 	  configure; make

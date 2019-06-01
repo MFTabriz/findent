@@ -174,6 +174,24 @@ contains
        end function f1
  end module
 
+ subroutine ticket7
+    integer :: int
+   real :: float
+   logical :: bool
+
+#define COND                      \
+  if (float > 1.) then;           \
+    if (bool) write(*, *) 'nope'; \
+end if
+
+   COND
+   if (.true.) then
+      int = int + 1
+   end if
+
+ end subroutine 
+
+
 program progfree
    type mytype  ! mytype
       integer i

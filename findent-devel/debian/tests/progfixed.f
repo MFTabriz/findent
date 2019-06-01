@@ -31,6 +31,21 @@
                 continue
            end function f1
        end 
+
+       subroutine ticket7
+                integer :: int
+       real :: float
+       logical :: bool
+#define COND \
+               if (float > 1.) then; \
+                  continue ; \
+                end if
+      COND
+      if (.true.) then
+      int = int + 1
+        end if
+
+       end
       
       program progfixed
          type mytype  ! mytype

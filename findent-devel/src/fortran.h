@@ -163,7 +163,7 @@ class Fortran
 
       }        // end of pop_all
 
-      void  handle_pre(Fortranline &line, const bool f_more, bool &p_more);
+      void  handle_pre(Fortranline &line, bool &p_more);
       bool  is_findentfix(Fortranline &line);
       bool  output_pre(lines_t &lines, lines_t *outlines);
       void  output_line();
@@ -176,7 +176,6 @@ class Fortran
       bool first_call;
       bool f_more;
       bool p_more;
-      int  pretype;
       int  pregentype;
       bool pushback;
       int  state;
