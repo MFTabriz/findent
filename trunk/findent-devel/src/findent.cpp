@@ -5,6 +5,7 @@
 #include "fortran.h"
 #include "free.h"
 #include "findent.h"
+#include "findentclass.h"
 
 int main(int argc, char*argv[])
 {
