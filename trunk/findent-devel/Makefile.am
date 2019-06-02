@@ -15,7 +15,7 @@ maintainer-clean-local:
 
 if MAKEWIN
 all-local:
-	test -f src/findent && mv src/findent src/findent.exe
+	test -f src/findent && mv src/findent src/findent.exe ; exit 0
 endif
 
 builtparser builtlexer:
