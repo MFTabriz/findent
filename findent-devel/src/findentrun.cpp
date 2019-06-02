@@ -41,7 +41,7 @@ int Findent::run()
    switch (input_format)
    {
       case FREE: source = new Free(this); break;
-      case FIXED: source = new Fixed(this); break;
+      default:   source = new Fixed(this); break;
    }
 
    init_indent();
