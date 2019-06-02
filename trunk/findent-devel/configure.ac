@@ -74,8 +74,9 @@ AM_CONDITIONAL([USEFLEX],[test "x$useflex" = "xyes"])
 
 # test for working gfortran (only used in make check):
 
-FC=gfortran
-AC_FC_FREEFORM(,[FC=""])
+#FC=gfortran
+#AC_FC_FREEFORM(,[FC=""])
+AC_PROG_FC([gfortran])
 AS_IF( [test "x$FC" = "xgfortran"],
       [AC_MSG_NOTICE([gfortran will be used to compile test sources in 'make check'])],
       [AC_MSG_NOTICE([No gfortran compiler found. 'make check' will not try to compile test sources])])
@@ -104,6 +105,8 @@ AC_CONFIG_FILES([test/progfree1.f.try.f.ref])
 AC_CONFIG_FILES([test/progfree1.f])
 AC_CONFIG_FILES([test/progfreefixed.f.try.f.ref])
 AC_CONFIG_FILES([test/progfreefixed.f])
+AC_CONFIG_FILES([test/esope.f.try.f.ref])
+AC_CONFIG_FILES([test/esope.f])
 
 AC_CONFIG_FILES([test/emacs_findent.ref])
 AC_CONFIG_FILES([test/emacs_help.ref])
