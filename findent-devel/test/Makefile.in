@@ -101,11 +101,11 @@ CONFIG_CLEAN_FILES = prelude postlude test-compile.sh doit \
 	progfixedfree.f.try.f.ref progfixedfree.f \
 	progfree-dos.f.try.f.ref progfree-dos.f progfree.f.try.f.ref \
 	progfree.f progfree1.f.try.f.ref progfree1.f \
-	progfreefixed.f.try.f.ref progfreefixed.f emacs_findent.ref \
-	emacs_help.ref gedit_external.ref gedit_help.ref \
-	gedit_plugin.ref gedit_plugin_py.ref help.ref makefdeps.ref \
-	manpage.ref readme.ref vim_findent.ref vim_fortran.ref \
-	vim_help.ref
+	progfreefixed.f.try.f.ref progfreefixed.f esope.f.try.f.ref \
+	esope.f emacs_findent.ref emacs_help.ref gedit_external.ref \
+	gedit_help.ref gedit_plugin.ref gedit_plugin_py.ref help.ref \
+	makefdeps.ref manpage.ref readme.ref vim_findent.ref \
+	vim_fortran.ref vim_help.ref
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -333,6 +333,7 @@ TEST_LOG_COMPILE = $(TEST_LOG_COMPILER) $(AM_TEST_LOG_FLAGS) \
 	$(TEST_LOG_FLAGS)
 am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/doit.in \
 	$(srcdir)/emacs_findent.ref.in $(srcdir)/emacs_help.ref.in \
+	$(srcdir)/esope.f.in $(srcdir)/esope.f.try.f.ref.in \
 	$(srcdir)/gedit_external.ref.in $(srcdir)/gedit_help.ref.in \
 	$(srcdir)/gedit_plugin.ref.in $(srcdir)/gedit_plugin_py.ref.in \
 	$(srcdir)/help.ref.in $(srcdir)/makefdeps.ref.in \
@@ -464,7 +465,7 @@ TESTS = \
 	 test1.sh  test2.sh  test3.sh  test4.sh  test5.sh  test6.sh  \
          test7.sh  test8.sh  test9.sh  test10.sh test11.sh test12.sh \
 	 test13.sh test14.sh test15.sh test16.sh test17.sh test18.sh \
-	 test19.sh test20.sh \
+	 test19.sh test20.sh test21.sh \
 	 end.sh
 
 EXTRA_DIST = $(TESTS)
@@ -544,6 +545,10 @@ progfree1.f: $(top_builddir)/config.status $(srcdir)/progfree1.f.in
 progfreefixed.f.try.f.ref: $(top_builddir)/config.status $(srcdir)/progfreefixed.f.try.f.ref.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 progfreefixed.f: $(top_builddir)/config.status $(srcdir)/progfreefixed.f.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+esope.f.try.f.ref: $(top_builddir)/config.status $(srcdir)/esope.f.try.f.ref.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+esope.f: $(top_builddir)/config.status $(srcdir)/esope.f.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 emacs_findent.ref: $(top_builddir)/config.status $(srcdir)/emacs_findent.ref.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
@@ -866,6 +871,13 @@ test20.sh.log: test20.sh
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+test21.sh.log: test21.sh
+	@p='test21.sh'; \
+	b='test21.sh'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 end.sh.log: end.sh
 	@p='end.sh'; \
 	b='end.sh'; \
@@ -1043,10 +1055,14 @@ uninstall-am:
 
 
 export SRCDIR = $(top_srcdir)
-export FC
+export FC 
 
 @MAKEWIN_TRUE@   export WINDOWS = yes
 @MAKEWIN_FALSE@   export WINDOWS = no
+
+@USEESOPE_TRUE@   export ESOPE = yes
+@USEESOPE_FALSE@   export ESOPE = no
+
 clean-local:
 	rm -rf *.tmpdir
 
