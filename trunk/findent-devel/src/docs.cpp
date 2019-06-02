@@ -291,6 +291,16 @@ void Docs::usage(bool man)
    manout(" ","");
    manout(" ","The problems arise because it is not possible to define a");
    manout(" ","statement label in a continuation in fixed format.");
+   manout(" ","");
+   manout("*","When converting from fixed format to free format, findent");
+   manout(" ","discards white space in a string if the string contains a");
+   manout(" ","continuation, e.g:");
+   manout(" ","      print *,\"a");
+   manout(" ","     +b\"");
+   manout(" ","");
+   manout(" ","is converted to:");
+   manout(" ","   print *,\"a&");
+   manout(" ","   &b\"");
 
    if(doman)
    {
