@@ -8,7 +8,7 @@ tar=$PWD/../versions/findent-$version.tar.gz
 dir=findent-$version
 dsc=findent_$version-1.dsc
 debdir=$PWD/../debian/findent-$version-deb
-for d in debian debian.xenial debian.wheezy debian.sid ; do
+for d in debian debian.xenial debian.wheezy debian.sid debian.stretch ; do
    if [ -e $d/changelog ] ; then
       sed -i "1s/(.*)/($version-1)/" $d/changelog   || exit 1
    fi
@@ -20,9 +20,14 @@ cd $debdir || exit 1
 cp $tar . || exit 1
 tar xf $tar || exit
 cd $dir || exit
-echo compat before xenial: `cat debian/compat` `grep Standards-Version debian/control`
-cp debian.xenial/* debian || exit
-echo compat after xenial: `cat debian/compat` `grep Standards-Version debian/control`
+code="xenial"
+codename=`lsb_release -sc`
+if [ "codename" = stretch ] ; then
+   code="stretch"
+fi
+echo compat before $code: `cat debian/compat` `grep Standards-Version debian/control`
+cp debian.code/* debian || exit
+echo compat after $code: `cat debian/compat` `grep Standards-Version debian/control`
 #dh_make --yes -s -f $tar
 dh_make --yes -s --createorig
 cd ..
