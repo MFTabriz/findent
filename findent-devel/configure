@@ -4847,6 +4847,8 @@ ac_config_files="$ac_config_files test/test-compile.sh"
 
 ac_config_files="$ac_config_files test/doit"
 
+ac_config_files="$ac_config_files test/init.sh"
+
 
 ac_config_files="$ac_config_files test/progfixed-dos.f.try.f.ref"
 
@@ -6460,6 +6462,7 @@ do
     "test/postlude") CONFIG_FILES="$CONFIG_FILES test/postlude" ;;
     "test/test-compile.sh") CONFIG_FILES="$CONFIG_FILES test/test-compile.sh" ;;
     "test/doit") CONFIG_FILES="$CONFIG_FILES test/doit" ;;
+    "test/init.sh") CONFIG_FILES="$CONFIG_FILES test/init.sh" ;;
     "test/progfixed-dos.f.try.f.ref") CONFIG_FILES="$CONFIG_FILES test/progfixed-dos.f.try.f.ref" ;;
     "test/progfixed-dos.f") CONFIG_FILES="$CONFIG_FILES test/progfixed-dos.f" ;;
     "test/progfixed.f.try.f.ref") CONFIG_FILES="$CONFIG_FILES test/progfixed.f.try.f.ref" ;;
@@ -7193,6 +7196,7 @@ See \`config.log' for more details" "$LINENO" 5; }
  ;;
     "test/test-compile.sh":F) chmod +x test/test-compile.sh ;;
     "test/doit":F) chmod +x test/doit ;;
+    "test/init.sh":F) chmod +x test/init.sh ;;
 
   esac
 done # for ac_tag

@@ -4,7 +4,7 @@ TESTS = \
 	 test13.sh test14.sh test15.sh test16.sh test17.sh test18.sh \
 	 test19.sh test20.sh test21.sh 
 
-AM_TESTS_ENVIRONMENT = $(srcdir)/init.sh ;
+AM_TESTS_ENVIRONMENT = ./init.sh ;
 
 EXTRA_DIST = $(TESTS)
 

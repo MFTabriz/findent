@@ -84,6 +84,7 @@ AC_CONFIG_FILES([test/prelude])
 AC_CONFIG_FILES([test/postlude])
 AC_CONFIG_FILES([test/test-compile.sh],[chmod +x test/test-compile.sh])
 AC_CONFIG_FILES([test/doit],[chmod +x test/doit])
+AC_CONFIG_FILES([test/init.sh],[chmod +x test/init.sh])
 
 AC_CONFIG_FILES([test/progfixed-dos.f.try.f.ref])
 AC_CONFIG_FILES([test/progfixed-dos.f])

@@ -94,7 +94,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 DIST_COMMON = $(srcdir)/Makefile.am $(am__DIST_COMMON)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
-CONFIG_CLEAN_FILES = prelude postlude test-compile.sh doit \
+CONFIG_CLEAN_FILES = prelude postlude test-compile.sh doit init.sh \
 	progfixed-dos.f.try.f.ref progfixed-dos.f \
 	progfixed.f.try.f.ref progfixed.f progfixed1.f.try.f.ref \
 	progfixed1.f progfixedfree-dos.f.try.f.ref progfixedfree-dos.f \
@@ -336,9 +336,10 @@ am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/doit.in \
 	$(srcdir)/esope.f.in $(srcdir)/esope.f.try.f.ref.in \
 	$(srcdir)/gedit_external.ref.in $(srcdir)/gedit_help.ref.in \
 	$(srcdir)/gedit_plugin.ref.in $(srcdir)/gedit_plugin_py.ref.in \
-	$(srcdir)/help.ref.in $(srcdir)/makefdeps.ref.in \
-	$(srcdir)/manpage.ref.in $(srcdir)/postlude.in \
-	$(srcdir)/prelude.in $(srcdir)/progfixed-dos.f.in \
+	$(srcdir)/help.ref.in $(srcdir)/init.sh.in \
+	$(srcdir)/makefdeps.ref.in $(srcdir)/manpage.ref.in \
+	$(srcdir)/postlude.in $(srcdir)/prelude.in \
+	$(srcdir)/progfixed-dos.f.in \
 	$(srcdir)/progfixed-dos.f.try.f.ref.in \
 	$(srcdir)/progfixed.f.in $(srcdir)/progfixed.f.try.f.ref.in \
 	$(srcdir)/progfixed1.f.in $(srcdir)/progfixed1.f.try.f.ref.in \
@@ -466,7 +467,7 @@ TESTS = \
 	 test13.sh test14.sh test15.sh test16.sh test17.sh test18.sh \
 	 test19.sh test20.sh test21.sh 
 
-AM_TESTS_ENVIRONMENT = $(srcdir)/init.sh ;
+AM_TESTS_ENVIRONMENT = ./init.sh ;
 EXTRA_DIST = $(TESTS)
 all: all-am
 
@@ -508,6 +509,8 @@ postlude: $(top_builddir)/config.status $(srcdir)/postlude.in
 test-compile.sh: $(top_builddir)/config.status $(srcdir)/test-compile.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 doit: $(top_builddir)/config.status $(srcdir)/doit.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+init.sh: $(top_builddir)/config.status $(srcdir)/init.sh.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 progfixed-dos.f.try.f.ref: $(top_builddir)/config.status $(srcdir)/progfixed-dos.f.try.f.ref.in
 	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
