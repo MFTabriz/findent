@@ -7,7 +7,7 @@ MAINTAINERCLEANFILES = config.h.in~
 EXTRA_DIST = bootstrap getversion LICENCE README.1st README.windows  \
 	     maketar makezip makedeb makesid README.2nd debian \
 	     makeupload pbuilderscript \
-	     debian.disco debian.wheezy debian.sid \
+	     debian.disco debian.wheezy debian.sid debian.stretch \
 	     simplemake.sh
 
 maintainer-clean-local:
