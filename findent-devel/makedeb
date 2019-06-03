@@ -34,6 +34,7 @@ dpkg-buildpackage -us -uc --check-command=lintian --check-option='--profile' --c
 if test "x$1" != xall ; then 
    cd ..
    rm -r $dir || exit 1
+   echo $0 done
    exit 0
 fi
 cd ..
