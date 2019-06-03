@@ -3,7 +3,7 @@ version=`./getversion`
 date=`date -R`
 echo "version = $version"
 sed -i "/^AC_INIT(findent/s/^.*/AC_INIT(findent, $version, wvermin@gmail.com)/" configure.ac    || exit 1
-for d in debian debian.wheezy debian.xenial debian.stretch ; do
+for d in debian debian.wheezy debian.disco debian.stretch ; do
    if [ -e $d/changelog ] ; then
       sed -i "1s/(.*)/($version-1)/" $d/changelog       || exit 1
       sed -i "0,/^ --.*>/{/^ --.*>/s/>  .*/>  $date/}" $d/changelog || exit 1
