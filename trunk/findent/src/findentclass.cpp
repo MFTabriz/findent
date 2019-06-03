@@ -64,10 +64,8 @@ void Findent::handle_pre_light(Fortranline &line, bool &p_more)
    // handles preprocessor lines and their continuations:
    //
    // line (input):   line to handle
-   // p    (inout):   input:  type of line: CPP or COCO. 
-   //                 output: if no continuation is expected, p = 0
-   // p_more (output):  true if a continuation is expected
-   //
+   // p_more (inout):   input: if true, line is a continuation
+   //                   output: if continuation is expected, p=true
 
    if (!p_more)   // this is the first line of a preprocessor sequence
       pregentype = line.getpregentype();

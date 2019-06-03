@@ -163,8 +163,8 @@ void Fortran::get_full_statement()
 	       state = end_start;
 	       break;
 	    }
-	    pretype = Curline.getpregentype();
-	    if(pretype == CPP || pretype == COCO)
+	    pregentype = Curline.getpregentype();
+	    if(pregentype == CPP || pregentype == COCO)
 	    {
 	       state = in_pre;
 	       break;
@@ -172,10 +172,10 @@ void Fortran::get_full_statement()
 
 	    if (FLAGS.deps)
 	    {
-	       switch(pretype)
+	       switch(pregentype)
 	       {
 		  case INCLUDE_CPP: case INCLUDE_CPP_STD: case INCLUDE_COCO:
-		     Includes.insert(std::make_pair(pretype,Curline.getinclude()));
+		     Includes.insert(std::make_pair(pregentype,Curline.getinclude()));
 	       }
 	    }
 
@@ -204,13 +204,13 @@ void Fortran::get_full_statement()
 	    {
 	       Curline = Getnext(End_of_file); 
 	       if (End_of_file) { state = end_fortran; break; }
-	       pretype = Curline.getpregentype();
-	       if (pretype == CPP || pretype == COCO)
+	       pregentype = Curline.getpregentype();
+	       if (pregentype == CPP || pregentype == COCO)
 	       {
 		  p_more = 0;
 		  while (1)
 		  {
-		     handle_pre(Curline,f_more,p_more);
+		     handle_pre(Curline,p_more);
 		     curlines.push_back(Curline);
 		     if(p_more)
 		     {
@@ -224,10 +224,10 @@ void Fortran::get_full_statement()
 	       }
 	       if (FLAGS.deps)
 	       {
-		  switch(pretype)
+		  switch(pregentype)
 		  {
 		     case INCLUDE_CPP: case INCLUDE_CPP_STD: case INCLUDE_COCO:
-			Includes.insert(std::make_pair(pretype,Curline.getinclude()));
+			Includes.insert(std::make_pair(pregentype,Curline.getinclude()));
 		  }
 	       }
 	       state = in_fortran;
@@ -249,7 +249,7 @@ void Fortran::get_full_statement()
 	    p_more = 0;
 	    while(1)
 	    {
-	       handle_pre(Curline,f_more,p_more);
+	       handle_pre(Curline,p_more);
 	       curlines.push_back(Curline);
 	       if(p_more)
 	       {
@@ -290,14 +290,13 @@ bool Fortran::is_findentfix(Fortranline &line)
    return rc;
 }
 
-void Fortran::handle_pre(Fortranline &line, const bool f_more, bool &p_more)
+void Fortran::handle_pre(Fortranline &line, bool &p_more)
 {
    int ifelse;
 
-   pregentype = line.getpregentype();
-   if(pregentype == CPP || pregentype == COCO)
+   if((!p_more) && ( pregentype == CPP || pregentype == COCO))
    {
-      pretype    = line.scanfixpre();
+      int pretype    = line.scanfixpre();
       switch(pretype)
       {
 	 case CPP:
@@ -354,8 +353,6 @@ void Fortran::handle_pre(Fortranline &line, const bool f_more, bool &p_more)
 	       case Pre_analyzer::ENDIFE:
 		  if(!fs_store.empty())
 		     fs_store.pop_back();
-		  break;
-
 		  break;
 	    }
 	    break;
@@ -607,6 +604,16 @@ void Fortran::indent_and_output()
 	       else
 		  Cur_indent = top_indent();
 	       break;
+#ifdef USEESOPE
+	    case SEGMENT:
+	       Cur_indent = top_indent();
+	       push_indent(Cur_indent + FLAGS.segment_indent);
+	       break;
+	    case ENDSEGMENT:
+	       if (!fi->indent_handled)
+		  Cur_indent = pop_indent();
+	       break;
+#endif
 	    default:
 	       Cur_indent = top_indent();
 	 } // end determine indent and refactor

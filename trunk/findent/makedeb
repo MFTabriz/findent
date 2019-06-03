@@ -8,11 +8,11 @@ tar=$PWD/../versions/findent-$version.tar.gz
 dir=findent-$version
 dsc=findent_$version-1.dsc
 debdir=$PWD/../debian/findent-$version-deb
-for d in debian debian.xenial debian.wheezy debian.sid ; do
-   if [ -e $d/changelog ] ; then
-      sed -i "1s/(.*)/($version-1)/" $d/changelog   || exit 1
-   fi
-done
+#for d in debian debian.disco debian.wheezy debian.sid debian.stretch ; do
+#   if [ -e $d/changelog ] ; then
+#      sed -i "1s/(.*)/($version-1)/" $d/changelog   || exit 1
+#   fi
+#done
 ./maketar || exit 1
 rm -rf $debdir
 mkdir -p $debdir || exit 1
@@ -20,9 +20,10 @@ cd $debdir || exit 1
 cp $tar . || exit 1
 tar xf $tar || exit
 cd $dir || exit
-echo compat before xenial: `cat debian/compat` `grep Standards-Version debian/control`
-cp debian.xenial/* debian || exit
-echo compat after xenial: `cat debian/compat` `grep Standards-Version debian/control`
+codename=`lsb_release -sc`
+echo compat before $codename: `cat debian/compat` `grep Standards-Version debian/control`
+cp debian.$codename/* debian || exit
+echo compat after $codename: `cat debian/compat` `grep Standards-Version debian/control`
 #dh_make --yes -s -f $tar
 dh_make --yes -s --createorig
 cd ..
@@ -33,6 +34,7 @@ dpkg-buildpackage -us -uc --check-command=lintian --check-option='--profile' --c
 if test "x$1" != xall ; then 
    cd ..
    rm -r $dir || exit 1
+   echo $0 done
    exit 0
 fi
 cd ..

@@ -1,3 +1,12 @@
+findent-3.1.1:
+	added support for ESOPE (SEGMENT, ENDSEGMENT) as configuration
+	parameter
+	free-format: statement label can now contain an &
+	bug fix: fortran.cp: preprocessor line with continuations where not
+	         handled properly
+	configure.ac: changed testing for gfortran
+	make check: start wineserver in first test to speed up checks.
+	   before ubuntu19.04 this was not necessary
 findent-3.1.0:
 	added simplemake.sh: compiles findent without 
 	  configure; make

@@ -37,6 +37,7 @@ class Flags
       DO_OMP,
       DO_README,
       DO_REFACTOR_PROCEDURE,
+      DO_SEGMENT,
       DO_USAGE,
       DO_VERSION,
       DO_VIM_FINDENT,
@@ -83,6 +84,9 @@ class Flags
    int module_indent;
    int output_format;
    int routine_indent;
+#ifdef USEESOPE
+   int segment_indent;
+#endif
    int select_indent; 
    int start_indent;
    int type_indent;

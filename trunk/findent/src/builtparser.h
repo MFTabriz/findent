@@ -1,8 +1,9 @@
-/* A Bison parser, made by GNU Bison 3.0.4.  */
+/* A Bison parser, made by GNU Bison 3.3.2.  */
 
 /* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015 Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2019 Free Software Foundation,
+   Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -29,6 +30,9 @@
 
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
+
+/* Undocumented macros, especially those whose name start with YY_,
+   are private implementation details.  Do not rely on them.  */
 
 #ifndef YY_YY_PARSER_HPP_INCLUDED
 # define YY_YY_PARSER_HPP_INCLUDED
@@ -132,38 +136,41 @@ extern int yydebug;
     INCLUDE_COCO = 342,
     INCFILENAME = 343,
     USE = 344,
-    IDENTIFIER = 345,
-    SKIP = 346,
-    SKIPALL = 347,
-    SKIPNOOP = 348,
-    KEYWORD = 349,
-    ELEMENTAL = 350,
-    IMPURE = 351,
-    PURE = 352,
-    RECURSIVE = 353,
-    SUBROUTINE = 354,
-    FUNCTION = 355,
-    PROGRAM = 356,
-    EOL = 357,
-    NAMED_LABEL = 358,
-    STLABEL = 359,
-    TYPE = 360,
-    ENDTYPE = 361,
-    CLASS = 362,
-    BASICTYPE = 363,
-    TYPEC = 364,
-    QSTRING = 365,
-    HSTRING = 366,
-    LR = 367,
-    LRB = 368,
-    DOTOPERATOR = 369,
-    I_NUMBER = 370,
-    UNCLASSIFIED = 371,
-    ERROR = 372,
-    OMP = 373,
-    SCANOMPFIXED = 374,
-    SCANOMPFREE = 375,
-    LAST_TOKEN = 376
+    SEGMENT = 345,
+    ENDSEGMENT = 346,
+    ESOPE = 347,
+    IDENTIFIER = 348,
+    SKIP = 349,
+    SKIPALL = 350,
+    SKIPNOOP = 351,
+    KEYWORD = 352,
+    ELEMENTAL = 353,
+    IMPURE = 354,
+    PURE = 355,
+    RECURSIVE = 356,
+    SUBROUTINE = 357,
+    FUNCTION = 358,
+    PROGRAM = 359,
+    EOL = 360,
+    NAMED_LABEL = 361,
+    STLABEL = 362,
+    TYPE = 363,
+    ENDTYPE = 364,
+    CLASS = 365,
+    BASICTYPE = 366,
+    TYPEC = 367,
+    QSTRING = 368,
+    HSTRING = 369,
+    LR = 370,
+    LRB = 371,
+    DOTOPERATOR = 372,
+    I_NUMBER = 373,
+    UNCLASSIFIED = 374,
+    ERROR = 375,
+    OMP = 376,
+    SCANOMPFIXED = 377,
+    SCANOMPFREE = 378,
+    LAST_TOKEN = 379
   };
 #endif
 
