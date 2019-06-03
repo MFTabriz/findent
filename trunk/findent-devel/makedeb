@@ -26,7 +26,7 @@ if [ "codename" = stretch ] ; then
    code="stretch"
 fi
 echo compat before $code: `cat debian/compat` `grep Standards-Version debian/control`
-cp debian.code/* debian || exit
+cp debian.$code/* debian || exit
 echo compat after $code: `cat debian/compat` `grep Standards-Version debian/control`
 #dh_make --yes -s -f $tar
 dh_make --yes -s --createorig
