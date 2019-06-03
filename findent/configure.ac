@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(findent, 3.1.0, wvermin@gmail.com)
+AC_INIT(findent, 3.1.1, wvermin@gmail.com)
 AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
 AC_CONFIG_SRCDIR([src/findent.cpp])
@@ -25,6 +25,9 @@ AS_IF( [test "x$with_windows" = xyes],
 
 AM_CONDITIONAL([MAKEMAN],[test "x$with_windows" != "xyes"])
 AM_CONDITIONAL([MAKEWIN],[test "x$with_windows" = "xyes"])
+
+AC_ARG_WITH(esope, [AS_HELP_STRING([--with-esope],[Build with esope support @<:@default=no@:>@])],[],[with_esope=no])
+AM_CONDITIONAL([USEESOPE],[test "x$with_esope" = "xyes"])
 
 # test if bison available etc...
 
@@ -68,10 +71,10 @@ AS_IF( [test "x$with_flex" = "xuse-flex-if-available"],
 
 AM_CONDITIONAL([USEFLEX],[test "x$useflex" = "xyes"])
 
+
 # test for working gfortran (only used in make check):
 
-FC=gfortran
-AC_FC_FREEFORM(,[FC=""])
+AC_PROG_FC([gfortran])
 AS_IF( [test "x$FC" = "xgfortran"],
       [AC_MSG_NOTICE([gfortran will be used to compile test sources in 'make check'])],
       [AC_MSG_NOTICE([No gfortran compiler found. 'make check' will not try to compile test sources])])
@@ -81,6 +84,7 @@ AC_CONFIG_FILES([test/prelude])
 AC_CONFIG_FILES([test/postlude])
 AC_CONFIG_FILES([test/test-compile.sh],[chmod +x test/test-compile.sh])
 AC_CONFIG_FILES([test/doit],[chmod +x test/doit])
+AC_CONFIG_FILES([test/init.sh],[chmod +x test/init.sh])
 
 AC_CONFIG_FILES([test/progfixed-dos.f.try.f.ref])
 AC_CONFIG_FILES([test/progfixed-dos.f])
@@ -100,6 +104,8 @@ AC_CONFIG_FILES([test/progfree1.f.try.f.ref])
 AC_CONFIG_FILES([test/progfree1.f])
 AC_CONFIG_FILES([test/progfreefixed.f.try.f.ref])
 AC_CONFIG_FILES([test/progfreefixed.f])
+AC_CONFIG_FILES([test/esope.f.try.f.ref])
+AC_CONFIG_FILES([test/esope.f])
 
 AC_CONFIG_FILES([test/emacs_findent.ref])
 AC_CONFIG_FILES([test/emacs_help.ref])

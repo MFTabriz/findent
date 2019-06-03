@@ -185,6 +185,9 @@ void Docs::usage(bool man)
    manout("-m<n>, --indent_module=<n>"      ,"MODULE       indent");
    manout("-r<n>, --indent_procedure=<n>"   ,"FUNCTION,");
    manout(" ",  " SUBROUTINE and PROGRAM indent");
+#ifdef USEESOPE
+   manout("--indent_segment=<n>"            ,"SEGMENT      indent");
+#endif
    manout("-s<n>, --indent_select=<n>"      ,"SELECT       indent");
    manout("-t<n>, --indent_type=<n>"        ,"TYPE         indent");
    manout("-w<n>, --indent_where=<n>"       ,"WHERE        indent");
@@ -271,6 +274,34 @@ void Docs::usage(bool man)
    manout(" ","convert free to fixed form: findent -ofixed < prog.f90 > prog.f");
    manout(" ","");
    manout(" ","refactor 'end': findent -Rr < in.f90 > out.f90");
+   manout(" "," ");
+   if(doman)
+   {
+      std::cout << ".PP" << std::endl << ".SS" << std::endl;
+   }
+   std::cout << "BUGS:"                    << std::endl;
+   manout("*","Also for free-format, findent is space-insensitive, while");
+   manout(" ","the standard states that space must be used as general separator.");
+   manout(" ","");
+   manout("*","There are some issues with labels in a continuation");
+   manout(" ","when converting from free to fixed format.");
+   manout(" ","For example:");
+   manout(" ","");
+   manout(" ","\n123&\n 4 continue");
+   manout(" ","");
+   manout(" ","The problems arise because it is not possible to define a");
+   manout(" ","statement label in a continuation in fixed format.");
+   manout(" ","");
+   manout("*","When converting from fixed format to free format, findent");
+   manout(" ","discards white space in a string if the string contains a");
+   manout(" ","continuation, e.g:");
+   manout(" ","      print *,\"a");
+   manout(" ","     +b\"");
+   manout(" ","");
+   manout(" ","is converted to:");
+   manout(" ","   print *,\"a&");
+   manout(" ","   &b\"");
+
    if(doman)
    {
       std::cout << ".SH COPYRIGHT" << std::endl;
@@ -312,9 +343,9 @@ void Docs::replaceAll( std::string &s, const std::string &search, const std::str
 void Docs::manout(const std::string flag, const std::string txt)
 {
 
+   std::string mantxt  = txt;
    if (doman)
    {
-      std::string mantxt  = txt;
       std::string manflag = flag;
       replaceAll(mantxt,"-","\\-");
       replaceAll(manflag,"-","\\-");
@@ -328,10 +359,15 @@ void Docs::manout(const std::string flag, const std::string txt)
    }
    else
    {
+      std::size_t start = 0;
+      if (mantxt.size() > 0)
+	 if(mantxt[0] == '\n')
+	    mantxt = mantxt.substr(1);
+      replaceAll(mantxt,"\n","\n\t  ");
       if (flag == " ")
-	 std::cout << flag << "\t" << "  " << txt << std::endl;
+	 std::cout << flag << "\t" << "  " << mantxt.substr(start) << std::endl;
       else
-	 std::cout << flag << "\t" << ": " << txt << std::endl;
+	 std::cout << flag << "\t" << ": " << mantxt.substr(start) << std::endl;
    }
 }
 

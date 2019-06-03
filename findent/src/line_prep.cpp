@@ -3,7 +3,7 @@
 
 #define DECIMAL_DIGITS                          \
    '0': case '1': case '2': case '3': case '4': \
-case '5': case '6': case '7': case '8': case '9'
+   case '5': case '6': case '7': case '8': case '9'
 
 #define HANDLE_END_STLABEL       \
 {                                \
@@ -82,6 +82,7 @@ Line_prep::Line_prep(const std::string s)
    int index      = -1;
    bool getnextc  = 1;
 
+   D(O("in Line_prep:");O(s););
    while(1)
    {
       if (getnextc)
@@ -152,9 +153,8 @@ Line_prep::Line_prep(const std::string s)
 	       }
 	       break;
 	    }
-
 	    //
-	    // here we found a label, directly follwed by a non-blank
+	    // here we found a label, directly followed by a non-blank
 	    // which tells us, that this is not a label
 	    // correction:
 	    //

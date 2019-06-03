@@ -31,6 +31,21 @@
                 continue
            end function f1
        end 
+
+       subroutine ticket7
+                integer :: int
+       real :: float
+       logical :: bool
+#define COND \
+               if (float > 1.) then; \
+                  continue ; \
+                end if
+      COND
+      if (.true.) then
+      int = int + 1
+        end if
+
+       end
       
       program progfixed
          type mytype  ! mytype
@@ -305,3 +320,12 @@ c$omp do
        enddo
 c$omp end parallel
               end
+      subroutine label_excercise
+      do 10
+     x 0 i=1,10
+      continue
+01 00  continue
+      do 02 0 i=1,10
+         continue
+   20   continue
+      end
