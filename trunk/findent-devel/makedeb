@@ -1,5 +1,5 @@
 #!/bin/bash
-# parameter all: produce debs for i386-wheezy, amd64=wheezy, amd64-sid
+# parameter all: produce debs for i386-stretch, amd64=stretch, amd64-sid
 curdir=$PWD
 unset CXXFLAGS
 version=`./getversion`
@@ -8,7 +8,7 @@ tar=$PWD/../versions/findent-$version.tar.gz
 dir=findent-$version
 dsc=findent_$version-1.dsc
 debdir=$PWD/../debian/findent-$version-deb
-#for d in debian debian.disco debian.wheezy debian.sid debian.stretch ; do
+#for d in debian debian.disco debian.stretch debian.sid ; do
 #   if [ -e $d/changelog ] ; then
 #      sed -i "1s/(.*)/($version-1)/" $d/changelog   || exit 1
 #   fi
@@ -39,8 +39,8 @@ if test "x$1" != xall ; then
 fi
 cd ..
 #for dist in amd64-sid ; do
-#for dist in amd64-wheezy ; do
-for dist in i386-wheezy amd64-wheezy amd64-sid ; do
+#for dist in amd64-stretch ; do
+for dist in i386-stretch amd64-stretch amd64-sid ; do
    debdirbuild=$curdir/../debian/findent-$version-deb-build.$dist
    rm -rf $debdirbuild
    mkdir -p $debdirbuild || exit 1
@@ -52,8 +52,8 @@ for dist in i386-wheezy amd64-wheezy amd64-sid ; do
    tar xf $tar || exit 1
    cd $dir || exit 1
    case $dist in
-      *wheezy*)
-	 cp debian.wheezy/* debian || exit 1
+      *stretch*)
+	 cp debian.stretch/* debian || exit 1
 	 ;;
       *sid*)
 	 cp debian.sid/* debian || exit 1

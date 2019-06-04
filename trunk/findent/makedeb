@@ -8,7 +8,7 @@ tar=$PWD/../versions/findent-$version.tar.gz
 dir=findent-$version
 dsc=findent_$version-1.dsc
 debdir=$PWD/../debian/findent-$version-deb
-#for d in debian debian.disco debian.strectch debian.sid ; do
+#for d in debian debian.disco debian.stretch debian.sid ; do
 #   if [ -e $d/changelog ] ; then
 #      sed -i "1s/(.*)/($version-1)/" $d/changelog   || exit 1
 #   fi
