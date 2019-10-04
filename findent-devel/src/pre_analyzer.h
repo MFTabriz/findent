@@ -11,7 +11,7 @@ class Pre_analyzer
 
    int analyze(const std::string s, const int pretype);
 
-   enum {NONE=1, IF, ELIF, ELSE, ENDIF, ENDIFE};
+   enum {PRE_NONE=1, PRE_IF, PRE_ELIF, PRE_ELSE, PRE_ENDIF, PRE_ENDIFE};
 };
 
 #endif

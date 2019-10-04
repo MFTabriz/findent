@@ -307,21 +307,21 @@ void Fortran::handle_pre(Fortranline &line, bool &p_more)
 	    ifelse = prea.analyze(line.trimmed_line(), pretype);
 	    switch(ifelse)
 	    {
-	       case Pre_analyzer::IF:
+	       case Pre_analyzer::PRE_IF:
 		  push_all();
 		  break;
 
-	       case Pre_analyzer::ELIF:
+	       case Pre_analyzer::PRE_ELIF:
 		  top_all();
 		  break;
 
-	       case Pre_analyzer::ELSE:
+	       case Pre_analyzer::PRE_ELSE:
 		  top_all();
-	       case Pre_analyzer::ENDIF:
+	       case Pre_analyzer::PRE_ENDIF:
 		  pop_all();
 		  break;
 
-	       case Pre_analyzer::ENDIFE:
+	       case Pre_analyzer::PRE_ENDIFE:
 		  break;
 
 	       default:
@@ -331,26 +331,26 @@ void Fortran::handle_pre(Fortranline &line, bool &p_more)
 
 	    switch(ifelse) // full_statement needs apart treatment:
 	    {
-	       case Pre_analyzer::IF:
+	       case Pre_analyzer::PRE_IF:
 		  fs_store.push_back(full_statement);
 		  break;
 
-	       case Pre_analyzer::ELIF:
+	       case Pre_analyzer::PRE_ELIF:
 		  if(fs_store.empty())
 		     full_statement = "";
 		  else
 		     full_statement = fs_store.back();
 		  break;
 
-	       case Pre_analyzer::ELSE:
+	       case Pre_analyzer::PRE_ELSE:
 		  if(fs_store.empty())
 		     full_statement = "";
 		  else
 		     full_statement = fs_store.back();
 		  break;
 
-	       case Pre_analyzer::ENDIF:
-	       case Pre_analyzer::ENDIFE:
+	       case Pre_analyzer::PRE_ENDIF:
+	       case Pre_analyzer::PRE_ENDIFE:
 		  if(!fs_store.empty())
 		     fs_store.pop_back();
 		  break;
