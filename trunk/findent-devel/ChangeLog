@@ -1,5 +1,7 @@
 findent-3.1.2:
 	correct spelling error in debian/control
+	pre_analyzer.h: change IF etc into PRE_IF to avoid expansion
+	   of macro's IF etc.
 findent-3.1.1:
 	added support for ESOPE (SEGMENT, ENDSEGMENT) as configuration
 	parameter
