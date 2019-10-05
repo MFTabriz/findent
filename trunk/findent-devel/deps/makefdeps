@@ -31,7 +31,7 @@ shift
 
 for i in $@ ; do
    j=${i%.*}$O
-   findent --deps < $i | awk -v name="$j" '{ print $0, name}' 
+   $FINDENTPROG --deps < $i | awk -v name="$j" '{ print $0, name}' 
 done | 
 awk '/^use /{use[$3] = use[$3] " " $2}
      /^mod |^sub /{ if (NF == 3) {module[$2] = $3}} 
