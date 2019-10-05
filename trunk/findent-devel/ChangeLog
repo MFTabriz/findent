@@ -2,6 +2,9 @@ findent-3.1.2:
 	correct spelling error in debian/control
 	pre_analyzer.h: change IF etc into PRE_IF to avoid expansion
 	   of macro's IF etc.
+	test/test18.sh: trivial change in sed command
+	deps/makedeps: use awk in stead of bash. (bash-3.x does not
+	   associative arrays)
 findent-3.1.1:
 	added support for ESOPE (SEGMENT, ENDSEGMENT) as configuration
 	parameter

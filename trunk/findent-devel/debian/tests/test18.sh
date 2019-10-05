@@ -36,8 +36,8 @@ end program prog2
 eof
 
 $WFINDENT -i5 prog1.f prog2.f
-sed -i 's/\r//' prog1.f
-sed -i 's/\r//' prog2.f
+sed -i "" 's/\r//' prog1.f
+sed -i "" 's/\r//' prog2.f
 for i in 1 2 ; do
    cmp -s prog$i.f prog$i.f.ref
    if [ $? -ne 0 ] ; then
