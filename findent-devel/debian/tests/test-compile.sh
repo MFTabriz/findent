@@ -39,7 +39,7 @@ if [ -f $prog.try.f.ref ]; then
 	    :
 	    ;;
 	 *)
-	    sed -i 's/\r//' $bprog.try.f
+	    sed -i "" $'s/\r//' $bprog.try.f
 	    ;;
       esac
    fi

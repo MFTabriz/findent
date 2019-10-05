@@ -31,7 +31,7 @@
   std::cout << "" << std::endl;
   std::cout << "for i in $@ ; do" << std::endl;
   std::cout << "   j=${i%.*}$O" << std::endl;
-  std::cout << "   findent --deps < $i | awk -v name=\"$j\" '{ print $0, name}' " << std::endl;
+  std::cout << "   $FINDENTPROG --deps < $i | awk -v name=\"$j\" '{ print $0, name}' " << std::endl;
   std::cout << "done | " << std::endl;
   std::cout << "awk '/^use /{use[$3] = use[$3] \" \" $2}" << std::endl;
   std::cout << "     /^mod |^sub /{ if (NF == 3) {module[$2] = $3}} " << std::endl;
