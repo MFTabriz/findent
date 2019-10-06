@@ -10,6 +10,14 @@
 # If this check succeeds, the file is overwritten, 
 # otherwize an error message is printed.
 #
+# NOTE: because usage is made of gnu-getopt, this script
+# does nothing in macOS: 
+case "$OSTYPE" in
+   darwin*) echo "Running in macOS, $0 does nothing"
+            exit 1
+	    ;;
+esac
+#
 
 # the location of findent, replace with correct location:
 FINDENT=${FINDENT:-findent-location}
