@@ -17,21 +17,17 @@ usage()
    exit 1
 }
 FINDENTPROG=${FINDENT:-findent}
-p=$( getopt -o s: -- "$@" ) || usage
-eval set -- "$p"
 
 O='.o'
-while [ "$1" != "--" ]; do
-   case "$1" in
-      '-s') shift; O="$1" ;;
-   esac
-   shift
-done
-shift
+if [ "$1" = "-s" ] ; then
+   O="$2"
+   shift; shift
+fi
 
-for i in $@ ; do
-   j=${i%.*}$O
-   $FINDENTPROG --deps < $i | awk -v name="$j" '{ print $0, name}' 
+while [ "$1" ] ; do
+   j=${1%.*}$O
+   $FINDENTPROG --deps < $1 | awk -v name="$j" '{ print $0, name}' 
+   shift
 done | 
 awk '/^use /{use[$3] = use[$3] " " $2}
      /^mod |^sub /{ if (NF == 3) {module[$2] = $3}} 
