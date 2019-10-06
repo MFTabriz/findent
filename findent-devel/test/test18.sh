@@ -2,7 +2,7 @@
 # test wfindent
 # do not test in macOS: wfindent uses gnu-getopt
 case "$OSTYPE" in
-   darwin*) exit 0
+   darwin*) exit 77 
 	    ;;
 esac
 
