@@ -6,7 +6,7 @@ findent-3.1.2:
 	deps/makedeps: use awk in stead of bash. (bash-3.x does not
 	   associative arrays)
 	test: some tiny things to make it work in macOS
-	wfindent: do nothing if runnig in macOS
+	wfindent: check if gnu-getopt is avaliable
 findent-3.1.1:
 	added support for ESOPE (SEGMENT, ENDSEGMENT) as configuration
 	parameter

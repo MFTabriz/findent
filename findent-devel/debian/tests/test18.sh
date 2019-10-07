@@ -1,5 +1,14 @@
 #!/bin/sh
 # test wfindent
+# do not test in macOS: wfindent uses gnu-getopt
+case "$OSTYPE" in
+   darwin*)
+      if [ ! -x //usr/local/opt/gnu-getopt/bin/getopt ] ; then
+	 exit 77 
+      fi
+      ;;
+esac
+
 if test -e prelude ; then
    . ./prelude
 else

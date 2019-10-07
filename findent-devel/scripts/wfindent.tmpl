@@ -10,14 +10,22 @@
 # If this check succeeds, the file is overwritten, 
 # otherwize an error message is printed.
 #
-# NOTE: because usage is made of gnu-getopt, this script
-# does nothing in macOS: 
+
+GETOPT=getopt
+
 case "$OSTYPE" in
-   darwin*) echo "Running in macOS, $0 does nothing"
-            exit 1
-	    ;;
+   darwin*) 
+      if [ -x /usr/local/opt/gnu-getopt/bin/getopt ] ; then
+	 GETOPT=/usr/local/opt/gnu-getopt/bin/getopt
+      else
+	 echo "$0: No gnu-getopt found. You can install it with:"
+	 echo "brew install gnu-getopt"
+	 echo "See also: https://brew.sh/"
+	 echo "No files changed."
+	 exit 1
+      fi
+      ;;
 esac
-#
 
 # the location of findent, replace with correct location:
 FINDENT=${FINDENT:-findent-location}
@@ -30,7 +38,7 @@ if ! "$FINDENT" -v >/dev/null 2>&1 ; then
 fi
 echo "$0 using: "`"$FINDENT" -v`
 # left-outs are: -q, -lastindent, -lastusable, --deps
-parms=$( getopt -o a:b:c:C:d:e:E:f:F:hHi:I:j:k:l:L:m:M:o:r:R:s:t:vw:x: \
+parms=$( $GETOPT -o a:b:c:C:d:e:E:f:F:hHi:I:j:k:l:L:m:M:o:r:R:s:t:vw:x: \
    -l help                                                \
    -l manpage                                             \
    -l readme                                              \
@@ -101,7 +109,7 @@ while [ "$1" ] ; do
 	 echo
 	 echo "see below for possible options"
 	 echo "Note: these options can only be used with findent (not wfindent):"
-         echo "   -q, --query_fix_free, -lastindent, --last_indent"
+	 echo "   -q, --query_fix_free, -lastindent, --last_indent"
 	 echo "   -lastusable, --last_usable, --deps"
 	 echo
 	 "$FINDENT" "$1"
