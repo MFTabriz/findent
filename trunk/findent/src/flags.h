@@ -42,7 +42,7 @@ class Flags
       DO_VERSION,
       DO_VIM_FINDENT,
       DO_VIM_FORTRAN,
-      DO_VIM_HELP,
+      DO_VIM_HELP
    };
 
    bool apply_indent         ; // 1: output indented line, else output original lines

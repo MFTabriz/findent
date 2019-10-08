@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 dir=`pwd`
 ./bootstrap                                                       || exit 1
 unset CXXFLAGS

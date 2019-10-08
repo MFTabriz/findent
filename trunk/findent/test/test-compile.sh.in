@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 export FINDENT_FLAGS="$TEST_FINDENT_FLAGS"
 prog="$1"
 echo "$0: $prog"
@@ -39,7 +39,12 @@ if [ -f $prog.try.f.ref ]; then
 	    :
 	    ;;
 	 *)
-	    sed -i 's/\r//' $bprog.try.f
+	    echo "$PWD CONVERTING $bprog.try.f"
+	    sum $bprog.try.f
+	    file $bprog.try.f
+	    sed -i~ $'s/\r//' $bprog.try.f
+	    sum $bprog.try.f
+	    file $bprog.try.f
 	    ;;
       esac
    fi

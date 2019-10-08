@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # vim: indentexpr=none
 if test -e prelude ; then
    . ./prelude

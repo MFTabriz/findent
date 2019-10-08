@@ -17,41 +17,38 @@ usage()
    exit 1
 }
 FINDENTPROG=${FINDENT:-findent}
-p=$( getopt -o s: -- "$@" ) || usage
-eval set -- "$p"
 
 O='.o'
-while [ "$1" != "--" ]; do
-   case "$1" in
-      '-s') shift; O="$1" ;;
-   esac
-   shift
-done
-shift
+if [ "$1" = "-s" ] ; then
+   O="$2"
+   shift; shift
+fi
 
-declare -A module use include
-for i in $@ ; do
-   j=${i%.*}$O
-   while read a b ; do
-      case $a in
-	 use)
-	    use[$j]="${use[$j]} $b" ;;
-	 mod|sub)
-	    [ "$b" ] && module[$b]=$j ;;
-	 inc|cpp|coc|std)
-	    include[$j]="${include[$j]} $b" ;;
-      esac
-   done < <( $FINDENTPROG --deps < $i )
-done
-for k in ${!use[@]}; do
-   m=""
-   for l in ${use[$k]}; do
-      m="$m ${module[$l]}"
-   done
-   if [ -n "${m// }" ] ; then
-      echo $k: $m
-   fi
-done
-for k in ${!include[@]}; do
-   echo $k: ${include[$k]}
-done
+while [ "$1" ] ; do
+   j=${1%.*}$O
+   $FINDENTPROG --deps < $1 | awk -v name="$j" '{ print $0, name}' 
+   shift
+done | 
+awk '/^use /{use[$3] = use[$3] " " $2}
+     /^mod |^sub /{ if (NF == 3) {module[$2] = $3}} 
+     /^inc |^cpp |^coc |^std / {include[$3] = include[$3] " " $2}
+END { 
+      for (k in use) 
+      {
+	  m = ""
+	  split(use[k],u)
+	  for (l in u) { 
+	     m=m " " module[u[l]]
+	     }
+	  mm = m; gsub(" ","",mm)
+	  if (length(mm) != 0) { 
+	     while (gsub("  "," ",m)){}
+	     sub("^ ","",m)
+	     print k ": " m 
+	  }
+      }
+      for (k in include) { 
+         while(sub("^ ","",include[k])){}
+         print k ": " include[k] 
+      }
+    }'

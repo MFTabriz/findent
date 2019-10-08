@@ -2,8 +2,8 @@ Source: findent
 Section: devel
 Priority: optional
 Maintainer: Willem Vermin <wvermin@gmail.com>
-Build-Depends: debhelper (>= 11), flex, bison
-Standards-Version: 4.3.0
+Build-Depends: debhelper (>= 12), flex, bison
+Standards-Version: 4.4.0
 Homepage: https://sourceforge.net/projects/findent/
 
 Package: findent
@@ -12,7 +12,7 @@ Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: indents/converts Fortran sources
  Indents Fortran sources: free or fixed format.
  Optionally converts from fixed format to free format.
- Optionally generates dpendencies for Make, based on
+ Optionally generates dependencies for Make, based on
  definition and usage of modules.
  Supports Fortran2008.
  Indentation is controlled by a number of flags.
