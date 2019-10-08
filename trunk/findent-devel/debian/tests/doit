@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 rc=0
 flags=$1
 eflags=$2

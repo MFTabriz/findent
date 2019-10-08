@@ -1,13 +1,31 @@
-#!/bin/sh
+#!/bin/bash
 # test wfindent
-# do not test in macOS: wfindent uses gnu-getopt
-case "$OSTYPE" in
-   darwin*)
-      if [ ! -x //usr/local/opt/gnu-getopt/bin/getopt ] ; then
-	 exit 77 
+# like wfindent, search for a suitable getopt. If no one available,
+# return 77 (i.e. test skipped)
+
+GETOPT=""
+if [ "$WFINDENT_GETOPT" ]; then
+   GETOPT="$WFINDENT_GETOPT"
+else
+   a=`getopt -T`
+   if [ "$?" -eq 4 ] ; then
+      GETOPT=getopt
+   else
+      tries="/usr/local/opt/gnu-getopt/bin/getopt /usr/local/bin/getopt"
+      for i in $tries ; do
+         if [ -x "$i" ] ; then
+            a=`"$i" -T`
+            if [ "$?" -eq 4 ] ; then
+               GETOPT="$i"
+               break
+            fi
+         fi
+      done
+      if [ -z "$GETOPT" ] ; then
+         exit 77
       fi
-      ;;
-esac
+   fi
+fi
 
 if test -e prelude ; then
    . ./prelude
@@ -45,8 +63,8 @@ end program prog2
 eof
 
 $WFINDENT -i5 prog1.f prog2.f
-sed -i "" $'s/\r//' prog1.f
-sed -i "" $'s/\r//' prog2.f
+sed -i~ $'s/\r//' prog1.f
+sed -i~ $'s/\r//' prog2.f
 for i in 1 2 ; do
    cmp -s prog$i.f prog$i.f.ref
    if [ $? -ne 0 ] ; then
