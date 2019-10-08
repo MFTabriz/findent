@@ -1,4 +1,4 @@
-.TH WFINDENT "1" "2015" "wfindent" "User Commands"
+.TH WFINDENT "1" "October 2019" "wfindent" "User Commands"
 .SH NAME
 wfindent \- Indents and optionally converts Fortran program sources
 .SH SYNOPSIS
@@ -9,7 +9,17 @@ See 'man 1 findent' for the options.
 .SH DESCRIPTION
 Wfindent is a wrapper for findent(1), calling findent for each of the 
 files. The files are overwritten by the indented version. A sanity
-check is made before oerwriting a input file.
+check is made before overwriting a input file.
+.SH ENVIRONMENT
+The following environment variables influence the working of wfindent:
+.B FINDENT
+.br
+If set, wfindent will use this as the location of findent.
+.br
+.B WFINDENT_GETOPT
+.br
+If set, wfindent will use this as the location of getopt. The correct
+working of wfindent depends on a gnu-compatible program 'getopt'.
 .PP
 .SS
 Example:
