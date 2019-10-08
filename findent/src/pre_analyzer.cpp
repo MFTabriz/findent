@@ -46,7 +46,7 @@ int Pre_analyzer::analyze(const std::string s, const int pretype)
       case CPP_IF:  case CPP_ENDIF:  case CPP_ELSE:  case CPP_ELIF:
       case COCO_IF: case COCO_ENDIF: case COCO_ELSE: case COCO_ELIF: 
       case INCLUDE_CPP: case INCLUDE_COCO: break;
-      default: return this->NONE;
+      default: return this->PRE_NONE;
    }
 
    int r;
@@ -54,26 +54,26 @@ int Pre_analyzer::analyze(const std::string s, const int pretype)
    {
       case CPP_IF: case COCO_IF:
 	 this->ifelse_stack.push(0);
-	 return this->IF;
+	 return this->PRE_IF;
       case CPP_ELIF: case COCO_ELIF:
-	 return this->ELIF;
+	 return this->PRE_ELIF;
       case CPP_ELSE: case COCO_ELSE:
 	 if (!this->ifelse_stack.empty())
 	 {
 	    ifelse_stack.pop();
 	    ifelse_stack.push(1);
 	 }
-	 return this->ELSE;
+	 return this->PRE_ELSE;
       case CPP_ENDIF: case COCO_ENDIF:
-	 r = this->ENDIF; 
+	 r = this->PRE_ENDIF; 
 	 if (!ifelse_stack.empty())
 	 {
 	    if (ifelse_stack.top())
-	       r = this->ENDIFE;
+	       r = this->PRE_ENDIFE;
 	    ifelse_stack.pop();
 	 }
 	 return r;
     default:
-      return this->NONE;
+      return this->PRE_NONE;
    }
 }

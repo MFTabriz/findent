@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #test output of help-texts
 if test -e prelude ; then
    . ./prelude

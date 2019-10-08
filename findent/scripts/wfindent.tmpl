@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # vim: filetype=sh
 #
 # in-place indenting of fortran sources using findent
@@ -9,7 +9,40 @@
 # as the input file.
 # If this check succeeds, the file is overwritten, 
 # otherwize an error message is printed.
-#
+
+# find a suitable getopt: i.e. that returns 4 with 'getopt -T'
+GETOPT=""
+if [ "$WFINDENT_GETOPT" ]; then
+   GETOPT="$WFINDENT_GETOPT"
+else
+   a=`getopt -T`
+   if [ "$?" -eq 4 ] ; then
+      GETOPT=getopt
+   else
+      tries="/usr/local/opt/gnu-getopt/bin/getopt /usr/local/bin/getopt"
+      for i in $tries ; do
+         if [ -x "$i" ] ; then
+            a=`"$i" -T`
+            if [ "$?" -eq 4 ] ; then
+               GETOPT="$i"
+               break
+            fi
+         fi
+      done
+      if [ -z "$GETOPT" ] ; then
+         echo "$0: No suitable getopt found. Tried:"
+         echo " - getopt"
+         for i in $tries ; do
+            echo " - $i"
+         done
+         echo "if you have available a suitable gnu-compatible getopt, you can set"
+         echo "the environment variable WFINDENT_GETOPT, like:"
+         echo "export WFINDENT_GETOPT=\"$HOME/bin/gnu-getopt\""
+         echo "No files indented."
+         exit 1
+      fi
+   fi
+fi
 
 # the location of findent, replace with correct location:
 FINDENT=${FINDENT:-findent-location}
@@ -20,9 +53,14 @@ if ! "$FINDENT" -v >/dev/null 2>&1 ; then
       exit 1
    fi
 fi
+
 echo "$0 using: "`"$FINDENT" -v`
+if [ "$GETOPT" != getopt ] ; then
+   echo "Using for getopt: $GETOPT"
+fi
+
 # left-outs are: -q, -lastindent, -lastusable, --deps
-parms=$( getopt -o a:b:c:C:d:e:E:f:F:hHi:I:j:k:l:L:m:M:o:r:R:s:t:vw:x: \
+parms=$( "$GETOPT" -o a:b:c:C:d:e:E:f:F:hHi:I:j:k:l:L:m:M:o:r:R:s:t:vw:x: \
    -l help                                                \
    -l manpage                                             \
    -l readme                                              \
@@ -76,45 +114,45 @@ fparms=""
 while [ "$1" ] ; do
    case "$1" in
       --) shift
-	 break
-	 ;;
+         break
+         ;;
       "-v"|"--version")
-	 echo "wfindent using $FINDENT"
-	 "$FINDENT" -v
-	 exit $?
-	 ;;
+         echo "wfindent using $FINDENT"
+         "$FINDENT" -v
+         exit $?
+         ;;
       "-h"|"-H"|"--help"|"--manpage") 
-	 echo "wfindent - Indents and optionally converts Fortran program sources"
-	 echo
-	 echo "wfindent [OPTION]... [FILE]..."
-	 echo "examples:"
-	 echo "$ wfindent -i4 -Rr *.f90"
-	 echo "$ wfindent -i3 prog.f90 sub.f"
-	 echo
-	 echo "see below for possible options"
-	 echo "Note: these options can only be used with findent (not wfindent):"
+         echo "wfindent - Indents and optionally converts Fortran program sources"
+         echo
+         echo "wfindent [OPTION]... [FILE]..."
+         echo "examples:"
+         echo "$ wfindent -i4 -Rr *.f90"
+         echo "$ wfindent -i3 prog.f90 sub.f"
+         echo
+         echo "see below for possible options"
+         echo "Note: these options can only be used with findent (not wfindent):"
          echo "   -q, --query_fix_free, -lastindent, --last_indent"
-	 echo "   -lastusable, --last_usable, --deps"
-	 echo
-	 "$FINDENT" "$1"
-	 exit $?
-	 ;;
+         echo "   -lastusable, --last_usable, --deps"
+         echo
+         "$FINDENT" "$1"
+         exit $?
+         ;;
       --readme|--makefdeps|--vim*|--gedit*|--emacs*)
-	 "$FINDENT" "$1"
-	 exit $?
-	 ;;
+         "$FINDENT" "$1"
+         exit $?
+         ;;
       --refactor*)    # special: optional argument must be preceded with '='
-	 fparms="$fparms $1" 
-	 shift
-	 if [ "$1" ] ; then
-	    fparms="$fparms=$1"
-	 fi
-	 shift
-	 ;;
+         fparms="$fparms $1" 
+         shift
+         if [ "$1" ] ; then
+            fparms="$fparms=$1"
+         fi
+         shift
+         ;;
       *)
-	 fparms="$fparms $1" 
-	 shift
-	 ;;
+         fparms="$fparms $1" 
+         shift
+         ;;
    esac
 done
 tmp=`mktemp`
@@ -125,15 +163,15 @@ while [ "$1" ] ; do
       # Check if file ends with newline. If not: correct number of lines
       lastchar="$(tail -c1 "$1" | od -a -An | tr -d ' ')"
       if [ "$lastchar" != "nl" ] ; then
-	 norig=`expr $norig + 1`
+         norig=`expr $norig + 1`
       fi
       cat "$1" | "$FINDENT" $fparms > $tmp
       nnew=`wc -l < $tmp`
       if [ $norig -eq $nnew ] ; then
-	 cp $tmp "$1"
-	 n=`expr $n + 1`
+         cp $tmp "$1"
+         n=`expr $n + 1`
       else
-	 echo "***** wfindent: error while converting $1, conversion abandoned"
+         echo "***** wfindent: error while converting $1, conversion abandoned"
       fi
    fi
    shift

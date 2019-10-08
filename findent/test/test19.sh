@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 if test -e prelude ; then
    . ./prelude
 else

@@ -3,7 +3,7 @@
 # BTW: it seems that ./makedeb produces exactly the same ...
 # version numbers for upstream releases:
 newversion=`./getversion`
-oldversion=2.8.2
+oldversion=3.1.1
 curdir=`pwd`
 dist=sid
 tar=$curdir/../versions/findent-$newversion.tar.gz
