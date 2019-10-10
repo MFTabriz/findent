@@ -1,0 +1,25 @@
+#!/bin/bash
+RASPI=raspi.local
+pi=pi@$RASPI
+app=findent
+build=$app-build
+version=`./getversion`
+tar=$app-$version.tar.gz
+dir=$app-$version
+debdir=$app-$version-deb
+deb=${app}_${version}-1_armhf.deb
+
+echo "rm $build"
+ssh $pi rm -rf $build || exit 1
+echo "create $build:"
+ssh $pi mkdir -p $build  || exit 1
+echo "scp ../versions/$tar:"
+scp ../versions/$tar $pi:$build  || exit 
+echo "untar $tar:"
+ssh $pi "cd $build && tar xf $tar" || exit 1
+echo "configure:"
+ssh $pi "cd $build/$dir && ./makedeb" || exit 1
+echo "retrieve $deb"
+scp $pi:$build/debian/$debdir/$deb ../debian/ || exit 1
+echo Normal end of $0
+
