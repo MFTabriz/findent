@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 version=`./getversion`
 date=`date -R`
 echo "version = $version"

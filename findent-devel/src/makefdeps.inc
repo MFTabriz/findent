@@ -1,4 +1,4 @@
-  std::cout << "#!/bin/bash" << std::endl;
+  std::cout << "#!/bin/sh" << std::endl;
   std::cout << "# - makefdeps -" << std::endl;
   std::cout << "# Creates make-dependencies for fortran sources, based on" << std::endl;
   std::cout << "# analysis by findent of (sub)modules that are needed or created and" << std::endl;

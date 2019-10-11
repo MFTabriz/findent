@@ -10,7 +10,7 @@ findent, what?
    findent is an indenter for Fortran programs, fixed and free format.
    findent can also translate fixed format to free format and vice versa.
    Since version 3.0.0, findent can generate dependencies based on USE,
-   MODULE, SUBMODULE, INCLUDE, #include, ??include  and emit a bash script
+   MODULE, SUBMODULE, INCLUDE, #include, ??include  and emit a sh script
    that, using findent, creates a dependency file to be used in a Makefile.
 
    findent will take care of:
@@ -384,7 +384,7 @@ findent, usage?
 >>>> snip ---------- checklength ---------------------------------------
 
 
-#!/bin/bash
+#!/bin/sh
 # checks file line lengths
 # Usage:
 # checklength <length> [file ...]
@@ -560,7 +560,7 @@ findent, creating a dependency file for use in an Makefile.
    prints the dependencies found in prog.f90, based on USE,
    MODULE, SUBMODULE, INCLUDE, #include and ??include.
 
-   This is used by the bash script makefdeps to create a dependency
+   This is used by the sh script makefdeps to create a dependency
    file for use in an Makefile. 
    Creation of the makefdeps script:
 
@@ -591,7 +591,7 @@ program: $(OBJS)
 include deps
 dep deps:
 	findent --makefdeps < /dev/null > makefdeps.sh
-	@if [ "`head -n 1 makefdeps.sh`" != "#!/bin/bash" ] ; then \
+	@if [ "`head -n 1 makefdeps.sh`" != "#!/bin/sh" ] ; then \
 	   findent -v 1>&2; \
 	   echo "Use findent version >= 3.0.0" 1>&2 ; exit 1 ; fi
 	chmod +x makefdeps.sh
@@ -661,7 +661,7 @@ findent, installation:
 wfindent
 ========
 
-  wfindent, a bash shell script, indents Fortran source in-place, 
+  wfindent, a sh shell script, indents Fortran source in-place, 
   performing a sanity check.
   It accepts all flags that findent accepts.
 

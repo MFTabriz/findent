@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # - makefdeps -
 # Creates make-dependencies for fortran sources, based on
 # analysis by findent of (sub)modules that are needed or created and
