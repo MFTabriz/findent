@@ -11,7 +11,7 @@ else
    if [ "$?" -eq 4 ] ; then
       GETOPT=getopt
    else
-      tries="/usr/local/opt/gnu-getopt/bin/getopt /usr/local/bin/getopt"
+      tries="/usr/local/opt/gnu-getopt/bin/getopt /usr/local/bin/getopt /usr/local/bin/gnugetopt"
       for i in $tries ; do
          if [ -x "$i" ] ; then
             a=`"$i" -T`

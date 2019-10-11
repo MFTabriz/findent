@@ -879,6 +879,8 @@ makefdeps.inc: $(DEPSDIR)/makefdeps $(TOCPP)
 
 includes: $(INCS)
 
+# env.sh is used in the test directory
+
 env.sh:
 	> $@
 	echo export SRCDIR=\"$(top_srcdir)\" >> $@
