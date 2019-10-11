@@ -327,7 +327,7 @@ AM_LDFLAGS =
 MOSTLYCLEANFILES = 
 CLEANFILES = findent findent.exe findent.1 \
 	     parser.cpp.h parser.hpp parser_report.txt \
-	     parser.cpp parser.h lexer.cpp
+	     parser.cpp parser.h lexer.cpp env.sh
 
 MAINTAINERCLEANFILES = builtparser.cpp builtparser.h builtlexer.cpp
 @MAKEMAN_TRUE@man1_MANS = findent.1
@@ -364,7 +364,7 @@ findent_SOURCES = \
 		  simpleostream.h        simpleostream.cpp \
                   version.h
 
-BUILT_SOURCES = parser.cpp parser.h lexer.cpp
+BUILT_SOURCES = parser.cpp parser.h lexer.cpp env.sh
 EXTRA_DIST = lexer.l parser.y tocpp.sh builtparser.cpp \
 	      builtparser.h builtlexer.cpp $(INCS)
 
@@ -788,7 +788,7 @@ uninstall-man: uninstall-man1
 
 
 @USEBISON_TRUE@parser.cpp: parser.y
-@USEBISON_TRUE@	$(YACC) -o parser.cpp -d $<
+@USEBISON_TRUE@	$(YACC) -o parser.cpp -d $?
 @USEBISON_TRUE@	if test -f parser.cpp.h ; then mv parser.cpp.h parser.h ; fi
 @USEBISON_TRUE@	if test -f parser.hpp ; then mv parser.hpp parser.h ; fi
 
@@ -805,16 +805,16 @@ uninstall-man: uninstall-man1
 @USEBISON_FALSE@	@echo "*** available, or it was specified not to use bison. ***"
 @USEBISON_FALSE@	@echo "*** I will use the pre-built parser.                 ***"
 @USEBISON_FALSE@	@echo "********************************************************"
-@USEBISON_FALSE@	cp $< $@
+@USEBISON_FALSE@	cp $? $@
 
 @USEBISON_FALSE@parser.h: builtparser.h
-@USEBISON_FALSE@	cp $< $@
+@USEBISON_FALSE@	cp $? $@
 
 @USEFLEX_TRUE@lexer.cpp: lexer.l
-@USEFLEX_TRUE@	$(LEX) -i -o lexer.cpp $<
+@USEFLEX_TRUE@	$(LEX) -i -o lexer.cpp $?
 
 @USEFLEX_TRUE@builtlexer: lexer.cpp
-@USEFLEX_TRUE@	mv $< builtlexer.cpp
+@USEFLEX_TRUE@	mv $? builtlexer.cpp
 
 @USEFLEX_FALSE@lexer.cpp: builtlexer.cpp
 @USEFLEX_FALSE@	@echo ""
@@ -823,7 +823,7 @@ uninstall-man: uninstall-man1
 @USEFLEX_FALSE@	@echo "*** available, or it was specified not to use flex. ***"
 @USEFLEX_FALSE@	@echo "*** I will use the pre-built lexer.                 ***"
 @USEFLEX_FALSE@	@echo "*******************************************************"
-@USEFLEX_FALSE@	cp $< $@
+@USEFLEX_FALSE@	cp $? $@
 
 @MAKEMAN_TRUE@findent.1: findent
 @MAKEMAN_TRUE@	: | ./findent -H > $@
@@ -878,6 +878,15 @@ makefdeps.inc: $(DEPSDIR)/makefdeps $(TOCPP)
 	$(TOCPP) < $(DEPSDIR)/makefdeps > $@
 
 includes: $(INCS)
+
+env.sh:
+	> $@
+	echo export SRCDIR=\"$(top_srcdir)\" >> $@
+	echo export FC=\"$(FC)\" >> $@
+@MAKEWIN_TRUE@	echo export WINDOWS=\"yes\" >> $@
+@MAKEWIN_FALSE@	echo export WINDOWS=\"no\" >> $@
+@USEESOPE_TRUE@	echo export ESOPE=\"yes\" >> $@
+@USEESOPE_FALSE@	echo export ESOPE=\"no\" >> $@
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

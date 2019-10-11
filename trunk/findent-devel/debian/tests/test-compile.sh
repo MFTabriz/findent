@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 export FINDENT_FLAGS="$TEST_FINDENT_FLAGS"
 prog="$1"
 echo "$0: $prog"
@@ -39,12 +39,9 @@ if [ -f $prog.try.f.ref ]; then
 	    :
 	    ;;
 	 *)
-	    echo "$PWD CONVERTING $bprog.try.f"
-	    sum $bprog.try.f
-	    file $bprog.try.f
-	    sed -i~ $'s/\r//' $bprog.try.f
-	    sum $bprog.try.f
-	    file $bprog.try.f
+	    tmpfile=`mktemp`
+	    tr -d '\r' < $bprog.try.f > $tmpfile
+	    mv $tmpfile $bprog.try.f
 	    ;;
       esac
    fi

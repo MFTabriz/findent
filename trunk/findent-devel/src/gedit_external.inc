@@ -1,4 +1,4 @@
-  std::cout << "#!/bin/bash" << std::endl;
+  std::cout << "#!/bin/sh" << std::endl;
   std::cout << "# to be used in gedit to indent fortran source" << std::endl;
   std::cout << "# in gedit:" << std::endl;
   std::cout << "#    Edit -> preferences -> enable \"External Tools\"" << std::endl;

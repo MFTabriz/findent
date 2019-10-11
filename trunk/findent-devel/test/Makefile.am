@@ -8,20 +8,5 @@ AM_TESTS_ENVIRONMENT = ./init.sh ;
 
 EXTRA_DIST = $(TESTS)
 
-export SRCDIR = $(top_srcdir)
-export FC 
-
-if MAKEWIN
-   export WINDOWS = yes
-else
-   export WINDOWS = no
-endif
-
-if USEESOPE
-   export ESOPE = yes
-else
-   export ESOPE = no
-endif
-
 clean-local:
 	rm -rf *.tmpdir
