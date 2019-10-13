@@ -10,7 +10,7 @@
   std::cout << "   findent is an indenter for Fortran programs, fixed and free format." << std::endl;
   std::cout << "   findent can also translate fixed format to free format and vice versa." << std::endl;
   std::cout << "   Since version 3.0.0, findent can generate dependencies based on USE," << std::endl;
-  std::cout << "   MODULE, SUBMODULE, INCLUDE, #include, ??include  and emit a bash script" << std::endl;
+  std::cout << "   MODULE, SUBMODULE, INCLUDE, #include, ??include  and emit a sh script" << std::endl;
   std::cout << "   that, using findent, creates a dependency file to be used in a Makefile." << std::endl;
   std::cout << "" << std::endl;
   std::cout << "   findent will take care of:" << std::endl;
@@ -384,7 +384,7 @@
   std::cout << ">>>> snip ---------- checklength ---------------------------------------" << std::endl;
   std::cout << "" << std::endl;
   std::cout << "" << std::endl;
-  std::cout << "#!/bin/bash" << std::endl;
+  std::cout << "#!/bin/sh" << std::endl;
   std::cout << "# checks file line lengths" << std::endl;
   std::cout << "# Usage:" << std::endl;
   std::cout << "# checklength <length> [file ...]" << std::endl;
@@ -560,7 +560,7 @@
   std::cout << "   prints the dependencies found in prog.f90, based on USE," << std::endl;
   std::cout << "   MODULE, SUBMODULE, INCLUDE, #include and ??include." << std::endl;
   std::cout << "" << std::endl;
-  std::cout << "   This is used by the bash script makefdeps to create a dependency" << std::endl;
+  std::cout << "   This is used by the sh script makefdeps to create a dependency" << std::endl;
   std::cout << "   file for use in an Makefile. " << std::endl;
   std::cout << "   Creation of the makefdeps script:" << std::endl;
   std::cout << "" << std::endl;
@@ -591,7 +591,7 @@
   std::cout << "include deps" << std::endl;
   std::cout << "dep deps:" << std::endl;
   std::cout << "	findent --makefdeps < /dev/null > makefdeps.sh" << std::endl;
-  std::cout << "	@if [ \"`head -n 1 makefdeps.sh`\" != \"#!/bin/bash\" ] ; then \\" << std::endl;
+  std::cout << "	@if [ \"`head -n 1 makefdeps.sh`\" != \"#!/bin/sh\" ] ; then \\" << std::endl;
   std::cout << "	   findent -v 1>&2; \\" << std::endl;
   std::cout << "	   echo \"Use findent version >= 3.0.0\" 1>&2 ; exit 1 ; fi" << std::endl;
   std::cout << "	chmod +x makefdeps.sh" << std::endl;
@@ -661,7 +661,7 @@
   std::cout << "wfindent" << std::endl;
   std::cout << "========" << std::endl;
   std::cout << "" << std::endl;
-  std::cout << "  wfindent, a bash shell script, indents Fortran source in-place, " << std::endl;
+  std::cout << "  wfindent, a sh shell script, indents Fortran source in-place, " << std::endl;
   std::cout << "  performing a sanity check." << std::endl;
   std::cout << "  It accepts all flags that findent accepts." << std::endl;
   std::cout << "" << std::endl;

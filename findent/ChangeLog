@@ -1,3 +1,9 @@
+findent-3.1.3:
+	changed /bin/bash back to /bin/sh for all scripts
+	   used during installation and running (because of openBSD)
+	changed in test folder all uses of 'sed' to remove \r to 'tr'
+	   because I couldn't get sed to work propery on all systems
+	changed all uses of $< in Makefile.am's into $? (because of BSD make)
 findent-3.1.2:
 	correct spelling error in debian/control
 	pre_analyzer.h: change IF etc into PRE_IF to avoid expansion
