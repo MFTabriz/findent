@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # to be used in gedit to indent fortran source
 # in gedit:
 #    Edit -> preferences -> enable "External Tools"

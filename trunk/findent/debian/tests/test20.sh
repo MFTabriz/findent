@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # vim: indentexpr=none
 # tests according to "Modern Fortran explaned" ISBN 978-0-19-881188-6
 if test -e prelude ; then

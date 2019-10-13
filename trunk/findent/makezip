@@ -1,4 +1,5 @@
 #!/bin/bash
+wineserver -p
 dir=`pwd`
 ./bootstrap                                                       || exit 1
 unset CXXFLAGS
@@ -24,4 +25,5 @@ zip   "findent-$version.zip" findent.exe README.txt \
 rm -f findent.exe README.txt wfindent.bat COPYING.txt
 cd "$dir"                                                         || exit 1
 make distclean
+wineserver -k
 echo "$0 done"

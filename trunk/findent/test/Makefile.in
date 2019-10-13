@@ -1042,15 +1042,6 @@ uninstall-am:
 .PRECIOUS: Makefile
 
 
-export SRCDIR = $(top_srcdir)
-export FC 
-
-@MAKEWIN_TRUE@   export WINDOWS = yes
-@MAKEWIN_FALSE@   export WINDOWS = no
-
-@USEESOPE_TRUE@   export ESOPE = yes
-@USEESOPE_FALSE@   export ESOPE = no
-
 clean-local:
 	rm -rf *.tmpdir
 

@@ -12,7 +12,7 @@ endif
 
 if USEBISON
 parser.cpp: parser.y
-	$(YACC) -o parser.cpp -d $<
+	$(YACC) -o parser.cpp -d $?
 	if test -f parser.cpp.h ; then mv parser.cpp.h parser.h ; fi
 	if test -f parser.hpp ; then mv parser.hpp parser.h ; fi
 	
@@ -31,18 +31,18 @@ parser.cpp: builtparser.cpp
 	@echo "*** available, or it was specified not to use bison. ***"
 	@echo "*** I will use the pre-built parser.                 ***"
 	@echo "********************************************************"
-	cp $< $@
+	cp $? $@
 
 parser.h: builtparser.h
-	cp $< $@
+	cp $? $@
 endif
 
 if USEFLEX
 lexer.cpp: lexer.l
-	$(LEX) -i -o lexer.cpp $<
+	$(LEX) -i -o lexer.cpp $?
 
 builtlexer: lexer.cpp
-	mv $< builtlexer.cpp
+	mv $? builtlexer.cpp
 
 else
 
@@ -53,14 +53,14 @@ lexer.cpp: builtlexer.cpp
 	@echo "*** available, or it was specified not to use flex. ***"
 	@echo "*** I will use the pre-built lexer.                 ***"
 	@echo "*******************************************************"
-	cp $< $@
+	cp $? $@
 endif
 
 MOSTLYCLEANFILES =
 
 CLEANFILES = findent findent.exe findent.1 \
 	     parser.cpp.h parser.hpp parser_report.txt \
-	     parser.cpp parser.h lexer.cpp
+	     parser.cpp parser.h lexer.cpp env.sh
 
 
 MAINTAINERCLEANFILES = builtparser.cpp builtparser.h builtlexer.cpp
@@ -163,7 +163,24 @@ findent_SOURCES = \
                   version.h
 
 
-BUILT_SOURCES = parser.cpp parser.h lexer.cpp
+BUILT_SOURCES = parser.cpp parser.h lexer.cpp env.sh
+
+# env.sh is used in the test directory
+
+env.sh:
+	> $@
+	echo export SRCDIR=\"$(top_srcdir)\" >> $@
+	echo export FC=\"$(FC)\" >> $@
+if MAKEWIN
+	echo export WINDOWS=\"yes\" >> $@
+else
+	echo export WINDOWS=\"no\" >> $@
+endif
+if USEESOPE
+	echo export ESOPE=\"yes\" >> $@
+else
+	echo export ESOPE=\"no\" >> $@
+endif
 
 EXTRA_DIST  = lexer.l parser.y tocpp.sh builtparser.cpp \
 	      builtparser.h builtlexer.cpp $(INCS)

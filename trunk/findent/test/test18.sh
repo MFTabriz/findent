@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # test wfindent
 # like wfindent, search for a suitable getopt. If no one available,
 # return 77 (i.e. test skipped)
@@ -11,7 +11,7 @@ else
    if [ "$?" -eq 4 ] ; then
       GETOPT=getopt
    else
-      tries="/usr/local/opt/gnu-getopt/bin/getopt /usr/local/bin/getopt"
+      tries="/usr/local/opt/gnu-getopt/bin/getopt /usr/local/bin/getopt /usr/local/bin/gnugetopt"
       for i in $tries ; do
          if [ -x "$i" ] ; then
             a=`"$i" -T`
@@ -63,8 +63,12 @@ end program prog2
 eof
 
 $WFINDENT -i5 prog1.f prog2.f
-sed -i~ $'s/\r//' prog1.f
-sed -i~ $'s/\r//' prog2.f
+tmpfile=`mktemp`
+tr -d '\r' < prog1.f > $tmpfile
+mv $tmpfile prog1.f
+tmpfile=`mktemp`
+tr -d '\r' < prog2.f > $tmpfile
+mv $tmpfile prog2.f
 for i in 1 2 ; do
    cmp -s prog$i.f prog$i.f.ref
    if [ $? -ne 0 ] ; then

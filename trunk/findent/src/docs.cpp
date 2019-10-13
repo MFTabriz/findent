@@ -222,7 +222,7 @@ void Docs::usage(bool man)
    manout(" ","  submodule(m) subm ->        use m");
    manout(" ","                              mod m:subm");
    manout(" ","  module module2    ->        mod module2");
-   manout("--makefdeps","outputs a bash(1) script that serves as a an example");
+   manout("--makefdeps","outputs a sh(1) script that serves as a an example");
    manout(" "," to generate dependencies for use in make(1).");
    manout(" "," ");
    if(doman)

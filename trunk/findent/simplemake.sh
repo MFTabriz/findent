@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # this script tries to compile findent, without using the
 # configure ; make ; make install 
