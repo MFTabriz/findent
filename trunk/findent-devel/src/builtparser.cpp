@@ -1,4 +1,4 @@
-/* A Bison parser, made by GNU Bison 3.3.2.  */
+/* A Bison parser, made by GNU Bison 3.4.1.  */
 
 /* Bison implementation for Yacc-like parsers in C
 
@@ -48,7 +48,7 @@
 #define YYBISON 1
 
 /* Bison version.  */
-#define YYBISON_VERSION "3.3.2"
+#define YYBISON_VERSION "3.4.1"
 
 /* Skeleton name.  */
 #define YYSKELETON_NAME "yacc.c"
@@ -66,7 +66,7 @@
 
 
 /* First part of user prologue.  */
-#line 1 "parser.y" /* yacc.c:337  */
+#line 1 "parser.y"
 
 #include <iostream>
 
@@ -77,7 +77,8 @@
 
 struct propstruct properties;
 
-#line 81 "parser.cpp" /* yacc.c:337  */
+#line 81 "parser.cpp"
+
 # ifndef YY_NULLPTR
 #  if defined __cplusplus
 #   if 201103L <= __cplusplus
@@ -98,8 +99,8 @@ struct propstruct properties;
 # define YYERROR_VERBOSE 0
 #endif
 
-/* In a future release of Bison, this section will be replaced
-   by #include "parser.hpp".  */
+/* Use api.header.include to #include this header
+   instead of duplicating it here.  */
 #ifndef YY_YY_PARSER_HPP_INCLUDED
 # define YY_YY_PARSER_HPP_INCLUDED
 /* Debug traces.  */
@@ -355,6 +356,8 @@ typedef short yytype_int16;
 # define YY_INITIAL_VALUE(Value) /* Nothing. */
 #endif
 
+
+#define YY_ASSERT(E) ((void) (0 && (E)))
 
 #if ! defined yyoverflow || YYERROR_VERBOSE
 
@@ -1461,6 +1464,8 @@ yynewstate:
 | yynewstate -- set current state (the top of the stack) to yystate.  |
 `--------------------------------------------------------------------*/
 yysetstate:
+  YYDPRINTF ((stderr, "Entering state %d\n", yystate));
+  YY_ASSERT (0 <= yystate && yystate < YYNSTATES);
   *yyssp = (yytype_int16) yystate;
 
   if (yyss + yystacksize - 1 <= yyssp)
@@ -1522,8 +1527,6 @@ yysetstate:
         YYABORT;
     }
 #endif /* !defined yyoverflow && !defined YYSTACK_RELOCATE */
-
-  YYDPRINTF ((stderr, "Entering state %d\n", yystate));
 
   if (yystate == YYFINAL)
     YYACCEPT;
@@ -1592,7 +1595,6 @@ yybackup:
   YY_IGNORE_MAYBE_UNINITIALIZED_BEGIN
   *++yyvsp = yylval;
   YY_IGNORE_MAYBE_UNINITIALIZED_END
-
   goto yynewstate;
 
 
@@ -1627,416 +1629,417 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-        case 8:
-#line 69 "parser.y" /* yacc.c:1652  */
+  case 8:
+#line 69 "parser.y"
     { properties.kind = ABSTRACTINTERFACE; }
-#line 1634 "parser.cpp" /* yacc.c:1652  */
+#line 1636 "parser.cpp"
     break;
 
   case 9:
-#line 70 "parser.y" /* yacc.c:1652  */
+#line 70 "parser.y"
     { properties.kind = ASSIGNMENT;        }
-#line 1640 "parser.cpp" /* yacc.c:1652  */
+#line 1642 "parser.cpp"
     break;
 
   case 10:
-#line 71 "parser.y" /* yacc.c:1652  */
+#line 71 "parser.y"
     { properties.kind = ASSOCIATE;         }
-#line 1646 "parser.cpp" /* yacc.c:1652  */
+#line 1648 "parser.cpp"
     break;
 
   case 11:
-#line 72 "parser.y" /* yacc.c:1652  */
+#line 72 "parser.y"
     { properties.kind = BLANK;             }
-#line 1652 "parser.cpp" /* yacc.c:1652  */
+#line 1654 "parser.cpp"
     break;
 
   case 12:
-#line 73 "parser.y" /* yacc.c:1652  */
+#line 73 "parser.y"
     { properties.kind = BLOCK;             }
-#line 1658 "parser.cpp" /* yacc.c:1652  */
+#line 1660 "parser.cpp"
     break;
 
   case 13:
-#line 74 "parser.y" /* yacc.c:1652  */
+#line 74 "parser.y"
     { properties.kind = BLOCKDATA;         }
-#line 1664 "parser.cpp" /* yacc.c:1652  */
+#line 1666 "parser.cpp"
     break;
 
   case 14:
-#line 75 "parser.y" /* yacc.c:1652  */
+#line 75 "parser.y"
     { properties.kind = CASE;              }
-#line 1670 "parser.cpp" /* yacc.c:1652  */
+#line 1672 "parser.cpp"
     break;
 
   case 15:
-#line 76 "parser.y" /* yacc.c:1652  */
+#line 76 "parser.y"
     { properties.kind = CASEDEFAULT;       }
-#line 1676 "parser.cpp" /* yacc.c:1652  */
+#line 1678 "parser.cpp"
     break;
 
   case 16:
-#line 77 "parser.y" /* yacc.c:1652  */
+#line 77 "parser.y"
     { properties.kind = CHANGETEAM;        }
-#line 1682 "parser.cpp" /* yacc.c:1652  */
+#line 1684 "parser.cpp"
     break;
 
   case 17:
-#line 78 "parser.y" /* yacc.c:1652  */
+#line 78 "parser.y"
     { properties.kind = CLASSDEFAULT;      }
-#line 1688 "parser.cpp" /* yacc.c:1652  */
+#line 1690 "parser.cpp"
     break;
 
   case 18:
-#line 79 "parser.y" /* yacc.c:1652  */
+#line 79 "parser.y"
     { properties.kind = CLASSIS;           }
-#line 1694 "parser.cpp" /* yacc.c:1652  */
+#line 1696 "parser.cpp"
     break;
 
   case 19:
-#line 80 "parser.y" /* yacc.c:1652  */
+#line 80 "parser.y"
     { properties.kind = CONTAINS;          }
-#line 1700 "parser.cpp" /* yacc.c:1652  */
+#line 1702 "parser.cpp"
     break;
 
   case 20:
-#line 81 "parser.y" /* yacc.c:1652  */
+#line 81 "parser.y"
     { properties.kind = CRITICAL;          }
-#line 1706 "parser.cpp" /* yacc.c:1652  */
+#line 1708 "parser.cpp"
     break;
 
   case 21:
-#line 82 "parser.y" /* yacc.c:1652  */
+#line 82 "parser.y"
     { properties.kind = DO;                }
-#line 1712 "parser.cpp" /* yacc.c:1652  */
+#line 1714 "parser.cpp"
     break;
 
   case 22:
-#line 83 "parser.y" /* yacc.c:1652  */
+#line 83 "parser.y"
     { properties.kind = ELSE;              }
-#line 1718 "parser.cpp" /* yacc.c:1652  */
+#line 1720 "parser.cpp"
     break;
 
   case 23:
-#line 84 "parser.y" /* yacc.c:1652  */
+#line 84 "parser.y"
     { properties.kind = ELSEIF;            }
-#line 1724 "parser.cpp" /* yacc.c:1652  */
+#line 1726 "parser.cpp"
     break;
 
   case 24:
-#line 85 "parser.y" /* yacc.c:1652  */
+#line 85 "parser.y"
     { properties.kind = ELSEWHERE;         }
-#line 1730 "parser.cpp" /* yacc.c:1652  */
+#line 1732 "parser.cpp"
     break;
 
   case 25:
-#line 86 "parser.y" /* yacc.c:1652  */
+#line 86 "parser.y"
     { properties.kind = ENDASSOCIATE;      }
-#line 1736 "parser.cpp" /* yacc.c:1652  */
+#line 1738 "parser.cpp"
     break;
 
   case 26:
-#line 87 "parser.y" /* yacc.c:1652  */
+#line 87 "parser.y"
     { properties.kind = ENDBLOCK;          }
-#line 1742 "parser.cpp" /* yacc.c:1652  */
+#line 1744 "parser.cpp"
     break;
 
   case 27:
-#line 88 "parser.y" /* yacc.c:1652  */
+#line 88 "parser.y"
     { properties.kind = ENDBLOCKDATA;      }
-#line 1748 "parser.cpp" /* yacc.c:1652  */
+#line 1750 "parser.cpp"
     break;
 
   case 28:
-#line 89 "parser.y" /* yacc.c:1652  */
+#line 89 "parser.y"
     { properties.kind = ENDCRITICAL;       }
-#line 1754 "parser.cpp" /* yacc.c:1652  */
+#line 1756 "parser.cpp"
     break;
 
   case 29:
-#line 90 "parser.y" /* yacc.c:1652  */
+#line 90 "parser.y"
     { properties.kind = ENDDO;             }
-#line 1760 "parser.cpp" /* yacc.c:1652  */
+#line 1762 "parser.cpp"
     break;
 
   case 30:
-#line 91 "parser.y" /* yacc.c:1652  */
+#line 91 "parser.y"
     { properties.kind = ENDENUM;           }
-#line 1766 "parser.cpp" /* yacc.c:1652  */
+#line 1768 "parser.cpp"
     break;
 
   case 31:
-#line 92 "parser.y" /* yacc.c:1652  */
+#line 92 "parser.y"
     { properties.kind = ENDFORALL;         }
-#line 1772 "parser.cpp" /* yacc.c:1652  */
+#line 1774 "parser.cpp"
     break;
 
   case 32:
-#line 93 "parser.y" /* yacc.c:1652  */
+#line 93 "parser.y"
     { properties.kind = ENDFUNCTION;       }
-#line 1778 "parser.cpp" /* yacc.c:1652  */
+#line 1780 "parser.cpp"
     break;
 
   case 33:
-#line 94 "parser.y" /* yacc.c:1652  */
+#line 94 "parser.y"
     { properties.kind = ENDIF;             }
-#line 1784 "parser.cpp" /* yacc.c:1652  */
+#line 1786 "parser.cpp"
     break;
 
   case 34:
-#line 95 "parser.y" /* yacc.c:1652  */
+#line 95 "parser.y"
     { properties.kind = ENDINTERFACE;      }
-#line 1790 "parser.cpp" /* yacc.c:1652  */
+#line 1792 "parser.cpp"
     break;
 
   case 35:
-#line 96 "parser.y" /* yacc.c:1652  */
+#line 96 "parser.y"
     { properties.kind = ENDMODULE;         }
-#line 1796 "parser.cpp" /* yacc.c:1652  */
+#line 1798 "parser.cpp"
     break;
 
   case 36:
-#line 97 "parser.y" /* yacc.c:1652  */
+#line 97 "parser.y"
     { properties.kind = ENDPROCEDURE;      }
-#line 1802 "parser.cpp" /* yacc.c:1652  */
+#line 1804 "parser.cpp"
     break;
 
   case 37:
-#line 98 "parser.y" /* yacc.c:1652  */
+#line 98 "parser.y"
     { properties.kind = ENDPROGRAM;        }
-#line 1808 "parser.cpp" /* yacc.c:1652  */
+#line 1810 "parser.cpp"
     break;
 
   case 38:
-#line 99 "parser.y" /* yacc.c:1652  */
+#line 99 "parser.y"
     { properties.kind = ENDSELECT;         }
-#line 1814 "parser.cpp" /* yacc.c:1652  */
+#line 1816 "parser.cpp"
     break;
 
   case 39:
-#line 100 "parser.y" /* yacc.c:1652  */
+#line 100 "parser.y"
     { properties.kind = ENDSUBMODULE;      }
-#line 1820 "parser.cpp" /* yacc.c:1652  */
+#line 1822 "parser.cpp"
     break;
 
   case 40:
-#line 101 "parser.y" /* yacc.c:1652  */
+#line 101 "parser.y"
     { properties.kind = ENDSUBROUTINE;     }
-#line 1826 "parser.cpp" /* yacc.c:1652  */
+#line 1828 "parser.cpp"
     break;
 
   case 41:
-#line 102 "parser.y" /* yacc.c:1652  */
+#line 102 "parser.y"
     { properties.kind = ENDTEAM;           }
-#line 1832 "parser.cpp" /* yacc.c:1652  */
+#line 1834 "parser.cpp"
     break;
 
   case 42:
-#line 103 "parser.y" /* yacc.c:1652  */
+#line 103 "parser.y"
     { properties.kind = ENDTYPE;           }
-#line 1838 "parser.cpp" /* yacc.c:1652  */
+#line 1840 "parser.cpp"
     break;
 
   case 43:
-#line 104 "parser.y" /* yacc.c:1652  */
+#line 104 "parser.y"
     { properties.kind = ENDWHERE;          }
-#line 1844 "parser.cpp" /* yacc.c:1652  */
+#line 1846 "parser.cpp"
     break;
 
   case 44:
-#line 105 "parser.y" /* yacc.c:1652  */
+#line 105 "parser.y"
     { properties.kind = ENTRY;             }
-#line 1850 "parser.cpp" /* yacc.c:1652  */
+#line 1852 "parser.cpp"
     break;
 
   case 45:
-#line 106 "parser.y" /* yacc.c:1652  */
+#line 106 "parser.y"
     { properties.kind = ENUM;              }
-#line 1856 "parser.cpp" /* yacc.c:1652  */
+#line 1858 "parser.cpp"
     break;
 
   case 46:
-#line 107 "parser.y" /* yacc.c:1652  */
+#line 107 "parser.y"
     { properties.kind = FORALL;            }
-#line 1862 "parser.cpp" /* yacc.c:1652  */
+#line 1864 "parser.cpp"
     break;
 
   case 47:
-#line 108 "parser.y" /* yacc.c:1652  */
+#line 108 "parser.y"
     { properties.kind = IF;                }
-#line 1868 "parser.cpp" /* yacc.c:1652  */
+#line 1870 "parser.cpp"
     break;
 
   case 48:
-#line 109 "parser.y" /* yacc.c:1652  */
+#line 109 "parser.y"
     { properties.kind = INCLUDE;           }
-#line 1874 "parser.cpp" /* yacc.c:1652  */
+#line 1876 "parser.cpp"
     break;
 
   case 49:
-#line 110 "parser.y" /* yacc.c:1652  */
+#line 110 "parser.y"
     { properties.kind = INTERFACE;         }
-#line 1880 "parser.cpp" /* yacc.c:1652  */
+#line 1882 "parser.cpp"
     break;
 
   case 50:
-#line 111 "parser.y" /* yacc.c:1652  */
+#line 111 "parser.y"
     { properties.kind = MODULE;            }
-#line 1886 "parser.cpp" /* yacc.c:1652  */
+#line 1888 "parser.cpp"
     break;
 
   case 51:
-#line 112 "parser.y" /* yacc.c:1652  */
+#line 112 "parser.y"
     { properties.kind = PROCEDURE;         }
-#line 1892 "parser.cpp" /* yacc.c:1652  */
+#line 1894 "parser.cpp"
     break;
 
   case 52:
-#line 113 "parser.y" /* yacc.c:1652  */
+#line 113 "parser.y"
     { properties.kind = PROGRAM;           }
-#line 1898 "parser.cpp" /* yacc.c:1652  */
+#line 1900 "parser.cpp"
     break;
 
   case 53:
-#line 114 "parser.y" /* yacc.c:1652  */
+#line 114 "parser.y"
     { properties.kind = PROCEDURE;         }
-#line 1904 "parser.cpp" /* yacc.c:1652  */
+#line 1906 "parser.cpp"
     break;
 
   case 54:
-#line 115 "parser.y" /* yacc.c:1652  */
+#line 115 "parser.y"
     { properties.kind = SELECTCASE;        }
-#line 1910 "parser.cpp" /* yacc.c:1652  */
+#line 1912 "parser.cpp"
     break;
 
   case 55:
-#line 116 "parser.y" /* yacc.c:1652  */
+#line 116 "parser.y"
     { properties.kind = SELECTTYPE;        }
-#line 1916 "parser.cpp" /* yacc.c:1652  */
+#line 1918 "parser.cpp"
     break;
 
   case 56:
-#line 117 "parser.y" /* yacc.c:1652  */
+#line 117 "parser.y"
     { properties.kind = END;               }
-#line 1922 "parser.cpp" /* yacc.c:1652  */
+#line 1924 "parser.cpp"
     break;
 
   case 57:
-#line 118 "parser.y" /* yacc.c:1652  */
+#line 118 "parser.y"
     { properties.kind = SUBROUTINE;        }
-#line 1928 "parser.cpp" /* yacc.c:1652  */
+#line 1930 "parser.cpp"
     break;
 
   case 58:
-#line 119 "parser.y" /* yacc.c:1652  */
+#line 119 "parser.y"
     { properties.kind = FUNCTION;          }
-#line 1934 "parser.cpp" /* yacc.c:1652  */
+#line 1936 "parser.cpp"
     break;
 
   case 59:
-#line 120 "parser.y" /* yacc.c:1652  */
+#line 120 "parser.y"
     { properties.kind = SUBMODULE;         }
-#line 1940 "parser.cpp" /* yacc.c:1652  */
+#line 1942 "parser.cpp"
     break;
 
   case 60:
-#line 121 "parser.y" /* yacc.c:1652  */
+#line 121 "parser.y"
     { properties.kind = TYPE;              }
-#line 1946 "parser.cpp" /* yacc.c:1652  */
+#line 1948 "parser.cpp"
     break;
 
   case 61:
-#line 122 "parser.y" /* yacc.c:1652  */
+#line 122 "parser.y"
     { properties.kind = TYPEIS;            }
-#line 1952 "parser.cpp" /* yacc.c:1652  */
+#line 1954 "parser.cpp"
     break;
 
   case 62:
-#line 123 "parser.y" /* yacc.c:1652  */
+#line 123 "parser.y"
     { properties.kind = USE;               }
-#line 1958 "parser.cpp" /* yacc.c:1652  */
+#line 1960 "parser.cpp"
     break;
 
   case 63:
-#line 124 "parser.y" /* yacc.c:1652  */
+#line 124 "parser.y"
     { properties.kind = WHERE;             }
-#line 1964 "parser.cpp" /* yacc.c:1652  */
+#line 1966 "parser.cpp"
     break;
 
   case 64:
-#line 125 "parser.y" /* yacc.c:1652  */
+#line 125 "parser.y"
     { properties.kind = SEGMENT;           }
-#line 1970 "parser.cpp" /* yacc.c:1652  */
+#line 1972 "parser.cpp"
     break;
 
   case 65:
-#line 126 "parser.y" /* yacc.c:1652  */
+#line 126 "parser.y"
     { properties.kind = ENDSEGMENT;        }
-#line 1976 "parser.cpp" /* yacc.c:1652  */
+#line 1978 "parser.cpp"
     break;
 
   case 71:
-#line 137 "parser.y" /* yacc.c:1652  */
+#line 137 "parser.y"
     {D(O("include"););}
-#line 1982 "parser.cpp" /* yacc.c:1652  */
+#line 1984 "parser.cpp"
     break;
 
   case 175:
-#line 291 "parser.y" /* yacc.c:1652  */
+#line 291 "parser.y"
     {lexer_enable(IDENTIFIER);}
-#line 1988 "parser.cpp" /* yacc.c:1652  */
+#line 1990 "parser.cpp"
     break;
 
   case 176:
-#line 293 "parser.y" /* yacc.c:1652  */
+#line 293 "parser.y"
     {lexer_enable(SKIP);}
-#line 1994 "parser.cpp" /* yacc.c:1652  */
+#line 1996 "parser.cpp"
     break;
 
   case 177:
-#line 295 "parser.y" /* yacc.c:1652  */
+#line 295 "parser.y"
     {lexer_enable(SKIPALL);}
-#line 2000 "parser.cpp" /* yacc.c:1652  */
+#line 2002 "parser.cpp"
     break;
 
   case 178:
-#line 297 "parser.y" /* yacc.c:1652  */
+#line 297 "parser.y"
     {lexer_enable(SKIPNOOP);}
-#line 2006 "parser.cpp" /* yacc.c:1652  */
+#line 2008 "parser.cpp"
     break;
 
   case 179:
-#line 299 "parser.y" /* yacc.c:1652  */
+#line 299 "parser.y"
     {properties.name=lexer_getname();}
-#line 2012 "parser.cpp" /* yacc.c:1652  */
+#line 2014 "parser.cpp"
     break;
 
   case 180:
-#line 301 "parser.y" /* yacc.c:1652  */
+#line 301 "parser.y"
     {properties.label=lexer_getstlabel();}
-#line 2018 "parser.cpp" /* yacc.c:1652  */
+#line 2020 "parser.cpp"
     break;
 
   case 181:
-#line 303 "parser.y" /* yacc.c:1652  */
+#line 303 "parser.y"
     {properties.dolabel=lexer_geti_number();}
-#line 2024 "parser.cpp" /* yacc.c:1652  */
+#line 2026 "parser.cpp"
     break;
 
   case 182:
-#line 305 "parser.y" /* yacc.c:1652  */
+#line 305 "parser.y"
     {properties.stringvalue=lexer_getstring();}
-#line 2030 "parser.cpp" /* yacc.c:1652  */
+#line 2032 "parser.cpp"
     break;
 
   case 183:
-#line 307 "parser.y" /* yacc.c:1652  */
+#line 307 "parser.y"
     {properties.lrvalue=lexer_getlr();}
-#line 2036 "parser.cpp" /* yacc.c:1652  */
+#line 2038 "parser.cpp"
     break;
 
 
-#line 2040 "parser.cpp" /* yacc.c:1652  */
+#line 2042 "parser.cpp"
+
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2267,7 +2270,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 312 "parser.y" /* yacc.c:1918  */
+#line 312 "parser.y"
 
 
 void resetprop()
