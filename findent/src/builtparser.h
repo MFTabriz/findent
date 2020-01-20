@@ -1,4 +1,4 @@
-/* A Bison parser, made by GNU Bison 3.3.2.  */
+/* A Bison parser, made by GNU Bison 3.4.1.  */
 
 /* Bison interface for Yacc-like parsers in C
 
@@ -148,29 +148,30 @@ extern int yydebug;
     IMPURE = 354,
     PURE = 355,
     RECURSIVE = 356,
-    SUBROUTINE = 357,
-    FUNCTION = 358,
-    PROGRAM = 359,
-    EOL = 360,
-    NAMED_LABEL = 361,
-    STLABEL = 362,
-    TYPE = 363,
-    ENDTYPE = 364,
-    CLASS = 365,
-    BASICTYPE = 366,
-    TYPEC = 367,
-    QSTRING = 368,
-    HSTRING = 369,
-    LR = 370,
-    LRB = 371,
-    DOTOPERATOR = 372,
-    I_NUMBER = 373,
-    UNCLASSIFIED = 374,
-    ERROR = 375,
-    OMP = 376,
-    SCANOMPFIXED = 377,
-    SCANOMPFREE = 378,
-    LAST_TOKEN = 379
+    NON_RECURSIVE = 357,
+    SUBROUTINE = 358,
+    FUNCTION = 359,
+    PROGRAM = 360,
+    EOL = 361,
+    NAMED_LABEL = 362,
+    STLABEL = 363,
+    TYPE = 364,
+    ENDTYPE = 365,
+    CLASS = 366,
+    BASICTYPE = 367,
+    TYPEC = 368,
+    QSTRING = 369,
+    HSTRING = 370,
+    LR = 371,
+    LRB = 372,
+    DOTOPERATOR = 373,
+    I_NUMBER = 374,
+    UNCLASSIFIED = 375,
+    ERROR = 376,
+    OMP = 377,
+    SCANOMPFIXED = 378,
+    SCANOMPFREE = 379,
+    LAST_TOKEN = 380
   };
 #endif
 

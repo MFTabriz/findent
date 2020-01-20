@@ -60,6 +60,9 @@ module some_module
    type name
         character(22) :: n
     end type
+    type isname
+    integer i
+    end type
 
 complex ccc
 interface myinterface
@@ -70,8 +73,8 @@ end interface
 interface anotherinterface
    module procedure funccc
 !
-!  trata
-   module procedure funcccc
+!  ticket 8
+   module procedure funcccc, funcy
 end interface
 abstract interface
      character*8 recursive function func(x)
@@ -84,6 +87,28 @@ contains
        real :: x
        funcc = 'a'
      end function funcc
+#if 0
+! gfortran does not handle NON_RECURSIVE
+     integer non_recursive function norecur(x)
+     real::x
+     norecur = x*10
+     end function norecur
+#endif
+#if 0
+! test non-standards
+       real function myfunc()
+            continue
+            end subroutine myfunc(something)
+       subroutine mysub
+            continue
+            end subroutine mysub(something)
+       procedure myproc
+            continue
+            end procedure myproc(something)
+       program myprog
+            continue
+            end program myprog(something)
+#endif
      integer(kind=4) pure function funccc(x)
         real, intent(in) :: x
         funccc = 2
@@ -92,9 +117,9 @@ contains
         type(onetype) :: x
         funcccc = x
      end function
-     integer elemental function funcx(x)
-        integer, intent(in) :: x
-        funcx = x
+     double precision function funcy(x)
+        double precision :: x
+        funcy = x
      end function
 #define GCC_VERSION (__GNUC__ * 10000  + __GNUC_MINOR__ * 100  + __GNUC_PATCHLEVEL__)
           /* Test for GCC >= 4.8.0 */
@@ -385,7 +410,7 @@ END ASSOCIATE
                                                    end
 
 subroutine multiline_preproc
-#ifdef one\   
+#ifdef one\
 two\
 three
 do i=1,10

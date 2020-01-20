@@ -1,6 +1,18 @@
+findent-3.1.5:
+	parser.y: recognize also (non-standard):
+	  END FUNCTION(something)
+	  END SUBROUTINE(something)
+	  END PROCEDURE(something)
+	  END PROGRAM(something)
+
+	Correct bug when parsing 'TYPE isname' and 'CLASS isname'
+	The lexer returned resp "TYPEIS" and "CLASSIS" which should
+	only be the case when 'IS' is followed by '('. (ticket 9)
 findent-3.1.4:
 	adapted some debian stuff
 	docs.cpp: added donations entry in manpage 
+	parser.y: recognize MODULE PROCEDURE SGAMMA, DGAMMA  (ticket 8) 
+	parser.y, lexer.l: recognize NON_RECURSIVE
 findent-3.1.3:
 	changed /bin/bash back to /bin/sh for all scripts
 	   used during installation and running (because of openBSD)

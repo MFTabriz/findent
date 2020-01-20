@@ -40,7 +40,7 @@ struct propstruct properties;
 
 %token IDENTIFIER SKIP SKIPALL SKIPNOOP KEYWORD
 
-%token ELEMENTAL IMPURE PURE RECURSIVE SUBROUTINE FUNCTION PROGRAM 
+%token ELEMENTAL IMPURE PURE RECURSIVE NON_RECURSIVE SUBROUTINE FUNCTION PROGRAM 
 %token EOL NAMED_LABEL
 %token STLABEL 
 %token TYPE ENDTYPE CLASS
@@ -136,10 +136,13 @@ use:                 USE    enable_identifier IDENTIFIER getname enable_skipall 
 
 include:             INCLUDE     QSTRING getstring EOL {D(O("include"););} ; /* include "file.inc" */
 
+identifiers:         IDENTIFIER
+	   |         identifiers ',' IDENTIFIER ;
+
 abstractinterface:   ABSTRACTINTERFACE  EOL     ;
 contains:            CONTAINS           EOL     ;
 interface:           INTERFACE          skipall ;   /* interface [name, operator(*), assignment(=) */
-moduleprocedure:     MODULEPROCEDURE    enable_identifier IDENTIFIER getname EOL ;
+moduleprocedure:     MODULEPROCEDURE    enable_identifier identifiers getname EOL ;
 procedure:           PROCEDURE          enable_identifier IDENTIFIER getname EOL ;
 
 
@@ -170,6 +173,7 @@ subroutineprefix_spec:  ELEMENTAL
 		    |   IMPURE      
 		    |   PURE        
 		    |   RECURSIVE   
+		    |   NON_RECURSIVE   
 		    |   intrinsic_type_spec
 		    |   TYPEC LR
 		    |   CLASS LR 
@@ -201,15 +205,19 @@ endcritical:         ENDCRITICAL   construct_name EOL ;
 enddo:               ENDDO         construct_name EOL ;
 endenum:             ENDENUM       EOL                ;
 endforall:           ENDFORALL     construct_name EOL ;
-endfunction:         ENDFUNCTION   construct_name EOL ;
+endfunction:         ENDFUNCTION   construct_name EOL 
+	   |         ENDFUNCTION   construct_name LR EOL;  /* to accommodate preprocessors who recognize END FUNCTION MYFUNC (SOMETHING) */
 endif:               ENDIF         construct_name EOL ;
 endinterface:        ENDINTERFACE  skipall            ;   /* end interface [name, operator(*), assignment(=)] */
 endmodule:           ENDMODULE     construct_name EOL ;
-endprocedure:        ENDPROCEDURE  construct_name EOL ;
-endprogram:          ENDPROGRAM    construct_name EOL ;
+endprocedure:        ENDPROCEDURE  construct_name EOL 
+	    |        ENDPROCEDURE  construct_name LR EOL;  /* to accommodate preprocessors who recognize END PROCEDURE MYPROC (SOMETHING) */
+endprogram:          ENDPROGRAM    construct_name EOL 
+	  |          ENDPROGRAM    construct_name LR EOL;  /* to accommodate preprocessors who recognize END PROGRAM MYPROG (SOMETHING) */
 endselect:           ENDSELECT     construct_name EOL ;
 endsubmodule:        ENDSUBMODULE  construct_name EOL ;
-endsubroutine:       ENDSUBROUTINE construct_name EOL ;
+endsubroutine:       ENDSUBROUTINE construct_name EOL 
+	     |       ENDSUBROUTINE construct_name LR EOL;  /* to accommodate preprocessors who recognize END SUBROUTINE MYSUB (SOMETHING) */
 endteam:             ENDTEAM       lr_construct_name EOL ;
 endtype:             ENDTYPE       construct_name EOL ;
 endsegment:          ENDSEGMENT    EOL ;
@@ -251,6 +259,7 @@ case:                CASE enable_identifier LR EOL                /* case (3)   
     |                CASE enable_identifier LR IDENTIFIER EOL;    /* case (3) name       */
 casedefault:         CASEDEFAULT       construct_name EOL    ;    /* case default [name] */
 classdefault:        CLASSDEFAULT      construct_name EOL ;
+
 classis:             CLASSIS       LR  construct_name EOL ;
 typeis:              TYPEIS        LR  construct_name EOL ;
 

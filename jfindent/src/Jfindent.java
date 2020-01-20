@@ -1,4 +1,4 @@
-/* $Id$
+/* $Id: Jfindent.java 115 2015-08-21 06:19:00Z willem_vermin $
  *
  * jfindent: a graphical wrapper for findent, my Fortran indenting program.
  * Take care that jfindent can find the findent executable.

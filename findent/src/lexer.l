@@ -48,7 +48,7 @@ ckey  call|close|common|continue|case|contains|cycle|class|codimension|contiguou
 		     start_stack.pop();
 		     if(lrreturn)
 		     {
-			return LR;
+			D(O("LR");Y); return LR;
 		     }
 		  }
 		}
@@ -147,13 +147,14 @@ associate         { D(O("ASSOCIATE");Y;);         return ASSOCIATE;         }
 assign            { D(O("ASSIGN");Y;);            return ASSIGN;            }
 block             { D(O("BLOCK");Y;);             return BLOCK;             }
 blockdata         { D(O("BLOCKDATA");Y;);         return BLOCKDATA;         }
-casedefault       { D(O("CASEDEFAULT");Y);        return CASEDEFAULT;       }
 case              { D(O("CASE");Y);               return CASE;              }
+casedefault       { D(O("CASEDEFAULT");Y);        return CASEDEFAULT;       }
 character         { D(O("CHARACTER");Y;);         return BASICTYPE;         }
-classdefault      { D(O("CLASSDEFAULT");Y);       return CLASSDEFAULT;      }
 changeteam        { D(O("CHANGETEAM");Y);         return CHANGETEAM;        }
 class             { D(O("CLASS");Y;);             return CLASS;             }
-classis           { D(O("CLASSIS");Y);            return CLASSIS;           }
+classdefault      { D(O("CLASSDEFAULT");Y);       return CLASSDEFAULT;      }
+	/* see comment at TYPEIS */
+classis/\(        { D(O("CLASSIS");Y);            return CLASSIS;           }
 complex           { D(O("COMPLEX");Y;);           return BASICTYPE;         }
 contains          { D(O("CONTAINS");Y);           return CONTAINS;          }
 critical          { D(O("CRITICAL");Y;);          return CRITICAL;          }
@@ -169,12 +170,12 @@ elemental         { D(O("ELEMENTAL");Y;);         return ELEMENTAL;         }
 else              { D(O("ELSE");Y);               return ELSE;              }
 elseif            { D(O("ELSEIF");Y);             return ELSEIF;            }
 elsewhere         { D(O("ELSEWHERE");Y);          return ELSEWHERE;         }
+end               { D(O("END");Y;);               return END;               }
 endassociate      { D(O("ENDASSOCIATE");Y;);      return ENDASSOCIATE;      }
 endblock          { D(O("ENDBLOCK");Y;);          return ENDBLOCK;          }
 endblockdata      { D(O("ENDBLOCKDATA");Y;);      return ENDBLOCKDATA;      }
 endcritical       { D(O("ENDCRITICAL");Y;);       return ENDCRITICAL;       }
 enddo             { D(O("ENDDO");Y;);             return ENDDO;             }
-end               { D(O("END");Y;);               return END;               }
 endenum           { D(O("ENDENUM");Y;);           return ENDENUM;           }
 endforall         { D(O("ENDFORALL");Y;);         return ENDFORALL;         }
 endfunction       { D(O("ENDFUNCTION");Y;);       return ENDFUNCTION;       }
@@ -208,6 +209,7 @@ program           { D(O("PROGRAM");Y;);           return PROGRAM;           }
 pure              { D(O("PURE");Y;);              return PURE;              }
 real              { D(O("REAL");Y;);              return BASICTYPE;         }
 recursive         { D(O("RECURSIVE");Y;);         return RECURSIVE;         } 
+non_recursive     { D(O("NON_RECURSIVE");Y;);     return NON_RECURSIVE;     } 
 selectcase        { D(O("SELECTCASE");Y);         return SELECTCASE;        }
 selecttype        { D(O("SELECTTYPE");Y);         return SELECTTYPE;        }
 submodule         { D(O("SUBMODULE");Y;);         return SUBMODULE;         }
@@ -216,7 +218,10 @@ to                { D(O("TO");Y;);                return TO;                }
 then              { D(O("THEN");Y;);              return THEN;              }
 type              { D(O("TYPE");Y;);              return TYPE;              }
 type/\(           { D(O("TYPEC");Y;);             return TYPEC;             }
-typeis            { D(O("TYPEIS");Y);             return TYPEIS;            }
+	/* To disambiguate between 'TYPE ISMYTYPE' and TYPE IS(MYTYPE), the lexer */
+	/* recognizes 'TYPEIS(' and returns "TYPEIS" */
+	/* Note that the '(' stays in the input buffer */
+typeis/\(         { D(O("TYPEIS");Y);             return TYPEIS;            }
 use               { D(O("USE");Y);                return USE;               }
 where             { D(O("WHERE");Y;);             return WHERE;             }
 }

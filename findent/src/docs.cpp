@@ -62,7 +62,7 @@ void Docs::usage(bool man)
    {
       doman = 1;
       std::cout << ".\\\" DO NOT MODIFY THIS FILE! It was created by findent \\-H"                << std::endl;
-      std::cout << ".TH FINDENT \"1\" \"2018\" \"findent\\-" << VERSION << "\" \"User Commands\"" << std::endl;
+      std::cout << ".TH FINDENT \"1\" \"2019\" \"findent\\-" << VERSION << "\" \"User Commands\"" << std::endl;
       std::cout << ".SH NAME"                                                                   << std::endl;
       std::cout << "findent \\- Indents and optionally converts Fortran program source"         << std::endl;
       std::cout << ".SH SYNOPSIS"                                                               << std::endl;
@@ -304,15 +304,28 @@ void Docs::usage(bool man)
 
    if(doman)
    {
+      std::cout << ".SH DONATIONS" << std::endl;
+      std::cout << ".br"           << std::endl;
+   }
+   else
+   {
+      std::cout << "DONATIONS"     << std::endl;
+   }
+   manout(" ","Donations to support the maintenance of this program are welcome: ");
+   manout(" ","https://paypal.me/wvermin");
+   if(doman)
+   {
       std::cout << ".SH COPYRIGHT" << std::endl;
       std::cout << ".br"           << std::endl;
    }
    else
    {
+      std::cout << std::endl;
       std::cout << "COPYRIGHT"     << std::endl;
    }
-   std::cout << "This is free software; see the source for copying conditions.  There is NO"  <<std::endl;
-   std::cout << "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE." <<std::endl;
+   manout(" ","This is free software; see the source for copying conditions.");
+   manout(" ","There is NO warranty; not even for MERCHANTABILITY or FITNESS");
+   manout(" ","FOR A PARTICULAR PURPOSE.");
 }
 
 void Docs::replaceAll( std::string &s, const std::string &search, const std::string &replace ) 
