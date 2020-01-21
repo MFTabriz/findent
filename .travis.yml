@@ -1,0 +1,9 @@
+language: cpp
+os: linux
+dist: xenial
+compiler: gcc
+script:
+    - cd findent
+    - ./configure
+    - make
+
