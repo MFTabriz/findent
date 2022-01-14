@@ -1,10 +1,39 @@
+/* -copyright-
+#-# Copyright: 2015,2016,2017,2018,2019,2020,2021 Willem Vermin wvermin@gmail.com
+#-# 
+#-# License: BSD-3-Clause
+#-#  Redistribution and use in source and binary forms, with or without
+#-#  modification, are permitted provided that the following conditions
+#-#  are met:
+#-#  1. Redistributions of source code must retain the above copyright
+#-#     notice, this list of conditions and the following disclaimer.
+#-#  2. Redistributions in binary form must reproduce the above copyright
+#-#     notice, this list of conditions and the following disclaimer in the
+#-#     documentation and/or other materials provided with the distribution.
+#-#  3. Neither the name of the copyright holder nor the names of its
+#-#     contributors may be used to endorse or promote products derived
+#-#     from this software without specific prior written permission.
+#-#   
+#-#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#-#  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#-#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+#-#  A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE HOLDERS OR
+#-#  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+#-#  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#-#  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+#-#  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#-#  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+#-#  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+#-#  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #include <stdio.h>
 #include <unistd.h>
 #include "findentclass.h"
 #include "fortranline.h"
 #include "debug.h"
 
-int Findent::determine_fix_or_free()
+int Findent::determine_fix_or_free(strings_t *input)
 {
    int rc;
    int n = 0;
@@ -15,10 +44,25 @@ int Findent::determine_fix_or_free()
    bool p_more = 0;
    bool skip = 0;
 
-   while ( n < nmax)
+   strings_t::iterator it = input->begin();
+
+   D(O(" "););
+   while (n < nmax)
    {
       n++;
-      line = mygetline(eof,1);
+      if(it == input->end())
+      {
+	 s = "";
+	 eof = 1;
+      }
+      else
+      {
+	 s = *it;
+	 it++;
+	 eof  = 0;
+      }
+      line = Fortranline(gl,s);
+      D(O(' '););
       if (eof)
       {
 	 //
@@ -128,6 +172,7 @@ int Findent::what_to_return()
    return 0;
 }              // end of what_to_return
 
+#if 0
 void Findent::init_indent()
 {
    //
@@ -152,6 +197,7 @@ void Findent::init_indent()
    push_indent(start_indent);
 
 }             // end of init_indent
+#endif
 
 
 std::string Findent::handle_dos(const std::string &s)
@@ -175,6 +221,7 @@ std::string Findent::handle_dos(const std::string &s)
    return sl;
 }         // end of handle_dos
 
+#if 0
 int Findent::guess_indent(Fortranline line)
 {
    //
@@ -218,102 +265,8 @@ int Findent::guess_indent(Fortranline line)
    }
    return si;
 }                // end of guess_indent
+#endif
 
-Fortranline Findent::getnext(bool &eof, bool use_wb)
-{
-   Fortranline line(gl);
-   eof = 0;
-   if (use_wb && !wizardbuffer.empty())
-   {
-      line = wizardbuffer.front();
-      num_lines++;
-      wizardbuffer.pop_front();
-      if (reading_from_tty && line.str() == ".")
-	 eof = 1;
-   }
-   else if (!curlinebuffer.empty())
-   {
-      line = curlinebuffer.front();
-      curlinebuffer.pop_front();
-      num_lines++;
-      if (reading_from_tty && line.str() == ".")
-	 eof = 1;
-   }
-   else
-   {
-      line = mygetline(eof);
-      if (!eof)
-	 num_lines++;
-   }
-
-   //
-   // remove trailing white space
-   // FIXED: convert leading tab to space
-   //
-
-   line.clean();
-
-   if(!use_wb && !eof)
-   {
-      num_lines--;
-      wizardbuffer.push_back(line);
-   }
-
-   if (!nbseen)
-   {
-      nbseen = !line.blank_or_comment() 
-	 && (line.getpregentype() == 0)
-	 && prevlastchar          != '\\'
-	 && line.lastchar()       != '\\'; 
-
-      if (flags.auto_firstindent && nbseen)
-      {
-	 start_indent = guess_indent(line);
-	 cur_indent   = start_indent;
-	 init_indent();
-	 indent_handled = 1;
-      }
-      prevlastchar = line.lastchar();
-   }
-
-   return line;
-}
-
-Fortranline Findent::mygetline(bool &eof, bool buffer)
-{
-   //
-   // reads next line from cin.
-   // side effects:
-   //   end_of_file is set if endoffile condition is met
-   //   endline is set to \n or \r\n
-   //   lines_read is incremented
-   //
-
-   std::string s;
-
-   getline(std::cin,s);
-
-   //
-   // sometimes, files do not end with (cr)lf, hence the test for s=="":
-   //
-   eof = (std::cin.eof() && s == "");
-
-   lines_read ++;
-
-   if (!eof && reading_from_tty)
-   {
-      eof = (s == ".");
-      if (eof)
-	 curlinebuffer.push_back(Fortranline(gl,s));
-   }
-
-   s = handle_dos(s);
-
-   if(buffer && !eof)
-      curlinebuffer.push_back(Fortranline(gl,s));
-
-   return Fortranline(gl,s);
-}              // end of mygetline
 
 std::string Findent::type2str(const int t)
 {

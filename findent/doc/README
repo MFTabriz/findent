@@ -4,16 +4,20 @@ This document is a not very well structured story about findent.
 You can skip this and use findent after reading the output of
   findent -h.
 
-findent, what?
+Findent: what?
 ==============
 
-   findent is an indenter for Fortran programs, fixed and free format.
-   findent can also translate fixed format to free format and vice versa.
+   Findent is an indenter for Fortran programs, fixed and free format.
+   Findent can also translate fixed format to free format and vice versa.
    Since version 3.0.0, findent can generate dependencies based on USE,
    MODULE, SUBMODULE, INCLUDE, #include, ??include  and emit a sh script
    that, using findent, creates a dependency file to be used in a Makefile.
+   Since version 4.1.0, findent can relabel Fortran sources.
+   Findent indents more than 100K lines per second, so usage as a 
+   standard indenter in an editor works very well, see 'findent and vim',
+   'findent and gedit' and 'findent and emacs' below.
 
-   findent will take care of:
+   Findent will take care of:
 
       continuation lines
       multi-statement lines
@@ -26,7 +30,7 @@ findent, what?
       FORALL constructs
       etc. see findentclass.cpp for details
 
-   findent will remove trailing spaces and tabs, and convert
+   Findent will remove trailing spaces and tabs, and convert
    tabs at the start of a line into spaces. By default, statement 
    labels are placed at the start of a line. Apart from this and
    indenting, findent will not alter the input, trying to
@@ -49,7 +53,7 @@ findent, what?
       ...
       END SUBROUTINE SUB
 
-   findent is space-insensitive, for example a line like:
+   Findent is space-insensitive, for example a line like:
 
       REALFUN  CTIONFUN(X)
 
@@ -59,7 +63,7 @@ findent, what?
 
        findent -h
 
-findent, why?
+Findent: why?
 =============
 
    There are a number of public domain Fortran indenting tools, for example:
@@ -86,18 +90,18 @@ findent, why?
 
    Furthermore, I want that indenting does not make irreversible changes 
    to the source: I want always be able to get back to the version after
-   the first indenting. (Exceptions: converting from fixed to free format;
-   adding 'subroutine foo' after 'end').
+   the first indenting. (Exceptions: converting from fixed to free format
+   or vice-versa; adding 'subroutine foo' after 'end'; relabeling).
 
    Therefore I decided, having some spare time after my retirement, 
    to try to build a Fortran indenter, based on flex and bison for
    readability.
    As programming language I chose C++, because of the availability
-   of string and deque.
+   of string, deque, set and map.
 
    After more or less finishing the indenting part, I realized that
    findent should be able to play a role in determining the dependencies
-   based on (sub)modules and various kinds of include's. So I added some
+   based on (sub)modules and various kinds of includes. So I added some
    lines to accomplish this. Together with an simple script 
    dependencies are easily created. See 'man findent' under '--deps' for
    details. 
@@ -112,13 +116,13 @@ findent, why?
      http://lagrange.mechse.illinois.edu/f90_mod_deps/f90_mod_deps.py
         does not seem to work properly.
    - fortdepend: see https://github.com/ZedThree/fort_depend.py
-        Does not work with submodules and is picky about end statements.
+        Does not work with submodules and is picky about END statements.
 
    I did not investigate if these tools can cope with split MODULE and
    USE lines and fixed-format space-independent source code.
 
 
-findent, how?
+Findent: how?
 =============
 
    So, here it is, a Fortran indenter to my taste, based on flex,
@@ -159,7 +163,7 @@ findent, how?
 		X(I) = Y(I)+J
         10 CONTINUE
 
-Findent, structure
+Findent: structure
 ==================
 
    In version 2.8.4, a major reorganizing has been done, trying to
@@ -273,15 +277,93 @@ Findent, structure
    other classes using pointers. But, like in biology, in creating
    a program, there is no law to keep it simple.
 
+   Btw, when adding the relabel option, I had to revise class-related
+   things a bit, so maybe the information above is not entirely correct.
 
-findent, usage?
-===============
+Findent: relabel
+================
+
+   Since version 4.1.0, findent optionally relabels, see the man page.
+
+   Relevant flags (see the man page):
+
+   --relabel
+   --relabel-restart
+   --query-relabel
+
+   I strongly advise to check your Fortran program after relabeling,
+   please let me know if there are problems.
+
+   Relabeling is done on a subroutine/function/program basis: 
+   the input is read until a start of a subroutine etc. is found,
+   and stored in a buffer until the corresponding end is found,
+   creating a list of defined and used labels.
+
+   If something goes wrong (for example: usage of an undefined
+   label), relabeling is abandoned for the current subroutine etc, 
+   and for the rest of the input.
+
+   If everything seems ok, a second pass is started to perform
+   the actual relabeling.
+
+   The complete input, relabeled or not, is presented to the 
+   indenter/converter, so all flags are honoured.
+
+    The following constructs are candidates for relabeling:
+
+       - 100,110,120,130: label
+       - X:         integer or real or logical expression
+       - I:         identifier
+       - [,]:       optional comma
+       - ...:       not parsed by findent, can be almost anything except '=...'
+       - [IF]:      optional IF(...)
+
+       100 ...         ! statement or format label
+       IF(...) 110,120,130
+       IF(...) 110,120
+       DO 100[,] I=X,...
+       DO 100[,] WHILE(...)
+       DO 100[,] CONCURRENT(...)
+       DO 100
+       [IF] ACCEPT 100...
+       [IF] ASSIGN 100 TO I
+       [IF] BACKSPACE(...,ERR=100,...)
+       [IF] CALL I(...,*100,...,&110,...,$120,...)
+       [IF] CLOSE(...,ERR=100,...)
+       [IF] DECODE(...,100,...,ERR=110,...)
+       [IF] DELETE(...,ERR=110,...)
+       [IF] ENCODE(...,100,...,ERR=110,...)
+       [IF] ENDFILE(...,ERR=100,...)
+       [IF] FIND(...,ERR=110,...)
+       [IF] FLUSH(...,ERR=100,...)
+       [IF] GOTO 100
+       [IF] GOTO I[,](100,110,120)
+       [IF] GOTO(100,110,120)...
+       [IF] INQUIRE(...,ERR=100,...)
+       [IF] OPEN(...,ERR=100,...)
+       [IF] PRINT 100...
+       [IF] READ 100...
+       [IF] READ(...,100,...)
+       [IF] READ(...,ERR=100,...,END=110,EOR=120,...,FMT=130)...
+       [IF] REREAD 100...
+       [IF] REREAD(...,100,...)
+       [IF] REREAD(...,ERR=100,...,END=110,EOR=120,...,FMT=130)...
+       [IF] REWIND(...,ERR=100,...)
+       [IF] REWRITE(...,100) ...
+       [IF] REWRITE(...,ERR=100,...,FMT=110,...,EOR=120)...
+       [IF] TYPE 100...
+       [IF] WAIT(...,ERR=100,...,END=110,...,EOR=120,...)
+       [IF] WRITE(...,100) ...
+       [IF] WRITE(...,ERR=100,...,FMT=110,...,EOR=120)...
+
+Findent: usage
+==============
 
    Findent reads from standard input and writes to standard output:
 
       findent < prog.f90 > prog1.f90
 
-   See also 'wfindent', later in this file.
+   See also 'wfindent' below.
 
    The command
 
@@ -308,7 +390,7 @@ findent, usage?
         example: -L72
         limit input line length to 72 characters.
 
-   NOTE 1: findent knows about tabbed input: for fixed-format input,
+   NOTE 1: Findent knows about tabbed input: for fixed-format input,
            the following transformations are made:
 
            10<tab>I=   -> 10<sp><sp><sp><sp>I=
@@ -318,9 +400,9 @@ findent, usage?
            So, a tab followed by 1-9 is transformed to a continuation line,
            otherwise to a normal line, starting in column 7.
 
-   NOTE 2: findent silently ignores errors in the flags
+   NOTE 2: Findent silently ignores errors in the flags
 
-   NOTE 3: handling of continuation lines
+   NOTE 3: Handling of continuation lines
            Example:
 
               a = &
@@ -486,7 +568,7 @@ end program addspace
 
         findent -ofree < prog.f | addspace | findent > prog.f90
 
-findent, failure, findentfix:
+Findent: failure, findentfix:
 =============================
 
    One thing is certain: findent contains errors. I appreciate it 
@@ -552,7 +634,7 @@ findent, failure, findentfix:
      ! findentfix: continue
 
 
-findent, creating a dependency file for use in an Makefile.
+Findent: creating a dependency file for use in an Makefile.
 ===========================================================
 
       findent --deps < prog.f90
@@ -642,7 +724,7 @@ print *,'this is sub'
    statement: you need to have gfortran >= 6 to compile.
 
 
-findent, installation:
+Findent: installation:
 ======================
 
    (For a more comprehensive text, see README.1st and INSTALL)
@@ -700,28 +782,26 @@ jfindent or jfindent.jar
   jfindent is a graphical front end for findent, and is available as
   a separate package on findent.sourceforge.net
 
-findent and vim
+Findent and vim
 ===============
 
    Findent is since version 2.7 very vim-aware. When using the vim scripts
    (look at findent --vim-help), findent is used as equalprg 
    ( :help equalprg )
    and indentexpr ( :help indentexpr )
-   This is possible because of the speed of findent: it indents about 
-   50000 - 100000 lines per second.
 
    Findent can emit configuration files, look at the output of:
 
       findent --vim_help
 
-findent and gedit
+Findent and gedit
 =================
 
    To enable findent in gedit, look at the output of:
 
       findent --gedit_help
 
-findent and emacs
+Findent and emacs
 =================
 
    To enable findent in emacs, look at the output of:
@@ -795,5 +875,4 @@ of findent.
 I am happy to receive comments, error reports and suggestions for
 improvements.
 
-October 2018, Willem Vermin, wvermin@gmail.com
-
+October 2021, Willem Vermin, wvermin@gmail.com

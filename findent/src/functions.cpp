@@ -1,3 +1,32 @@
+/* -copyright-
+#-# Copyright: 2015,2016,2017,2018,2019,2020,2021 Willem Vermin wvermin@gmail.com
+#-# 
+#-# License: BSD-3-Clause
+#-#  Redistribution and use in source and binary forms, with or without
+#-#  modification, are permitted provided that the following conditions
+#-#  are met:
+#-#  1. Redistributions of source code must retain the above copyright
+#-#     notice, this list of conditions and the following disclaimer.
+#-#  2. Redistributions in binary form must reproduce the above copyright
+#-#     notice, this list of conditions and the following disclaimer in the
+#-#     documentation and/or other materials provided with the distribution.
+#-#  3. Neither the name of the copyright holder nor the names of its
+#-#     contributors may be used to endorse or promote products derived
+#-#     from this software without specific prior written permission.
+#-#   
+#-#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#-#  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#-#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+#-#  A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE HOLDERS OR
+#-#  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+#-#  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#-#  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+#-#  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#-#  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+#-#  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+#-#  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -19,20 +48,6 @@ std::string stolower(const std::string &s)
    for (int i=0; i<l; i++)
       sl[i] = tolower(sl[i]);
    return sl;
-}
-
-std::string firstchars(const std::string &s, const int n)
-{
-   size_t l = s.length();
-   switch(l)
-   {
-      case 0:
-	 return std::string("");
-      case 1:
-	 return s.substr(0,1);
-      default:
-	 return s.substr(0,2);
-   }
 }
 
 std::string remove_blanks(const std::string &s)
@@ -101,7 +116,7 @@ bool isfixedcmtp(const std::string &s)
    char c = firstchar(s);
    char cts = firstchar(trim(s));
    return (cts == 0 || c == 'C' || c == 'c' || cts == '!' || c == '*' \
-	 || cts == '#' || c == 'd' || c == 'D' || firstchars(trim(s),2) == "??"); 
+	 || cts == '#' || c == 'd' || c == 'D' || trim(s).substr(0,2) == "??"); 
 }
 
 int num_leading_spaces(const std::string &s)
@@ -110,6 +125,15 @@ int num_leading_spaces(const std::string &s)
    if (p == std::string::npos)
       return s.size();
    return p;
+}
+
+std::string leading_blanks(const std::string &s)
+{
+   std::string r;
+   size_t p = 0;
+   while(p < s.size() && (s[p] == ' ' || s[p] == '\t'))
+      r += s[p++];
+   return r;
 }
 
 char fixedmissingquote(const std::string &s)
@@ -218,3 +242,83 @@ std::string remove_trailing_comment(const std::string &s,const char prevquote)
    }
    return so;
 }              // end of remove_trailing_comment
+
+// get integer (l) from string (s). n will become the number 
+// of characters used
+// examples:
+//     "0123456789"
+// s   " 1 2 3   "  : l: 123, n:9
+// s   " 1 2 3   p" : l: 123, n:9
+//
+void getint_sp(const std::string &s, unsigned long int &l, unsigned int &n)
+{
+   l = 0;
+   n = 0;
+   bool r = 0;
+   for (size_t i = 0; i<s.length(); i++)
+   {
+      char c = s.at(i);
+      switch (c)
+      {
+	 case ' ': case '\t':
+	    n++;
+	    break;
+	 case '0': case '1': case '2': case '3': case '4': 
+	 case '5': case '6': case '7': case '8': case '9': 
+	    l = l*10 + c - '0';
+	    n++;
+	    break;
+	 default:
+	    r = 1;
+	    break;
+      }
+      if(r)
+	 break;
+   }
+} // end of getint_sp
+
+// given s, l will contain digits from s, ignoring space
+// n will contain number of characters used from s
+//    s        l     n
+// " 3 6 " -> "36"  5
+// "36p"   -> "36"  2
+//
+void getstr_sp(const std::string &s, std::string &l, unsigned int &n)
+{
+   l              = "";
+   n              = 0;
+   bool r         = false;
+   bool firstzero = false;
+   for (size_t i = 0; i<s.length(); i++)
+   {
+      char c = s.at(i);
+      switch (c)
+      {
+	 case ' ': case '\t':
+	    n++;
+	    break;
+	 case '0': case '1': case '2': case '3': case '4': 
+	 case '5': case '6': case '7': case '8': case '9': 
+	    if (c == '0')
+	    {
+	       if(l.size() == 0)
+	       {
+		  n++;
+		  firstzero = true;
+		  break;
+	       }
+	    }
+	    l += c;
+	    n++;
+	    break;
+	 default:
+	    r = 1;
+	    break;
+      }
+      if(r)
+	 break;
+   }
+   if (firstzero && l.size() == 0)
+      l = "0";
+} // end of getstr_sp
+

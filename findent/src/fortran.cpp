@@ -1,15 +1,196 @@
+/* -copyright-
+#-# Copyright: 2015,2016,2017,2018,2019,2020,2021 Willem Vermin wvermin@gmail.com
+#-# 
+#-# License: BSD-3-Clause
+#-#  Redistribution and use in source and binary forms, with or without
+#-#  modification, are permitted provided that the following conditions
+#-#  are met:
+#-#  1. Redistributions of source code must retain the above copyright
+#-#     notice, this list of conditions and the following disclaimer.
+#-#  2. Redistributions in binary form must reproduce the above copyright
+#-#     notice, this list of conditions and the following disclaimer in the
+#-#     documentation and/or other materials provided with the distribution.
+#-#  3. Neither the name of the copyright holder nor the names of its
+#-#     contributors may be used to endorse or promote products derived
+#-#     from this software without specific prior written permission.
+#-#   
+#-#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#-#  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#-#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+#-#  A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE HOLDERS OR
+#-#  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+#-#  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#-#  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+#-#  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#-#  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+#-#  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+#-#  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #include "fortran.h"
 #include "pre_analyzer.h"
 #include "line_prep.h"
 #include "functions.h"
+#include "flags.h"
 
-#define Cur_indent   fi->cur_indent
+#define Cur_indent   cur_indent
 #define FLAGS        fi->flags
 #define Endline      fi->endline
-#define End_of_file  fi->end_of_file
-#define Getnext      fi->getnext
+#define End_of_file  end_of_file
+#define Getnext      getnext
 #define Includes     fi->includes
 #define Curline      (*curline)
+
+void Fortran::init_indent()
+{
+   //
+   // fills the indent-stack until indent 0
+   // if flags.all_indent <= 0: build indent_stack with a number of start_indent's
+   //
+   while(!indent.empty())
+      indent.pop_back();
+   int l=0;
+   if(FLAGS.all_indent > 0)
+   {
+      for (l = start_indent%FLAGS.all_indent; l<start_indent; l+=FLAGS.all_indent)
+      {
+	 push_indent(l);
+      }
+   }
+   else
+   {
+      for (int i=0; i<100; i++)
+	 push_indent(start_indent);
+   }
+   push_indent(start_indent);
+
+}             // end of init_indent
+
+//Fortranline Fortran::mygetline(bool &eof, bool keep_lines)
+Fortranline Fortran::mygetline(bool &eof)
+{
+   std::string s = "";
+   eof = 0;
+
+   if (input->empty())
+   {
+      eof = 1;
+   }
+   else
+   {
+      s = input->front();
+      input->pop_front();
+   }
+   //}
+
+lines_read ++;
+
+return Fortranline(gl,s);
+}              // end of mygetline
+
+Fortranline Fortran::getnext(bool &eof, bool use_wb)
+{
+   Fortranline line(gl);
+   eof = 0;
+   if (use_wb && !wizardbuffer.empty())
+   {
+      line = wizardbuffer.front();
+      D(O("wizardbuffer_pop");O(line.str());O(wizardbuffer.size()););
+      num_lines++;
+      wizardbuffer.pop_front();
+      //if (reading_from_tty && line.str() == ".")
+      //	 eof = 1;
+   }
+   else
+   {
+      line = mygetline(eof);
+      if (!eof)
+	 num_lines++;
+   }
+
+   //
+   // remove trailing white space
+   // FIXED: convert leading tab to space
+   //
+
+   line.clean();
+
+   if(!use_wb && !eof)
+   {
+      num_lines--;
+      wizardbuffer.push_back(line);
+      D(O("wizardbuffer_push");O(line.str());O(wizardbuffer.size()););
+   }
+
+   if (!nbseen)
+   {
+      nbseen = !line.blank_or_comment() 
+	 && (line.getpregentype() == 0)
+	 && prevlastchar          != '\\'
+	 && line.lastchar()       != '\\'; 
+
+      if (FLAGS.auto_firstindent && nbseen)
+      {
+	 start_indent = guess_indent(line);
+	 cur_indent   = start_indent;
+	 init_indent();
+	 indent_handled = 1;
+      }
+      prevlastchar = line.lastchar();
+   }
+
+   D(O(line.str());O(use_wb););
+   DL(
+	 if(use_wb)
+	 D(O("getnext___");O(line.str()););
+     );
+
+   return line;
+}
+
+int Fortran::guess_indent(Fortranline line)
+{
+   //
+   // count spaces at start of line, correct for tabs and & and label
+   //
+   int si         = 0;
+   bool ready     = 0;
+   const int tabl = 8;
+
+   if (line.format() == FIXED)
+   {
+      std::string s = line.str();
+      si             = s.find_first_not_of(' ') -6;
+      if (si <0)
+	 si = 0;
+      return si;
+   }
+
+   std::string s = line.str();
+   for (unsigned int j=0; j<s.length(); j++)
+   {
+      switch (s[j])
+      {
+	 case ' ' : case '0' : case '1' : case '2' : case '3' : case '4' : 
+	 case '5' : case '6' : case '7' : case '8' : case '9' :
+	    si ++;
+	    break;
+	 case '&' :
+	    si++;
+	    ready = 1;
+	    break;
+	 case '\t' :
+	    si = (si/tabl)*tabl + tabl;
+	    break;
+	 default:
+	    ready = 1;
+	    break;
+      }
+      if(ready)
+	 break;
+   }
+   return si;
+}                // end of guess_indent
 
 bool Fortran::output_pre(lines_t &lines, lines_t *outlines)
 {
@@ -58,10 +239,11 @@ void Fortran::handle_last_usable_only()
    //
    int usable_line = 1;
 
-   fi->init_indent();
+   init_indent();
    while(1)
    {
-      int prev         = fi->num_lines;
+      //int prev         = fi->num_lines;
+      int prev         = num_lines;
       get_full_statement();
       Line_prep p(full_statement);
       propstruct props = parseline(p);
@@ -70,13 +252,15 @@ void Fortran::handle_last_usable_only()
 	 case BLANK:
 	 case CASE:
 	 case CASEDEFAULT:
-	 case CLASSIS:
 	 case CLASSDEFAULT:
+	 case CLASSIS:
 	 case CONTAINS:
-	 case ENTRY:
 	 case ELSE:
 	 case ELSEIF:
 	 case ELSEWHERE:
+	 case ENTRY:
+	 case RANK:
+	 case RANKDEFAULT:
 	 case TYPEIS:
 	    break;
 	 default: 
@@ -100,10 +284,10 @@ void Fortran::get_full_statement()
    //
    // full_statement is used to determine the indentation
    //
-   // Also, every line is stored in 'lines'
+   // Also, every line is unmodified stored in 'c_lines'
    // 
    // If the input starts with a comment or a preprocessor line,
-   // full_statement = "", lines will contain the line, possibly
+   // full_statement = "", c_lines will contain the line, possibly
    // followed by preprocessor continuation lines as in:
    /* #define foo \   */
    //           bar
@@ -137,26 +321,39 @@ void Fortran::get_full_statement()
    //
 
    full_statement = "";
-   fi->indent_handled=0;
+   if(relabeling)
+      full_pos.clear();
+   indent_handled = 0;
+   pregion = 0;
 
    if (first_call)
    {
-      Curline = Getnext(End_of_file);
-      first_call = 0;
+      Curline     = Getnext(End_of_file);
+      first_call  = 0;
    }
 
-   while(!curlines.empty())
-      curlines.pop_back();
+   c_lines.clear();
+   if(relabeling)
+      full_pos.clear();
 
    while(1)
    {
+      D(O("State:");O(state);O(fs_store.size());O(Curline.str()););
       switch(state)
       {
 	 case start:
 	    if (fs_store.empty())
+	    {
 	       full_statement = "";
+	       if(relabeling)
+		  full_pos.clear();
+	    }
 	    else
+	    {
 	       full_statement = fs_store.back();
+	       if(relabeling)
+		  full_pos    = fp_store.back();
+	    }
 
 	    if (End_of_file) 
 	    {
@@ -189,8 +386,10 @@ void Fortran::get_full_statement()
 	    break;
 
 	 case in_ffix:
-	    curlines.push_back(Curline);
+	    Curline.preregion(pregion);
+	    c_lines.push_back(Curline);
 	    full_statement = rtrim(remove_trailing_comment(Curline.rest()));
+	    // todo full_pos
 	    Curline = Getnext(End_of_file);
 	    state = start;
 	    return;
@@ -198,7 +397,9 @@ void Fortran::get_full_statement()
 	 case in_fortran:
 	    if(End_of_file) { state = end_fortran; break; }
 
+	    Curline.preregion(pregion);
 	    build_statement(Curline, f_more, pushback);
+	    D(O("Full_statement ");O(Curline.str());O(f_more);O(pushback););
 
 	    if (f_more)
 	    {
@@ -211,7 +412,8 @@ void Fortran::get_full_statement()
 		  while (1)
 		  {
 		     handle_pre(Curline,p_more);
-		     curlines.push_back(Curline);
+		     Curline.preregion(pregion);
+		     c_lines.push_back(Curline);
 		     if(p_more)
 		     {
 			Curline = Getnext(End_of_file); 
@@ -250,7 +452,8 @@ void Fortran::get_full_statement()
 	    while(1)
 	    {
 	       handle_pre(Curline,p_more);
-	       curlines.push_back(Curline);
+	       Curline.preregion(pregion);
+	       c_lines.push_back(Curline);
 	       if(p_more)
 	       {
 		  Curline = Getnext(End_of_file); 
@@ -304,24 +507,30 @@ void Fortran::handle_pre(Fortranline &line, bool &p_more)
 	 case FINDENTFIX:
 	    break;
 	 default:
-	    ifelse = prea.analyze(line.trimmed_line(), pretype);
+	    ifelse = prea.analyze(pretype);
 	    switch(ifelse)
 	    {
 	       case Pre_analyzer::PRE_IF:
+		  pregion++;
 		  push_all();
 		  break;
 
 	       case Pre_analyzer::PRE_ELIF:
+		  pregion++;
 		  top_all();
 		  break;
 
 	       case Pre_analyzer::PRE_ELSE:
+		  pregion++;
 		  top_all();
+		  // fall through
 	       case Pre_analyzer::PRE_ENDIF:
+		  pregion++;
 		  pop_all();
 		  break;
 
 	       case Pre_analyzer::PRE_ENDIFE:
+		  pregion++;
 		  break;
 
 	       default:
@@ -333,26 +542,80 @@ void Fortran::handle_pre(Fortranline &line, bool &p_more)
 	    {
 	       case Pre_analyzer::PRE_IF:
 		  fs_store.push_back(full_statement);
+		  D(O("full in if");O(full_statement););
+		  cl_store.push_back(c_lines);
+		  if(relabeling)
+		     fp_store.push_back(full_pos);
 		  break;
 
 	       case Pre_analyzer::PRE_ELIF:
 		  if(fs_store.empty())
+		  {
 		     full_statement = "";
+		     cl_store.clear();
+		     if(relabeling)
+			full_pos.clear();
+		  }
 		  else
+		  {
 		     full_statement = fs_store.back();
+
+		     lines_t x      = cl_store.back();
+		     for (size_t i = 0; i<x.size(); ++i)
+		     {
+			x[i].written(true);
+			D(O("marked as written");O(x[i].written());O(x[i].str()););
+		     }
+		     while(x.size())
+		     {
+			c_lines.push_back(x[0]);
+			x.pop_front();
+		     }
+		     if(relabeling)
+			full_pos    = fp_store.back();
+		  }
 		  break;
 
 	       case Pre_analyzer::PRE_ELSE:
 		  if(fs_store.empty())
+		  {
 		     full_statement = "";
+		     cl_store.clear();
+		     if(relabeling)
+			full_pos.clear();
+		     D(O("full in else");O(full_statement););
+		  }
 		  else
+		  {
 		     full_statement = fs_store.back();
+		     D(O("full in else");O(full_statement););
+		     lines_t x      = cl_store.back();
+		     for (size_t i = 0; i<x.size(); ++i)
+		     {
+			x[i].written(true);
+			D(O("marked as written");O(x[i].written());O(x[i].str()););
+		     }
+		     while(x.size())
+		     {
+			c_lines.push_back(x[0]);
+			x.pop_front();
+		     }
+
+		     if(relabeling)
+			full_pos    = fp_store.back();
+		  }
 		  break;
 
 	       case Pre_analyzer::PRE_ENDIF:
 	       case Pre_analyzer::PRE_ENDIFE:
+		  D(O("#endif stack:");O(fs_store.size()););
 		  if(!fs_store.empty())
+		  {
 		     fs_store.pop_back();
+		     cl_store.pop_back();
+		     if(relabeling)
+			fp_store.pop_back();
+		  }
 		  break;
 	    }
 	    break;
@@ -374,49 +637,34 @@ void Fortran::indent_and_output()
    while(1)
    {
       Line_prep p(rest);
+      bool ch = p.contains_hollerith;
       propstruct props = parseline(p); 
-      fi->labellength = props.label.size();
-      if (fi->labellength > 0)
+      labellength      = props.stlabel.size();
+      if (labellength > 0)
 	 //
 	 // if there was a previous labeled do, handle it:
 	 //
       {
-	 int ilabel = string2number<int>(props.label);
+	 int ilabel = string2number<int>(props.stlabel);
 	 while ( top_dolabel() == ilabel )
 	 {
 	    pop_indent();
 	    pop_dolabel();
 	    Cur_indent = top_indent();
-	    fi->indent_handled = 1;
+	    //fi->indent_handled = 1;
+	    indent_handled = 1;
 	 }
       }
       //
       // if the previous non-blank line was PROCEDURE (module procedure)
-      // then determine if this was a procedure with content
+      // then determine if this was a procedure with executable content
       // if so: take delayed action with respect to indenting
       //
       if (prev_props.kind == PROCEDURE)
       {
-	 switch (props.kind)
+	 switch (props.type)
 	 {
-	    case ASSIGNMENT:
-	    case UNCLASSIFIED:
-	    case BLOCK:
-	    case CHANGETEAM:
-	    case CONTAINS:
-	    case CRITICAL:
-	    case DO:
-	    case END:
-	    case ENDPROCEDURE:
-	    case ENTRY:
-	    case ENUM:
-	    case FORALL:
-	    case IF:
-	    case INCLUDE:
-	    case SELECTCASE:
-	    case SELECTTYPE:
-	    case TYPE:
-	    case WHERE:
+	    case EXEC:
 	       Cur_indent = top_indent();
 	       push_indent(Cur_indent + FLAGS.routine_indent);
 	       empty_dolabels();
@@ -428,14 +676,7 @@ void Fortran::indent_and_output()
       }
       Cur_indent = top_indent();
       refactor_end_found = 0;
-      //
-      // for every entity that is eligible for refacoring it's end
-      // e.g. subroutine
-      // we will push props on the rprops stack
-      // for every corresponding end-entity (e.g. endsubroutine) we will
-      // pop the rprops stack
-      // 
-      if (FLAGS.deps)
+      if (FLAGS.deps)   // determine dependencies
       {
 	 switch(props.kind)  /* handle includes etc */
 	 {
@@ -460,8 +701,28 @@ void Fortran::indent_and_output()
       }
       else
       {
+	 //
+	 // for every entity that is eligible for refactoring it's end
+	 // e.g. subroutine
+	 // we will push props on the rprops stack
+	 // for every corresponding end-entity (e.g. endsubroutine) we will
+	 // pop the rprops stack
+	 // 
 	 switch(props.kind)   //determine indent, refactor
 	 {
+	    case TYPE:
+	       Cur_indent = top_indent();
+	       push_indent(Cur_indent + FLAGS.type_indent);
+	       empty_dolabels();
+	       push_rprops(props);
+	       break;
+	    case INTERFACE:
+	       D(O("INTERFACE_NAME");O(props.name););
+	       Cur_indent = top_indent();
+	       push_indent(Cur_indent + FLAGS.interface_indent);
+	       empty_dolabels();
+	       push_rprops(props);
+	       break;
 	    case SUBROUTINE:
 	    case FUNCTION:
 	    case PROGRAM:
@@ -496,24 +757,28 @@ void Fortran::indent_and_output()
 	       empty_dolabels();
 	       break;
 	    case ABSTRACTINTERFACE:
-	    case INTERFACE:
+	       D(O("ABSTRACTINTERFACE"););
 	       Cur_indent = top_indent();
 	       push_indent(Cur_indent + FLAGS.interface_indent);
 	       empty_dolabels();
+	       push_rprops(props);
 	       break;
 	    case DO:
 	       Cur_indent = top_indent();
 	       push_indent(Cur_indent + FLAGS.do_indent);
-	       if (props.dolabel != "")
-		  push_dolabel(string2number<int>(props.dolabel));
+	       if (props.labels.size() != 0)
+		  push_dolabel(string2number<int>(props.labels[0]));
 	       break;
 	    case SELECTCASE:
+	    case SELECTRANK:
 	    case SELECTTYPE:
 	       Cur_indent = top_indent();
 	       push_indent(Cur_indent + FLAGS.select_indent);
 	       break;
 	    case CASE:
 	    case CASEDEFAULT:
+	    case RANK:
+	    case RANKDEFAULT:
 	    case CLASSDEFAULT:
 	    case CLASSIS:
 	    case TYPEIS:
@@ -526,11 +791,14 @@ void Fortran::indent_and_output()
 	    case ENDPROCEDURE:
 	    case ENDPROGRAM:
 	    case ENDSUBROUTINE:
-	       refactor_end_found = 1;
-	       if (!fi->indent_handled)
+	    case ENDSUBMODULE:
+	    case ENDINTERFACE:
+	    case ENDTYPE:
+	       if (!indent_handled)
 		  Cur_indent = pop_indent();
 	       cur_rprop = top_rprops();
 	       pop_rprops();
+	       refactor_end_found = (cur_rprop.kind != ABSTRACTINTERFACE);
 	       break;
 	    case ENDASSOCIATE:
 	    case ENDBLOCK:
@@ -539,13 +807,10 @@ void Fortran::indent_and_output()
 	    case ENDENUM:
 	    case ENDFORALL:
 	    case ENDIF:
-	    case ENDINTERFACE:
 	    case ENDSELECT:
-	    case ENDSUBMODULE:
 	    case ENDTEAM:
-	    case ENDTYPE:
 	    case ENDWHERE:
-	       if (!fi->indent_handled)
+	       if (!indent_handled)
 		  Cur_indent = pop_indent();
 	       break;
 	    case PROCEDURE:  // in fact: moduleprocedure
@@ -560,7 +825,7 @@ void Fortran::indent_and_output()
 		  Cur_indent -= FLAGS.contains_indent;
 	       else
 	       {
-		  Cur_indent = fi->start_indent;
+		  Cur_indent = start_indent;
 		  pop_indent();
 		  push_indent(Cur_indent);
 	       }
@@ -589,18 +854,14 @@ void Fortran::indent_and_output()
 	       Cur_indent = top_indent();
 	       push_indent(Cur_indent + FLAGS.associate_indent);
 	       break;
-	    case TYPE:
-	       Cur_indent = top_indent();
-	       push_indent(Cur_indent + FLAGS.type_indent);
-	       break;
 	    case FORALL:
 	       Cur_indent = top_indent();
 	       push_indent(Cur_indent + FLAGS.forall_indent);
 	       break;
 	    case INCLUDE:
-	       D(O("INCLUDE");O(FLAGS.include_left);O(fi->start_indent););
+	       D(O("INCLUDE");O(FLAGS.include_left);O(start_indent););
 	       if (FLAGS.include_left)
-		  Cur_indent = fi->start_indent;
+		  Cur_indent = start_indent;
 	       else
 		  Cur_indent = top_indent();
 	       break;
@@ -610,7 +871,7 @@ void Fortran::indent_and_output()
 	       push_indent(Cur_indent + FLAGS.segment_indent);
 	       break;
 	    case ENDSEGMENT:
-	       if (!fi->indent_handled)
+	       if (!indent_handled)
 		  Cur_indent = pop_indent();
 	       break;
 #endif
@@ -627,7 +888,7 @@ void Fortran::indent_and_output()
 	 }
 	 if(first_time)  // check to handle multi-statement line like x=1;y=3
 	 {
-	    output_line();
+	    output_line(ch);
 	    first_time = 0;
 	 }
       }
@@ -637,9 +898,9 @@ void Fortran::indent_and_output()
    }
 }               // end of indent_and_output
 
-void Fortran::output_line()
+void Fortran::output_line(bool ch)
 {
-   if (curlines.empty())
+   if (c_lines.empty())
       return;
 
    mycout.reset();
@@ -651,25 +912,24 @@ void Fortran::output_line()
       //
       // no indentation requested:
       //
-      while (! curlines.empty())
+      while (!c_lines.empty())
       {
-	 mycout << curlines.front().str() << Endline;
-	 curlines.pop_front();
+	 if(!c_lines.front().written())
+	    mycout << c_lines.front().str() << Endline;
+	 c_lines.pop_front();
       }
       return;
    }
 
    if (fi->input_format == fi->output_format)
-      output(curlines);
+      output(c_lines,ch);
    else
-      output_converted(curlines);
-
-
+      output_converted(c_lines,ch);
 }           // end of output_line
 
 void Fortran::handle_refactor()
 {
-   if (FLAGS.refactor_routines && refactor_end_found)
+   if (FLAGS.refactor_end && refactor_end_found)
    {
       //
       // handle refactor routines
@@ -681,8 +941,8 @@ void Fortran::handle_refactor()
 	 // first, we have to locate that line, the back of the deque
 	 // could have comment or empty lines
 	 //
-	 lines_t::reverse_iterator it = curlines.rbegin();
-	 while (it != curlines.rend())
+	 lines_t::reverse_iterator it = c_lines.rbegin();
+	 while (it != c_lines.rend())
 	 {
 	    if ( it->blank_or_comment_or_pre() )
 	       it++;
@@ -694,9 +954,9 @@ void Fortran::handle_refactor()
 	 // returns false. The scanned characters will be replaced by something
 	 // like: 'end subroutine mysub'
 	 //
-	 //std::string s = curlines.back().trimmed_line();
+	 //std::string s = c_lines.back().trimmed_line();
 	 std::string s = it->trimmed_line();
-	 size_t startpos = s.find_first_not_of(' ',fi->labellength);
+	 size_t startpos = s.find_first_not_of(' ',labellength);
 	 size_t endpos   = s.length();
 	 for (size_t i=startpos; i<s.length(); i++)
 	 {
@@ -727,7 +987,7 @@ void Fortran::handle_refactor()
 	       break;
 	 }
 	 std::string replacement = "end " + whatrprop(cur_rprop);
-	 if (FLAGS.upcase_routine_type)
+	 if (FLAGS.upcase_end_type)
 	    replacement = stoupper(replacement);
 	 if (cur_rprop.name != "")
 	    replacement += " " + cur_rprop.name;

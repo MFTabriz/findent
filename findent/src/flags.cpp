@@ -1,3 +1,33 @@
+/* -copyright-
+#-# Copyright: 2015,2016,2017,2018,2019,2020,2021 Willem Vermin wvermin@gmail.com
+#-# 
+#-# License: BSD-3-Clause
+#-#  Redistribution and use in source and binary forms, with or without
+#-#  modification, are permitted provided that the following conditions
+#-#  are met:
+#-#  1. Redistributions of source code must retain the above copyright
+#-#     notice, this list of conditions and the following disclaimer.
+#-#  2. Redistributions in binary form must reproduce the above copyright
+#-#     notice, this list of conditions and the following disclaimer in the
+#-#     documentation and/or other materials provided with the distribution.
+#-#  3. Neither the name of the copyright holder nor the names of its
+#-#     contributors may be used to endorse or promote products derived
+#-#     from this software without specific prior written permission.
+#-#   
+#-#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#-#  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#-#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+#-#  A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE HOLDERS OR
+#-#  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+#-#  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#-#  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+#-#  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#-#  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+#-#  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+#-#  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+
 #include <getopt.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,9 +35,12 @@
 
 #include "debug.h"
 #include "flags.h"
-#include "parser.h"
+#include "parser.hpp"
 
 #define optargcheck if (!optarg || strlen(optarg)==0) break;
+
+const int RELABEL_START     = 1000;
+const int RELABEL_INCREMENT = 10;
 
 void Flags::set_defaults(void)
 {
@@ -15,25 +48,34 @@ void Flags::set_defaults(void)
    default_indent       = 3;
    all_indent           = default_indent;
 
+   align_paren          = 0;
    apply_indent         = 1;
    auto_firstindent     = 0;
    conchar              = ' ';
    deps                 = 0;
+   end_env_found        = 0;
    honour_omp           = 1;
    include_left         = include_left_default;
    input_format         = UNKNOWN;
    input_format_gnu     = 0;
    input_line_length    = 0;
    label_left           = 1;
+   label_left_set       = 0;
    last_indent_only     = 0;
    last_usable_only     = 0;
    max_indent           = 100;
    only_fix_free        = 0;
    output_format        = 0;
-   refactor_routines    = 0;
+   query_relabel        = 0;
+   refactor_end         = 0;
+   relabel              = 0;
+   relabel_reset        = 1;
+   relabel_start        = RELABEL_START;
+   relabel_increment    = RELABEL_INCREMENT;
    return_format        = 0;
+   safe                 = 0;
    start_indent         = 0;
-   upcase_routine_type  = 0;
+   upcase_end_type      = 0;
 
    set_default_indents();
 }
@@ -52,7 +94,7 @@ void Flags::set_default_indents()
    enum_indent         = all_indent;              // -E
    forall_indent       = all_indent;              // -F
    if_indent           = all_indent;              // -f
-   indent_cont         = 1;                       // !-k-
+   indent_continuation = 1;                       // !-k-
    indent_contain      = 1;                       // !-C-
    interface_indent    = all_indent;              // -j
    module_indent       = all_indent;              // -m
@@ -80,7 +122,7 @@ int Flags::get_flags(int argc, char *argv[])
       //
       // malloc enough space for all flags:
       //
-      allflags    = (char**) malloc(sizeof(char*)*(strlen(envflags)+argc));
+      allflags    = (char**) malloc(sizeof(char*)*(strlen(envflags)+argc+1));
       allflags[0] = argv[0];
       char *a  = strtok(envflags," \t:");
       while (a != 0)
@@ -91,9 +133,13 @@ int Flags::get_flags(int argc, char *argv[])
    }
    else
    {
-      allflags    = (char**) malloc(sizeof(char*)*argc);
+      allflags    = (char**) malloc(sizeof(char*)*(argc+1));
       allflags[0] = argv[0];
    }
+
+   // add sentinel to separate environment flags frol command line flags
+
+   allflags[nflags++] = (char*)"--end_of_env";
 
    for (int i = 1; i<argc; i++)
    {
@@ -155,6 +201,9 @@ int Flags::get_flags(int argc, char *argv[])
       {"indent_continuation", required_argument, 0, 'k'                  },
       {"indent-continuation", required_argument, 0, 'k'                  },
 
+      {"align_paren"        , optional_argument, 0, DO_ALIGN_PAREN       },
+      {"align-paren"        , optional_argument, 0, DO_ALIGN_PAREN       },
+
       {"last_indent"        , no_argument      , 0, DO_LAST_INDENT       },
       {"last-indent"        , no_argument      , 0, DO_LAST_INDENT       },
 
@@ -182,8 +231,19 @@ int Flags::get_flags(int argc, char *argv[])
       {"indent_procedure"   , required_argument, 0, 'r'                  },
       {"indent-procedure"   , required_argument, 0, 'r'                  },
 
-      {"refactor_procedures", optional_argument, 0, DO_REFACTOR_PROCEDURE},
-      {"refactor-procedures", optional_argument, 0, DO_REFACTOR_PROCEDURE},
+      {"refactor_end"       , optional_argument, 0, DO_REFACTOR_END      },
+      {"refactor-end"       , optional_argument, 0, DO_REFACTOR_END      },
+
+      {"refactor_procedures", optional_argument, 0, DO_REFACTOR_END      }, // deprecated
+      {"refactor-procedures", optional_argument, 0, DO_REFACTOR_END      }, // deprecated
+
+      {"relabel"            , optional_argument, 0, DO_RELABEL           },
+
+      {"relabel_reset"      , required_argument, 0, DO_RELABEL_RESET     },
+      {"relabel-reset"      , required_argument, 0, DO_RELABEL_RESET     },
+
+      {"query_relabel"      , optional_argument, 0, DO_QUERY_RELABEL     },
+      {"query-relabel"      , optional_argument, 0, DO_QUERY_RELABEL     },
 
 #ifdef USEESOPE
       {"indent_segment"     , required_argument, 0, DO_SEGMENT           },
@@ -235,11 +295,17 @@ int Flags::get_flags(int argc, char *argv[])
 
       {"readme"             , no_argument      , 0, DO_README            },
 
+      {"safe"               , no_argument      , 0, DO_SAFE              },
+
+      {"changelog"          , no_argument      , 0, DO_CHANGELOG         },
+
       {"makefdeps"          , no_argument      , 0, DO_MAKEFDEPS         },
 
       {"openmp"             , required_argument, 0, DO_OMP               },
 
       {"deps"               , no_argument,       0, DO_DEPS              },
+
+      {"end_of_env"         , no_argument,       0, DO_END_ENV           },
 
       {0,0,0,0}
    };
@@ -301,12 +367,12 @@ int Flags::get_flags(int argc, char *argv[])
 	    forall_indent     = atoi(optarg);  // --indent_forall=nn
 	    break;
 	 case 'h' :                            // --help
-	    //usage(0);
-	    retval = DO_USAGE;
+	    if(end_env_found)
+	       retval = DO_USAGE;
 	    break;
 	 case 'H':                             // --manpage
-	    //usage(1);
-	    retval = DO_MANPAGE;
+	    if(end_env_found)
+	       retval = DO_MANPAGE;
 	    break;
 	 case 'i' :                            // --input_format=fixed/free/auto
 	    optargcheck;
@@ -340,19 +406,30 @@ int Flags::get_flags(int argc, char *argv[])
 	    break;
 	 case 'k' :                           // --indent_continuation=nn/no
 	    optargcheck;
-	    if (strlen(optarg)>0 && (optarg[0] == '-' || !strcmp(optarg,"none")))
-	       indent_cont = 0;
+	    if (strlen(optarg)>0 && (optarg[0] == 'd' || !strcmp(optarg,"default")))
+	       indent_continuation = 1;
+	    else if (strlen(optarg)>0 && (optarg[0] == '-' || !strcmp(optarg,"none")))
+	       indent_continuation = 0;
 	    else
 	       cont_indent = atoi(optarg);
 	    break;
 	 case 'l' :
 	    optargcheck;
 	    if(std::string(optarg) == "astindent")       // --last_indent
-	       last_indent_only = 1;
+	    {
+	       if(end_env_found)
+		  last_indent_only = 1;
+	    }
 	    else if(std::string(optarg) == "astusable")  // --last_usable
-	       last_usable_only = 1;
+	    {
+	       if(end_env_found)
+		  last_usable_only = 1;
+	    }
 	    else
+	    {
 	       label_left     = (atoi(optarg) != 0);     // --label_left=0/1
+	       label_left_set = true;
+	    }
 	    break;
 	 case 'L' :
 	    optargcheck;
@@ -389,7 +466,8 @@ int Flags::get_flags(int argc, char *argv[])
 	    }
 	    break;
 	 case 'q' :                                    // --query_fix_free
-	    only_fix_free = 1;
+	    if (end_env_found)
+	       only_fix_free = 1;
 	    break;
 	 case 'Q':
 	    //
@@ -402,14 +480,15 @@ int Flags::get_flags(int argc, char *argv[])
 	    optargcheck;
 	    routine_indent    = atoi(optarg);
 	    break;
-	 case 'R':                                     // --refactor_procedures[=upcase]
+	 case 'R':                                     // --refactor_end[=upcase]
 	    optargcheck;
 	    switch(optarg[0])
 	    {
 	       case 'R' :
-		  upcase_routine_type = 1;
+		  upcase_end_type = 1;
+		  // fall through
 	       case 'r' :
-		  refactor_routines = 1;
+		  refactor_end = 1;
 		  break;
 	    }
 	    break;
@@ -422,7 +501,8 @@ int Flags::get_flags(int argc, char *argv[])
 	    type_indent       = atoi(optarg);       // --indent_type=nn
 	    break;
 	 case 'v' :
-	    retval = DO_VERSION;
+	    if(end_env_found)
+	       retval = DO_VERSION;
 	    break;
 	 case 'w' :
 	    optargcheck;
@@ -444,11 +524,19 @@ int Flags::get_flags(int argc, char *argv[])
 	       conchar = '&';
 	    break;
 	 case DO_DEPS:
-	    deps = 1;
+	    if(end_env_found)
+	       deps = 1;
 	    break;
 	 case DO_INCLUDE_LEFT:
 	    optargcheck;
 	    include_left       = (atoi(optarg) != 0);     // --include_left=0/1
+	    break;
+	 case DO_ALIGN_PAREN:
+	    align_paren = 1;
+	    if(optarg != 0 && strlen(optarg) > 0)
+	    {
+	       align_paren = (atoi(optarg) != 0);
+	    }
 	    break;
 	 case DO_INDENT_CONTAINS:
 	    optargcheck;
@@ -477,23 +565,65 @@ int Flags::get_flags(int argc, char *argv[])
 	    }
 	    break;
 	 case DO_LAST_INDENT:
-	    last_indent_only = 1;
+	    if(end_env_found)
+	       last_indent_only = 1;
 	    break;
 	 case DO_LAST_USABLE:
-	    last_usable_only = 1;
+	    if(end_env_found)
+	       last_usable_only = 1;
 	    break;
 	 case DO_LABEL_LEFT:
 	    optargcheck;
-	    label_left       = (atoi(optarg) != 0);     // --label_left=0/1
+	    label_left     = (atoi(optarg) != 0);     // --label_left=0/1
+	    label_left_set = true;
 	    break;
-	 case DO_REFACTOR_PROCEDURE:
-	    refactor_routines    = 1;
-	    upcase_routine_type  = 0;
+	 case DO_QUERY_RELABEL:
+	    if(end_env_found)
+	    {
+	       query_relabel = 2;
+	       relabel       = 1;
+	       if(optarg != 0 && strlen(optarg) > 0)
+	       {
+		  query_relabel = atoi(optarg);
+		  if(query_relabel < 0 || query_relabel > 2)
+		     query_relabel = 0;
+		  if(query_relabel == 0)
+		     relabel = 0;
+		  else
+		     relabel = 1;
+	       }
+	    }
+	    break;
+	 case DO_REFACTOR_END:
+	    refactor_end     = 1;
+	    upcase_end_type  = 0;
 	    if (optarg != 0 && strlen(optarg) > 0)
 	    {
 	       if (!strcmp(optarg,"upcase"))
-		  upcase_routine_type = 1;
+		  upcase_end_type = 1;
 	    }
+	    break;
+	 case DO_RELABEL:
+	    relabel = 1;
+	    if (optarg != 0 && strlen(optarg) > 0)
+	    {
+	       relabel_start = atoi(optarg);
+	       char *p = strchr(optarg,',');
+	       if (p)
+		  relabel_increment = atoi(p+1);
+	       if (relabel_start <= 0 || relabel_increment <= 0)
+		  relabel = 0;
+	    }
+	    break;
+	 case DO_RELABEL_RESET:
+	    optargcheck;
+	    relabel_reset = (atoi(optarg) != 0);
+	    break;
+	 case DO_SAFE:
+	    safe          = 1;
+	    end_env_found = 0;  // this is a hack: if we encounter --safe
+	    //                     we enter the state as if FINDENT_FLAGS
+	    //                     has not been parsed. 
 	    break;
 #ifdef USEESOPE
 	 case DO_SEGMENT:
@@ -508,6 +638,10 @@ int Flags::get_flags(int argc, char *argv[])
 	    else
 	       honour_omp = 1;
 	    break;
+	 case DO_END_ENV:
+	    end_env_found = 1;
+	    break;
+	 case DO_CHANGELOG:
 	 case DO_EMACS_FINDENT:
 	 case DO_EMACS_HELP:
 	 case DO_GEDIT_EXTERNAL:
@@ -519,7 +653,8 @@ int Flags::get_flags(int argc, char *argv[])
 	 case DO_VIM_FINDENT:
 	 case DO_VIM_FORTRAN:
 	 case DO_VIM_HELP:
-	    retval = c;
+	    if(end_env_found)
+	       retval = c;
 	    break;
       }
       if (retval != DO_NOTHING)

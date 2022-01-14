@@ -68,7 +68,7 @@
               enddo
               do 123 i=1,2
                  continue
-123           continue
+  123         continue
               print *,'; function ',indx," function "
               continue
 99880         FORMAT ('  function ')
@@ -99,9 +99,9 @@
                          call one(a)
                          do 7 j=1,20
                             call two(a)
-7                        x=x+j
+    7                    x=x+j
                          continue
-90                 continue
+   90              continue
                    continue
                  end block
               enddo loop
@@ -136,7 +136,7 @@
               endif wv
               if (.false.) goto 88
               if (.false.) goto 99999
-88            if ('x' .eq. "abc''d") l=1
+   88         if ('x' .eq. "abc''d") l=1
 99999         continue
               if ('x' .eq. "abc''d") l=1
               continue

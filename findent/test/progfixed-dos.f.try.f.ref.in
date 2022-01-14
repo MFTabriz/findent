@@ -53,9 +53,9 @@
                       call one(a)
                       do 7 j=1,20
                          call two(a)
-  7                   x=x+j
+    7                 x=x+j
                       continue
-  90            continue
+   90           continue
                 continue
               end block
            enddo
@@ -70,7 +70,7 @@
            end critical
            if (.false.) goto 88
            if (.false.) goto 99999
-  88       if ('x' .eq. "abc''d") l=1
+   88      if ('x' .eq. "abc''d") l=1
 99999      continue
            if ('x' .eq. "abc''d")then
                continue

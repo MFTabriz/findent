@@ -25,7 +25,7 @@
             MODULE SUBROUTINE sub2(arg2)
                  INTEGER :: arg2
             end subroutine sub2
-       END INTERFACE
+       end interface
   end module ancestor
 
   SUBMODULE (ancestor) descendant
@@ -59,23 +59,23 @@
        end type onetype
        type name
             character(22) :: n
-       end type
+       end type name
        type isname
             integer i
-       end type
+       end type isname
 
        complex ccc
        interface myinterface
             subroutine tx(a,b)
                  real a,b
             end subroutine tx
-       end interface
+       end interface myinterface
        interface anotherinterface
             module procedure funccc
 !
 !  ticket 8
             module procedure funcccc, funcy
-       end interface
+       end interface anotherinterface
        abstract interface
             character*8 recursive function func(x)
                  real :: x
@@ -429,7 +429,7 @@ defined(q)
        type domain_data
             real, dimension(:, :), allocatable :: temperature
             integer:: ibound, icopy, todomain
-       end type
+       end type domain_data
 
        type(domain_data), dimension(2), target :: dom
        allocate(dom(1) % temperature(20, 20))

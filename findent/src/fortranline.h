@@ -1,3 +1,32 @@
+/* -copyright-
+#-# Copyright: 2015,2016,2017,2018,2019,2020,2021 Willem Vermin wvermin@gmail.com
+#-# 
+#-# License: BSD-3-Clause
+#-#  Redistribution and use in source and binary forms, with or without
+#-#  modification, are permitted provided that the following conditions
+#-#  are met:
+#-#  1. Redistributions of source code must retain the above copyright
+#-#     notice, this list of conditions and the following disclaimer.
+#-#  2. Redistributions in binary form must reproduce the above copyright
+#-#     notice, this list of conditions and the following disclaimer in the
+#-#     documentation and/or other materials provided with the distribution.
+#-#  3. Neither the name of the copyright holder nor the names of its
+#-#     contributors may be used to endorse or promote products derived
+#-#     from this software without specific prior written permission.
+#-#   
+#-#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#-#  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#-#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+#-#  A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE HOLDERS OR
+#-#  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+#-#  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#-#  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+#-#  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#-#  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+#-#  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+#-#  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 #ifndef FORTRANLINE_H
 #define FORTRANLINE_H
 
@@ -5,7 +34,7 @@
 
 #include "functions.h"
 #include "lexer.h"
-#include "parser.h"
+#include "parser.hpp"
 #include "globals.h"
 #include "debug.h"
 
@@ -26,26 +55,27 @@ class Fortranline
    bool        omp_cache;          bool omp_cached;
    int         scanfixpre_cache;   bool scanfixpre_cached;
    std::string trim_cache;         bool trim_cached;
-   std::string incfile_cache;
+   std::string incfile_cache;      bool Written;
 
    bool     is_clean;
    Globals* gl;
    int      local_format;
    bool     local_gnu_format;
+   int      Preregion;
 
 
-   void init()
+   void init(void)
    {
       local_format      = gl->global_format;
       local_gnu_format  = gl->global_gnu_format;
 
-      is_clean          = 0;
+      is_clean          = false;
 
-      firstchar_cached  = 0;
-      ltrim_cached      = 0;
-      omp_cached        = 0;
-      scanfixpre_cached = 0;
-      trim_cached       = 0;
+      firstchar_cached  = false;
+      ltrim_cached      = false;
+      omp_cached        = false;
+      scanfixpre_cached = false;
+      trim_cached       = false;
    }
 
    void init(Globals* g)
@@ -54,14 +84,14 @@ class Fortranline
       init();
    }
 
-   void do_clean();
-   bool do_omp();
+   void do_clean(void);
+   bool do_omp(void);
 
    public:
 
-   void print();
+   void print(void);
 
-   void clean()
+   void clean(void)
    {
       if (is_clean)
 	 return;
@@ -77,18 +107,48 @@ class Fortranline
 	 clean();
    }
 
+   Fortranline()
+   {
+      Written  = false;
+      Preregion = 0;
+   }
+
    Fortranline(Globals* g)
    {
+      Written  = false;
+      Preregion = 0;
       init(g);
    }
 
    Fortranline(Globals*g, const std::string &s)
    {
+      Written  = false;
+      Preregion = 0;
       init(g);
       orig_line = s;
    }
 
-   std::string g_format2txt()
+   void written(bool w)
+   {
+      Written = w;
+   }
+
+   bool written(void)
+   {
+      return Written;
+   }
+
+   void preregion(int p)
+   {
+      Preregion = p;
+   }
+
+   int preregion(void)
+   {
+      return Preregion;
+   }
+
+   std::string g_format2txt(void)
    {
       switch(g_format())
       {
@@ -105,19 +165,19 @@ class Fortranline
 
    void g_format(const int what)    { gl->global_format = what; }
 
-   int g_format()                   { return gl->global_format; }
+   int g_format(void)               { return gl->global_format; }
 
    void line_length(const int what) { gl->global_line_length=what; }
 
-   int line_length()                { return gl->global_line_length; }
+   int line_length(void)            { return gl->global_line_length; }
 
    void gnu_format(bool what)       { gl->global_gnu_format=what; }
 
-   bool gnu_format()                { return gl->global_gnu_format; }
+   bool gnu_format(void)            { return gl->global_gnu_format; }
 
-   std::string str()                { return orig_line; }
+   std::string str(void)            { return orig_line; }
 
-   std::string strnomp()      
+   std::string strnomp(void)      
    {
       clean();
       return orig_without_omp; 
@@ -131,7 +191,7 @@ class Fortranline
       init();
    }
 
-   int format() const
+   int format(void) const
    {
       if (local_format == UNKNOWN)
 	 return gl->global_format;
@@ -139,7 +199,7 @@ class Fortranline
    }
 
 
-   std::string trimmed_line()
+   std::string trimmed_line(void)
    {
       //
       // result is different for FIXED or FREE, see below:
@@ -159,7 +219,7 @@ class Fortranline
       }
    }
 
-   std::string rtrim() 
+   std::string rtrim(void) 
    {
       if (omp())
 	 return ::rtrim(orig_without_omp);
@@ -167,7 +227,7 @@ class Fortranline
 	 return ::rtrim(orig_line);
    }
 
-   std::string ltrim()
+   std::string ltrim(void)
    {
       if (!ltrim_cached)
       {
@@ -180,7 +240,7 @@ class Fortranline
       return ltrim_cache;
    }
 
-   std::string trim() 
+   std::string trim(void) 
    {
       if (!trim_cached)
       {
@@ -193,7 +253,7 @@ class Fortranline
       return trim_cache;
    }
 
-   char firstchar() 
+   char firstchar(void) 
    {
       // returns first char of ltrim(), 0 if length()=0
       if (!firstchar_cached)
@@ -216,7 +276,7 @@ class Fortranline
 	 return 0;
    }
 
-   char lastchar() const
+   char lastchar(void) const
    {
       if (orig_line.length() > 0)
 	 return *orig_line.rbegin();
@@ -226,7 +286,7 @@ class Fortranline
 
    std::string first2chars() { return ltrim().substr(0,2); }
 
-   int scanfixpre()
+   int scanfixpre(void)
    {
       if(!scanfixpre_cached)
       {
@@ -249,7 +309,7 @@ class Fortranline
 	 return "";
    }
 
-   bool omp()
+   bool omp(void)
    {
       if (!omp_cached)
       {
@@ -259,7 +319,7 @@ class Fortranline
       return omp_cache;
    }
 
-   std::string rest() 
+   std::string rest(void) 
    {
       if(scanfixpre()==FINDENTFIX)
 	 return lexer_getrest();
@@ -267,9 +327,9 @@ class Fortranline
 	 return "";
    }
 
-   bool blank() { return (trim().length() == 0); }
+   bool blank(void) { return (trim().length() == 0); }
 
-   bool comment() 
+   bool comment(void) 
    {
       switch (format())
       {
@@ -298,9 +358,9 @@ class Fortranline
       return 0;
    }
 
-   bool blank_or_comment() { return blank() || comment(); }
+   bool blank_or_comment(void) { return blank() || comment(); }
 
-   int getpregentype() 
+   int getpregentype(void) 
    {
       int  pretype = scanfixpre();
       switch(pretype)
@@ -319,17 +379,17 @@ class Fortranline
       }
    }
 
-   bool precpp() { return firstchar() == '#'; }
+   bool precpp(void)                  { return firstchar() == '#'; }
 
-   bool precoco() { return first2chars() == "??"; }
+   bool precoco(void)                 { return first2chars() == "??"; }
 
-   bool pre() { return precpp() || precoco(); }
+   bool pre(void)                     { return precpp() || precoco(); }
 
-   bool blank_or_comment_or_pre() { return blank_or_comment() || pre(); }
+   bool blank_or_comment_or_pre(void) { return blank_or_comment() || pre(); }
 
-   bool fortran() { return !blank_or_comment_or_pre(); }
+   bool fortran(void)                 { return !blank_or_comment_or_pre(); }
 
-   bool fixedcontinuation() const
+   bool fixedcontinuation(void) const
    {
       //
       // returns 1 if the line, interpreted as a fixed format line,

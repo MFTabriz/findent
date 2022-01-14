@@ -51,7 +51,7 @@
   std::cout << " in gedit:" << std::endl;
   std::cout << "   (Edit ->) Preferences -> plugins -> check: findent" << std::endl;
   std::cout << "  findent is available in popup menu (right-click) and" << std::endl;
-  std::cout << "  shortcut <Ctrl><Alt>f . You can change that in " << std::endl;
+  std::cout << "  shortcut <Ctrl><Alt>i . You can change that in " << std::endl;
   std::cout << "  findent.py, look for the definition of 'shortcut'." << std::endl;
   std::cout << "" << std::endl;
   std::cout << "  Advantage of plugin over external tool: gedit scrolls" << std::endl;
@@ -59,7 +59,7 @@
   std::cout << "" << std::endl;
   std::cout << "Flags for findent:" << std::endl;
   std::cout << "" << std::endl;
-  std::cout << "  both the external command as the plugin pass the environment" << std::endl;
+  std::cout << "  Both the external command as the plugin pass the environment" << std::endl;
   std::cout << "  variable GEDIT_FINDENT_FLAGS to findent. Example: if you" << std::endl;
   std::cout << "  want general indentation set to 2 but indentation of do-loops" << std::endl;
   std::cout << "  set to 4, specify:" << std::endl;

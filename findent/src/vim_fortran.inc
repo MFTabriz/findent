@@ -32,6 +32,9 @@
   std::cout << "   finish" << std::endl;
   std::cout << "endif" << std::endl;
   std::cout << "" << std::endl;
+  std::cout << "\" no interesting side-effects caused by settings in FINDENT_FLAGS:" << std::endl;
+  std::cout << "let $FINDENT_FLAGS = \"\"" << std::endl;
+  std::cout << "" << std::endl;
   std::cout << "if !exists(\"b:use_findent_indentexpr\")" << std::endl;
   std::cout << "   let b:use_findent_indentexpr = 1" << std::endl;
   std::cout << "endif" << std::endl;
@@ -64,7 +67,7 @@
   std::cout << "\" The output of this external command must be \"free\" or \"fixed\"" << std::endl;
   std::cout << "function! Findent_get_freefixed()" << std::endl;
   std::cout << "   let indentparmsq = ' -q'" << std::endl;
-  std::cout << "   let f = g:findent.indentparmsq.' 2>/dev/null'" << std::endl;
+  std::cout << "   let f = g:findent.indentparmsq" << std::endl;
   std::cout << "   if strpart(system(f,\" continue\"),0,4) != \"free\"" << std::endl;
   std::cout << "      let f = \"\"" << std::endl;
   std::cout << "   endif" << std::endl;
@@ -75,9 +78,9 @@
   std::cout << "\" Return \"\" if no such command can be found" << std::endl;
   std::cout << "\" side effect: s:findent_getindent is the command tried" << std::endl;
   std::cout << "function! Findent_get_getindent()" << std::endl;
-  std::cout << "   let getindent=g:findent.' -Ia -lastindent -i'.b:fortran_format.' '.b:findent_flags.' 2>/dev/null'" << std::endl;
+  std::cout << "   let getindent=g:findent.' -Ia -lastindent -i'.b:fortran_format.' '.b:findent_flags" << std::endl;
   std::cout << "   let s:findent_getindent = getindent" << std::endl;
-  std::cout << "   if system(getindent,'    continue') == 4" << std::endl;
+  std::cout << "   if system(getindent,'      continue') == 6" << std::endl;
   std::cout << "      return getindent" << std::endl;
   std::cout << "   else" << std::endl;
   std::cout << "      return \"\"" << std::endl;
@@ -90,7 +93,7 @@
   std::cout << "function! Findent_get_indentprog()" << std::endl;
   std::cout << "   \" first a test:" << std::endl;
   std::cout << "   let indentparms = ' -Ia -i'.b:fortran_format.' '.b:findent_flags" << std::endl;
-  std::cout << "   let indentprog = g:findent.indentparms.' 2>/dev/null'" << std::endl;
+  std::cout << "   let indentprog = g:findent.indentparms" << std::endl;
   std::cout << "   let s:fortran_indentprog = indentprog" << std::endl;
   std::cout << "   if strpart(system(indentprog,\"continue\"),0,8) == \"continue\"" << std::endl;
   std::cout << "      return indentprog" << std::endl;
@@ -245,7 +248,7 @@
   std::cout << "   let g:fortran_free_source = 1" << std::endl;
   std::cout << "   let b:fortran_free_source = 1" << std::endl;
   std::cout << "   let b:fortran_fixed_source = 0" << std::endl;
-  std::cout << "   setlocal colorcolumn=133" << std::endl;
+  std::cout << "   \"setlocal colorcolumn=133" << std::endl;
   std::cout << "   if exists(\"g:findent_setcolumns\")" << std::endl;
   std::cout << "      if(g:findent_setcolumns)" << std::endl;
   std::cout << "	 setlocal numberwidth=6" << std::endl;
@@ -258,7 +261,7 @@
   std::cout << "   let g:fortran_fixed_source = 1" << std::endl;
   std::cout << "   let b:fortran_fixed_source = 1" << std::endl;
   std::cout << "   let b:fortran_free_source = 0" << std::endl;
-  std::cout << "   setlocal colorcolumn=6,73" << std::endl;
+  std::cout << "   \"setlocal colorcolumn=6,73" << std::endl;
   std::cout << "endif" << std::endl;
   std::cout << "" << std::endl;
   std::cout << "call Findent_set_indentprog()" << std::endl;

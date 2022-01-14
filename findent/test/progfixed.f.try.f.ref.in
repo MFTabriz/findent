@@ -109,9 +109,9 @@ c a comment
                       call one(a)
                       do 7 j=1,20
                          call two(a)
-  7                   x=x+j
+    7                 x=x+j
                       continue
-  90            continue
+   90           continue
                 continue
               end block
            enddo loop
@@ -146,7 +146,7 @@ c a comment
            endif wv
            if (.false.) goto 88
            if (.false.) goto 99999
-  88       if ('x' .eq. "abc''d") l=1
+   88      if ('x' .eq. "abc''d") l=1
 99999      continue
            if ('x' .eq. "abc''d") l=1
            continue
@@ -264,7 +264,7 @@ defined(q)
            type domain_data
                 real, dimension(:, :), allocatable :: temperature
                 integer:: ibound, icopy, todomain
-           end type
+           end type domain_data
 
            type(domain_data), dimension(2), target :: dom
            allocate(dom(1) % temperature(20, 20))
@@ -324,7 +324,7 @@ c$omp end parallel
            do 10
      x      0 i=1,10
               continue
-01 00      continue
+  100      continue
            do 02 0 i=1,10
               continue
    20      continue

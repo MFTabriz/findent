@@ -14,6 +14,34 @@
 
 @SET_MAKE@
 
+# -copyright-
+#-# Copyright: 2015,2016,2017,2018,2019,2020,2021 Willem Vermin wvermin@gmail.com
+#-# 
+#-# License: BSD-3-Clause
+#-#  Redistribution and use in source and binary forms, with or without
+#-#  modification, are permitted provided that the following conditions
+#-#  are met:
+#-#  1. Redistributions of source code must retain the above copyright
+#-#     notice, this list of conditions and the following disclaimer.
+#-#  2. Redistributions in binary form must reproduce the above copyright
+#-#     notice, this list of conditions and the following disclaimer in the
+#-#     documentation and/or other materials provided with the distribution.
+#-#  3. Neither the name of the copyright holder nor the names of its
+#-#     contributors may be used to endorse or promote products derived
+#-#     from this software without specific prior written permission.
+#-#   
+#-#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#-#  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#-#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+#-#  A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE HOLDERS OR
+#-#  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+#-#  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#-#  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+#-#  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#-#  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+#-#  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+#-#  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 VPATH = @srcdir@
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
@@ -106,7 +134,8 @@ am_findent_OBJECTS = debug.$(OBJEXT) docs.$(OBJEXT) findent.$(OBJEXT) \
 	flags.$(OBJEXT) fortran.$(OBJEXT) fortranline.$(OBJEXT) \
 	free.$(OBJEXT) functions.$(OBJEXT) globals.$(OBJEXT) \
 	line_prep.$(OBJEXT) mylexer.$(OBJEXT) myparser.$(OBJEXT) \
-	pre_analyzer.$(OBJEXT) prop.$(OBJEXT) simpleostream.$(OBJEXT)
+	pre_analyzer.$(OBJEXT) prop.$(OBJEXT) relabel.$(OBJEXT) \
+	simpleostream.$(OBJEXT)
 findent_OBJECTS = $(am_findent_OBJECTS)
 findent_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -132,7 +161,8 @@ am__depfiles_remade = ./$(DEPDIR)/debug.Po ./$(DEPDIR)/docs.Po \
 	./$(DEPDIR)/functions.Po ./$(DEPDIR)/globals.Po \
 	./$(DEPDIR)/line_prep.Po ./$(DEPDIR)/mylexer.Po \
 	./$(DEPDIR)/myparser.Po ./$(DEPDIR)/pre_analyzer.Po \
-	./$(DEPDIR)/prop.Po ./$(DEPDIR)/simpleostream.Po
+	./$(DEPDIR)/prop.Po ./$(DEPDIR)/relabel.Po \
+	./$(DEPDIR)/simpleostream.Po
 am__mv = mv -f
 CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
@@ -327,9 +357,10 @@ AM_LDFLAGS =
 MOSTLYCLEANFILES = 
 CLEANFILES = findent findent.exe findent.1 \
 	     parser.cpp.h parser.hpp parser_report.txt \
-	     parser.cpp parser.h lexer.cpp env.sh
+	     parser.cpp lexer.cpp env.sh \
+	     $(INCS)
 
-MAINTAINERCLEANFILES = builtparser.cpp builtparser.h builtlexer.cpp
+MAINTAINERCLEANFILES = builtparser.cpp builtparser.hpp builtlexer.cpp
 @MAKEMAN_TRUE@man1_MANS = findent.1
 DEPSDIR = $(top_srcdir)/deps
 EMACSDIR = $(top_srcdir)/emacs
@@ -338,13 +369,14 @@ READMEDIR = $(top_srcdir)/doc
 TOCPP = $(top_srcdir)/src/tocpp.sh
 VIMDIR = $(top_srcdir)/vim
 INCS = vim_fortran.inc vim_findent.inc vim_help.inc gedit_external.inc gedit_plugin.inc \
-       gedit_plugin_py.inc gedit_help.inc emacs_findent.inc emacs_help.inc readme.inc makefdeps.inc
+       gedit_plugin_py.inc gedit_help.inc emacs_findent.inc emacs_help.inc readme.inc makefdeps.inc \
+       changelog.inc
 
 findent_SOURCES = \
 		  debug.cpp              debug.h           \
 		  docs.cpp               docs.h            \
 		  findent.cpp            findent.h         \
-		                         findent_types.h   \
+		  findent_types.h   \
 		  findentclass.cpp       findentclass.h    \
 		  findentrun.cpp         findentrun.h      \
 		  fixed.cpp              fixed.h           \
@@ -354,19 +386,20 @@ findent_SOURCES = \
 		  free.cpp               free.h            \
 		  functions.cpp          functions.h       \
 		  globals.cpp            globals.h         \
-		                         lexer.h           \
+		  lexer.h           \
 		  line_prep.cpp          line_prep.h       \
 		  mylexer.cpp                              \
 		  myparser.cpp                             \
-		                         parser.h          \
+		  parser.hpp        \
 		  pre_analyzer.cpp       pre_analyzer.h    \
 		  prop.cpp               prop.h            \
+		  relabel.cpp            relabel.h         \
 		  simpleostream.h        simpleostream.cpp \
-                  version.h
+		  version.h
 
-BUILT_SOURCES = parser.cpp parser.h lexer.cpp env.sh
-EXTRA_DIST = lexer.l parser.y tocpp.sh builtparser.cpp \
-	      builtparser.h builtlexer.cpp $(INCS)
+BUILT_SOURCES = parser.cpp parser.hpp lexer.cpp env.sh
+EXTRA_DIST = lexer.l parser.y tocpp.sh \
+	      builtparser.cpp builtparser.hpp builtlexer.cpp
 
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -472,6 +505,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/myparser.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pre_analyzer.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/prop.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/relabel.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/simpleostream.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
@@ -685,6 +719,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/myparser.Po
 	-rm -f ./$(DEPDIR)/pre_analyzer.Po
 	-rm -f ./$(DEPDIR)/prop.Po
+	-rm -f ./$(DEPDIR)/relabel.Po
 	-rm -f ./$(DEPDIR)/simpleostream.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
@@ -748,6 +783,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/myparser.Po
 	-rm -f ./$(DEPDIR)/pre_analyzer.Po
 	-rm -f ./$(DEPDIR)/prop.Po
+	-rm -f ./$(DEPDIR)/relabel.Po
 	-rm -f ./$(DEPDIR)/simpleostream.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
@@ -787,16 +823,14 @@ uninstall-man: uninstall-man1
 .PRECIOUS: Makefile
 
 
-@USEBISON_TRUE@parser.cpp: parser.y
-@USEBISON_TRUE@	$(YACC) -o parser.cpp -d $?
-@USEBISON_TRUE@	if test -f parser.cpp.h ; then mv parser.cpp.h parser.h ; fi
-@USEBISON_TRUE@	if test -f parser.hpp ; then mv parser.hpp parser.h ; fi
-
-@USEBISON_TRUE@parser.h: parser.cpp
+@USEBISON_TRUE@parser.hpp parser.cpp: $(top_srcdir)/src/parser.y
+@USEBISON_TRUE@	$(YACC) -o parser.cpp -d $(top_srcdir)/src/parser.y
+@USEBISON_TRUE@	if test -f parser.cpp.h ; then mv parser.cpp.h parser.hpp ; fi
+@USEBISON_TRUE@	if test -f parser.h ; then mv parser.h parser.hpp ; fi
 
 @USEBISON_TRUE@builtparser: parser.cpp
 @USEBISON_TRUE@	mv parser.cpp builtparser.cpp
-@USEBISON_TRUE@	mv parser.h builtparser.h
+@USEBISON_TRUE@	mv parser.hpp builtparser.hpp
 
 @USEBISON_FALSE@parser.cpp: builtparser.cpp 
 @USEBISON_FALSE@	@echo ""
@@ -805,16 +839,18 @@ uninstall-man: uninstall-man1
 @USEBISON_FALSE@	@echo "*** available, or it was specified not to use bison. ***"
 @USEBISON_FALSE@	@echo "*** I will use the pre-built parser.                 ***"
 @USEBISON_FALSE@	@echo "********************************************************"
-@USEBISON_FALSE@	cp $? $@
+@USEBISON_FALSE@	cp builtparser.cpp $@
 
-@USEBISON_FALSE@parser.h: builtparser.h
-@USEBISON_FALSE@	cp $? $@
+@USEBISON_FALSE@parser.hpp: builtparser.hpp
+@USEBISON_FALSE@	cp builtparser.hpp $@
 
-@USEFLEX_TRUE@lexer.cpp: lexer.l
-@USEFLEX_TRUE@	$(LEX) -i -o lexer.cpp $?
+@USEFLEX_TRUE@mylexer.$(OBJEXT): lexer.cpp
+
+@USEFLEX_TRUE@lexer.cpp: lexer.l parser.hpp
+@USEFLEX_TRUE@	$(LEX) -i -o lexer.cpp $(top_srcdir)/src/lexer.l
 
 @USEFLEX_TRUE@builtlexer: lexer.cpp
-@USEFLEX_TRUE@	mv $? builtlexer.cpp
+@USEFLEX_TRUE@	mv lexer.cpp builtlexer.cpp
 
 @USEFLEX_FALSE@lexer.cpp: builtlexer.cpp
 @USEFLEX_FALSE@	@echo ""
@@ -823,26 +859,26 @@ uninstall-man: uninstall-man1
 @USEFLEX_FALSE@	@echo "*** available, or it was specified not to use flex. ***"
 @USEFLEX_FALSE@	@echo "*** I will use the pre-built lexer.                 ***"
 @USEFLEX_FALSE@	@echo "*******************************************************"
-@USEFLEX_FALSE@	cp $? $@
+@USEFLEX_FALSE@	cp builtlexer.cpp $@
 
 @MAKEMAN_TRUE@findent.1: findent
 @MAKEMAN_TRUE@	: | ./findent -H > $@
 
-findent.o: parser.h
+findent.$(OBJEXT): parser.hpp
 
-vim_plugin.o: vim_fortran.inc vim_findent.inc vim_help.inc
+vim_plugin.$(OBJEXT): vim_fortran.inc vim_findent.inc vim_help.inc
 
-gedit_plugin.o: gedit_external.inc gedit_plugin.inc gedit_plugin_py.inc \
+gedit_plugin.$(OBJEXT): gedit_external.inc gedit_plugin.inc gedit_plugin_py.inc \
    gedit_help.inc
 
-emacs_plugin.o: emacs_findent.inc emacs_help.inc
+emacs_plugin.$(OBJEXT): emacs_findent.inc emacs_help.inc
 
-readme_plugin.o: readme.inc
+readme_plugin.$(OBJEXT): readme.inc
 
-docs.o:    vim_fortran.inc vim_findent.inc vim_help.inc \
-	   gedit_external.inc gedit_plugin.inc gedit_plugin_py.inc gedit_help.inc \
-           emacs_findent.inc emacs_help.inc \
-	   readme.inc makefdeps.inc
+docs.$(OBJEXT):    vim_fortran.inc vim_findent.inc vim_help.inc \
+   gedit_external.inc gedit_plugin.inc gedit_plugin_py.inc gedit_help.inc \
+   emacs_findent.inc emacs_help.inc \
+   readme.inc makefdeps.inc changelog.inc
 
 vim_fortran.inc: $(VIMDIR)/fortran.vim $(TOCPP)
 	$(TOCPP) < $(VIMDIR)/fortran.vim > $@
@@ -877,7 +913,8 @@ readme.inc: $(READMEDIR)/README $(TOCPP)
 makefdeps.inc: $(DEPSDIR)/makefdeps $(TOCPP)
 	$(TOCPP) < $(DEPSDIR)/makefdeps > $@
 
-includes: $(INCS)
+changelog.inc: $(top_srcdir)/ChangeLog $(TOCPP)
+	$(TOCPP) < $(top_srcdir)/ChangeLog > $@
 
 # env.sh is used in the test directory
 
@@ -887,6 +924,7 @@ env.sh:
 	echo export FC=\"$(FC)\" >> $@
 @MAKEWIN_TRUE@	echo export WINDOWS=\"yes\" >> $@
 @MAKEWIN_FALSE@	echo export WINDOWS=\"no\" >> $@
+
 @USEESOPE_TRUE@	echo export ESOPE=\"yes\" >> $@
 @USEESOPE_FALSE@	echo export ESOPE=\"no\" >> $@
 

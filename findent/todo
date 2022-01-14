@@ -1,10 +1,17 @@
-fixed2free(): 
-         program p
-	 print *,"a
-        +b"
-	 end
-   should give with -ofree -L20:
-   program p
-      print *,"           &
-      &b"
-   end
+V left-right label also in fixed, default right -- will not do
+V prevent relabeling when preprocessor stmnt in continuation lines of labels list
+V implement --query-relabel
+V assert -> DL
+V do not use same space for relabeled labels
+V comprehensive relabel text in man page
+V omp test
+V investigate if label can be on more than one line  too complicated
+V Fatal error in buildstatement: make it an internal error - NO
+V extensive relabel test code
+V relabel testing with errors
+V test --query-relabel
+V internal error met labeldef 55555555555555555 ?
+V contains test
+V if label multiple defined: use first definition
+V test with double defined label
+V implement not resetting labelcounter

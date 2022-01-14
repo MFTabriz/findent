@@ -1,3 +1,32 @@
+/* -copyright-
+#-# Copyright: 2015,2016,2017,2018,2019,2020,2021 Willem Vermin wvermin@gmail.com
+#-# 
+#-# License: BSD-3-Clause
+#-#  Redistribution and use in source and binary forms, with or without
+#-#  modification, are permitted provided that the following conditions
+#-#  are met:
+#-#  1. Redistributions of source code must retain the above copyright
+#-#     notice, this list of conditions and the following disclaimer.
+#-#  2. Redistributions in binary form must reproduce the above copyright
+#-#     notice, this list of conditions and the following disclaimer in the
+#-#     documentation and/or other materials provided with the distribution.
+#-#  3. Neither the name of the copyright holder nor the names of its
+#-#     contributors may be used to endorse or promote products derived
+#-#     from this software without specific prior written permission.
+#-#   
+#-#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#-#  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#-#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+#-#  A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE HOLDERS OR
+#-#  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+#-#  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#-#  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+#-#  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#-#  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+#-#  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+#-#  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #include <algorithm>
 #include <sstream>
 #include <string>
@@ -11,23 +40,25 @@
 void Fixed::build_statement(Fortranline &line, bool &f_more, bool &pushback)
 {
    //
-   // adds line to curlines
+   // adds line to c_lines
    // adds line (stripped from comments, preprocessor stuff and 
    //    continuation stuff)  to full_statement
-   // f_more 1: more lines are to expected
-   //        0: this line is complete
+   // f_more true: more lines are to expected
+   //        false: this line is complete
    //
 
    pushback = 0;
+   f_more   = false;
 
    if (line.blank_or_comment())
    {
-      curlines.push_back(line);
+      c_lines.push_back(line);
 
-      if (curlines.size() ==1)
-	 f_more = 0;   // do not expect continuation lines
+      if (c_lines.size() ==1)
+	 f_more = false;   // do not expect continuation lines
       else
-	 f_more = 1;   // but here we do
+	 f_more = true;   // but here we do
+      D(O("FULL_fs_return");O(line.str());O(full_statement);O(f_more););
       return;
    }
 
@@ -39,9 +70,8 @@ void Fixed::build_statement(Fortranline &line, bool &f_more, bool &pushback)
    //
    if(!cleanfive(s))
    {
-      D(O("not clean");O(line););
-      curlines.push_back(line);
-      f_more = 1;
+      c_lines.push_back(line);
+      f_more = true;
       return;
    }
 
@@ -51,14 +81,44 @@ void Fixed::build_statement(Fortranline &line, bool &f_more, bool &pushback)
    //
    // this is a line with code
    //
-   if (curlines.empty())
+
+   // 
+   // check if this is the first line with proper fortran
+   //
+   bool first_fortran_line = true;
+   for(size_t i = 0; i< c_lines.size(); ++i)
+      if (c_lines[i].fortran())
+      {
+	 first_fortran_line = false;
+	 break;
+      }
+   if (first_fortran_line)
    {
       //
-      // this is the first line
+      // this is the first line with fortran content
       //
-      curlines.push_back(line);
+      c_lines.push_back(line);
       full_statement += trim(sl);
+      D(O("fs_build");O(full_statement););
       full_statement = rtrim(remove_trailing_comment(full_statement));
+      D(O("fs_build");O(full_statement););
+
+      // -------------------------------------
+      if(relabeling)
+      {
+	 size_t i = 0;
+	 int    l = 0;
+	 //while((line.str()[i] == ' ' || line.str()[i] == '\t') && i < line.str().size())
+	 while(i < sl.size() && (sl.at(i) == ' ' || sl.at(i) == '\t'))
+	 {
+	    i++;
+	    l++;
+	 }
+	 for(size_t i=0; i<full_statement.size(); i++)
+	    insert_in_full_pos(c_lines.size()-1,l+i);
+
+      }
+
       if (!f_more)
 	 f_more = wizard();     // is there a continuation line in the future?
       return;
@@ -75,27 +135,48 @@ void Fixed::build_statement(Fortranline &line, bool &f_more, bool &pushback)
       //
       pushback = 1;
       f_more   = 0;          // do not look for further continuation lines
+      D(O("FULL_fs_return");O(line.str());O(full_statement);O(f_more););
       return;
    }
    //
    // this is a continuation line
    //
-   curlines.push_back(line);
+   c_lines.push_back(line);
    full_statement += rtrim((rtrim(sl)+"      ").substr(6));
-   full_statement = rtrim(remove_trailing_comment(full_statement));
+   D(O("fs_build");O(full_statement););
+   full_statement  = rtrim(remove_trailing_comment(full_statement));
+   D(O("fs_build");O(full_statement););
+
+   // -------------------------------------------------------------
+
+   if(relabeling)
+   {
+      size_t m = full_pos.size();
+
+      int k = 6;
+      for (size_t i = m; i < full_statement.size(); i++)
+      {
+	 insert_in_full_pos(c_lines.size()-1,k++);
+      }
+   }
+
+
    if(!f_more)
       f_more = wizard();   // look for more continuation lines
+   D(O("FULL_fs_return");O(line.str());O(full_statement);O(f_more););
 }           // end of build_statement
 
 
-void Fixed::output(lines_t &lines,lines_t *freelines)
+void Fixed::output(lines_t &lines,bool contains_hollerith,lines_t *freelines)
 {
+   D(O("entering Fixed::output"););
    //
    // output lines input: fixed format, output: fixed format
    //
    // lines optionally start with comments and/or preprocessor lines
    // lines ends with a fortran line
    //
+   (void) contains_hollerith;  // not used
    const std::string continuations = 
       "123456789" 
       "abcdefghijklmnopqrstuvwxyz" 
@@ -113,8 +194,15 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
    {
       mycout.reset();
 
+      if(lines.front().written())
+      {
+	 lines.pop_front();
+	 continue;
+      }
+
       if(output_pre(lines,freelines))
 	 continue;
+
       if (lines.empty())
 	 return;
 
@@ -164,7 +252,8 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	       //
 	    {
 	       if(to_mycout)
-		  mycout << insert_omp(blanks(M(std::max(fi->cur_indent+6,1))));
+		  //mycout << insert_omp(blanks(M(std::max(fi->cur_indent+6,1))));
+		  mycout << insert_omp(blanks(M(std::max(cur_indent+6,1))));
 	       else
 	       {
 		  os << cmpstr << ' ';
@@ -245,10 +334,31 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	 //
 	 // output label field including possible continuation character
 	 //
-	 if(to_mycout)
-	    mycout << insert_omp(s.substr(0,6));
+	 std::string label;
+	 int         nlabel;
+	 if(is_omp)
+	 {
+	    unsigned int n;
+	    getstr_sp(s.substr(2,3),label,n);
+	    nlabel = 3;
+	 }
 	 else
-	    os << cmpstr << s.substr(0,5);
+	 {
+	    unsigned int n;
+	    getstr_sp(s.substr(0,5),label,n);
+	    nlabel = 5;
+	 }
+	 if (fi->flags.label_left)
+	    label = label + std::string(nlabel-label.size(),' ');
+	 else
+	    label = std::string(nlabel-label.size(),' ') + label;
+
+	 if(to_mycout)
+	    //mycout << insert_omp(s.substr(0,6));
+	    mycout << ompstr + label+s[5];
+	 else
+	    //os << cmpstr << s.substr(0,5);
+	    os << cmpstr << label + ' ';
 
 	 //
 	 // try to honour current indentation
@@ -279,7 +389,8 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 	 {
 	    case ' ' :   // no dangling strings, output with indent
 	       if(to_mycout)
-		  mycout << blanks(M(std::max(adjust_indent+fi->cur_indent,0))) 
+		  //mycout << blanks(M(std::max(adjust_indent+fi->cur_indent,0))) 
+		  mycout << blanks(M(std::max(adjust_indent+cur_indent,0))) 
 		     << trim(s.substr(6));
 	       else
 		  os << trim(s.substr(6));
@@ -343,11 +454,12 @@ void Fixed::output(lines_t &lines,lines_t *freelines)
 }     // end of output
 
 
-void Fixed::output_converted(lines_t &lines)
+void Fixed::output_converted(lines_t &lines, bool ch)
 {
+   D(O("fixed::output_converted "););
    lines_t freelines;
 
-   output(lines, &freelines);
+   output(lines, ch, &freelines);
 
    Globals oldgl = *gl;
    gl->global_format = FREE;
@@ -360,10 +472,13 @@ void Fixed::output_converted(lines_t &lines)
    //
    while(it != freelines.end()) 
    {
+      D(O((*it)););
       it->clean(1);
       it++;
    }
-   f.output(freelines);
+   f.cur_indent  = cur_indent;
+   f.labellength = labellength;
+   f.output(freelines, ch);
    (*gl) = oldgl;
 }    // end of output_converted
 
@@ -372,7 +487,7 @@ bool Fixed::wizard()
 {
    //
    // Look ahead to see if the next fixed-format fortran line is a continuation
-   // return 1 if a continuation is found, 0 otherwize.
+   // return true if a continuation is found, false otherwize.
    // For free format, always return 0.
    //
 
@@ -384,9 +499,10 @@ bool Fixed::wizard()
 
    while(1)
    {
-      line = fi->getnext(eof,0);
+      line = getnext(eof,0);
       if (eof)
 	 return 0;
+
 
       if (line.pre())
       {
@@ -396,7 +512,7 @@ bool Fixed::wizard()
 	    fi->handle_pre_light(line,p_more);
 	    if (p_more)
 	    {
-	       line = fi->getnext(eof,0);
+	       line = getnext(eof,0);
 	       if (eof)
 		  return 0;
 	    }
@@ -408,11 +524,13 @@ bool Fixed::wizard()
 	 continue;
       }
 
+
       if (line.fortran() && cleanfive(line.strnomp()))
       {
 	 //
 	 // return 1 if this is a fixed fortran continuation line
 	 //
+
 	 return line.fixedcontinuation();
       }
    }
@@ -432,13 +550,16 @@ bool Fixed::wizard(lines_t lines)
    while(it != lines.end())
    {
       if (it-> fortran() && cleanfive(it->strnomp()))
+      {
+	 D(O(it->str());O(it->fixedcontinuation()););
 	 return it->fixedcontinuation();
+      }
       it++;
    }
    return 0;
 }
 
-std::string Fixed::add_amp(const std::string s,const char p)
+std::string Fixed::add_amp(const std::string &s,const char p)
 {
    //
    // examples:

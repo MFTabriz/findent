@@ -1,7 +1,35 @@
+# -copyright-
+#-# Copyright: 2015,2016,2017,2018,2019,2020,2021 Willem Vermin wvermin@gmail.com
+#-# 
+#-# License: BSD-3-Clause
+#-#  Redistribution and use in source and binary forms, with or without
+#-#  modification, are permitted provided that the following conditions
+#-#  are met:
+#-#  1. Redistributions of source code must retain the above copyright
+#-#     notice, this list of conditions and the following disclaimer.
+#-#  2. Redistributions in binary form must reproduce the above copyright
+#-#     notice, this list of conditions and the following disclaimer in the
+#-#     documentation and/or other materials provided with the distribution.
+#-#  3. Neither the name of the copyright holder nor the names of its
+#-#     contributors may be used to endorse or promote products derived
+#-#     from this software without specific prior written permission.
+#-#   
+#-#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#-#  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#-#  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+#-#  A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE HOLDERS OR
+#-#  CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+#-#  EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#-#  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+#-#  PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#-#  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+#-#  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+#-#  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_INIT(findent, 3.1.5, wvermin@gmail.com)
+AC_INIT([findent], [4.1.3], [wvermin@gmail.com])
 AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
 AC_CONFIG_SRCDIR([src/findent.cpp])
@@ -106,7 +134,12 @@ AC_CONFIG_FILES([test/progfreefixed.f.try.f.ref])
 AC_CONFIG_FILES([test/progfreefixed.f])
 AC_CONFIG_FILES([test/esope.f.try.f.ref])
 AC_CONFIG_FILES([test/esope.f])
+AC_CONFIG_FILES([test/progrelabelfree.f])
+AC_CONFIG_FILES([test/progrelabelfree.f.try.f.ref])
+AC_CONFIG_FILES([test/progfixedrelabelfixed.f])
+AC_CONFIG_FILES([test/progfixedrelabelfixed.f.try.f.ref])
 
+AC_CONFIG_FILES([test/changelog.ref])
 AC_CONFIG_FILES([test/emacs_findent.ref])
 AC_CONFIG_FILES([test/emacs_help.ref])
 AC_CONFIG_FILES([test/gedit_external.ref])
@@ -127,7 +160,8 @@ AC_PROG_SED
 
 AC_LANG([C++])
 AC_HEADER_STDC
-AC_CHECK_HEADERS([iostream string stack vector cstdio queue algorithm sstream],[],AC_MSG_ERROR([Exiting])) 
+AC_CHECK_HEADERS([iostream string deque map algorithm sstream iomanip set typeinfo utility],[],AC_MSG_ERROR([Exiting])) 
+AC_CHECK_HEADERS([assert.h errno.h getopt.h inttypes.h stdio.h stdlib.h string.h unistd.h],[],AC_MSG_ERROR([Exiting])) 
 
 AC_OUTPUT(Makefile src/Makefile scripts/Makefile test/Makefile vim/Makefile 
 	  gedit/Makefile emacs/Makefile doc/Makefile deps/Makefile)
